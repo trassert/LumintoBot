@@ -1,0 +1,11 @@
+db/*
+images/*
+logs/*
+update/*
+
+bot.session
+bot.session-journal
+test.py
+test.txt
+
+**/__pycache__/
