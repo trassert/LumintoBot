@@ -178,6 +178,15 @@ def get_money(id):
         return 0
 
 
+def get_all_money():
+    'Получить все деньги'
+    with open(
+        path.join('db', 'money.json'), 'r', encoding='utf8'
+    ) as f:
+        data = json.load(f)
+        return sum(data.values())
+
+
 def add_money(id, count):
     id = str(id)
     with open(

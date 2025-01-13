@@ -5,7 +5,7 @@ import aiohttp
 import aiohttp.web
 
 from time import time
-from hashlib import sha1
+from hashlib import sha1, md5
 from requests import codes
 from os import listdir, path, remove
 from datetime import timedelta
@@ -37,7 +37,8 @@ from modules.db import (
     get_active,
     update_shop,
     set_warn,
-    get_warns
+    get_warns,
+    get_all_money
 )
 from modules.morphy import decline_number
 from modules.system_info import get_system_info
@@ -887,7 +888,19 @@ async def bot():
         if warns == settings('max_warns'):
             return await event.reply(phrase.max_warns)
 
+    async def all_money(event):
+        return await event.reply(
+            phrase.money.all_money.format(
+                decline_number(get_all_money(), 'изумруд')
+            )
+        )
+
     await bot_client.start(bot_token=settings("token_bot"))
+
+    'Все деньги'
+    bot_client.add_event_handler(
+        all_money, events.NewMessage(incoming=True, pattern="/банк")
+    )
 
     'Варн'
     bot_client.add_event_handler(
@@ -1225,6 +1238,37 @@ async def web_server():
         )
         return aiohttp.web.Response(text='ok')
 
+    async def servers(request):
+        data = await request.post()
+        username = data['username']
+        sign = data['sign']
+        time = data['time']
+        logger.warning(f'{username} проголосовал в {time} с хешем {sign}')
+        hash = md5(
+            f'{username}|{time}|{settings("servers_key")}'.encode()
+        ).hexdigest()
+        if sign != hash:
+            logger.warning('Хеш не совпал!')
+            logger.warning(f'Должен быть: {sign}')
+            logger.warning(f'Имеется: {hash}')
+            return aiohttp.web.Response(
+                text='Переданные данные не прошли проверку.'
+            )
+        tg_id = give_id_by_nick_minecraft(username)
+        if tg_id is not None:
+            add_money(tg_id, 10)
+            give = phrase.servers_money.format(
+                decline_number(10, 'изумруд')
+            )
+        else:
+            give = ''
+        await bot_client.send_message(
+            settings('default_chat'),
+            phrase.servers.format(nick=username, money=give),
+            link_preview=False
+        )
+        return aiohttp.web.Response(text='ok')
+
     async def version(request):
         q = request.query.get('q')
         try:
@@ -1251,6 +1295,7 @@ async def web_server():
     app.add_routes(
         [
             aiohttp.web.post('/hotmc', hotmc),
+            aiohttp.web.post('/servers', servers),
             aiohttp.web.get('/version', version),
         ]
     )
