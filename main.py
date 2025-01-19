@@ -37,7 +37,6 @@ from modules.db import (
     get_active,
     update_shop,
     set_warn,
-    get_warns,
     get_all_money
 )
 from modules.morphy import decline_number
@@ -141,7 +140,7 @@ async def bot():
 
     async def stat(event):
         entity = await bot_client.get_entity(event.sender_id)
-        if event.text.startswith('🗣'):
+        if event.text.startswith('‹'):
             if event.sender_id in settings('api_bot_id', log=False):
                 id = give_id_by_nick_minecraft(
                     event.text.split(

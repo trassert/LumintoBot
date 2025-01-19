@@ -1,0 +1,28 @@
+{
+    "theme": "desert",
+    "Грузовой бамбуковый плот": {
+        "name": "minecraft:bamboo_chest_raft",
+        "price": 2,
+        "value": 1
+    },
+    "Книга «Мягкое падение IV»": {
+        "name": "enchanted_book[stored_enchantments={levels:{feather_falling:4}}]",
+        "price": 25,
+        "value": 1
+    },
+    "Подзорная труба": {
+        "name": "minecraft:red_sandstone_stairs",
+        "price": 5,
+        "value": 1
+    },
+    "Резной красный песчаник": {
+        "name": "minecraft:chiseled_red_sandstone",
+        "price": 10,
+        "value": 20
+    },
+    "Чистая карта": {
+        "name": "minecraft:red_sandstone_stairs",
+        "price": 5,
+        "value": 1
+    }
+}

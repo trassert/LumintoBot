@@ -1,7 +1,13 @@
-db/*
+db/user_stats/*
+db/data.json
+db/minecraft.json
+db/money.json
+
 images/*
 logs/*
-update/*
+
+update/mods/*
+update/prog/*
 
 bot.session
 bot.session-journal
