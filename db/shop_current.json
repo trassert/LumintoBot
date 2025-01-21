@@ -1,28 +1,28 @@
 {
-    "theme": "desert",
-    "Грузовой бамбуковый плот": {
-        "name": "minecraft:bamboo_chest_raft",
-        "price": 2,
+    "theme": "raiders",
+    "Белая шерсть": {
+        "name": "minecraft:white_wool",
+        "price": 8,
+        "value": 48
+    },
+    "Бирка": {
+        "name": "minecraft:name_tag",
+        "price": 20,
         "value": 1
     },
-    "Книга «Мягкое падение IV»": {
-        "name": "enchanted_book[stored_enchantments={levels:{feather_falling:4}}]",
-        "price": 25,
-        "value": 1
-    },
-    "Подзорная труба": {
-        "name": "minecraft:red_sandstone_stairs",
-        "price": 5,
-        "value": 1
-    },
-    "Резной красный песчаник": {
-        "name": "minecraft:chiseled_red_sandstone",
+    "Волчья броня": {
+        "name": "minecraft:wolf_armor",
         "price": 10,
-        "value": 20
-    },
-    "Чистая карта": {
-        "name": "minecraft:red_sandstone_stairs",
-        "price": 5,
         "value": 1
+    },
+    "Динамит": {
+        "name": "minecraft:tnt",
+        "price": 24,
+        "value": 16
+    },
+    "Красная шерсть": {
+        "name": "minecraft:red_wool",
+        "price": 8,
+        "value": 32
     }
 }

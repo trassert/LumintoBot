@@ -5,6 +5,7 @@ from os import path, listdir
 from datetime import datetime, timedelta
 from random import choice
 from time import time
+from .random import weighted_choice
 
 logger = logging.getLogger(__name__)
 
@@ -256,7 +257,7 @@ def update_shop():
     themes = []
     for theme in data:
         themes.append(theme)
-    current_shop['theme'] = choice(themes)
+    current_shop['theme'] = weighted_choice(themes, settings('shop_weight'))
     current_items = []
     all_items = list(data[current_shop['theme']].keys())
     while len(current_items) != 5:

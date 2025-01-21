@@ -2,6 +2,7 @@ db/user_stats/*
 db/data.json
 db/minecraft.json
 db/money.json
+db/shop_current.json
 
 images/*
 logs/*

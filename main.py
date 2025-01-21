@@ -7,7 +7,7 @@ import aiohttp.web
 from time import time
 from hashlib import sha1, md5
 from requests import codes
-from os import listdir, path, remove
+from os import listdir, path
 from datetime import timedelta
 from random import choice, randint
 from rich.logging import RichHandler
@@ -21,7 +21,7 @@ from telethon.tl.types import (
 from telethon import events
 from telethon.sync import TelegramClient
 from telethon.tl.functions.users import GetFullUserRequest
-from telethon.errors import UserAdminInvalidError
+# from telethon.errors import UserAdminInvalidError
 
 from modules import phrases as phrase
 from modules.db import (
@@ -31,12 +31,8 @@ from modules.db import (
     get_shop,
     give_id_by_nick_minecraft,
     give_nick_by_id_minecraft,
-    give_stat,
     settings,
-    add_stat,
-    get_active,
     update_shop,
-    set_warn,
     get_all_money
 )
 from modules.morphy import decline_number
@@ -90,10 +86,10 @@ async def time_to_update_shop():
         today = datetime.now()
         last = get_last_update()
         seconds = (
-            timedelta(hours=3) - (today - last)
+            timedelta(hours=2) - (today - last)
         ).total_seconds()
         'Если время прошло'
-        if today - last > timedelta(hours=3):
+        if today - last > timedelta(hours=2):
             update_shop()
             settings('shop_version', settings('shop_version') + 1)
             settings(
@@ -128,8 +124,8 @@ async def async_ai_response(message):
 
 
 async def bot():
-    global bot_client
-    bot_client = TelegramClient(
+    global client
+    client = TelegramClient(
         session="bot",
         api_id=settings("api_id"),
         api_hash=settings("api_hash"),
@@ -138,103 +134,154 @@ async def bot():
         use_ipv6=True
     )
 
-    async def stat(event):
-        entity = await bot_client.get_entity(event.sender_id)
-        if event.text.startswith('‹'):
-            if event.sender_id in settings('api_bot_id', log=False):
-                id = give_id_by_nick_minecraft(
-                    event.text.split(
-                        '›'
-                    )[0].split(
-                        '‹'
-                    )[1]
-                )
-                if id is not None:
-                    add_stat(id)
-        try:
-            if not entity.bot:
-                add_stat(event.sender_id)
-        except AttributeError:
-            pass
+    # async def stat(event):
+    #     entity = await client.get_entity(event.sender_id)
+    #     if event.text.startswith('‹'):
+    #         if event.sender_id in settings('api_bot_id', log=False):
+    #             id = give_id_by_nick_minecraft(
+    #                 event.text.split(
+    #                     '›'
+    #                 )[0].split(
+    #                     '‹'
+    #                 )[1]
+    #             )
+    #             if id is not None:
+    #                 add_stat(id)
+    #     try:
+    #         if not entity.bot:
+    #             add_stat(event.sender_id)
+    #     except AttributeError:
+    #         pass
 
-    async def push_unactive(event):
-        participants = await bot_client.get_participants(
-            settings('default_chat')
-        )
-        list_ids = [user.id for user in participants]
-        list_db = []
-        for filename in listdir(path.join('db', 'user_stats')):
-            if filename.endswith('.json'):
-                list_db.append(int(filename.replace('.json', '')))
-        list_names = []
-        for id in list_ids:
-            if id not in list_db:
-                user = await bot_client.get_entity(id)
-                if not user.bot:
-                    if user.username:
-                        list_names.append(
-                            f'@{user.username}'
-                        )
-                    else:
-                        list_names.append(
-                            f'[{user.first_name}](tg://user?id={id})'
-                        )
-        return await event.reply(
-            phrase.unactive+' '.join(list_names)
-        )
+    # async def push_unactive(event):
+    #     participants = await client.get_participants(
+    #         settings('default_chat')
+    #     )
+    #     list_ids = [user.id for user in participants]
+    #     list_db = []
+    #     for filename in listdir(path.join('db', 'user_stats')):
+    #         if filename.endswith('.json'):
+    #             list_db.append(int(filename.replace('.json', '')))
+    #     list_names = []
+    #     for id in list_ids:
+    #         if id not in list_db:
+    #             user = await client.get_entity(id)
+    #             if not user.bot:
+    #                 if user.username:
+    #                     list_names.append(
+    #                         f'@{user.username}'
+    #                     )
+    #                 else:
+    #                     list_names.append(
+    #                         f'[{user.first_name}](tg://user?id={id})'
+    #                     )
+    #     return await event.reply(
+    #         phrase.unactive+' '.join(list_names)
+    #     )
 
-    async def stat_check(event):
-        try:
-            days = int(
-                event.text.replace(
-                    '/моя стата', ''
-                ).replace(
-                    '/mystat', ''
-                ).replace(
-                    '/мстат', ''
-                ).replace(
-                    'сколько я написал', ''
-                )
-            )
-        except ValueError:
-            days = 1
-        return await event.reply(
-            phrase.stat.format(
-                messages=give_stat(event.sender_id, days),
-                time=days
-            )
-        )
+    # async def stat_check(event):
+    #     try:
+    #         days = int(
+    #             event.text.replace(
+    #                 '/моя стата', ''
+    #             ).replace(
+    #                 '/mystat', ''
+    #             ).replace(
+    #                 '/мстат', ''
+    #             ).replace(
+    #                 'сколько я написал', ''
+    #             )
+    #         )
+    #     except ValueError:
+    #         days = 1
+    #     return await event.reply(
+    #         phrase.stat.format(
+    #             messages=give_stat(event.sender_id, days),
+    #             time=days
+    #         )
+    #     )
 
-    async def active_check(event):
-        try:
-            days = int(
-                event.text.replace(
-                    '/актив', ''
-                ).replace(
-                    '/топ актив', ''
-                ).replace(
-                    '/топ соо', ''
-                ).replace(
-                    '/top active', ''
-                )
-            )
-        except ValueError:
-            days = 1
-        text = phrase.active.format(days)
-        n = 1
-        for data in get_active(days):
-            try:
-                if data[1] != 1:
-                    entity = await bot_client.get_entity(int(data[0]))
-                    name = entity.first_name
-                    if entity.last_name is not None:
-                        name += f' {entity.last_name}'
-                    text += f'{n}. {name}: {data[1]}\n'
-                    n += 1
-            except ValueError as e:
-                logger.error(e)
-                remove(path.join('db', 'user_stats', f'{data[0]}.json'))
-        return await event.reply(text)
+    # async def active_check(event):
+    #     try:
+    #         days = int(
+    #             event.text.replace(
+    #                 '/актив', ''
+    #             ).replace(
+    #                 '/топ актив', ''
+    #             ).replace(
+    #                 '/топ соо', ''
+    #             ).replace(
+    #                 '/top active', ''
+    #             )
+    #         )
+    #     except ValueError:
+    #         days = 1
+    #     text = phrase.active.format(days)
+    #     n = 1
+    #     for data in get_active(days):
+    #         try:
+    #             if data[1] != 1:
+    #                 entity = await client.get_entity(int(data[0]))
+    #                 name = entity.first_name
+    #                 if entity.last_name is not None:
+    #                     name += f' {entity.last_name}'
+    #                 text += f'{n}. {name}: {data[1]}\n'
+    #                 n += 1
+    #         except ValueError as e:
+    #             logger.error(e)
+    #             remove(path.join('db', 'user_stats', f'{data[0]}.json'))
+    #     return await event.reply(text)
+    # async def mute_user(event):
+    #     if event.sender_id not in settings('admins_id'):
+    #         return await event.reply(phrase.no_perm)
+    #     args = event.text.split(" ", maxsplit=3)[1:]
+    #     if args[0] in ['помощь', 'help']:
+    #         return await event.reply(phrase.mute_help)
+    #     user_link = args[0]
+    #     if len(args) > 2:
+    #         reason = ' '.join(args[2:])
+    #     else:
+    #         reason = 'Нет'
+    #     if '.' in args[1]:
+    #         stamp = args[1].split(".")
+    #         if len(stamp) == 3:
+    #             until_date = timedelta(
+    #                 minutes=int(stamp[0]),
+    #                 hours=int(stamp[1]),
+    #                 days=int(stamp[2])
+    #             )
+    #         elif len(stamp) == 2:
+    #             until_date = timedelta(
+    #                 minutes=int(stamp[0]),
+    #                 hours=int(stamp[1]),
+    #             )
+    #         else:
+    #             return await event.reply(phrase.mute_time_error)
+    #     else:
+    #         until_date = timedelta(minutes=int(args[1]))
+    #     user = await client.get_entity(user_link)
+    #     try:
+    #         await client.edit_permissions(
+    #             entity=event.chat_id,
+    #             user=user.id,
+    #             send_messages=False,
+    #             send_media=False,
+    #             send_stickers=False,
+    #             send_gifs=False,
+    #             send_games=False,
+    #             send_inline=False,
+    #             send_polls=False,
+    #             until_date=until_date
+    #         )
+    #         return await event.reply(
+    #             phrase.muted.format(
+    #                 user=user.first_name,
+    #                 time=str(until_date).replace(':00', '').replace('day', 'дней'),
+    #                 reason=reason
+    #             ),
+    #         )
+    #     except UserAdminInvalidError:
+    #         return await event.reply(phrase.is_admin)
 
     async def link_nick(event):
         nick = event.text.split(' ', maxsplit=1)[1].strip()
@@ -343,11 +390,11 @@ async def bot():
                 "current_game",
                 {"hints": [], "word": word, "unsec": unsec}
             )
-            bot_client.add_event_handler(
+            client.add_event_handler(
                 crocodile_hint,
                 events.NewMessage(incoming=True, pattern="/подсказка")
             )
-            bot_client.add_event_handler(
+            client.add_event_handler(
                 crocodile_handler,
                 events.NewMessage(incoming=True, chats=event.chat_id)
             )
@@ -364,8 +411,8 @@ async def bot():
             word = settings("current_game")["word"]
             settings("current_game", 0)
             settings('crocodile_last_hint', 0)
-            bot_client.remove_event_handler(crocodile_hint)
-            bot_client.remove_event_handler(crocodile_handler)
+            client.remove_event_handler(crocodile_hint)
+            client.remove_event_handler(crocodile_handler)
             return await event.reply(phrase.crocodile.down.format(word))
         elif data.decode('utf-8').startswith('shop'):
             args = data.decode('utf-8').split('.')
@@ -476,8 +523,8 @@ async def bot():
                 settings('crocodile_super_game', 0)
                 settings('max_bet', settings('default_max_bet'))
                 settings('min_bet', settings('default_min_bet'))
-            bot_client.remove_event_handler(crocodile_hint)
-            bot_client.remove_event_handler(crocodile_handler)
+            client.remove_event_handler(crocodile_hint)
+            client.remove_event_handler(crocodile_handler)
             return await event.reply(
                 phrase.crocodile.win.format(current_word)+bets_str
             )
@@ -609,7 +656,7 @@ async def bot():
         settings('crocodile_super_game', 1)
         settings('max_bet', 100)
         settings('min_bet', 50)
-        await bot_client.send_message(
+        await client.send_message(
             settings('default_chat'), phrase.crocodile.super_game_wait
         )
         await asyncio.sleep(60)
@@ -621,15 +668,15 @@ async def bot():
                 'word': arg
             }
         )
-        bot_client.add_event_handler(
+        client.add_event_handler(
             crocodile_hint,
             events.NewMessage(incoming=True, pattern="/подсказка")
         )
-        bot_client.add_event_handler(
+        client.add_event_handler(
             crocodile_handler,
             events.NewMessage(incoming=True, chats=settings('default_chat'))
         )
-        return await bot_client.send_message(
+        return await client.send_message(
             settings('default_chat'), phrase.crocodile.super_game
         )
 
@@ -683,7 +730,7 @@ async def bot():
         if event.sender_id != settings('creator'):
             return await event.reply(phrase.no_perm)
         tag = event.text.split(" ", maxsplit=1)[1]
-        user = await bot_client(
+        user = await client(
             GetFullUserRequest(tag)
         )
         admins = settings('admins_id')
@@ -697,65 +744,13 @@ async def bot():
         if event.sender_id != settings('creator'):
             return await event.reply(phrase.no_perm)
         tag = event.text.split(" ", maxsplit=1)[1]
-        user = await bot_client(
+        user = await client(
             GetFullUserRequest(tag)
         )
         admins = settings('admins_id')
         admins.remove(user.full_user.id)
         settings('admins_id', admins)
         return await event.reply(phrase.del_admin)
-
-    async def mute_user(event):
-        if event.sender_id not in settings('admins_id'):
-            return await event.reply(phrase.no_perm)
-        args = event.text.split(" ", maxsplit=3)[1:]
-        if args[0] in ['помощь', 'help']:
-            return await event.reply(phrase.mute_help)
-        user_link = args[0]
-        if len(args) > 2:
-            reason = ' '.join(args[2:])
-        else:
-            reason = 'Нет'
-        if '.' in args[1]:
-            stamp = args[1].split(".")
-            if len(stamp) == 3:
-                until_date = timedelta(
-                    minutes=int(stamp[0]),
-                    hours=int(stamp[1]),
-                    days=int(stamp[2])
-                )
-            elif len(stamp) == 2:
-                until_date = timedelta(
-                    minutes=int(stamp[0]),
-                    hours=int(stamp[1]),
-                )
-            else:
-                return await event.reply(phrase.mute_time_error)
-        else:
-            until_date = timedelta(minutes=int(args[1]))
-        user = await bot_client.get_entity(user_link)
-        try:
-            await bot_client.edit_permissions(
-                entity=event.chat_id,
-                user=user.id,
-                send_messages=False,
-                send_media=False,
-                send_stickers=False,
-                send_gifs=False,
-                send_games=False,
-                send_inline=False,
-                send_polls=False,
-                until_date=until_date
-            )
-            return await event.reply(
-                phrase.muted.format(
-                    user=user.first_name,
-                    time=str(until_date).replace(':00', '').replace('day', 'дней'),
-                    reason=reason
-                ),
-            )
-        except UserAdminInvalidError:
-            return await event.reply(phrase.is_admin)
 
     async def server_top_list(event):
         try:
@@ -793,7 +788,7 @@ async def bot():
         args = event.text.split(" ", maxsplit=3)
         try:
             tag = args[2]
-            user = await bot_client(
+            user = await client(
                 GetFullUserRequest(tag)
             )
         except IndexError:
@@ -828,7 +823,7 @@ async def bot():
         args = event.text.split(" ", maxsplit=2)
         try:
             tag = args[1]
-            user = await bot_client(
+            user = await client(
                 GetFullUserRequest(tag)
             )
         except IndexError:
@@ -876,16 +871,16 @@ async def bot():
             parse_mode="html"
         )
 
-    async def warn(event):
-        if event.sender_id not in settings('admins_id'):
-            return await event.reply(phrase.no_perm)
-        reply_to_msg = event.reply_to_msg_id
-        if reply_to_msg:
-            reply_message = await event.get_reply_message()
-            print(reply_message.sender_id)
-        warns = set_warn(reply_message.sender_id)
-        if warns == settings('max_warns'):
-            return await event.reply(phrase.max_warns)
+    # async def warn(event):
+    #     if event.sender_id not in settings('admins_id'):
+    #         return await event.reply(phrase.no_perm)
+    #     reply_to_msg = event.reply_to_msg_id
+    #     if reply_to_msg:
+    #         reply_message = await event.get_reply_message()
+    #         print(reply_message.sender_id)
+    #     warns = set_warn(reply_message.sender_id)
+    #     if warns == settings('max_warns'):
+    #         return await event.reply(phrase.max_warns)
 
     async def all_money(event):
         return await event.reply(
@@ -894,247 +889,255 @@ async def bot():
             )
         )
 
-    await bot_client.start(bot_token=settings("token_bot"))
+    await client.start(bot_token=settings("token_bot"))
 
     'Все деньги'
-    bot_client.add_event_handler(
+    client.add_event_handler(
         all_money, events.NewMessage(incoming=True, pattern="/банк")
     )
 
-    'Варн'
-    bot_client.add_event_handler(
-        warn, events.NewMessage(incoming=True, pattern="/варн")
-    )
+    # 'Варн'
+    # client.add_event_handler(
+    #     warn, events.NewMessage(incoming=True, pattern="/варн")
+    # )
 
-    'Добавление статистики'
-    bot_client.add_event_handler(
-        stat, events.NewMessage(chats=settings("default_chat"))
-    )
+    # 'Добавление статистики'
+    # client.add_event_handler(
+    #     stat, events.NewMessage(chats=settings("default_chat"))
+    # )
+
+    # 'Пуш неактивных'
+    # client.add_event_handler(
+    #     push_unactive, events.NewMessage(incoming=True, pattern="/пуш неактив")
+    # )
+    # client.add_event_handler(
+    #     push_unactive, events.NewMessage(incoming=True, pattern="/unactive")
+    # )
+
+    # 'Мут'
+    # client.add_event_handler(
+    #     mute_user, events.NewMessage(incoming=True, pattern="/мут")
+    # )
+    # client.add_event_handler(
+    #     mute_user, events.NewMessage(incoming=True, pattern="/mute")
+    # )
+
+    # 'Мут'
+    # client.add_event_handler(
+    #     mute_user, events.NewMessage(incoming=True, pattern="/мут")
+    # )
+    # client.add_event_handler(
+    #     mute_user, events.NewMessage(incoming=True, pattern="/mute")
+    # )
+
+    # 'Моя стата'
+    # client.add_event_handler(
+    #     stat_check,
+    #     events.NewMessage(incoming=True, pattern="/моя стата")
+    # )
+    # client.add_event_handler(
+    #     stat_check,
+    #     events.NewMessage(incoming=True, pattern="/mystat")
+    # )
+    # client.add_event_handler(
+    #     stat_check,
+    #     events.NewMessage(incoming=True, pattern="/мстат")
+    # )
+    # client.add_event_handler(
+    #     stat_check,
+    #     events.NewMessage(incoming=True, pattern="сколько я написал")
+    # )
+
+    # 'Стата беседы'
+    # client.add_event_handler(
+    #     active_check, events.NewMessage(incoming=True, pattern="/актив")
+    # )
+    # client.add_event_handler(
+    #     active_check, events.NewMessage(incoming=True, pattern="/топ актив")
+    # )
+    # client.add_event_handler(
+    #     active_check, events.NewMessage(incoming=True, pattern="/топ соо")
+    # )
+    # client.add_event_handler(
+    #     active_check, events.NewMessage(incoming=True, pattern="/top active")
+    # )
 
     'ДНС'
-    bot_client.add_event_handler(
+    client.add_event_handler(
         tg_dns, events.NewMessage(incoming=True, pattern="/днс")
     )
-    bot_client.add_event_handler(
+    client.add_event_handler(
         tg_dns, events.NewMessage(incoming=True, pattern="/dns")
     )
 
     'Супер-игра'
-    bot_client.add_event_handler(
+    client.add_event_handler(
         super_game, events.NewMessage(incoming=True, pattern="/суперигра")
     )
 
-    'Пуш неактивных'
-    bot_client.add_event_handler(
-        push_unactive, events.NewMessage(incoming=True, pattern="/пуш неактив")
-    )
-    bot_client.add_event_handler(
-        push_unactive, events.NewMessage(incoming=True, pattern="/unactive")
-    )
-
     'Линк ника к майнкрафту'
-    bot_client.add_event_handler(
+    client.add_event_handler(
         link_nick, events.NewMessage(incoming=True, pattern="/linknick")
     )
-    bot_client.add_event_handler(
+    client.add_event_handler(
         link_nick, events.NewMessage(incoming=True, pattern="/привязать")
     )
-    bot_client.add_event_handler(
+    client.add_event_handler(
         link_nick, events.NewMessage(incoming=True, pattern="/connect")
     )
 
     'Магазин'
-    bot_client.add_event_handler(
+    client.add_event_handler(
         shop, events.NewMessage(incoming=True, pattern="/shop")
     )
-    bot_client.add_event_handler(
+    client.add_event_handler(
         shop, events.NewMessage(incoming=True, pattern="/магазин")
     )
 
     'Кошелек'
-    bot_client.add_event_handler(
+    client.add_event_handler(
         get_balance,
         events.NewMessage(incoming=True, pattern="/баланс")
     )
-    bot_client.add_event_handler(
+    client.add_event_handler(
         get_balance,
         events.NewMessage(incoming=True, pattern="/мой баланс")
     )
-    bot_client.add_event_handler(
+    client.add_event_handler(
         get_balance,
         events.NewMessage(incoming=True, pattern="/wallet")
     )
 
     'Добавить монет'
-    bot_client.add_event_handler(
+    client.add_event_handler(
         add_balance,
         events.NewMessage(incoming=True, pattern="/изменить баланс")
     )
-    bot_client.add_event_handler(
+    client.add_event_handler(
         add_balance,
         events.NewMessage(incoming=True, pattern="/change balance")
     )
 
     'Переслать монет'
-    bot_client.add_event_handler(
+    client.add_event_handler(
         swap_money,
         events.NewMessage(incoming=True, pattern="/скинуть")
     )
-    bot_client.add_event_handler(
+    client.add_event_handler(
         swap_money,
         events.NewMessage(incoming=True, pattern="/переслать")
     )
-    bot_client.add_event_handler(
+    client.add_event_handler(
         swap_money,
         events.NewMessage(incoming=True, pattern="/кинуть")
     )
-    bot_client.add_event_handler(
+    client.add_event_handler(
         swap_money,
         events.NewMessage(incoming=True, pattern="/дать")
     )
 
-    'Моя стата'
-    bot_client.add_event_handler(
-        stat_check,
-        events.NewMessage(incoming=True, pattern="/моя стата")
-    )
-    bot_client.add_event_handler(
-        stat_check,
-        events.NewMessage(incoming=True, pattern="/mystat")
-    )
-    bot_client.add_event_handler(
-        stat_check,
-        events.NewMessage(incoming=True, pattern="/мстат")
-    )
-    bot_client.add_event_handler(
-        stat_check,
-        events.NewMessage(incoming=True, pattern="сколько я написал")
-    )
-
-    'Стата беседы'
-    bot_client.add_event_handler(
-        active_check, events.NewMessage(incoming=True, pattern="/актив")
-    )
-    bot_client.add_event_handler(
-        active_check, events.NewMessage(incoming=True, pattern="/топ актив")
-    )
-    bot_client.add_event_handler(
-        active_check, events.NewMessage(incoming=True, pattern="/топ соо")
-    )
-    bot_client.add_event_handler(
-        active_check, events.NewMessage(incoming=True, pattern="/top active")
-    )
-
     'Топ игроков'
-    bot_client.add_event_handler(
+    client.add_event_handler(
         server_top_list,
         events.NewMessage(incoming=True, pattern="/топ игроков")
     )
-    bot_client.add_event_handler(
+    client.add_event_handler(
         server_top_list,
         events.NewMessage(incoming=True, pattern="/top players")
     )
-    bot_client.add_event_handler(
+    client.add_event_handler(
         server_top_list,
         events.NewMessage(incoming=True, pattern="/bestplayers")
     )
 
     'Сервер'
-    bot_client.add_event_handler(
+    client.add_event_handler(
         sysinfo, events.NewMessage(incoming=True, pattern="/серв")
     )
-    bot_client.add_event_handler(
+    client.add_event_handler(
         sysinfo, events.NewMessage(incoming=True, pattern="/сервер")
     )
-    bot_client.add_event_handler(
+    client.add_event_handler(
         sysinfo, events.NewMessage(incoming=True, pattern="/server")
     )
 
     'Айпи'
-    bot_client.add_event_handler(
+    client.add_event_handler(
         host, events.NewMessage(incoming=True, pattern="/хост")
     )
-    bot_client.add_event_handler(
+    client.add_event_handler(
         host, events.NewMessage(incoming=True, pattern="/host")
     )
 
     'Помощь'
-    bot_client.add_event_handler(
+    client.add_event_handler(
         help, events.NewMessage(incoming=True, pattern="/помощь")
     )
-    bot_client.add_event_handler(
+    client.add_event_handler(
         help, events.NewMessage(incoming=True, pattern="/help")
     )
 
     'Пинг'
-    bot_client.add_event_handler(
+    client.add_event_handler(
         ping, events.NewMessage(incoming=True, pattern="/пинг")
     )
-    bot_client.add_event_handler(
+    client.add_event_handler(
         ping, events.NewMessage(incoming=True, pattern="/ping")
     )
 
     'ИИ'
-    bot_client.add_event_handler(
+    client.add_event_handler(
         gemini, events.NewMessage(incoming=True, pattern="/ии")
     )
-    bot_client.add_event_handler(
+    client.add_event_handler(
         gemini, events.NewMessage(incoming=True, pattern="ии")
     )
-    bot_client.add_event_handler(
+    client.add_event_handler(
         gemini, events.NewMessage(incoming=True, pattern="/ai")
     )
 
-    'Мут'
-    bot_client.add_event_handler(
-        mute_user, events.NewMessage(incoming=True, pattern="/мут")
-    )
-    bot_client.add_event_handler(
-        mute_user, events.NewMessage(incoming=True, pattern="/mute")
-    )
-
     'RCON'
-    bot_client.add_event_handler(
+    client.add_event_handler(
         mcrcon, events.NewMessage(incoming=True, pattern=r"f/|p/")
     )
 
     'Админы'
-    bot_client.add_event_handler(
+    client.add_event_handler(
         add_admins, events.NewMessage(incoming=True, pattern=r"\+админ")
     )
-    bot_client.add_event_handler(
+    client.add_event_handler(
         add_admins, events.NewMessage(incoming=True, pattern=r"\+admin")
     )
-    bot_client.add_event_handler(
+    client.add_event_handler(
         del_admins, events.NewMessage(incoming=True, pattern=r"\-админ")
     )
-    bot_client.add_event_handler(
+    client.add_event_handler(
         del_admins, events.NewMessage(incoming=True, pattern=r"\-admin")
     )
 
     'Крокодил'
-    bot_client.add_event_handler(
+    client.add_event_handler(
         crocodile, events.NewMessage(incoming=True, pattern="/крокодил")
     )
-    bot_client.add_event_handler(
+    client.add_event_handler(
         crocodile, events.NewMessage(incoming=True, pattern="/crocodile")
     )
-    bot_client.add_event_handler(
+    client.add_event_handler(
         crocodile_bet, events.NewMessage(incoming=True, pattern="/ставка")
     )
-    bot_client.add_event_handler(callback_handler, events.CallbackQuery())
+    client.add_event_handler(callback_handler, events.CallbackQuery())
 
     if settings("current_game") != 0:
-        bot_client.add_event_handler(
+        client.add_event_handler(
             crocodile_handler,
             events.NewMessage(incoming=True, chats=settings("default_chat"))
         )
-        bot_client.add_event_handler(
+        client.add_event_handler(
             crocodile_hint,
             events.NewMessage(incoming=True, pattern="/подсказка")
         )
 
-    await bot_client.run_until_disconnected()
+    await client.run_until_disconnected()
 
 
 # def update_server(host):
@@ -1172,16 +1175,20 @@ async def setup_ip(check_set=True):
     "NOIP синхронизация"
     async with aiohttp.ClientSession() as session:
         try:
-            async with session.get("https://v4.ident.me") as v4_ident:
+            async with session.get(
+                "https://v4.ident.me", timeout=3
+            ) as v4_ident:
                 v4 = await v4_ident.text()
         except:
             v4 = False
         try:
-            async with session.get("https://v6.ident.me") as v6_ident:
+            async with session.get(
+                "https://v6.ident.me", timeout=3
+            ) as v6_ident:
                 v6 = await v6_ident.text()
         except:
             v6 = False
-        if not v4 or not v6:
+        if not v4 and not v6:
             return logger.error('Ошибка при получении IP.'
                                 'Сервер может быть недоступен')
         elif v4 == settings('ipv4') and v6 == settings('ipv6') and check_set:
@@ -1230,7 +1237,7 @@ async def web_server():
             )
         else:
             give = ''
-        await bot_client.send_message(
+        await client.send_message(
             settings('default_chat'),
             phrase.hotmc.format(nick=nick, money=give),
             link_preview=False
@@ -1261,7 +1268,7 @@ async def web_server():
             )
         else:
             give = ''
-        await bot_client.send_message(
+        await client.send_message(
             settings('default_chat'),
             phrase.servers.format(nick=username, money=give),
             link_preview=False
@@ -1319,6 +1326,7 @@ async def main():
             logger.warning('Закрываю бота!')
             break
 
+
 if __name__ == "__main__":
     # Thread(
     #     target=update_server,
@@ -1330,6 +1338,8 @@ if __name__ == "__main__":
     #     args=("0.0.0.0",),
     #     daemon=True
     # ).start()
+    if sum(settings('shop_weight').values()) != 100:
+        logger.error('Сумма весов в магазине не равна 100!')
     try:
         asyncio.run(main())
     except KeyboardInterrupt:

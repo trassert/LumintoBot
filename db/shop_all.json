@@ -146,11 +146,6 @@
             "name": "minecraft:brush",
             "price": 5,
             "value": 1
-        },
-        "Книга «Мягкое падение IV»": {
-            "name": "enchanted_book[stored_enchantments={levels:{feather_falling:4}}]",
-            "price": 25,
-            "value": 1
         }
     },
     "flower": {
