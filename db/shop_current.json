@@ -1,28 +1,28 @@
 {
-    "theme": "raiders",
-    "Белая шерсть": {
-        "name": "minecraft:white_wool",
-        "price": 8,
-        "value": 48
-    },
-    "Бирка": {
-        "name": "minecraft:name_tag",
-        "price": 20,
+    "theme": "desert",
+    "Бамбуковый плот": {
+        "name": "minecraft:bamboo_raft",
+        "price": 2,
         "value": 1
     },
-    "Волчья броня": {
-        "name": "minecraft:wolf_armor",
+    "Кисть": {
+        "name": "minecraft:brush",
+        "price": 5,
+        "value": 1
+    },
+    "Подзорная труба": {
+        "name": "minecraft:red_sandstone_stairs",
+        "price": 5,
+        "value": 1
+    },
+    "Резной красный песчаник": {
+        "name": "minecraft:chiseled_red_sandstone",
         "price": 10,
+        "value": 20
+    },
+    "Чистая карта": {
+        "name": "minecraft:red_sandstone_stairs",
+        "price": 5,
         "value": 1
-    },
-    "Динамит": {
-        "name": "minecraft:tnt",
-        "price": 24,
-        "value": 16
-    },
-    "Красная шерсть": {
-        "name": "minecraft:red_wool",
-        "price": 8,
-        "value": 32
     }
 }

@@ -195,8 +195,10 @@ def add_money(id, count):
     ) as f:
         data = json.load(f)
         if id in data:
+            old = data[id]
             data[id] = data[id] + count
         else:
+            old = 0
             data[id] = count
 
     if data[id] < 0:
@@ -207,6 +209,7 @@ def add_money(id, count):
         json.dump(
             data, f, indent=4, ensure_ascii=False, sort_keys=True
         )
+        logger.info(f'Изменён баланс {id} ({old} -> {data[id]})')
         return data[id]
 
 

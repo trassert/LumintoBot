@@ -276,7 +276,8 @@ async def bot():
     #         return await event.reply(
     #             phrase.muted.format(
     #                 user=user.first_name,
-    #                 time=str(until_date).replace(':00', '').replace('day', 'дней'),
+    #                 time=str(until_date
+    #             ).replace(':00', '').replace('day', 'дней'),
     #                 reason=reason
     #             ),
     #         )
@@ -729,12 +730,23 @@ async def bot():
     async def add_admins(event):
         if event.sender_id != settings('creator'):
             return await event.reply(phrase.no_perm)
-        tag = event.text.split(" ", maxsplit=1)[1]
-        user = await client(
-            GetFullUserRequest(tag)
-        )
+        try:
+            tag = event.text.split(" ", maxsplit=1)[1]
+            user = await client(
+                GetFullUserRequest(tag)
+            )
+        except IndexError:
+            reply_to_msg = event.reply_to_msg_id
+            if reply_to_msg:
+                reply_message = await event.get_reply_message()
+                user = reply_message.sender_id
+            else:
+                return await event.reply(
+                    phrase.money.no_people
+                )
+        user = user.full_user.id
         admins = settings('admins_id')
-        admins.append(user.full_user.id)
+        admins.append(user)
         settings('admins_id', admins)
         return await event.reply(
             phrase.new_admin.format(nick=tag, id=user.full_user.id)
@@ -821,21 +833,9 @@ async def bot():
 
     async def swap_money(event):
         args = event.text.split(" ", maxsplit=2)
+
         try:
-            tag = args[1]
-            user = await client(
-                GetFullUserRequest(tag)
-            )
-        except IndexError:
-            return await event.reply(
-                phrase.money.no_people+phrase.money.swap_balance_use
-            )
-        except TypeError or ValueError:
-            return await event.reply(
-                phrase.money.no_such_people+phrase.money.swap_balance_use
-            )
-        try:
-            count = int(args[2])
+            count = int(args[1])
             if count <= 0:
                 return await event.reply(
                     phrase.money.negative_count
@@ -848,6 +848,23 @@ async def bot():
             return await event.reply(
                 phrase.money.nan_count+phrase.money.swap_balance_use
             )
+
+        try:
+            tag = args[2]
+            user = await client(
+                GetFullUserRequest(tag)
+            )
+            user = user.full_user.id
+        except (TypeError, ValueError, IndexError):
+            reply_to_msg = event.reply_to_msg_id
+            if reply_to_msg:
+                reply_message = await event.get_reply_message()
+                user = reply_message.sender_id
+            else:
+                return await event.reply(
+                    phrase.money.no_people+phrase.money.swap_balance_use
+                )
+
         sender_balance = get_money(event.sender_id)
         if sender_balance < count:
             return await event.reply(
@@ -856,7 +873,7 @@ async def bot():
                 )
             )
         add_money(event.sender_id, -count)
-        add_money(user.full_user.id, count)
+        add_money(user, count)
         return await event.reply(
             phrase.money.swap_money.format(
                 decline_number(count, 'изумруд')
@@ -871,16 +888,13 @@ async def bot():
             parse_mode="html"
         )
 
-    # async def warn(event):
-    #     if event.sender_id not in settings('admins_id'):
-    #         return await event.reply(phrase.no_perm)
-    #     reply_to_msg = event.reply_to_msg_id
-    #     if reply_to_msg:
-    #         reply_message = await event.get_reply_message()
-    #         print(reply_message.sender_id)
-    #     warns = set_warn(reply_message.sender_id)
-    #     if warns == settings('max_warns'):
-    #         return await event.reply(phrase.max_warns)
+    async def test(event):
+        if event.sender_id not in settings('admins_id'):
+            return await event.reply(phrase.no_perm)
+        reply_to_msg = event.reply_to_msg_id
+        if reply_to_msg:
+            reply_message = await event.get_reply_message()
+            print(reply_message.sender_id)
 
     async def all_money(event):
         return await event.reply(
@@ -896,10 +910,10 @@ async def bot():
         all_money, events.NewMessage(incoming=True, pattern="/банк")
     )
 
-    # 'Варн'
-    # client.add_event_handler(
-    #     warn, events.NewMessage(incoming=True, pattern="/варн")
-    # )
+    'Тест'
+    client.add_event_handler(
+        test, events.NewMessage(incoming=True, pattern="/тест")
+    )
 
     # 'Добавление статистики'
     # client.add_event_handler(
