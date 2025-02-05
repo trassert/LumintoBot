@@ -706,6 +706,8 @@ async def bot():
                     ).replace(
                         '****************************************',
                         ''
+                    ).replace(
+                        ') ', '. '
                     )
                 )
         except TimeoutError:
