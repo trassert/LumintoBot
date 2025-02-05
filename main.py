@@ -1332,10 +1332,19 @@ async def web_server():
             )
 
     async def github(request):
-        'Вебхук'
-        from rich import print
+        'Вебхук для гитхаба'
         data = await request.json()
-        print(data)
+        head = data['head_commit']
+        await client.send_message(
+            tokens.bot.chat,
+            '**🎉 : Я получил обновление!**\n'
+            f'Автор: {head["author"]["name"]}\n'
+            f'Сообщение: {head["message"]}\n',
+            '\n'
+            f'**[Что изменилось]({head["url"]})**',
+            link_preview=False
+        )
+        return aiohttp.web.Response(text='ok')
 
     app = aiohttp.web.Application()
     app.add_routes(
