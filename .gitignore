@@ -6,6 +6,7 @@ db/shop_current.json
 db/crocodile_stat.json
 db/bot.session
 db/bot.session-journal
+db/shop_current.json
 
 images/*
 logs/*

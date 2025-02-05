@@ -181,7 +181,7 @@ def update_shop():
     themes = []
     for theme in load:
         themes.append(theme)
-    current_shop['theme'] = weighted_choice(themes, load('shop_weight'))
+    current_shop['theme'] = weighted_choice(themes, data('shop_weight'))
     current_items = []
     all_items = list(load[current_shop['theme']].keys())
     while len(current_items) != 5:

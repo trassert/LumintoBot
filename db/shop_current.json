@@ -1,8 +1,8 @@
 {
     "theme": "armorer",
-    "Алмазные ботинки": {
-        "name": "minecraft:diamond_boots",
-        "price": 13,
+    "Алмазный меч": {
+        "name": "minecraft:diamond_sword",
+        "price": 10,
         "value": 1
     },
     "Железные поножи": {
@@ -10,14 +10,14 @@
         "price": 5,
         "value": 1
     },
-    "Кожаные штаны": {
-        "name": "minecraft:leather_leggings",
-        "price": 3,
+    "Кожаные ботинки": {
+        "name": "minecraft:leather_boots",
+        "price": 2,
         "value": 1
     },
-    "Койф": {
-        "name": "minecraft:chainmail_helmet",
-        "price": 4,
+    "Кольчуга": {
+        "name": "minecraft:chainmail_chestplate",
+        "price": 6,
         "value": 1
     },
     "Кольчужные поножи": {
