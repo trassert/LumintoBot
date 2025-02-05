@@ -575,7 +575,7 @@ async def bot():
 
     async def super_game(event):
         if event.sender_id not in data('admins_id'):
-            return await event.reply(phrase.no_perm)
+            return await event.reply(phrase.perms.no)
         arg = event.text.lower().split(" ", maxsplit=1)[1]
         bets = data('crocodile_bets')
         bets[str(tokens.bot.creator)] = 50
@@ -611,7 +611,7 @@ async def bot():
         try:
             arg = event.text.split(" ", maxsplit=1)[1]
         except IndexError:
-            return await event.reply(phrase.no_response)
+            return await event.reply(phrase.no.response)
         response = await async_ai_response(arg)
         if response is None:
             return await event.reply(phrase.server.overload)
@@ -631,10 +631,10 @@ async def bot():
             port = data('rcon_port_purpur')
             password = tokens.rcon
         else:
-            return await event.reply(phrase.no_server)
+            return await event.reply(phrase.no.server)
 
         if event.sender_id not in data('admins_id'):
-            return await event.reply(phrase.no_perm)
+            return await event.reply(phrase.perms.no)
         command = event.text[2:]
         logger.info(f'Выполняется команда: {command}')
         try:
@@ -655,7 +655,7 @@ async def bot():
 
     async def add_admins(event):
         if event.sender_id != tokens.bot.creator:
-            return await event.reply(phrase.no_perm)
+            return await event.reply(phrase.perms.no)
         try:
             tag = event.text.split(" ", maxsplit=1)[1]
             user = await client(
@@ -675,12 +675,12 @@ async def bot():
         admins.append(user)
         data('admins_id', admins)
         return await event.reply(
-            phrase.new_admin.format(nick=tag, id=user.full_user.id)
+            phrase.perms.admin_add.format(nick=tag, id=user.full_user.id)
         )
 
     async def del_admins(event):
         if event.sender_id != tokens.bot.creator:
-            return await event.reply(phrase.no_perm)
+            return await event.reply(phrase.perms.no)
         tag = event.text.split(" ", maxsplit=1)[1]
         user = await client(
             GetFullUserRequest(tag)
@@ -688,7 +688,7 @@ async def bot():
         admins = data('admins_id')
         admins.remove(user.full_user.id)
         data('admins_id', admins)
-        return await event.reply(phrase.del_admin)
+        return await event.reply(phrase.perms.admin_del)
 
     async def server_top_list(event):
         try:
@@ -722,7 +722,7 @@ async def bot():
 
     async def add_balance(event):
         if event.sender_id not in data('admins_id'):
-            return await event.reply(phrase.no_perm)
+            return await event.reply(phrase.perms.no)
         args = event.text.split(" ", maxsplit=3)
         try:
             tag = args[2]
@@ -808,7 +808,7 @@ async def bot():
 
     async def tg_dns(event):
         if event.sender_id not in data('admins_id'):
-            return await event.reply(phrase.no_perm)
+            return await event.reply(phrase.perms.no)
         return await event.reply(
             phrase.dns.format(await setup_ip(check_set=False)),
             parse_mode="html"
@@ -816,7 +816,7 @@ async def bot():
 
     async def test(event):
         if event.sender_id not in data('admins_id'):
-            return await event.reply(phrase.no_perm)
+            return await event.reply(phrase.perms.no)
         reply_to_msg = event.reply_to_msg_id
         if reply_to_msg:
             reply_message = await event.get_reply_message()
