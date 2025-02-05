@@ -50,7 +50,6 @@ class money:
 
 
 class help:
-    mods = '💻 : [Установка модов](https://teletype.in/@trassert/mods)'
     comm = '🤖 : [Помощь по командам](https://teletype.in/@trassert/commandsv2)'
 
 

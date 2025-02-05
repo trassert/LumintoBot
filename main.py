@@ -366,8 +366,6 @@ async def bot():
         await event.reply(get_system_info())
 
     async def help(event):
-        await event.reply(phrase.help.mods, link_preview=True)
-        await asyncio.sleep(1)
         await event.reply(phrase.help.comm, link_preview=True)
 
     async def ping(event):
@@ -1029,6 +1027,9 @@ async def bot():
         help, events.NewMessage(incoming=True, pattern="/помощь")
     )
     client.add_event_handler(
+        help, events.NewMessage(incoming=True, pattern="/команды")
+    )
+    client.add_event_handler(
         help, events.NewMessage(incoming=True, pattern="/help")
     )
 
@@ -1136,7 +1137,7 @@ async def setup_ip(check_set=True):
             async with session.get(
                 f'http://{tokens.noip.name}:{tokens.noip.password}'
                 '@dynupdate.no-ip.com/'
-                f'nic/update?hostname={data("host")}&myip={v4},{v6}',
+                f'nic/update?hostname={data("noip_host")}&myip={v4},{v6}',
                 headers={
                     "User-Agent": "Trassert MinecraftServer' \
                         '/Windows 11-22000 s3pple@yandex.ru"

@@ -1,174 +1,160 @@
-client = ''
-settings = ''
-give_id_by_nick_minecraft = ''
-add_stat = ''
-UserAdminInvalidError = ''
-tokens = ''
-listdir = ''
-path = ''
-phrase = ''
-give_stat = ''
-get_active = ''
-logger = ''
-remove = ''
-timedelta = ''
+# async def stat(event):
+#     entity = await client.get_entity(event.sender_id)
+#     if event.text.startswith('‹'):
+#         if event.sender_id in settings('api_bot_id', log=False):
+#             id = give_id_by_nick_minecraft(
+#                 event.text.split(
+#                     '›'
+#                 )[0].split(
+#                     '‹'
+#                 )[1]
+#             )
+#             if id is not None:
+#                 add_stat(id)
+#     try:
+#         if not entity.bot:
+#             add_stat(event.sender_id)
+#     except AttributeError:
+#         pass
 
 
-async def stat(event):
-    entity = await client.get_entity(event.sender_id)
-    if event.text.startswith('‹'):
-        if event.sender_id in settings('api_bot_id', log=False):
-            id = give_id_by_nick_minecraft(
-                event.text.split(
-                    '›'
-                )[0].split(
-                    '‹'
-                )[1]
-            )
-            if id is not None:
-                add_stat(id)
-    try:
-        if not entity.bot:
-            add_stat(event.sender_id)
-    except AttributeError:
-        pass
+# async def push_unactive(event):
+#     participants = await client.get_participants(
+#         tokens.bot.chat
+#     )
+#     list_ids = [user.id for user in participants]
+#     list_db = []
+#     for filename in listdir(path.join('db', 'user_stats')):
+#         if filename.endswith('.json'):
+#             list_db.append(int(filename.replace('.json', '')))
+#     list_names = []
+#     for id in list_ids:
+#         if id not in list_db:
+#             user = await client.get_entity(id)
+#             if not user.bot:
+#                 if user.username:
+#                     list_names.append(
+#                         f'@{user.username}'
+#                     )
+#                 else:
+#                     list_names.append(
+#                         f'[{user.first_name}](tg://user?id={id})'
+#                     )
+#     return await event.reply(
+#         phrase.unactive+' '.join(list_names)
+#     )
 
 
-async def push_unactive(event):
-    participants = await client.get_participants(
-        tokens.bot.chat
-    )
-    list_ids = [user.id for user in participants]
-    list_db = []
-    for filename in listdir(path.join('db', 'user_stats')):
-        if filename.endswith('.json'):
-            list_db.append(int(filename.replace('.json', '')))
-    list_names = []
-    for id in list_ids:
-        if id not in list_db:
-            user = await client.get_entity(id)
-            if not user.bot:
-                if user.username:
-                    list_names.append(
-                        f'@{user.username}'
-                    )
-                else:
-                    list_names.append(
-                        f'[{user.first_name}](tg://user?id={id})'
-                    )
-    return await event.reply(
-        phrase.unactive+' '.join(list_names)
-    )
+# async def stat_check(event):
+#     try:
+#         days = int(
+#             event.text.replace(
+#                 '/моя стата', ''
+#             ).replace(
+#                 '/mystat', ''
+#             ).replace(
+#                 '/мстат', ''
+#             ).replace(
+#                 'сколько я написал', ''
+#             )
+#         )
+#     except ValueError:
+#         days = 1
+#     return await event.reply(
+#         phrase.stat.format(
+#             messages=give_stat(event.sender_id, days),
+#             time=days
+#         )
+#     )
 
 
-async def stat_check(event):
-    try:
-        days = int(
-            event.text.replace(
-                '/моя стата', ''
-            ).replace(
-                '/mystat', ''
-            ).replace(
-                '/мстат', ''
-            ).replace(
-                'сколько я написал', ''
-            )
-        )
-    except ValueError:
-        days = 1
-    return await event.reply(
-        phrase.stat.format(
-            messages=give_stat(event.sender_id, days),
-            time=days
-        )
-    )
+# async def active_check(event):
+#     try:
+#         days = int(
+#             event.text.replace(
+#                 '/актив', ''
+#             ).replace(
+#                 '/топ актив', ''
+#             ).replace(
+#                 '/топ соо', ''
+#             ).replace(
+#                 '/top active', ''
+#             )
+#         )
+#     except ValueError:
+#         days = 1
+#     text = phrase.active.format(days)
+#     n = 1
+#     for data in get_active(days):
+#         try:
+#             if data[1] != 1:
+#                 entity = await client.get_entity(int(data[0]))
+#                 name = entity.first_name
+#                 if entity.last_name is not None:
+#                     name += f' {entity.last_name}'
+#                 text += f'{n}. {name}: {data[1]}\n'
+#                 n += 1
+#         except ValueError as e:
+#             logger.error(e)
+#             remove(path.join('db', 'user_stats', f'{data[0]}.json'))
+#     return await event.reply(text)
 
 
-async def active_check(event):
-    try:
-        days = int(
-            event.text.replace(
-                '/актив', ''
-            ).replace(
-                '/топ актив', ''
-            ).replace(
-                '/топ соо', ''
-            ).replace(
-                '/top active', ''
-            )
-        )
-    except ValueError:
-        days = 1
-    text = phrase.active.format(days)
-    n = 1
-    for data in get_active(days):
-        try:
-            if data[1] != 1:
-                entity = await client.get_entity(int(data[0]))
-                name = entity.first_name
-                if entity.last_name is not None:
-                    name += f' {entity.last_name}'
-                text += f'{n}. {name}: {data[1]}\n'
-                n += 1
-        except ValueError as e:
-            logger.error(e)
-            remove(path.join('db', 'user_stats', f'{data[0]}.json'))
-    return await event.reply(text)
+# async def mute_user(event):
+#     if event.sender_id not in settings('admins_id'):
+#         return await event.reply(phrase.no_perm)
+#     args = event.text.split(" ", maxsplit=3)[1:]
+#     if args[0] in ['помощь', 'help']:
+#         return await event.reply(phrase.mute_help)
+#     user_link = args[0]
+#     if len(args) > 2:
+#         reason = ' '.join(args[2:])
+#     else:
+#         reason = 'Нет'
+#     if '.' in args[1]:
+#         stamp = args[1].split(".")
+#         if len(stamp) == 3:
+#             until_date = timedelta(
+#                 minutes=int(stamp[0]),
+#                 hours=int(stamp[1]),
+#                 days=int(stamp[2])
+#             )
+#         elif len(stamp) == 2:
+#             until_date = timedelta(
+#                 minutes=int(stamp[0]),
+#                 hours=int(stamp[1]),
+#             )
+#         else:
+#             return await event.reply(phrase.mute_time_error)
+#     else:
+#         until_date = timedelta(minutes=int(args[1]))
+#     user = await client.get_entity(user_link)
+#     try:
+#         await client.edit_permissions(
+#             entity=event.chat_id,
+#             user=user.id,
+#             send_messages=False,
+#             send_media=False,
+#             send_stickers=False,
+#             send_gifs=False,
+#             send_games=False,
+#             send_inline=False,
+#             send_polls=False,
+#             until_date=until_date
+#         )
+#         return await event.reply(
+#             phrase.muted.format(
+#                 user=user.first_name,
+#                 time=str(until_date
+#             ).replace(':00', '').replace('day', 'дней'),
+#                 reason=reason
+#             ),
+#         )
+#     except UserAdminInvalidError:
+#         return await event.reply(phrase.is_admin)
 
 
-async def mute_user(event):
-    if event.sender_id not in settings('admins_id'):
-        return await event.reply(phrase.no_perm)
-    args = event.text.split(" ", maxsplit=3)[1:]
-    if args[0] in ['помощь', 'help']:
-        return await event.reply(phrase.mute_help)
-    user_link = args[0]
-    if len(args) > 2:
-        reason = ' '.join(args[2:])
-    else:
-        reason = 'Нет'
-    if '.' in args[1]:
-        stamp = args[1].split(".")
-        if len(stamp) == 3:
-            until_date = timedelta(
-                minutes=int(stamp[0]),
-                hours=int(stamp[1]),
-                days=int(stamp[2])
-            )
-        elif len(stamp) == 2:
-            until_date = timedelta(
-                minutes=int(stamp[0]),
-                hours=int(stamp[1]),
-            )
-        else:
-            return await event.reply(phrase.mute_time_error)
-    else:
-        until_date = timedelta(minutes=int(args[1]))
-    user = await client.get_entity(user_link)
-    try:
-        await client.edit_permissions(
-            entity=event.chat_id,
-            user=user.id,
-            send_messages=False,
-            send_media=False,
-            send_stickers=False,
-            send_gifs=False,
-            send_games=False,
-            send_inline=False,
-            send_polls=False,
-            until_date=until_date
-        )
-        return await event.reply(
-            phrase.muted.format(
-                user=user.first_name,
-                time=str(until_date
-            ).replace(':00', '').replace('day', 'дней'),
-                reason=reason
-            ),
-        )
-    except UserAdminInvalidError:
-        return await event.reply(phrase.is_admin)
-
+'Сервер обновлений'
 
 # def update_server(host):
 #     app = Flask(__name__)
@@ -210,6 +196,7 @@ async def mute_user(event):
 #     daemon=True
 # ).start()
 
+'Стата'
 
 # def add_stat(id):
 #     'Добавляет статистику'
@@ -287,6 +274,7 @@ async def mute_user(event):
 #         data[id] = give_stat(id, days)
 #     return sorted(data.items(), key=lambda item: item[1], reverse=reverse)
 
+'ДБ варнов'
 
 # def get_warns(id):
 #     id = str(id)
@@ -306,6 +294,7 @@ async def mute_user(event):
 #             )
 #         return {}
 
+'Варны'
 
 # def set_warn(id):
 #     id = str(id)
@@ -327,6 +316,8 @@ async def mute_user(event):
 #             data, f, indent=4, ensure_ascii=False, sort_keys=True
 #         )
 #     return warns
+
+'Устаревшие хандлеры'
 
 # 'Добавление статистики'
 # client.add_event_handler(
@@ -388,3 +379,10 @@ async def mute_user(event):
 # client.add_event_handler(
 #     active_check, events.NewMessage(incoming=True, pattern="/top active")
 # )
+
+
+'Помощь по модам'
+#await event.reply(phrase.help.mods, link_preview=True)
+#await asyncio.sleep(1)
+
+#mods = '💻 : [Установка модов](https://teletype.in/@trassert/mods)'
