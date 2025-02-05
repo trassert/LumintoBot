@@ -1134,7 +1134,7 @@ async def setup_ip(check_set=True):
 
             "NOIP синхронизация"
             async with session.get(
-                f'http://{tokens.noip.user}:{tokens.noip.password}'
+                f'http://{tokens.noip.name}:{tokens.noip.password}'
                 '@dynupdate.no-ip.com/'
                 f'nic/update?hostname={data("host")}&myip={v4},{v6}',
                 headers={
