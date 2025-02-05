@@ -1332,8 +1332,9 @@ async def web_server():
             )
 
     async def github(request):
+        'Вебхук'
         data = await request.post()
-        print(data.json())
+        print(data.dict())
 
     app = aiohttp.web.Application()
     app.add_routes(
