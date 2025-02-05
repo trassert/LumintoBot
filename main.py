@@ -1337,11 +1337,11 @@ async def web_server():
         head = data['head_commit']
         await client.send_message(
             tokens.bot.chat,
-            '**🎉 : Я получил обновление!**\n'
-            f'Автор: {head["author"]["name"]}\n'
-            f'Сообщение: {head["message"]}\n',
-            '\n'
-            f'**[Что изменилось]({head["url"]})**',
+            phrase.github.format(
+                author=head["author"]["name"],
+                message=head["message"],
+                url=head["url"]
+            ),
             link_preview=False
         )
         return aiohttp.web.Response(text='ok')
