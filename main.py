@@ -1333,6 +1333,7 @@ async def web_server():
 
     async def github(request):
         'Вебхук'
+        from rich import print
         data = await request.json()
         print(data)
 
