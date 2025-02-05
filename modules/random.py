@@ -7,12 +7,12 @@ logger = logging.getLogger(__name__)
 def weighted_choice(strings, weights):
     if not isinstance(strings, list) or \
             not all(isinstance(s, str) for s in strings):
-        print("Strings должен быть списком строк.")
+        logger.error("Strings должен быть списком строк.")
         return None
 
     # Проверка на словарь
     if not isinstance(weights, dict):
-        print("Weights должен быть словарем.")
+        logger.error("Weights должен быть словарем.")
         return None
 
     # Проверка, что все ключи в weights есть в strings и веса - числа
@@ -21,10 +21,10 @@ def weighted_choice(strings, weights):
         if k in strings and isinstance(v, (int, float))
     }
     if not all(v >= 0 for v in valid_weights.values()):
-        print("Веса должны быть неотрицательными числами.")
+        logger.error("Веса должны быть неотрицательными числами.")
         return None
     if len(valid_weights) == 0:
-        print("Нет валидных весов для строк.")
+        logger.error("Нет валидных весов для строк.")
         return None
 
     # Создаем список весов, соответствующий порядку строк
@@ -40,5 +40,5 @@ def weighted_choice(strings, weights):
     try:
         return choices(strings, weights=normalized_probabilities, k=1)[0]
     except IndexError:
-        print("Список строк пуст или веса некорректны.")
+        logger.error("Список строк пуст или веса некорректны.")
         return None

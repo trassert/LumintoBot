@@ -374,33 +374,33 @@
     "nether": {
         "Багровый нилий": {
             "name": "minecraft:crimson_nylium",
-            "price": 1,
-            "value": 3
+            "price": 10,
+            "value": 32
         },
         "Базальт": {
             "name": "minecraft:basalt",
-            "price": 1,
-            "value": 2
+            "price": 3,
+            "value": 36
         },
         "Гладкий базальт": {
             "name": "minecraft:smooth_basalt",
-            "price": 1,
-            "value": 1
+            "price": 3,
+            "value": 10
         },
         "Искажённый нилий": {
             "name": "minecraft:warped_nylium",
-            "price": 1,
-            "value": 4
+            "price": 4,
+            "value": 16
         },
         "Костный блок": {
             "name": "minecraft:bone_block",
-            "price": 2,
-            "value": 1
+            "price": 3,
+            "value": 5
         },
         "Магма": {
             "name": "minecraft:magma_block",
-            "price": 1,
-            "value": 1
+            "price": 10,
+            "value": 10
         },
         "Незерак": {
             "name": "minecraft:netherrack",
@@ -424,12 +424,12 @@
         },
         "Почва душ": {
             "name": "minecraft:soul_soil",
-            "price": 8,
-            "value": 8
+            "price": 14,
+            "value": 32
         },
         "Чернит": {
             "name": "minecraft:blackstone",
-            "price": 10,
+            "price": 6,
             "value": 64
         },
         "Огненный заряд": {
@@ -456,7 +456,7 @@
         },
         "Булава": {
             "name": "minecraft:mace",
-            "price": 20,
+            "price": 100,
             "value": 1
         },
         "Волчья броня": {
@@ -724,8 +724,8 @@
     "witch": {
         "Бутылочка": {
             "name": "minecraft:glass_bottle",
-            "price": 1,
-            "value": 1
+            "price": 6,
+            "value": 30
         },
         "Драконье дыхание": {
             "name": "minecraft:dragon_breath",
@@ -734,74 +734,75 @@
         },
         "Золотая морковь": {
             "name": "minecraft:golden_carrot",
-            "price": 5,
-            "value": 1
+            "price": 20,
+            "value": 32
         },
         "Иглобрюх": {
             "name": "minecraft:pufferfish",
-            "price": 3,
-            "value": 1
+            "price": 10,
+            "value": 20
         },
         "Кроличья лапка": {
             "name": "minecraft:rabbit_foot",
-            "price": 3,
-            "value": 1
+            "price": 10,
+            "value": 32
         },
         "Маринованный паучий глаз": {
             "name": "minecraft:fermented_spider_eye",
-            "price": 3,
-            "value": 1
-        },
-        "Незерский нарост": {
-            "name": "minecraft:nether_wart",
-            "price": 4,
-            "value": 1
+            "price": 10,
+            "value": 32
         },
         "Огненный порошок": {
             "name": "minecraft:blaze_powder",
-            "price": 2,
-            "value": 1
+            "price": 10,
+            "value": 64
         },
         "Паучий глаз": {
             "name": "minecraft:spider_eye",
-            "price": 3,
-            "value": 1
+            "price": 18,
+            "value": 32
         },
         "Порох": {
             "name": "minecraft:gunpowder",
-            "price": 3,
-            "value": 1
+            "price": 30,
+            "value": 64
         },
         "Редстоуновая пыль": {
             "name": "minecraft:redstone",
-            "price": 1,
-            "value": 1
+            "price": 40,
+            "value": 100
         },
         "Сахар": {
             "name": "minecraft:sugar",
-            "price": 1,
-            "value": 1
+            "price": 30,
+            "value": 60
         },
         "Сверкающий ломтик арбуза": {
             "name": "minecraft:glistering_melon_slice",
-            "price": 3,
-            "value": 1
+            "price": 5,
+            "value": 8
         },
         "Светокаменная пыль": {
             "name": "minecraft:glowstone_dust",
-            "price": 1,
-            "value": 7
+            "price": 12,
+            "value": 56
         },
         "Сгусток магмы": {
             "name": "minecraft:magma_cream",
-            "price": 3,
-            "value": 1
+            "price": 14,
+            "value": 23
         },
         "Слеза гаста": {
             "name": "minecraft:ghast_tear",
-            "price": 4,
-            "value": 2
+            "price": 10,
+            "value": 7
+        },
+        "Зелье возврата": {
+            "name": "minecraft:potion[custom_name='{\"text\":\"Зелье возврата\",\"italic\":false}',custom_data='{recallpotion:1}',hide_additional_tooltip={},enchantment_glint_override=true,potion_contents={custom_color:249343},rarity=\"rare\"] 1",
+            "price": 32,
+            "value": 1
         }
+        
     },
     "blacksmith": {
         "Бирка": {
@@ -831,7 +832,7 @@
         },
         "Кузнечный шаблон «Вождь»": {
             "name": "minecraft:host_armor_trim_smithing_template",
-            "price": 18,
+            "price": 31,
             "value": 1
         },
         "Кузнечный шаблон «Вредина»": {
@@ -861,7 +862,7 @@
         },
         "Кузнечный шаблон «Ось»": {
             "name": "minecraft:bolt_armor_trim_smithing_template",
-            "price": 10,
+            "price": 25,
             "value": 1
         },
         "Кузнечный шаблон «Поток»": {
@@ -901,17 +902,17 @@
         },
         "Кузнечный шаблон «Тишина»": {
             "name": "minecraft:silence_armor_trim_smithing_template",
-            "price": 15,
+            "price": 45,
             "value": 1
         },
         "Кузнечный шаблон «Хранитель»": {
             "name": "minecraft:ward_armor_trim_smithing_template",
-            "price": 21,
+            "price": 30,
             "value": 1
         },
         "Кузнечный шаблон «Шпиль»": {
             "name": "minecraft:spire_armor_trim_smithing_template",
-            "price": 13,
+            "price": 27,
             "value": 1
         },
         "Наковальня": {
@@ -921,7 +922,7 @@
         },
         "Незеритовое улучшение": {
             "name": "minecraft:netherite_upgrade_smithing_template",
-            "price": 25,
+            "price": 45,
             "value": 1
         },
         "Рельсы": {
