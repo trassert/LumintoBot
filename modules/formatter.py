@@ -1,4 +1,5 @@
 from pymorphy3 import MorphAnalyzer
+import re
 
 morph = MorphAnalyzer()
 
@@ -23,3 +24,12 @@ def decline_number(number, noun):
     else:
         word = p.inflect({'gent', 'plur'}).word
     return f"{number} {word}"
+
+
+def formatter(text):
+    text = re.sub(r"\\boxed\{.*?\}", "", text)
+    return text.replace(
+        '$', '**'
+    ).replace(
+        '\cdot', '×'
+    )

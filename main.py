@@ -37,7 +37,7 @@ from modules.db import (
     update_shop,
     get_all_money
 )
-from modules.morphy import decline_number
+from modules.formatter import decline_number, formatter
 from modules.system_info import get_system_info
 from modules.mcrcon import MinecraftClient
 
@@ -130,14 +130,14 @@ async def async_ai_response(message):
             f'/gemini?q={message}&token={tokens.google}'
         ) as main_server:
             if main_server.status == codes.ok:
-                return await main_server.text()
+                return formatter(await main_server.text())
         async with session.get(
             'https://'
             'trassert0reserve.pythonanywhere.com'
             f'/gemini?q={message}&token={tokens.google}'
         ) as reserve_server:
             if reserve_server.status == codes.ok:
-                return await reserve_server.text()
+                return formatter(await reserve_server.text())
     return None
 
 
