@@ -942,7 +942,7 @@
         },
         "Яйцо призыва железного голема": {
             "name": "minecraft:iron_golem_spawn_egg",
-            "price": 12,
+            "price": 26,
             "value": 1
         }
     }
