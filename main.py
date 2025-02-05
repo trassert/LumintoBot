@@ -1210,10 +1210,10 @@ async def setup_ip(check_set=True):
 
 async def web_server():
     async def hotmc(request):
-        data = await request.post()
-        nick = data['nick']
-        sign = data['sign']
-        time = data['time']
+        load = await request.post()
+        nick = load['nick']
+        sign = load['sign']
+        time = load['time']
         logger.warning(f'{nick} проголосовал в {time} с хешем {sign}')
         hash = sha1(
             f'{nick}{time}{tokens.hotmc}'.encode()
@@ -1241,10 +1241,10 @@ async def web_server():
         return aiohttp.web.Response(text='ok')
 
     async def servers(request):
-        data = await request.post()
-        username = data['username']
-        sign = data['sign']
-        time = data['time']
+        load = await request.post()
+        username = load['username']
+        sign = load['sign']
+        time = load['time']
         logger.warning(f'{username} проголосовал в {time} с хешем {sign}')
         hash = md5(
             f'{username}|{time}|{tokens.mcservers}'.encode()
@@ -1295,8 +1295,8 @@ async def web_server():
 
     async def github(request):
         'Вебхук для гитхаба'
-        data = await request.json()
-        head = data['head_commit']
+        load = await request.json()
+        head = load['head_commit']
         await client.send_message(
             tokens.bot.chat,
             phrase.github.format(

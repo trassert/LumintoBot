@@ -17,23 +17,23 @@ def data(key, value=None, delete=None, log=True):
             with open(
                 path.join('db', 'data.json'), "r", encoding="utf-8"
             ) as f:
-                data = json.load(f)
+                load = json.load(f)
             with open(
                 path.join('db', 'data.json'), "w", encoding="utf-8"
             ) as f:
-                data[key] = value
-                data = dict(sorted(data.items()))
+                load[key] = value
+                load = dict(sorted(load.items()))
                 return json.dump(
-                    data, f, indent=4, ensure_ascii=False, sort_keys=True
+                    load, f, indent=4, ensure_ascii=False, sort_keys=True
                     )
         except FileNotFoundError:
             logger.error("Файл не найден")
             with open(
                 path.join('db', 'data.json'), "w", encoding="utf-8"
             ) as f:
-                data = {}
-                data[key] = value
-                return json.dump(data, f, indent=4, sort_keys=True)
+                load = {}
+                load[key] = value
+                return json.dump(load, f, indent=4, sort_keys=True)
         except json.decoder.JSONDecodeError:
             logger.error("Ошибка при чтении файла")
             with open(
@@ -47,14 +47,14 @@ def data(key, value=None, delete=None, log=True):
         with open(
             path.join('db', 'data.json'), "r", encoding="utf-8"
         ) as f:
-            data = json.load(f)
+            load = json.load(f)
         with open(
             path.join('db', 'data.json'), "w", encoding="utf-8"
         ) as f:
-            if key in data:
-                del data[key]
+            if key in load:
+                del load[key]
             return json.dump(
-                data, f, indent=4, ensure_ascii=False, sort_keys=True
+                load, f, indent=4, ensure_ascii=False, sort_keys=True
                 )
     else:
         if log:
@@ -63,8 +63,8 @@ def data(key, value=None, delete=None, log=True):
             with open(
                 path.join('db', 'data.json'), "r", encoding="utf-8"
             ) as f:
-                data = json.load(f)
-                return data.get(key)
+                load = json.load(f)
+                return load.get(key)
         except json.decoder.JSONDecodeError:
             logger.error("Ошибка при чтении файла")
             with open(
@@ -86,16 +86,16 @@ def get_money(id):
     with open(
         path.join('db', 'money.json'), 'r', encoding='utf8'
     ) as f:
-        data = json.load(f)
-        if id in data:
-            return data[id]
+        load = json.load(f)
+        if id in load:
+            return load[id]
 
     with open(
         path.join('db', 'money.json'), 'w', encoding='utf8'
     ) as f:
-        data[id] = 0
+        load[id] = 0
         json.dump(
-            data, f, indent=4, ensure_ascii=False, sort_keys=True
+            load, f, indent=4, ensure_ascii=False, sort_keys=True
         )
         return 0
 
@@ -105,8 +105,8 @@ def get_all_money():
     with open(
         path.join('db', 'money.json'), 'r', encoding='utf8'
     ) as f:
-        data = json.load(f)
-        return sum(data.values())
+        load = json.load(f)
+        return sum(load.values())
 
 
 def add_money(id, count):
@@ -114,24 +114,24 @@ def add_money(id, count):
     with open(
         path.join('db', 'money.json'), 'r', encoding='utf8'
     ) as f:
-        data = json.load(f)
-        if id in data:
-            old = data[id]
-            data[id] = data[id] + count
+        load = json.load(f)
+        if id in load:
+            old = load[id]
+            load[id] = load[id] + count
         else:
             old = 0
-            data[id] = count
+            load[id] = count
 
-    if data[id] < 0:
-        data[id] = 0
+    if load[id] < 0:
+        load[id] = 0
     with open(
         path.join('db', 'money.json'), 'w', encoding='utf8'
     ) as f:
         json.dump(
-            data, f, indent=4, ensure_ascii=False, sort_keys=True
+            load, f, indent=4, ensure_ascii=False, sort_keys=True
         )
-        logger.info(f'Изменён баланс {id} ({old} -> {data[id]})')
-        return data[id]
+        logger.info(f'Изменён баланс {id} ({old} -> {load[id]})')
+        return load[id]
 
 
 def give_id_by_nick_minecraft(nick):
@@ -139,9 +139,9 @@ def give_id_by_nick_minecraft(nick):
     with open(
         path.join('db', 'minecraft.json'), 'r', encoding='utf8'
     ) as f:
-        data = json.load(f)
-        if nick in data:
-            return data[nick]
+        load = json.load(f)
+        if nick in load:
+            return load[nick]
         return None
 
 
@@ -150,8 +150,8 @@ def give_nick_by_id_minecraft(id):
     with open(
         path.join('db', 'minecraft.json'), 'r', encoding='utf8'
     ) as f:
-        data = json.load(f)
-        for key, value in data.items():
+        load = json.load(f)
+        for key, value in load.items():
             if value == id:
                 return key
         return None
@@ -162,13 +162,13 @@ def add_nick_minecraft(nick, id):
     with open(
         path.join('db', 'minecraft.json'), 'r', encoding='utf8'
     ) as f:
-        data = json.load(f)
-    data[nick] = int(id)
+        load = json.load(f)
+    load[nick] = int(id)
     with open(
         path.join('db', 'minecraft.json'), 'w', encoding='utf8'
     ) as f:
         json.dump(
-            data, f, indent=4, ensure_ascii=False, sort_keys=True
+            load, f, indent=4, ensure_ascii=False, sort_keys=True
         )
 
 
@@ -177,13 +177,13 @@ def update_shop():
     with open(
         path.join('db', 'shop_all.json'), 'r', encoding='utf8'
     ) as f:
-        data = json.load(f)
+        load = json.load(f)
     themes = []
-    for theme in data:
+    for theme in load:
         themes.append(theme)
-    current_shop['theme'] = weighted_choice(themes, data('shop_weight'))
+    current_shop['theme'] = weighted_choice(themes, load('shop_weight'))
     current_items = []
-    all_items = list(data[current_shop['theme']].keys())
+    all_items = list(load[current_shop['theme']].keys())
     while len(current_items) != 5:
         current_items.append(choice(list(all_items)))
     while len(set(current_items)) != len(current_items) \
@@ -191,7 +191,7 @@ def update_shop():
         current_items = list(set(current_items))
         current_items.append(choice(all_items))
     for item in current_items:
-        current_shop[item] = data[current_shop['theme']][item]
+        current_shop[item] = load[current_shop['theme']][item]
     with open(
         path.join('db', 'shop_current.json'), 'w', encoding='utf8'
     ) as f:
@@ -204,8 +204,8 @@ def get_shop():
     with open(
         path.join('db', 'shop_current.json'), 'r', encoding='utf8'
     ) as f:
-        data = json.load(f)
-    return data
+        load = json.load(f)
+    return load
 
 
 class crocodile_stat:
@@ -217,16 +217,16 @@ class crocodile_stat:
         with open(
             path.join('db', 'crocodile_stat.json'), 'r', encoding='utf8'
         ) as f:
-            data = json.load(f)
-        if self.id in data:
-            return data[self.id]
+            load = json.load(f)
+        if self.id in load:
+            return load[self.id]
         else:
             with open(
                 path.join('db', 'crocodile_stat.json'), 'r', encoding='utf8'
             ) as f:
-                data[self.id] = 0
+                load[self.id] = 0
                 json.dump(
-                    data, f, indent=4, ensure_ascii=False, sort_keys=True
+                    load, f, indent=4, ensure_ascii=False, sort_keys=True
                 )
             return 0
 
@@ -234,21 +234,23 @@ class crocodile_stat:
         with open(
             path.join('db', 'crocodile_stat.json'), 'r', encoding='utf8'
         ) as f:
-            data = json.load(f)
-        if self.id in data:
-            data[self.id] += 1
+            load = json.load(f)
+        if self.id in load:
+            load[self.id] += 1
         else:
-            data[self.id] = 1
+            load[self.id] = 1
         with open(
             path.join('db', 'crocodile_stat.json'), 'w', encoding='utf8'
         ) as f:
             json.dump(
-                data, f, indent=4, ensure_ascii=False, sort_keys=True
+                load, f, indent=4, ensure_ascii=False, sort_keys=True
             )
 
     def get_all(self=False):
         with open(
             path.join('db', 'crocodile_stat.json'), 'r', encoding='utf8'
         ) as f:
-            data = json.load(f)
-        return dict(sorted(data.items(), key=lambda item: item[1], reverse=True))
+            load = json.load(f)
+        return dict(
+            sorted(load.items(), key=lambda item: item[1], reverse=True)
+        )
