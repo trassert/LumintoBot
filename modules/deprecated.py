@@ -327,3 +327,64 @@ async def mute_user(event):
 #             data, f, indent=4, ensure_ascii=False, sort_keys=True
 #         )
 #     return warns
+
+# 'Добавление статистики'
+# client.add_event_handler(
+#     stat, events.NewMessage(chats=tokens.bot.chat)
+# )
+
+# 'Пуш неактивных'
+# client.add_event_handler(
+#     push_unactive, events.NewMessage(incoming=True, pattern="/пуш неактив")
+# )
+# client.add_event_handler(
+#     push_unactive, events.NewMessage(incoming=True, pattern="/unactive")
+# )
+
+# 'Мут'
+# client.add_event_handler(
+#     mute_user, events.NewMessage(incoming=True, pattern="/мут")
+# )
+# client.add_event_handler(
+#     mute_user, events.NewMessage(incoming=True, pattern="/mute")
+# )
+
+# 'Мут'
+# client.add_event_handler(
+#     mute_user, events.NewMessage(incoming=True, pattern="/мут")
+# )
+# client.add_event_handler(
+#     mute_user, events.NewMessage(incoming=True, pattern="/mute")
+# )
+
+# 'Моя стата'
+# client.add_event_handler(
+#     stat_check,
+#     events.NewMessage(incoming=True, pattern="/моя стата")
+# )
+# client.add_event_handler(
+#     stat_check,
+#     events.NewMessage(incoming=True, pattern="/mystat")
+# )
+# client.add_event_handler(
+#     stat_check,
+#     events.NewMessage(incoming=True, pattern="/мстат")
+# )
+# client.add_event_handler(
+#     stat_check,
+#     events.NewMessage(incoming=True, pattern="сколько я написал")
+# )
+
+# 'Стата беседы'
+# client.add_event_handler(
+#     active_check, events.NewMessage(incoming=True, pattern="/актив")
+# )
+# client.add_event_handler(
+#     active_check, events.NewMessage(incoming=True, pattern="/топ актив")
+# )
+# client.add_event_handler(
+#     active_check, events.NewMessage(incoming=True, pattern="/топ соо")
+# )
+# client.add_event_handler(
+#     active_check, events.NewMessage(incoming=True, pattern="/top active")
+# )

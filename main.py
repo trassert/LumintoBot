@@ -13,6 +13,7 @@ from random import choice, randint
 from rich.logging import RichHandler
 from datetime import datetime
 from bestconfig import Config
+from traceback import format_exc
 
 from telethon.tl.types import (
     ReplyInlineMarkup,
@@ -93,7 +94,7 @@ def get_last_update():
             int(last[5]),
             int(last[6]),
         )
-    except:
+    except Exception:
         data('shop_update_time', str(datetime.now()))
         return get_last_update()
 
@@ -322,7 +323,11 @@ async def bot():
         elif data.decode('utf-8').startswith('word'):
             args = data.decode('utf-8').split('.')
             if args[1] == 'yes':
-                with open(path.join('db', 'crocodile_words.txt'), 'a', encoding='utf-8') as f:
+                with open(
+                    path.join('db', 'crocodile_words.txt'),
+                    'a',
+                    encoding='utf-8'
+                ) as f:
                     f.write(f'\n{args[2]}')
                 add_money(args[4], coofs.WordRequest)
                 await client.send_message(
@@ -428,7 +433,9 @@ async def bot():
                             if str(event.sender_id) in topers:
                                 all += round(bets[key]*coofs.TopBets)
                             else:
-                                all += round(bets[key]*data('crocodile_bet_coo'))
+                                all += round(
+                                    bets[key]*data('crocodile_bet_coo')
+                                )
                         else:
                             all += bets[key]
                     add_money(event.sender_id, all)
@@ -497,7 +504,8 @@ async def bot():
                                 text="✅ Играть", data=b"crocodile.start"
                             ),
                             KeyboardButtonCallback(
-                                text="❌ Остановить игру", data=b"crocodile.stop"
+                                text="❌ Остановить игру",
+                                data=b"crocodile.stop"
                             )
                         ]
                     )
@@ -510,7 +518,8 @@ async def bot():
                     KeyboardButtonRow(
                         [
                             KeyboardButtonCallback(
-                                text="❌ Остановить игру", data=b"crocodile.stop"
+                                text="❌ Остановить игру",
+                                data=b"crocodile.stop"
                             )
                         ]
                     )
@@ -898,74 +907,15 @@ async def bot():
 
     'Стата крокодила'
     client.add_event_handler(
-        crocodile_wins, events.NewMessage(incoming=True, pattern="/стат крокодил")
+        crocodile_wins, events.NewMessage(
+            incoming=True, pattern="/стат крокодил"
+        )
     )
 
     'Тест'
     client.add_event_handler(
         test, events.NewMessage(incoming=True, pattern="/тест")
     )
-
-    # 'Добавление статистики'
-    # client.add_event_handler(
-    #     stat, events.NewMessage(chats=tokens.bot.chat)
-    # )
-
-    # 'Пуш неактивных'
-    # client.add_event_handler(
-    #     push_unactive, events.NewMessage(incoming=True, pattern="/пуш неактив")
-    # )
-    # client.add_event_handler(
-    #     push_unactive, events.NewMessage(incoming=True, pattern="/unactive")
-    # )
-
-    # 'Мут'
-    # client.add_event_handler(
-    #     mute_user, events.NewMessage(incoming=True, pattern="/мут")
-    # )
-    # client.add_event_handler(
-    #     mute_user, events.NewMessage(incoming=True, pattern="/mute")
-    # )
-
-    # 'Мут'
-    # client.add_event_handler(
-    #     mute_user, events.NewMessage(incoming=True, pattern="/мут")
-    # )
-    # client.add_event_handler(
-    #     mute_user, events.NewMessage(incoming=True, pattern="/mute")
-    # )
-
-    # 'Моя стата'
-    # client.add_event_handler(
-    #     stat_check,
-    #     events.NewMessage(incoming=True, pattern="/моя стата")
-    # )
-    # client.add_event_handler(
-    #     stat_check,
-    #     events.NewMessage(incoming=True, pattern="/mystat")
-    # )
-    # client.add_event_handler(
-    #     stat_check,
-    #     events.NewMessage(incoming=True, pattern="/мстат")
-    # )
-    # client.add_event_handler(
-    #     stat_check,
-    #     events.NewMessage(incoming=True, pattern="сколько я написал")
-    # )
-
-    # 'Стата беседы'
-    # client.add_event_handler(
-    #     active_check, events.NewMessage(incoming=True, pattern="/актив")
-    # )
-    # client.add_event_handler(
-    #     active_check, events.NewMessage(incoming=True, pattern="/топ актив")
-    # )
-    # client.add_event_handler(
-    #     active_check, events.NewMessage(incoming=True, pattern="/топ соо")
-    # )
-    # client.add_event_handler(
-    #     active_check, events.NewMessage(incoming=True, pattern="/top active")
-    # )
 
     'ДНС'
     client.add_event_handler(
@@ -1146,104 +1096,116 @@ async def bot():
 
 
 async def setup_ip(check_set=True):
-    async with aiohttp.ClientSession() as session:
-        try:
+    '''
+    Обновляет динамику.
+    Параметр chech_set отвечает за принудительность
+    '''
+
+    error_text = ''
+    try:
+        async with aiohttp.ClientSession() as session:
+            try:
+                async with session.get(
+                    "https://v4.ident.me", timeout=3
+                ) as v4_ident:
+                    v4 = await v4_ident.text()
+            except Exception:
+                v4 = False
+                error_text += 'Не могу получить IPv4.\n'
+            try:
+                async with session.get(
+                    "https://v6.ident.me", timeout=3
+                ) as v6_ident:
+                    v6 = await v6_ident.text()
+            except Exception:
+                v6 = False
+                error_text += 'Не могу получить IPv6.\n'
+            if not v4 and not v6:
+                return logger.error('Ошибка при получении IP.'
+                                    'Сервер может быть недоступен')
+            elif v4 == data('ipv4') and v6 == data('ipv6') and check_set:
+                return logger.warning("IPv4 и IPv6 не изменились")
+            if check_set:
+                logger.warning("IPv4 или IPv6 изменились")
+            else:
+                logger.warning('Принудительно выставляю IP')
+            data('ipv4', v4)
+            data('ipv6', v6)
+
+            "NOIP синхронизация"
             async with session.get(
-                "https://v4.ident.me", timeout=3
-            ) as v4_ident:
-                v4 = await v4_ident.text()
-        except:
-            v4 = False
-        try:
-            async with session.get(
-                "https://v6.ident.me", timeout=3
-            ) as v6_ident:
-                v6 = await v6_ident.text()
-        except:
-            v6 = False
-        if not v4 and not v6:
-            return logger.error('Ошибка при получении IP.'
-                                'Сервер может быть недоступен')
-        elif v4 == data('ipv4') and v6 == data('ipv6') and check_set:
-            return logger.warning("IPv4 и IPv6 не изменились")
-        if check_set:
-            logger.warning("IPv4 или IPv6 изменились")
-        else:
-            logger.warning('Принудительно выставляю IP')
-        data('ipv4', v4)
-        data('ipv6', v6)
+                f'http://{tokens.noip.user}:{tokens.noip.password}'
+                '@dynupdate.no-ip.com/'
+                f'nic/update?hostname={data("host")}&myip={v4},{v6}',
+                headers={
+                    "User-Agent": "Trassert MinecraftServer' \
+                        '/Windows 11-22000 s3pple@yandex.ru"
+                },
+            ) as noip:
+                logger.info(f"Ответ NOIP: {await noip.text()}")
+                noip = await noip.text()
 
-        "NOIP синхронизация"
-        async with session.get(
-            f'http://{tokens.noip.user}:{tokens.noip.password}'
-            '@dynupdate.no-ip.com/'
-            f'nic/update?hostname={data("host")}&myip={v4},{v6}',
-            headers={
-                "User-Agent": "Trassert MinecraftServer' \
-                    '/Windows 11-22000 s3pple@yandex.ru"
-            },
-        ) as noip:
-            logger.info(f"Ответ NOIP: {await noip.text()}")
-            await noip.text()
+            "REGru синхронизация"
+            input_data = {
+                "username": tokens.reg.email,
+                "password": tokens.reg.password,
+                "output_content_type": "plain",
+                "domain_name": data('host')
+            }
+            post = await session.post(
+                'https://api.reg.ru/api/regru2/zone/clear',
+                data=input_data
+            )
+            out = await post.json(content_type='text/plain')
+            logger.warning(out)
 
-        "REGru синхронизация"
-        input_data = {
-            "username": tokens.reg.email,
-            "password": tokens.reg.password,
-            "output_content_type": "plain",
-            "domain_name": data('host')
-        }
-        post = await session.post(
-            'https://api.reg.ru/api/regru2/zone/clear',
-            data=input_data
-        )
-        out = await post.json(content_type='text/plain')
-        logger.warning(out)
+            input_data = {
+                "username": tokens.reg.email,
+                "password": tokens.reg.password,
+                "subdomain": "@",
+                "ipaddr": v4,
+                "output_content_type": "plain",
+                "domain_name": data('host')
+            }
+            post = await session.post(
+                'https://api.reg.ru/api/regru2/zone/add_alias',
+                data=input_data
+            )
+            out = await post.json(content_type='text/plain')
+            logger.warning(out)
 
-        input_data = {
-            "username": tokens.reg.email,
-            "password": tokens.reg.password,
-            "subdomain": "@",
-            "ipaddr": v4,
-            "output_content_type": "plain",
-            "domain_name": data('host')
-        }
-        post = await session.post(
-            'https://api.reg.ru/api/regru2/zone/add_alias',
-            data=input_data
-        )
-        out = await post.json(content_type='text/plain')
-        logger.warning(out)
+            input_data = {
+                "username": tokens.reg.email,
+                "password": tokens.reg.password,
+                "subdomain": "@",
+                "ipaddr": v6,
+                "output_content_type": "plain",
+                "domain_name": data('host')
+            }
+            post = await session.post(
+                'https://api.reg.ru/api/regru2/zone/add_aaaa',
+                data=input_data
+            )
+            out = await post.json(content_type='text/plain')
+            logger.warning(out)
 
-        input_data = {
-            "username": tokens.reg.email,
-            "password": tokens.reg.password,
-            "subdomain": "@",
-            "ipaddr": v6,
-            "output_content_type": "plain",
-            "domain_name": data('host')
-        }
-        post = await session.post(
-            'https://api.reg.ru/api/regru2/zone/add_aaaa',
-            data=input_data
-        )
-        out = await post.json(content_type='text/plain')
-        logger.warning(out)
-
-        input_data = {
-            "username": tokens.reg.email,
-            "password": tokens.reg.password,
-            "subdomain": "v6",
-            "ipaddr": v6,
-            "output_content_type": "plain",
-            "domain_name": data('host')
-        }
-        post = await session.post(
-            'https://api.reg.ru/api/regru2/zone/add_aaaa',
-            data=input_data
-        )
-        out = await post.json(content_type='text/plain')
-        logger.warning(out)
+            input_data = {
+                "username": tokens.reg.email,
+                "password": tokens.reg.password,
+                "subdomain": "v6",
+                "ipaddr": v6,
+                "output_content_type": "plain",
+                "domain_name": data('host')
+            }
+            post = await session.post(
+                'https://api.reg.ru/api/regru2/zone/add_aaaa',
+                data=input_data
+            )
+            out = await post.json(content_type='text/plain')
+            logger.warning(out)
+    except Exception:
+        error_text += format_exc()
+    return error_text if error_text != '' else noip
 
 
 async def web_server():
