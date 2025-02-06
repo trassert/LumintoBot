@@ -123,22 +123,24 @@ async def async_ai_response(message):
     ) if len(message) < 100 else logger.info(
         f"Выполняю запрос к AI: {message[:100]}..."
     )
-    async with aiohttp.ClientSession() as session:
-        async with session.get(
-            'https://'
-            'trassert.pythonanywhere.com'
-            f'/gemini?q={message}&token={tokens.google}'
-        ) as main_server:
-            if main_server.status == codes.ok:
-                return formatter(await main_server.text())
-        async with session.get(
-            'https://'
-            'trassert0reserve.pythonanywhere.com'
-            f'/gemini?q={message}&token={tokens.google}'
-        ) as reserve_server:
-            if reserve_server.status == codes.ok:
-                return formatter(await reserve_server.text())
-    return None
+    try:
+        async with aiohttp.ClientSession() as session:
+            async with session.get(
+                'https://'
+                'trassert.pythonanywhere.com'
+                f'/gemini?q={message}&token={tokens.google}'
+            ) as main_server:
+                if main_server.status == codes.ok:
+                    return formatter(await main_server.text())
+            async with session.get(
+                'https://'
+                'trassert0reserve.pythonanywhere.com'
+                f'/gemini?q={message}&token={tokens.google}'
+            ) as reserve_server:
+                if reserve_server.status == codes.ok:
+                    return formatter(await reserve_server.text())
+    except TimeoutError:
+        return None
 
 
 async def bot():
