@@ -269,19 +269,46 @@ async def bot():
             )
             return await event.reply(phrase.crocodile.up)
         elif data == b"crocodile.stop":
-            if setting('crocodile_super_game') == 1:
-                return await event.answer(
-                    phrase.crocodile.super_game_here, alert=True
-                )
+            entity = await client.get_entity(event.sender_id)
+            user = f'@{entity.username}' if entity.username \
+                else entity.first_name + " " + entity.last_name
             if setting("current_game") == 0:
                 return await event.answer(
                     phrase.crocodile.already_down, alert=True
                 )
+            if setting('crocodile_super_game') == 1:
+                return await event.answer(
+                    phrase.crocodile.super_game_here, alert=True
+                )
+            bets_json = setting('crocodile_bets')
+            if bets_json != {}:
+                bets = round(sum(list(bets_json.values())) / 2)
+                bets = 1 if bets < 1 else bets
+                sender_balance = get_money(event.sender_id)
+                if sender_balance < bets:
+                    return await event.answer(
+                        phrase.crocodile.not_enough.format(
+                            decline_number(sender_balance, 'изумруд')
+                        ),
+                        alert=True
+                    )
+                add_money(event.sender_id, -bets)
             word = setting("current_game")["word"]
             setting("current_game", 0)
             setting('crocodile_last_hint', 0)
             client.remove_event_handler(crocodile_hint)
             client.remove_event_handler(crocodile_handler)
+            if bets_json != {}:
+                return await event.reply(
+                    phrase.crocodile.down_payed.format(
+                        user=user,
+                        money=decline_number(
+                            bets,
+                            'изумруд'
+                        ),
+                        word=word
+                    )
+                )
             return await event.reply(phrase.crocodile.down.format(word))
         elif data.decode('utf-8').startswith('shop'):
             args = data.decode('utf-8').split('.')
