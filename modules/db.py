@@ -8,7 +8,7 @@ from .random import weighted_choice
 logger = logging.getLogger(__name__)
 
 
-def data(key, value=None, delete=None, log=True):
+def setting(key, value=None, delete=None, log=True):
     "Изменить/получить ключ из настроек"
     if value is not None:
         if log:
@@ -181,7 +181,7 @@ def update_shop():
     themes = []
     for theme in load:
         themes.append(theme)
-    current_shop['theme'] = weighted_choice(themes, data('shop_weight'))
+    current_shop['theme'] = weighted_choice(themes, setting('shop_weight'))
     current_items = []
     all_items = list(load[current_shop['theme']].keys())
     while len(current_items) != 5:

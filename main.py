@@ -33,7 +33,7 @@ from modules.db import (
     get_shop,
     give_id_by_nick_minecraft,
     give_nick_by_id_minecraft,
-    data,
+    setting,
     update_shop,
     get_all_money
 )
@@ -75,7 +75,7 @@ def remove_section_marks(text):
 
 
 def get_last_update():
-    last = data('shop_update_time')
+    last = setting('shop_update_time')
     if last is not None:
         last = last.replace(
             ':', '-'
@@ -95,7 +95,7 @@ def get_last_update():
             int(last[6]),
         )
     except Exception:
-        data('shop_update_time', str(datetime.now()))
+        setting('shop_update_time', str(datetime.now()))
         return get_last_update()
 
 
@@ -109,8 +109,8 @@ async def time_to_update_shop():
         'Если время прошло'
         if today - last > timedelta(hours=2):
             update_shop()
-            data('shop_version', data('shop_version') + 1)
-            data(
+            setting('shop_version', setting('shop_version') + 1)
+            setting(
                 'shop_update_time', str(today).split(':')[0]+':00:00.000000'
             )
         await asyncio.sleep(abs(seconds))
@@ -166,16 +166,16 @@ async def bot():
         if give_nick_by_id_minecraft(event.sender_id) is not None:
             return await event.reply(phrase.nick.already_have)
 
-        add_money(event.sender_id, data('link_gift'))
+        add_money(event.sender_id, setting('link_gift'))
         add_nick_minecraft(nick, event.sender_id)
         return await event.reply(
             phrase.nick.success.format(
-                decline_number(data('link_gift'), 'изумруд')
+                decline_number(setting('link_gift'), 'изумруд')
             )
         )
 
     async def shop(event):
-        version = data('shop_version')
+        version = setting('shop_version')
         keyboard = ReplyInlineMarkup(
             [
                 KeyboardButtonRow(
@@ -241,11 +241,11 @@ async def bot():
         data = event.data
         logger.info(f'{event.sender_id} отправил КБ - {data}')
         if data == b"crocodile.start":
-            if data('crocodile_super_game') == 1:
+            if setting('crocodile_super_game') == 1:
                 return await event.answer(
                     phrase.crocodile.super_game_here, alert=True
                 )
-            if data("current_game") != 0:
+            if setting("current_game") != 0:
                 return await event.answer(phrase.crocodile.no, alert=True)
             with open("db\\crocodile_words.txt", 'r', encoding='utf8') as f:
                 word = choice(f.read().split('\n'))
@@ -255,7 +255,7 @@ async def bot():
                     unsec += "_"
                 elif x == " ":
                     unsec += x
-            data(
+            setting(
                 "current_game",
                 {"hints": [], "word": word, "unsec": unsec}
             )
@@ -269,23 +269,23 @@ async def bot():
             )
             return await event.reply(phrase.crocodile.up)
         elif data == b"crocodile.stop":
-            if data('crocodile_super_game') == 1:
+            if setting('crocodile_super_game') == 1:
                 return await event.answer(
                     phrase.crocodile.super_game_here, alert=True
                 )
-            if data("current_game") == 0:
+            if setting("current_game") == 0:
                 return await event.answer(
                     phrase.crocodile.already_down, alert=True
                 )
-            word = data("current_game")["word"]
-            data("current_game", 0)
-            data('crocodile_last_hint', 0)
+            word = setting("current_game")["word"]
+            setting("current_game", 0)
+            setting('crocodile_last_hint', 0)
             client.remove_event_handler(crocodile_hint)
             client.remove_event_handler(crocodile_handler)
             return await event.reply(phrase.crocodile.down.format(word))
         elif data.decode('utf-8').startswith('shop'):
             args = data.decode('utf-8').split('.')
-            if int(args[-1]) != data("shop_version"):
+            if int(args[-1]) != setting("shop_version"):
                 return await event.answer(phrase.shop.old, alert=True)
             nick = give_nick_by_id_minecraft(event.sender_id)
             if nick is None:
@@ -304,9 +304,9 @@ async def bot():
                 )
             try:
                 async with MinecraftClient(
-                    host=data('ipv4'),
-                    port=data('rcon_port_purpur'),
-                    password=data('rcon_password_purpur')
+                    host=setting('ipv4'),
+                    port=setting('rcon_port_purpur'),
+                    password=setting('rcon_password_purpur')
                 ) as rcon:
                     command = f'invgive {nick} {item["name"]} {item["value"]}'
                     logger.info(f'Выполняется команда: {command}')
@@ -360,7 +360,7 @@ async def bot():
                 )
 
     async def host(event):
-        await event.reply(phrase.server.host.format(data("host")))
+        await event.reply(phrase.server.host.format(setting("host")))
 
     async def sysinfo(event):
         await event.reply(get_system_info())
@@ -378,15 +378,15 @@ async def bot():
         await event.reply(phrase.ping.set.format(ping))
 
     async def crocodile_hint(event):
-        hint = data("current_game")["hints"]
+        hint = setting("current_game")["hints"]
         if event.sender_id in hint:
             return await event.reply(phrase.crocodile.hints_all)
         hint.append(event.sender_id)
-        db = data("current_game")
+        db = setting("current_game")
         db["hints"] = hint
-        data("current_game", db)
-        word = data("current_game")["word"]
-        last_hint = data("crocodile_last_hint")
+        setting("current_game", db)
+        word = setting("current_game")["word"]
+        last_hint = setting("crocodile_last_hint")
         if last_hint != 0:
             check_last = 'Так же учитывай, ' \
                 f'что подсказка {last_hint} уже была.'
@@ -400,22 +400,22 @@ async def bot():
             'содержать слово в любом случае. ' + check_last
         )
         if response is None:
-            hint = data("current_game")["hints"]
+            hint = setting("current_game")["hints"]
             hint.remove(event.sender_id)
-            db = data("current_game")
+            db = setting("current_game")
             db["hints"] = hint
-            data("current_game", db)
+            setting("current_game", db)
             return await event.reply(phrase.crocodile.error)
-        data("crocodile_last_hint", response)
+        setting("crocodile_last_hint", response)
         await event.reply(response)
 
     async def crocodile_handler(event):
         text = event.text.strip().lower()
         if len(text) > 0:
-            current_word = data("current_game")["word"]
-            current_mask = list(data("current_game")["unsec"])
+            current_word = setting("current_game")["word"]
+            current_mask = list(setting("current_game")["unsec"])
             if text == current_word:
-                bets = data('crocodile_bets')
+                bets = setting('crocodile_bets')
                 all = 0
                 bets_str = ''
                 topers = []
@@ -432,7 +432,7 @@ async def bot():
                                 all += round(bets[key]*coofs.TopBets)
                             else:
                                 all += round(
-                                    bets[key]*data('crocodile_bet_coo')
+                                    bets[key]*setting('crocodile_bet_coo')
                                 )
                         else:
                             all += bets[key]
@@ -440,13 +440,13 @@ async def bot():
                     bets_str = phrase.crocodile.bet_win.format(
                         decline_number(all, 'изумруд'),
                     )
-                data("current_game", 0)
-                data("crocodile_bets", {})
-                data("crocodile_last_hint", 0)
-                if data('crocodile_super_game') == 1:
-                    data('crocodile_super_game', 0)
-                    data('max_bet', data('default_max_bet'))
-                    data('min_bet', data('default_min_bet'))
+                setting("current_game", 0)
+                setting("crocodile_bets", {})
+                setting("crocodile_last_hint", 0)
+                if setting('crocodile_super_game') == 1:
+                    setting('crocodile_super_game', 0)
+                    setting('max_bet', setting('default_max_bet'))
+                    setting('min_bet', setting('default_min_bet'))
                 client.remove_event_handler(crocodile_hint)
                 client.remove_event_handler(crocodile_handler)
                 crocodile_stat(event.sender_id).add()
@@ -470,18 +470,18 @@ async def bot():
                         n = n + 1
                 if "".join(current_mask) == current_word:
                     current_mask[randint(0, len(current_mask)-1)] = '_'
-                    cgame = data("current_game")
+                    cgame = setting("current_game")
                     cgame["unsec"] = "".join(current_mask)
-                    data("current_game", cgame)
+                    setting("current_game", cgame)
                     return await event.reply(
                         phrase.crocodile.new.format(
                             "".join(current_mask).replace("_", "..")
                         )
                     )
-                if list(data("current_game")["unsec"]) != current_mask:
-                    cgame = data("current_game")
+                if list(setting("current_game")["unsec"]) != current_mask:
+                    cgame = setting("current_game")
                     cgame["unsec"] = "".join(current_mask)
-                    data("current_game", cgame)
+                    setting("current_game", cgame)
                     return await event.reply(
                         phrase.crocodile.new.format(
                             "".join(current_mask).replace("_", "..")
@@ -489,11 +489,11 @@ async def bot():
                     )
 
     async def crocodile(event):
-        if not event.chat_id == data("default_chat"):
+        if not event.chat_id == setting("default_chat"):
             return await event.reply(phrase.default_chat)
         else:
             pass
-        if data("current_game") == 0:
+        if setting("current_game") == 0:
             keyboard = ReplyInlineMarkup(
                 [
                     KeyboardButtonRow(
@@ -530,20 +530,20 @@ async def bot():
             bet = int(
                 event.text.split(" ", maxsplit=1)[1]
             )
-            if bet < data('min_bet'):
+            if bet < setting('min_bet'):
                 return await event.reply(
                     phrase.money.min_count.format(
-                        decline_number(data('min_bet'), 'изумруд')
+                        decline_number(setting('min_bet'), 'изумруд')
                     )
                 )
-            elif bet > data('max_bet'):
+            elif bet > setting('max_bet'):
                 return await event.reply(
                     phrase.money.max_count.format(
-                        decline_number(data('max_bet'), 'изумруд')
+                        decline_number(setting('max_bet'), 'изумруд')
                     )
                 )
         except IndexError:
-            bet = data('min_bet')
+            bet = setting('min_bet')
         except ValueError:
             return await event.reply(
                 phrase.money.nan_count
@@ -555,18 +555,18 @@ async def bot():
                     decline_number(sender_balance, 'изумруд')
                 )
             )
-        if data("current_game") != 0:
+        if setting("current_game") != 0:
             return await event.reply(
                 phrase.crocodile.no
             )
-        all_bets = data('crocodile_bets')
+        all_bets = setting('crocodile_bets')
         if str(event.sender_id) in all_bets:
             return await event.reply(
                 phrase.crocodile.bet_already
             )
         add_money(event.sender_id, -bet)
         all_bets[str(event.sender_id)] = bet
-        data('crocodile_bets', all_bets)
+        setting('crocodile_bets', all_bets)
         return await event.reply(
             phrase.crocodile.bet.format(
                 decline_number(bet, 'изумруд')
@@ -574,20 +574,20 @@ async def bot():
         )
 
     async def super_game(event):
-        if event.sender_id not in data('admins_id'):
+        if event.sender_id not in setting('admins_id'):
             return await event.reply(phrase.perms.no)
         arg = event.text.lower().split(" ", maxsplit=1)[1]
-        bets = data('crocodile_bets')
+        bets = setting('crocodile_bets')
         bets[str(tokens.bot.creator)] = 50
-        data('crocodile_bets', bets)
-        data('crocodile_super_game', 1)
-        data('max_bet', 100)
-        data('min_bet', 50)
+        setting('crocodile_bets', bets)
+        setting('crocodile_super_game', 1)
+        setting('max_bet', 100)
+        setting('min_bet', 50)
         await client.send_message(
             tokens.bot.chat, phrase.crocodile.super_game_wait
         )
         await asyncio.sleep(60)
-        data(
+        setting(
             'current_game',
             {
                 'hints': [],
@@ -623,17 +623,17 @@ async def bot():
 
     async def mcrcon(event):
         if event.text[0] == 'f':
-            host = data('ipv4')
-            port = data('rcon_port_fabric')
+            host = setting('ipv4')
+            port = setting('rcon_port_fabric')
             password = tokens.rcon
         elif event.text[0] == 'p':
-            host = data('ipv4')
-            port = data('rcon_port_purpur')
+            host = setting('ipv4')
+            port = setting('rcon_port_purpur')
             password = tokens.rcon
         else:
             return await event.reply(phrase.no.server)
 
-        if event.sender_id not in data('admins_id'):
+        if event.sender_id not in setting('admins_id'):
             return await event.reply(phrase.perms.no)
         command = event.text[2:]
         logger.info(f'Выполняется команда: {command}')
@@ -671,9 +671,9 @@ async def bot():
                     phrase.money.no_people
                 )
         user = user.full_user.id
-        admins = data('admins_id')
+        admins = setting('admins_id')
         admins.append(user)
-        data('admins_id', admins)
+        setting('admins_id', admins)
         return await event.reply(
             phrase.perms.admin_add.format(nick=tag, id=user.full_user.id)
         )
@@ -685,16 +685,16 @@ async def bot():
         user = await client(
             GetFullUserRequest(tag)
         )
-        admins = data('admins_id')
+        admins = setting('admins_id')
         admins.remove(user.full_user.id)
-        data('admins_id', admins)
+        setting('admins_id', admins)
         return await event.reply(phrase.perms.admin_del)
 
     async def server_top_list(event):
         try:
             async with MinecraftClient(
-                host=data('ipv4'),
-                port=data('rcon_port_purpur'),
+                host=setting('ipv4'),
+                port=setting('rcon_port_purpur'),
                 password=tokens.rcon
             ) as rcon:
                 await event.reply(
@@ -723,7 +723,7 @@ async def bot():
         )
 
     async def add_balance(event):
-        if event.sender_id not in data('admins_id'):
+        if event.sender_id not in setting('admins_id'):
             return await event.reply(phrase.perms.no)
         args = event.text.split(" ", maxsplit=3)
         try:
@@ -809,7 +809,7 @@ async def bot():
         )
 
     async def tg_dns(event):
-        if event.sender_id not in data('admins_id'):
+        if event.sender_id not in setting('admins_id'):
             return await event.reply(phrase.perms.no)
         return await event.reply(
             phrase.dns.format(await setup_ip(check_set=False)),
@@ -817,7 +817,7 @@ async def bot():
         )
 
     async def test(event):
-        if event.sender_id not in data('admins_id'):
+        if event.sender_id not in setting('admins_id'):
             return await event.reply(phrase.perms.no)
         reply_to_msg = event.reply_to_msg_id
         if reply_to_msg:
@@ -1085,7 +1085,7 @@ async def bot():
     )
     client.add_event_handler(callback_handler, events.CallbackQuery())
 
-    if data("current_game") != 0:
+    if setting("current_game") != 0:
         client.add_event_handler(
             crocodile_handler,
             events.NewMessage(incoming=True, chats=tokens.bot.chat)
@@ -1126,20 +1126,20 @@ async def setup_ip(check_set=True):
             if not v4 and not v6:
                 return logger.error('Ошибка при получении IP.'
                                     'Сервер может быть недоступен')
-            elif v4 == data('ipv4') and v6 == data('ipv6') and check_set:
+            elif v4 == setting('ipv4') and v6 == setting('ipv6') and check_set:
                 return logger.warning("IPv4 и IPv6 не изменились")
             if check_set:
                 logger.warning("IPv4 или IPv6 изменились")
             else:
                 logger.warning('Принудительно выставляю IP')
-            data('ipv4', v4)
-            data('ipv6', v6)
+            setting('ipv4', v4)
+            setting('ipv6', v6)
 
             "NOIP синхронизация"
             async with session.get(
                 f'http://{tokens.noip.name}:{tokens.noip.password}'
                 '@dynupdate.no-ip.com/'
-                f'nic/update?hostname={data("noip_host")}&myip={v4},{v6}',
+                f'nic/update?hostname={setting("noip_host")}&myip={v4},{v6}',
                 headers={
                     "User-Agent": "Trassert MinecraftServer' \
                         '/Windows 11-22000 s3pple@yandex.ru"
@@ -1153,7 +1153,7 @@ async def setup_ip(check_set=True):
                 "username": tokens.reg.email,
                 "password": tokens.reg.password,
                 "output_content_type": "plain",
-                "domain_name": data('host')
+                "domain_name": setting('host')
             }
             post = await session.post(
                 'https://api.reg.ru/api/regru2/zone/clear',
@@ -1168,7 +1168,7 @@ async def setup_ip(check_set=True):
                 "subdomain": "@",
                 "ipaddr": v4,
                 "output_content_type": "plain",
-                "domain_name": data('host')
+                "domain_name": setting('host')
             }
             post = await session.post(
                 'https://api.reg.ru/api/regru2/zone/add_alias',
@@ -1183,7 +1183,7 @@ async def setup_ip(check_set=True):
                 "subdomain": "@",
                 "ipaddr": v6,
                 "output_content_type": "plain",
-                "domain_name": data('host')
+                "domain_name": setting('host')
             }
             post = await session.post(
                 'https://api.reg.ru/api/regru2/zone/add_aaaa',
@@ -1198,7 +1198,7 @@ async def setup_ip(check_set=True):
                 "subdomain": "v6",
                 "ipaddr": v6,
                 "output_content_type": "plain",
-                "domain_name": data('host')
+                "domain_name": setting('host')
             }
             post = await session.post(
                 'https://api.reg.ru/api/regru2/zone/add_aaaa',
@@ -1323,7 +1323,7 @@ async def web_server():
     runner = aiohttp.web.AppRunner(app)
     await runner.setup()
     ipv4 = aiohttp.web.TCPSite(runner, '0.0.0.0', 5000)
-    ipv6 = aiohttp.web.TCPSite(runner, data('ipv6'), 5000)
+    ipv6 = aiohttp.web.TCPSite(runner, setting('ipv6'), 5000)
     await ipv4.start()
     await ipv6.start()
 
@@ -1343,7 +1343,7 @@ async def main():
 
 
 if __name__ == "__main__":
-    if sum(data('shop_weight').values()) != 100:
+    if sum(setting('shop_weight').values()) != 100:
         logger.error('Сумма весов в магазине не равна 100!')
     try:
         asyncio.run(main())
