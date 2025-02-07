@@ -335,7 +335,7 @@ async def bot():
                 async with MinecraftClient(
                     host=setting('ipv4'),
                     port=setting('rcon_port_purpur'),
-                    password=setting('rcon_password_purpur')
+                    password=tokens.rcon
                 ) as rcon:
                     command = f'invgive {nick} {item["name"]} {item["value"]}'
                     logger.info(f'Выполняется команда: {command}')
