@@ -31,5 +31,5 @@ def formatter(text):
     return text.replace(
         '$', '**'
     ).replace(
-        '\\cdot', '×'
+        '\\cdot', '×'  # ! Экранизация необходима
     )
