@@ -6,7 +6,6 @@ import aiohttp.web
 
 from time import time
 from hashlib import sha1, md5
-from requests import codes
 from os import listdir, path
 from datetime import timedelta
 from random import choice, randint
@@ -37,9 +36,10 @@ from modules.db import (
     update_shop,
     get_all_money
 )
-from modules.formatter import decline_number, formatter
+from modules.formatter import decline_number
 from modules.system_info import get_system_info
 from modules.mcrcon import MinecraftClient
+from modules.ai import ai_response
 
 tokens = Config(path.join('configs', 'tokens.yml'))
 coofs = Config(path.join('configs', 'coofs.yml'))
@@ -114,33 +114,6 @@ async def time_to_update_shop():
                 'shop_update_time', str(today).split(':')[0]+':00:00.000000'
             )
         await asyncio.sleep(abs(seconds))
-
-
-async def async_ai_response(message):
-    "Запрос к Google Gemini"
-    logger.info(
-        f"Выполняю запрос к AI: {message}"
-    ) if len(message) < 100 else logger.info(
-        f"Выполняю запрос к AI: {message[:100]}..."
-    )
-    try:
-        async with aiohttp.ClientSession() as session:
-            async with session.get(
-                'https://'
-                'trassert.pythonanywhere.com'
-                f'/gemini?q={message}&token={tokens.google}'
-            ) as main_server:
-                if main_server.status == codes.ok:
-                    return formatter(await main_server.text())
-            async with session.get(
-                'https://'
-                'trassert0reserve.pythonanywhere.com'
-                f'/gemini?q={message}&token={tokens.google}'
-            ) as reserve_server:
-                if reserve_server.status == codes.ok:
-                    return formatter(await reserve_server.text())
-    except TimeoutError:
-        return None
 
 
 async def bot():
@@ -421,7 +394,7 @@ async def bot():
                 f'что подсказка {last_hint} уже была.'
         else:
             check_last = ''
-        response = await async_ai_response(
+        response = await ai_response(
             f'Сделай подсказку для слова "{word}". '
             'Ни в коем случае не добавляй никаких "подсказка для слова.." '
             'и т.п, ответ должен содержать только подсказку. '
@@ -641,7 +614,7 @@ async def bot():
             arg = event.text.split(" ", maxsplit=1)[1]
         except IndexError:
             return await event.reply(phrase.no.response)
-        response = await async_ai_response(arg)
+        response = await ai_response(arg)
         if response is None:
             return await event.reply(phrase.server.overload)
         if len(response) > 4096:
