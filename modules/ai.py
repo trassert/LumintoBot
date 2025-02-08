@@ -40,6 +40,6 @@ async def ai_response(message):
                     server.format(message=message, token=tokens.google)
                 ) as request:
                     if request.status == codes.ok:
-                        return await formatter(request.text())
+                        return formatter(await request.text())
             except TimeoutError:
                 return None
