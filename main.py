@@ -39,7 +39,7 @@ from modules.db import (
 from modules.formatter import decline_number
 from modules.system_info import get_system_info
 from modules.mcrcon import MinecraftClient
-from modules.ai import ai_response
+from modules.ai import ai_response, ai_servers
 
 tokens = Config(path.join('configs', 'tokens.yml'))
 coofs = Config(path.join('configs', 'coofs.yml'))
@@ -377,7 +377,47 @@ async def bot():
             ping = phrase.ping.min
         else:
             ping = f"за {str(ping)} сек."
-        await event.reply(phrase.ping.set.format(ping))
+        try:
+            arg = event.text.split(' ')[1].lower()
+        except IndexError:
+            arg = None
+        all_servers_ping = []
+        if arg in [
+            'all',
+            'подробно',
+            'подробный',
+            'полн',
+            'полный',
+            'весь',
+            'ии',
+            'фулл',
+            'full'
+        ]:
+            async with aiohttp.ClientSession() as session:
+                n = 1
+                for server in ai_servers:
+                    timestamp = time()
+                    async with session.get(server) as request:
+                        try:
+                            if await request.text() == 'ok':
+                                server_ping = round(time() - timestamp, 2)
+                                if server_ping > 0:
+                                    server_ping = f"за {server_ping} сек."
+                                else:
+                                    server_ping = phrase.ping.min
+                                all_servers_ping.append(
+                                    f'\n🌐 : Сервер {n} ответил {server_ping}'
+                                )
+                            else:
+                                all_servers_ping.append(
+                                    f'\n❌ : Сервер {n} - Ошибка!'
+                                )
+                        except TimeoutError:
+                            all_servers_ping.append(
+                                f'❌ : Сервер {n} - Нет подключения!'
+                            )
+                    n += 1
+        return await event.reply(phrase.ping.set.format(ping)+''.join(all_servers_ping))
 
     async def crocodile_hint(event):
         hint = setting("current_game")["hints"]
@@ -1319,7 +1359,7 @@ async def web_server():
             aiohttp.web.post('/hotmc', hotmc),
             aiohttp.web.post('/servers', servers),
             aiohttp.web.post('/github', github),
-            aiohttp.web.get('/version', version),
+            aiohttp.web.get('/version', version)
         ]
     )
     runner = aiohttp.web.AppRunner(app)

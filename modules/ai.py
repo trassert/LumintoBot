@@ -10,21 +10,17 @@ logger = logging.getLogger(__name__)
 
 tokens = Config(path.join('configs', 'tokens.yml'))
 
-servers = [
+ai_servers = [
     'https://'
     '8f00b559-ee6f-4441-88f8-768ff444297d-00-t3sgt8jrx79r.'
-    'pike.replit.dev'
-    '/gemini?q={message}&token={token}',
+    'pike.replit.dev/',
 
     'https://'
-    'trassert0reserve.pythonanywhere.com'
-    '/gemini?q={message}&token={token}',
+    'trassert0reserve.pythonanywhere.com/',
 
     'https://'
-    'trassert.pythonanywhere.com'
-    '/gemini?q={message}&token={token}'
+    'trassert.pythonanywhere.com/'
 ]
-
 
 async def ai_response(message):
     "Запрос к Google Gemini"
@@ -34,10 +30,10 @@ async def ai_response(message):
         f"Выполняю запрос к AI: {message[:100]}..."
     )
     async with aiohttp.ClientSession() as session:
-        for server in servers:
+        for server in ai_servers:
             try:
                 async with session.get(
-                    server.format(message=message, token=tokens.google)
+                    server+'gemini?q={message}&token={token}'.format(message=message, token=tokens.google)
                 ) as request:
                     if request.status == codes.ok:
                         return formatter(await request.text())
