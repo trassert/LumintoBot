@@ -48,7 +48,7 @@ class MinecraftClient:
 
     async def _send(self, typen, message):
         if not self._writer:
-            raise ClientError('Not connected.')
+            raise ClientError('Не подключён.')
 
         out = struct.pack(
             '<li', 0, typen

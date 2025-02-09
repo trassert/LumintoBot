@@ -880,10 +880,13 @@ async def bot():
         for id in all.keys():
             if n > 10:
                 break
-            entity = await client.get_entity(int(id))
-            name = entity.first_name
-            if entity.last_name is not None:
-                name += f' {entity.last_name}'
+            try:
+                entity = await client.get_entity(int(id))
+                name = entity.first_name
+                if entity.last_name is not None:
+                    name += f' {entity.last_name}'
+            except:
+                name = 'Неопознанный персонаж'
             text += f'{n}. {name}: {all[id]}\n'
             n += 1
         return await event.reply(
