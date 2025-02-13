@@ -945,5 +945,42 @@
             "price": 26,
             "value": 1
         }
+    },
+    "end": {
+        "Стержень Энда": {
+            "name": "minecraft:end_rod",
+            "price": 13,
+            "value": 1
+        },
+        "Голова дракона": {
+            "name": "minecraft:dragon_head",
+            "price": 36,
+            "value": 1
+        },
+        "Зелье возврата": {
+            "name": "minecraft:potion[custom_name='{\"text\":\"Зелье возврата\",\"italic\":false}',custom_data='{recallpotion:1}',hide_additional_tooltip={},enchantment_glint_override=true,potion_contents={custom_color:249343},rarity=\"rare\"]",
+            "price": 32,
+            "value": 1
+        },
+        "Элитры": {
+            "name": "minecraft:elytra",
+            "price": 125,
+            "value": 1
+        },
+        "Кристалл Энда": {
+            "name": "minecraft:end_crystal",
+            "price": 32,
+            "value": 2
+        },
+        "Драконье дыхание": {
+            "name": "minecraft:dragon_breath",
+            "price": 20,
+            "value": 1
+        },
+        "Плод хоруса": {
+            "name": "minecraft:chorus_fruit",
+            "price": 16,
+            "value": 3
+        }
     }
 }

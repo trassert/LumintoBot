@@ -100,6 +100,7 @@ def get_last_update():
 
 
 async def time_to_update_shop():
+    await asyncio.sleep(10)  # ! Для предотвращения блокировки
     while True:
         today = datetime.now()
         last = get_last_update()
@@ -108,7 +109,13 @@ async def time_to_update_shop():
         ).total_seconds()
         'Если время прошло'
         if today - last > timedelta(hours=2):
-            update_shop()
+            theme = update_shop()
+            await client.send_message(
+                tokens.bot.chat,
+                phrase.shop.update.format(
+                    theme=phrase.shop_quotes[theme]['translate']
+                )
+            )
             setting('shop_version', setting('shop_version') + 1)
             setting(
                 'shop_update_time', str(today).split(':')[0]+':00:00.000000'

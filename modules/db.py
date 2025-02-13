@@ -173,6 +173,8 @@ def add_nick_minecraft(nick, id):
 
 
 def update_shop():
+    'Обновляет магазин'
+    'Возвращает тему магазина'
     current_shop = {}
     with open(
         path.join('db', 'shop_all.json'), 'r', encoding='utf8'
@@ -198,6 +200,7 @@ def update_shop():
         json.dump(
             current_shop, f, indent=4, ensure_ascii=False, sort_keys=True
         )
+    return current_shop['theme']
 
 
 def get_shop():

@@ -12,10 +12,6 @@ tokens = Config(path.join('configs', 'tokens.yml'))
 
 ai_servers = [
     'https://'
-    '8f00b559-ee6f-4441-88f8-768ff444297d-00-t3sgt8jrx79r.'
-    'pike.replit.dev/',
-
-    'https://'
     'trassert0reserve.pythonanywhere.com/',
 
     'https://'
