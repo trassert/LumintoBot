@@ -719,6 +719,11 @@
             "name": "minecraft:conduit",
             "price": 7,
             "value": 1
+        },
+        "Губка": {
+            "name": "minecraft:sponge",
+            "price": 8,
+            "value": 1
         }
     },
     "witch": {
