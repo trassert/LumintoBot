@@ -21,6 +21,7 @@ from telethon.tl.types import (
 )
 from telethon import events
 from telethon.sync import TelegramClient
+from telethon import errors as TGErrors
 from telethon.tl.functions.users import GetFullUserRequest
 
 from modules import phrases as phrase
@@ -940,16 +941,21 @@ async def bot():
                 )
             ]
         )
-        await client.send_message(
-            tokens.bot.creator,
-            phrase.word.request.format(
-                user=f'@{entity}',
-                word=word
-            ),
-            buttons=keyboard
-        )
+        try:
+            await client.send_message(
+                tokens.bot.creator,
+                phrase.word.request.format(
+                    user=f'@{entity}',
+                    word=word
+                ),
+                buttons=keyboard
+            )
+        except TGErrors.ButtonDataInvalidError:
+            return await event.reply(
+                phrase.word.set.format(word=word)
+            )
         return await event.reply(
-            phrase.word.set.format(word=word)
+            phrase.word.long
         )
 
     await client.start(bot_token=tokens.bot.token)
