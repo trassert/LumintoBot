@@ -952,10 +952,10 @@ async def bot():
             )
         except TGErrors.ButtonDataInvalidError:
             return await event.reply(
-                phrase.word.set.format(word=word)
+                phrase.word.long
             )
         return await event.reply(
-            phrase.word.long
+            phrase.word.set.format(word=word)
         )
 
     await client.start(bot_token=tokens.bot.token)
