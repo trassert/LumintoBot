@@ -330,7 +330,7 @@ async def bot():
                 alert=True
             )
         elif data[0] == 'word':
-            user_name = await client.get_entity(data[3])
+            user_name = await client.get_entity(int(data[3]))
             if user_name.username is None:
                 if user_name.last_name is None:
                     user_name = user_name.first_name
