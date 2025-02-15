@@ -220,81 +220,81 @@ async def bot():
         )
 
     async def callback_handler(event):
-        data = event.data
+        data = event.data.decode('utf-8').split('.')
         logger.info(f'{event.sender_id} отправил КБ - {data}')
-        if data == b"crocodile.start":
-            if setting('crocodile_super_game') == 1:
-                return await event.answer(
-                    phrase.crocodile.super_game_here, alert=True
-                )
-            if setting("current_game") != 0:
-                return await event.answer(phrase.crocodile.no, alert=True)
-            with open("db\\crocodile_words.txt", 'r', encoding='utf8') as f:
-                word = choice(f.read().split('\n'))
-            unsec = ""
-            for x in list(word):
-                if x.isalpha():
-                    unsec += "_"
-                elif x == " ":
-                    unsec += x
-            setting(
-                "current_game",
-                {"hints": [], "word": word, "unsec": unsec}
-            )
-            client.add_event_handler(
-                crocodile_hint,
-                events.NewMessage(incoming=True, pattern="/подсказка")
-            )
-            client.add_event_handler(
-                crocodile_handler,
-                events.NewMessage(incoming=True, chats=event.chat_id)
-            )
-            return await event.reply(phrase.crocodile.up)
-        elif data == b"crocodile.stop":
-            entity = await client.get_entity(event.sender_id)
-            user = f'@{entity.username}' if entity.username \
-                else entity.first_name + " " + entity.last_name
-            if setting("current_game") == 0:
-                return await event.answer(
-                    phrase.crocodile.already_down, alert=True
-                )
-            if setting('crocodile_super_game') == 1:
-                return await event.answer(
-                    phrase.crocodile.super_game_here, alert=True
-                )
-            bets_json = setting('crocodile_bets')
-            if bets_json != {}:
-                bets = round(sum(list(bets_json.values())) / 2)
-                bets = 1 if bets < 1 else bets
-                sender_balance = get_money(event.sender_id)
-                if sender_balance < bets:
+        if data[0] == 'crocodile':
+            if data[1] == 'start':
+                if setting('crocodile_super_game') == 1:
                     return await event.answer(
-                        phrase.crocodile.not_enough.format(
-                            decline_number(sender_balance, 'изумруд')
-                        ),
-                        alert=True
+                        phrase.crocodile.super_game_here, alert=True
                     )
-                add_money(event.sender_id, -bets)
-            word = setting("current_game")["word"]
-            setting("current_game", 0)
-            setting('crocodile_last_hint', 0)
-            client.remove_event_handler(crocodile_hint)
-            client.remove_event_handler(crocodile_handler)
-            if bets_json != {}:
-                return await event.reply(
-                    phrase.crocodile.down_payed.format(
-                        user=user,
-                        money=decline_number(
-                            bets,
-                            'изумруд'
-                        ),
-                        word=word
-                    )
+                if setting("current_game") != 0:
+                    return await event.answer(phrase.crocodile.no, alert=True)
+                with open("db\\crocodile_words.txt", 'r', encoding='utf8') as f:
+                    word = choice(f.read().split('\n'))
+                unsec = ""
+                for x in list(word):
+                    if x.isalpha():
+                        unsec += "_"
+                    elif x == " ":
+                        unsec += x
+                setting(
+                    "current_game",
+                    {"hints": [], "word": word, "unsec": unsec}
                 )
-            return await event.reply(phrase.crocodile.down.format(word))
-        elif data.decode('utf-8').startswith('shop'):
-            args = data.decode('utf-8').split('.')
-            if int(args[-1]) != setting("shop_version"):
+                client.add_event_handler(
+                    crocodile_hint,
+                    events.NewMessage(incoming=True, pattern="/подсказка")
+                )
+                client.add_event_handler(
+                    crocodile_handler,
+                    events.NewMessage(incoming=True, chats=event.chat_id)
+                )
+                return await event.reply(phrase.crocodile.up)
+            elif data[1] == 'start':
+                entity = await client.get_entity(event.sender_id)
+                user = f'@{entity.username}' if entity.username \
+                    else entity.first_name + " " + entity.last_name
+                if setting("current_game") == 0:
+                    return await event.answer(
+                        phrase.crocodile.already_down, alert=True
+                    )
+                if setting('crocodile_super_game') == 1:
+                    return await event.answer(
+                        phrase.crocodile.super_game_here, alert=True
+                    )
+                bets_json = setting('crocodile_bets')
+                if bets_json != {}:
+                    bets = round(sum(list(bets_json.values())) / 2)
+                    bets = 1 if bets < 1 else bets
+                    sender_balance = get_money(event.sender_id)
+                    if sender_balance < bets:
+                        return await event.answer(
+                            phrase.crocodile.not_enough.format(
+                                decline_number(sender_balance, 'изумруд')
+                            ),
+                            alert=True
+                        )
+                    add_money(event.sender_id, -bets)
+                word = setting("current_game")["word"]
+                setting("current_game", 0)
+                setting('crocodile_last_hint', 0)
+                client.remove_event_handler(crocodile_hint)
+                client.remove_event_handler(crocodile_handler)
+                if bets_json != {}:
+                    return await event.reply(
+                        phrase.crocodile.down_payed.format(
+                            user=user,
+                            money=decline_number(
+                                bets,
+                                'изумруд'
+                            ),
+                            word=word
+                        )
+                    )
+                return await event.reply(phrase.crocodile.down.format(word))
+        elif data[0] == 'shop':
+            if int(data[-1]) != setting("shop_version"):
                 return await event.answer(phrase.shop.old, alert=True)
             nick = give_nick_by_id_minecraft(event.sender_id)
             if nick is None:
@@ -303,7 +303,7 @@ async def bot():
             del shop['theme']
             balance = get_money(event.sender_id)
             items = list(shop.keys())
-            item = shop[items[int(args[1])]]
+            item = shop[items[int(data[1])]]
             if balance < item['price']:
                 return await event.answer(
                     phrase.money.not_enough.format(
@@ -325,25 +325,32 @@ async def bot():
             add_money(event.sender_id, -item['price'])
             return await event.answer(
                 phrase.shop.buy.format(
-                    items[int(args[1])]
+                    items[int(data[1])]
                 ),
                 alert=True
             )
-        elif data.decode('utf-8').startswith('word'):
-            args = data.decode('utf-8').split('.')
-            if args[1] == 'yes':
+        elif data[0] == 'word':
+            user_name = await client.get_entity(data[3])
+            if user_name.username is None:
+                if user_name.last_name is None:
+                    user_name = user_name.first_name
+                else:
+                    user_name = user_name.first_name + " " + user_name.last_name
+            else:
+                user_name = f'@{user_name.username}'
+            if data[1] == 'yes':
                 with open(
                     path.join('db', 'crocodile_words.txt'),
                     'a',
                     encoding='utf-8'
                 ) as f:
-                    f.write(f'\n{args[2]}')
-                add_money(args[4], coofs.WordRequest)
+                    f.write(f'\n{data[2]}')
+                add_money(data[3], coofs.WordRequest)
                 await client.send_message(
                     tokens.bot.chat,
                     phrase.word.success.format(
-                        word=args[2],
-                        user=args[3],
+                        word=data[2],
+                        user=user_name,
                         money=decline_number(
                             coofs.WordRequest, 'изумруд'
                         )
@@ -354,12 +361,12 @@ async def bot():
                     event.message_id,
                     phrase.word.add
                 )
-            if args[1] == 'no':
+            if data[1] == 'no':
                 await client.send_message(
                     tokens.bot.chat,
                     phrase.word.no.format(
-                        word=args[2],
-                        user=args[3]
+                        word=data[2],
+                        user=user_name
                     )
                 )
                 return await client.edit_message(
@@ -923,11 +930,11 @@ async def bot():
                     [
                         KeyboardButtonCallback(
                             text="✅ Добавить",
-                            data=f"word.yes.{word}.{entity}.{event.sender_id}".encode()
+                            data=f"word.yes.{word}.{event.sender_id}".encode()
                         ),
                         KeyboardButtonCallback(
                             text="❌ Отклонить",
-                            data=f"word.no.{word}.{entity}.{event.sender_id}".encode()
+                            data=f"word.no.{word}.{event.sender_id}".encode()
                         )
                     ]
                 )
