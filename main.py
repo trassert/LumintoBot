@@ -758,13 +758,11 @@ async def bot():
                     remove_section_marks(
                         await rcon.send('playtime top')
                     ).replace(
-                        '[Лидеры по времени на сервере]',
+                        '(Лидеры по времени на сервере)',
                         phrase.stat_server.format("ванильного")
                     ).replace(
-                        '****************************************',
+                        '***',
                         ''
-                    ).replace(
-                        ') ', '. '
                     )
                 )
         except TimeoutError:
