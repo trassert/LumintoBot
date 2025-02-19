@@ -1172,7 +1172,7 @@ async def bot():
 async def setup_ip(check_set=True):
     '''
     Обновляет динамику.
-    Параметр chech_set отвечает за принудительность
+    Параметр check_set отвечает за принудительность
     '''
 
     error_text = ''
@@ -1279,8 +1279,14 @@ async def setup_ip(check_set=True):
             logger.warning(out)
     except Exception:
         error_text += format_exc()
+        logger.error(error_text)
     return error_text if error_text != '' else noip
 
+
+async def time_to_check_ip():
+    while True:
+        await asyncio.sleep(coofs.IPSleepTime)
+        await setup_ip()
 
 async def web_server():
     async def hotmc(request):
@@ -1404,7 +1410,11 @@ async def main():
         try:
             await setup_ip()
             await web_server()
-            await asyncio.gather(bot(), time_to_update_shop())
+            await asyncio.gather(
+                bot(),
+                time_to_update_shop(),
+                time_to_check_ip()
+            )
         except ConnectionError:
             logger.error('Жду 20 секунд (нет подключения к интернету)')
             await asyncio.sleep(20)
