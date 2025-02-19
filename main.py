@@ -871,13 +871,22 @@ async def bot():
             parse_mode="html"
         )
 
-    async def test(event):
-        if event.sender_id not in setting('admins_id'):
-            return await event.reply(phrase.perms.no)
-        reply_to_msg = event.reply_to_msg_id
-        if reply_to_msg:
-            reply_message = await event.get_reply_message()
-            print(reply_message.sender_id)
+    async def leave_message(event):
+        if event.user_left:
+            user_name = await client.get_entity(int(event.user_id))
+            if user_name.username is None:
+                if user_name.last_name is None:
+                    user_name = user_name.first_name
+                else:
+                    user_name = user_name.first_name + " " + user_name.last_name
+            else:
+                user_name = f'@{user_name.username}'
+            return await client.send_message(
+                tokens.bot.chat,
+                phrase.leave_message.format(
+                    user_name
+                )
+            )
 
     async def all_money(event):
         return await event.reply(
@@ -958,6 +967,10 @@ async def bot():
 
     await client.start(bot_token=tokens.bot.token)
 
+    client.add_event_handler(
+        leave_message, events.ChatAction(chats=tokens.bot.chat)
+    )
+
     'Запрос на слово'
     client.add_event_handler(
         word_request, events.NewMessage(incoming=True, pattern="/слово")
@@ -973,11 +986,6 @@ async def bot():
         crocodile_wins, events.NewMessage(
             incoming=True, pattern="/стат крокодил"
         )
-    )
-
-    'Тест'
-    client.add_event_handler(
-        test, events.NewMessage(incoming=True, pattern="/тест")
     )
 
     'ДНС'
