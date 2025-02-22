@@ -710,7 +710,7 @@ async def bot():
         except TimeoutError:
             return await event.reply(phrase.server.stopped)
 
-    async def add_admins(event):
+    async def add_staff(event):
         if event.sender_id != tokens.bot.creator:
             return await event.reply(phrase.perms.no)
         try:
@@ -718,32 +718,60 @@ async def bot():
             user = await client(
                 GetFullUserRequest(tag)
             )
+            user = user.full_user.id
         except IndexError:
             reply_to_msg = event.reply_to_msg_id
             if reply_to_msg:
                 reply_message = await event.get_reply_message()
                 user = reply_message.sender_id
+                entity = await client.get_entity(user)
+                if entity.username is None:
+                    if entity.last_name is None:
+                        tag = entity.first_name
+                    else:
+                        tag = entity.first_name + " " + entity.last_name
+                else:
+                    tag = f'@{entity.username}'
             else:
                 return await event.reply(
                     phrase.money.no_people
                 )
-        user = user.full_user.id
         admins = setting('admins_id')
         admins.append(user)
         setting('admins_id', admins)
         return await event.reply(
-            phrase.perms.admin_add.format(nick=tag, id=user.full_user.id)
+            phrase.perms.admin_add.format(nick=tag, id=user)
         )
 
-    async def del_admins(event):
+    async def del_staff(event):
         if event.sender_id != tokens.bot.creator:
             return await event.reply(phrase.perms.no)
-        tag = event.text.split(" ", maxsplit=1)[1]
-        user = await client(
-            GetFullUserRequest(tag)
-        )
+        try:
+            tag = event.text.split(" ", maxsplit=1)[1]
+            user = await client(
+                GetFullUserRequest(tag)
+            )
+            user = user.full_user.id
+        except IndexError:
+            reply_to_msg = event.reply_to_msg_id
+            if reply_to_msg:
+                reply_message = await event.get_reply_message()
+                user = reply_message.sender_id
+                entity = await client.get_entity(user)
+                if entity.username is None:
+                    if entity.last_name is None:
+                        tag = entity.first_name
+                    else:
+                        tag = entity.first_name + " " + entity.last_name
+                else:
+                    tag = f'@{entity.username}'
+            else:
+                return await event.reply(
+                    phrase.money.no_people
+                )
         admins = setting('admins_id')
-        admins.remove(user.full_user.id)
+        while user.full_user.id in admins:
+            admins.remove(user.full_user.id)
         setting('admins_id', admins)
         return await event.reply(phrase.perms.admin_del)
 
@@ -1132,16 +1160,16 @@ async def bot():
 
     'Админы'
     client.add_event_handler(
-        add_admins, events.NewMessage(incoming=True, pattern=r"\+админ")
+        add_staff, events.NewMessage(incoming=True, pattern=r"\+cтафф")
     )
     client.add_event_handler(
-        add_admins, events.NewMessage(incoming=True, pattern=r"\+admin")
+        add_staff, events.NewMessage(incoming=True, pattern=r"\+staff")
     )
     client.add_event_handler(
-        del_admins, events.NewMessage(incoming=True, pattern=r"\-админ")
+        del_staff, events.NewMessage(incoming=True, pattern=r"\-стафф")
     )
     client.add_event_handler(
-        del_admins, events.NewMessage(incoming=True, pattern=r"\-admin")
+        del_staff, events.NewMessage(incoming=True, pattern=r".\-staff")
     )
 
     'Крокодил'
