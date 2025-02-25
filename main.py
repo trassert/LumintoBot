@@ -27,15 +27,13 @@ from telethon.tl.functions.users import GetFullUserRequest
 from modules import phrases as phrase
 from modules.db import (
     add_money,
-    add_nick_minecraft,
     crocodile_stat,
     get_money,
     get_shop,
-    give_id_by_nick_minecraft,
-    give_nick_by_id_minecraft,
     setting,
     update_shop,
-    get_all_money
+    get_all_money,
+    nicks
 )
 from modules.formatter import decline_number
 from modules.system_info import get_system_info
@@ -144,13 +142,13 @@ async def bot():
         if not re.match("^[A-Za-z0-9_]*$", nick):
             return await event.reply(phrase.nick.invalid)
 
-        if give_id_by_nick_minecraft(nick) is not None:
+        if nicks(nick=nick).get() is not None:
             return await event.reply(phrase.nick.taken)
-        if give_nick_by_id_minecraft(event.sender_id) is not None:
+        if nicks(id=event.sender_id).get() is not None:
             return await event.reply(phrase.nick.already_have)
 
         add_money(event.sender_id, setting('link_gift'))
-        add_nick_minecraft(nick, event.sender_id)
+        nicks(nick, event.sender_id).link()
         return await event.reply(
             phrase.nick.success.format(
                 decline_number(setting('link_gift'), 'изумруд')
@@ -297,7 +295,7 @@ async def bot():
         elif data[0] == 'shop':
             if int(data[-1]) != setting("shop_version"):
                 return await event.answer(phrase.shop.old, alert=True)
-            nick = give_nick_by_id_minecraft(event.sender_id)
+            nick = nicks(id=event.sender_id).get()
             if nick is None:
                 return await event.answer(phrase.nick.not_append, alert=True)
             shop = get_shop()
@@ -1333,7 +1331,7 @@ async def web_server():
             return aiohttp.web.Response(
                 text='Переданные данные не прошли проверку.'
             )
-        tg_id = give_id_by_nick_minecraft(nick)
+        tg_id = nicks(nick=nick).get()
         if tg_id is not None:
             add_money(tg_id, 10)
             give = phrase.hotmc_money.format(
@@ -1364,7 +1362,7 @@ async def web_server():
             return aiohttp.web.Response(
                 text='Переданные данные не прошли проверку.'
             )
-        tg_id = give_id_by_nick_minecraft(username)
+        tg_id = nicks(nick=username).get()
         if tg_id is not None:
             add_money(tg_id, 10)
             give = phrase.servers_money.format(

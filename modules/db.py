@@ -7,6 +7,7 @@ from .random import weighted_choice
 
 logger = logging.getLogger(__name__)
 
+nick_path = path.join('db', 'minecraft.json')
 
 def setting(key, value=None, delete=None, log=True):
     "Изменить/получить ключ из настроек"
@@ -134,44 +135,6 @@ def add_money(id, count):
         return load[id]
 
 
-def give_id_by_nick_minecraft(nick):
-    'Получить ид игрока по нику'
-    with open(
-        path.join('db', 'minecraft.json'), 'r', encoding='utf8'
-    ) as f:
-        load = json.load(f)
-        if nick in load:
-            return load[nick]
-        return None
-
-
-def give_nick_by_id_minecraft(id):
-    'Получить никнейм игрока по ид'
-    with open(
-        path.join('db', 'minecraft.json'), 'r', encoding='utf8'
-    ) as f:
-        load = json.load(f)
-        for key, value in load.items():
-            if value == id:
-                return key
-        return None
-
-
-def add_nick_minecraft(nick, id):
-    'Связать никнейм игрока'
-    with open(
-        path.join('db', 'minecraft.json'), 'r', encoding='utf8'
-    ) as f:
-        load = json.load(f)
-    load[nick] = int(id)
-    with open(
-        path.join('db', 'minecraft.json'), 'w', encoding='utf8'
-    ) as f:
-        json.dump(
-            load, f, indent=4, ensure_ascii=False, sort_keys=True
-        )
-
-
 def update_shop():
     'Обновляет магазин'
     'Возвращает тему магазина'
@@ -257,3 +220,39 @@ class crocodile_stat:
         return dict(
             sorted(load.items(), key=lambda item: item[1], reverse=True)
         )
+
+class nicks:
+    def __init__(self, nick=None, id=None):
+        self.nick = nick
+        self.id = id
+    def get(self):
+        if self.nick:
+            'Получить id игрока по нику'
+            with open(nick_path, 'r', encoding='utf8') as f:
+                load = json.load(f)
+                if self.nick in load:
+                    return load[self.nick]
+                return None
+        elif self.id:
+            'Получить ник по id'
+            with open(nick_path, 'r', encoding='utf8') as f:
+                load = json.load(f)
+                for key, value in load.items():
+                    if value == self.id:
+                        return key
+                return None
+        else:
+            raise TypeError('Нужен ник или id!')
+    def get_all(self):
+        with open(nick_path, 'r', encoding='utf8') as f:
+            load = json.load(f)
+            return dict(sorted(load.items()))
+    def link(self):
+        with open(nick_path, 'r', encoding='utf8') as f:
+            load = json.load(f)
+        load[self.nick] = int(self.id)
+        with open(nick_path, 'w', encoding='utf8') as f:
+            json.dump(
+                load, f, indent=4, ensure_ascii=False, sort_keys=True
+            )
+        return True
