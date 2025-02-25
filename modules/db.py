@@ -9,6 +9,7 @@ logger = logging.getLogger(__name__)
 
 nick_path = path.join('db', 'minecraft.json')
 
+
 def setting(key, value=None, delete=None, log=True):
     "Изменить/получить ключ из настроек"
     if value is not None:
@@ -221,6 +222,7 @@ class crocodile_stat:
             sorted(load.items(), key=lambda item: item[1], reverse=True)
         )
 
+
 class nicks:
     def __init__(self, nick=None, id=None):
         self.nick = nick
@@ -250,6 +252,10 @@ class nicks:
     def link(self):
         with open(nick_path, 'r', encoding='utf8') as f:
             load = json.load(f)
+        for key, value in load.items():
+            if value == self.id:
+                del load[key]
+                break
         load[self.nick] = int(self.id)
         with open(nick_path, 'w', encoding='utf8') as f:
             json.dump(

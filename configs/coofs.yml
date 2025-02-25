@@ -2,3 +2,5 @@ TopLowerBets: 5
 TopBets: 1.5
 WordRequest: 2
 IPSleepTime: 3600
+LinkGift: 5
+PriceForChangeNick: 32

@@ -143,15 +143,38 @@ async def bot():
             return await event.reply(phrase.nick.invalid)
 
         if nicks(nick=nick).get() is not None:
+            if nicks(id=event.sender_id).get() == nick:
+                return await event.reply(phrase.nick.already_you)
             return await event.reply(phrase.nick.taken)
-        if nicks(id=event.sender_id).get() is not None:
-            return await event.reply(phrase.nick.already_have)
+        elif nicks(id=event.sender_id).get() is not None:
+            if nicks(id=event.sender_id).get() == nick:
+                return await event.reply(phrase.nick.already_you)
+            keyboard = ReplyInlineMarkup(
+                [
+                    KeyboardButtonRow(
+                        [
+                            KeyboardButtonCallback(
+                                text="✅ Сменить",
+                                data=f'nick.{nick}.{event.sender_id}'.encode()
+                            )
+                        ]
+                    )
+                ]
+            )
+            return await event.reply(
+                phrase.nick.already_have.format(
+                    price=decline_number(
+                        coofs.PriceForChangeNick, 'изумруд'
+                    )
+                ),
+                buttons=keyboard
+            )
 
-        add_money(event.sender_id, setting('link_gift'))
+        add_money(event.sender_id, coofs.LinkGift)
         nicks(nick, event.sender_id).link()
         return await event.reply(
             phrase.nick.success.format(
-                decline_number(setting('link_gift'), 'изумруд')
+                decline_number(coofs.LinkGift, 'изумруд')
             )
         )
 
@@ -373,6 +396,36 @@ async def bot():
                     event.message_id,
                     phrase.word.noadd
                 )
+        elif data[0] == 'nick':
+            if event.sender_id != int(data[2]):
+                return await event.answer(phrase.not_for_you)
+            if nicks(id=event.sender_id).get() == data[1]:
+                return await event.answer(phrase.nick.already_you, alert=True)
+            balance = get_money(event.sender_id)
+            if balance - coofs.PriceForChangeNick < 0:
+                return await event.answer(
+                    phrase.money.not_enough.format(
+                        decline_number(balance, 'изумруд')
+                    )
+                )
+            add_money(event.sender_id, -coofs.PriceForChangeNick)
+            nicks(data[1], event.sender_id).link()
+            user_name = await client.get_entity(int(data[2]))
+            if user_name.username is None:
+                if user_name.last_name is None:
+                    user_name = user_name.first_name
+                else:
+                    user_name = user_name.first_name + " " + user_name.last_name
+            else:
+                user_name = f'@{user_name.username}'
+            return await event.reply(
+                phrase.nick.buy_nick.format(
+                    user=user_name,
+                    price=decline_number(
+                        coofs.PriceForChangeNick, 'изумруд'
+                    )
+                )
+            )
 
     async def host(event):
         await event.reply(phrase.server.host.format(setting("host")))
