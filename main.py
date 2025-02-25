@@ -991,10 +991,38 @@ async def bot():
             phrase.word.set.format(word=word)
         )
 
+    async def check_nick(event):
+        args = event.text.split(' ', maxsplit=1)
+        try:
+            tag = args[1]
+            user = await client(
+                GetFullUserRequest(tag)
+            )
+            user = user.full_user.id
+        except (TypeError, ValueError, IndexError):
+            reply_to_msg = event.reply_to_msg_id
+            if reply_to_msg:
+                reply_message = await event.get_reply_message()
+                user = reply_message.sender_id
+            else:
+                return await event.reply(phrase.nick.who)
+        nick = nicks(id=user).get()
+        if nick is None:
+            return await event.reply(phrase.nick.no_nick)
+        return await event.reply(phrase.nick.usernick.format(nick))
+
     await client.start(bot_token=tokens.bot.token)
 
     client.add_event_handler(
         leave_message, events.ChatAction(chats=tokens.bot.chat)
+    )
+
+    'Посмотреть ник'
+    client.add_event_handler(
+        check_nick, events.NewMessage(incoming=True, pattern="/ник")
+    )
+    client.add_event_handler(
+        check_nick, events.NewMessage(incoming=True, pattern="/nick")
     )
 
     'Запрос на слово'
@@ -1314,6 +1342,7 @@ async def time_to_check_ip():
         await asyncio.sleep(coofs.IPSleepTime)
         await setup_ip()
 
+
 async def web_server():
     async def hotmc(request):
         load = await request.post()
@@ -1451,7 +1480,7 @@ async def main():
 
 if __name__ == "__main__":
     if sum(setting('shop_weight').values()) != 100:
-        logger.error('Сумма весов в магазине не равна 100!')
+        logger.error('Сумма процентов в магазине не равна 100!')
     try:
         asyncio.run(main())
     except KeyboardInterrupt:
