@@ -72,4 +72,5 @@ class MinecraftClient:
 
     async def send(self, cmd):
         result = await self._send(2, cmd)
+        await asyncio.sleep(0.003)  # ! хз сработает ли это
         return result
