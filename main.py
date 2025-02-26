@@ -273,7 +273,7 @@ async def bot():
                     events.NewMessage(incoming=True, chats=event.chat_id)
                 )
                 return await event.reply(phrase.crocodile.up)
-            elif data[1] == 'start':
+            elif data[1] == 'stop':
                 entity = await client.get_entity(event.sender_id)
                 user = f'@{entity.username}' if entity.username \
                     else entity.first_name + " " + entity.last_name
