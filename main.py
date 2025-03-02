@@ -39,6 +39,7 @@ from modules.formatter import decline_number
 from modules.system_info import get_system_info
 from modules.mcrcon import MinecraftClient
 from modules.ai import ai_response, ai_servers
+from modules.diff import get_enchant_desc
 
 tokens = Config(path.join('configs', 'tokens.yml'))
 coofs = Config(path.join('configs', 'coofs.yml'))
@@ -1075,7 +1076,7 @@ async def bot():
         arg = event.pattern_match.group(1)
         if arg.strip() == '':
             return await event.reply(phrase.enchant.no_arg)
-        return await event.reply(f'Arg: {arg}\nError: Data AI not found')
+        return await event.reply(get_enchant_desc(arg))
 
     await client.start(bot_token=tokens.bot.token)
 
