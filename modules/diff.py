@@ -1,7 +1,10 @@
 import difflib
 import json
+import logging
 
 from os import path
+
+logger = logging.getLogger(__name__)
 
 def similar(word, list):
     max_ratio = 0
@@ -11,6 +14,11 @@ def similar(word, list):
         if diff > 0.5 and diff > max_ratio:
             max_ratio = diff
             max_simular = n
+    logger.info(
+        'Выполнен поиск слова\n'
+        f'Искомое: {word}\n'
+        f'Найдено: {max_simular if max_simular != "" else "Ничего"}'
+    )
     return max_simular
 
 def get_enchant_desc(string):
