@@ -125,6 +125,9 @@ class word:
     long = '📝 : Слишком длинное слово'
 
 
+class enchant:
+    no_arg = '🤔 : Укажи название зачарования'
+
 not_for_you = '👎 : Кнопка не для вас'
 leave_message = '😓 : {} покинул нас'
 stat_server = '📊 : Топ игроки {} сервера:\n'

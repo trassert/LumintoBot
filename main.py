@@ -1064,6 +1064,19 @@ async def bot():
             return await event.reply(phrase.nick.no_nick)
         return await event.reply(phrase.nick.usernick.format(nick))
 
+    @client.on(events.NewMessage(pattern=r'/чара(.*)'))
+    @client.on(events.NewMessage(pattern=r'/чарка(.*)'))
+    @client.on(events.NewMessage(pattern=r'/зачарование(.*)'))
+    @client.on(events.NewMessage(pattern=r'/enchant(.*)'))
+    @client.on(events.NewMessage(pattern=r'что за чара(.*)'))
+    @client.on(events.NewMessage(pattern=r'чарка(.*)'))
+    @client.on(events.NewMessage(pattern=r'зачарование(.*)'))
+    async def get_enchant(event):
+        arg = event.pattern_match.group(1)
+        if arg.strip() == '':
+            return await event.reply(phrase.enchant.no_arg)
+        return await event.reply(f'Arg: {arg}\nError: Data AI not found')
+
     await client.start(bot_token=tokens.bot.token)
 
     client.add_event_handler(
