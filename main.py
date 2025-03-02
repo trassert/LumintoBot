@@ -1076,7 +1076,10 @@ async def bot():
         arg = event.pattern_match.group(1)
         if arg.strip() == '':
             return await event.reply(phrase.enchant.no_arg)
-        return await event.reply(get_enchant_desc(arg))
+        desc = get_enchant_desc(arg)
+        if desc is None:
+            return await event.reply(phrase.enchant.no_diff)
+        return await event.reply(phrase.enchant.main.format(desc))
 
     await client.start(bot_token=tokens.bot.token)
 
