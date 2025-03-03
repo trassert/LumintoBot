@@ -136,7 +136,8 @@ async def bot():
 
     # Кнопки бота
 
-    async def callback_handler(event):
+    @client.on(events.CallbackQuery())
+    async def callback_action(event):
         data = event.data.decode('utf-8').split('.')
         logger.info(f'{event.sender_id} отправил КБ - {data}')
         if data[0] == 'crocodile':
@@ -305,6 +306,18 @@ async def bot():
                     price=decline_number(
                         coofs.PriceForChangeNick, 'изумруд'
                     )
+                )
+            )
+
+    @client.on(events.ChatAction(chats=tokens.bot.chat))
+    async def chat_action(event):
+        if event.user_left:
+            # ! Если пидорас ушёл из чата
+            user_name = await get_name(event.user_id)
+            return await client.send_message(
+                tokens.bot.chat,
+                phrase.leave_message.format(
+                    user_name
                 )
             )
 
@@ -734,6 +747,7 @@ async def bot():
         else:
             return await event.reply(response)
 
+    @client.on(events.NewMessage(incoming=True, pattern=r"f/|p/"))
     async def mcrcon(event):
         if event.text[0] == 'f':
             host = setting('ipv4')
@@ -955,16 +969,6 @@ async def bot():
             parse_mode="html"
         )
 
-    async def leave_message(event):
-        if event.user_left:
-            user_name = await get_name(event.user_id)
-            return await client.send_message(
-                tokens.bot.chat,
-                phrase.leave_message.format(
-                    user_name
-                )
-            )
-
     async def all_money(event):
         return await event.reply(
             phrase.money.all_money.format(
@@ -1079,10 +1083,6 @@ async def bot():
         return await event.reply(phrase.enchant.main.format(desc))
 
     await client.start(bot_token=tokens.bot.token)
-
-    client.add_event_handler(
-        leave_message, events.ChatAction(chats=tokens.bot.chat)
-    )
 
     'Посмотреть ник'
     client.add_event_handler(
@@ -1246,11 +1246,6 @@ async def bot():
         gemini, events.NewMessage(incoming=True, pattern="/ai")
     )
 
-    'RCON'
-    client.add_event_handler(
-        mcrcon, events.NewMessage(incoming=True, pattern=r"f/|p/")
-    )
-
     'Админы'
     client.add_event_handler(
         add_staff, events.NewMessage(incoming=True, pattern=r"\+cтафф")
@@ -1275,7 +1270,6 @@ async def bot():
     client.add_event_handler(
         crocodile_bet, events.NewMessage(incoming=True, pattern="/ставка")
     )
-    client.add_event_handler(callback_handler, events.CallbackQuery())
 
     if setting("current_game") != 0:
         client.add_event_handler(
