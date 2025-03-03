@@ -134,113 +134,7 @@ async def bot():
         use_ipv6=True
     )
 
-    async def link_nick(event):
-        nick = event.text.split(' ', maxsplit=1)[1].strip()
-        if len(nick) < 4:
-            return await event.reply(phrase.nick.too_short)
-        if len(nick) > 16:
-            return await event.reply(phrase.nick.too_big)
-        if not re.match("^[A-Za-z0-9_]*$", nick):
-            return await event.reply(phrase.nick.invalid)
-
-        if nicks(nick=nick).get() is not None:
-            if nicks(id=event.sender_id).get() == nick:
-                return await event.reply(phrase.nick.already_you)
-            return await event.reply(phrase.nick.taken)
-        elif nicks(id=event.sender_id).get() is not None:
-            if nicks(id=event.sender_id).get() == nick:
-                return await event.reply(phrase.nick.already_you)
-            keyboard = ReplyInlineMarkup(
-                [
-                    KeyboardButtonRow(
-                        [
-                            KeyboardButtonCallback(
-                                text="✅ Сменить",
-                                data=f'nick.{nick}.{event.sender_id}'.encode()
-                            )
-                        ]
-                    )
-                ]
-            )
-            return await event.reply(
-                phrase.nick.already_have.format(
-                    price=decline_number(
-                        coofs.PriceForChangeNick, 'изумруд'
-                    )
-                ),
-                buttons=keyboard
-            )
-
-        add_money(event.sender_id, coofs.LinkGift)
-        nicks(nick, event.sender_id).link()
-        return await event.reply(
-            phrase.nick.success.format(
-                decline_number(coofs.LinkGift, 'изумруд')
-            )
-        )
-
-    async def shop(event):
-        version = setting('shop_version')
-        keyboard = ReplyInlineMarkup(
-            [
-                KeyboardButtonRow(
-                    [
-                        KeyboardButtonCallback(
-                            text="1️⃣", data=f"shop.0.{version}".encode()
-                        ),
-                        KeyboardButtonCallback(
-                            text="2️⃣", data=f"shop.1.{version}".encode()
-                        ),
-                        KeyboardButtonCallback(
-                            text="3️⃣", data=f"shop.2.{version}".encode()
-                        ),
-                        KeyboardButtonCallback(
-                            text="4️⃣", data=f"shop.3.{version}".encode()
-                        ),
-                        KeyboardButtonCallback(
-                            text="5️⃣", data=f"shop.4.{version}".encode()
-                        ),
-                    ]
-                )
-            ]
-        )
-        shop = get_shop()
-        theme = shop['theme']
-        del shop['theme']
-        items = list(shop.keys())
-        return await event.reply(
-            phrase.shop.shop.format(
-                trade_1=items[0],
-                value_1=f' ({shop[items[0]]['value']})' if
-                shop[items[0]]['value'] != 1 else '',
-                price_1=decline_number(shop[items[0]]['price'], 'изумруд'),
-
-                trade_2=items[1],
-                value_2=f' ({shop[items[1]]['value']})' if
-                shop[items[1]]['value'] != 1 else '',
-                price_2=decline_number(shop[items[1]]['price'], 'изумруд'),
-
-                trade_3=items[2],
-                value_3=f' ({shop[items[2]]['value']})' if
-                shop[items[2]]['value'] != 1 else '',
-                price_3=decline_number(shop[items[2]]['price'], 'изумруд'),
-
-                trade_4=items[3],
-                value_4=f' ({shop[items[3]]['value']})' if
-                shop[items[3]]['value'] != 1 else '',
-                price_4=decline_number(shop[items[3]]['price'], 'изумруд'),
-
-                trade_5=items[4],
-                value_5=f' ({shop[items[4]]['value']})' if
-                shop[items[4]]['value'] != 1 else '',
-                price_5=decline_number(shop[items[4]]['price'], 'изумруд'),
-
-                quote=choice(phrase.shop_quotes[theme]['quotes']),
-                emo=phrase.shop_quotes[theme]['emo']
-            ),
-            buttons=keyboard,
-            parse_mode="html"
-        )
+    # Кнопки бота
 
     async def callback_handler(event):
         data = event.data.decode('utf-8').split('.')
@@ -353,14 +247,7 @@ async def bot():
                 alert=True
             )
         elif data[0] == 'word':
-            user_name = await client.get_entity(int(data[3]))
-            if user_name.username is None:
-                if user_name.last_name is None:
-                    user_name = user_name.first_name
-                else:
-                    user_name = user_name.first_name + " " + user_name.last_name
-            else:
-                user_name = f'@{user_name.username}'
+            user_name = await get_name(data[3])
             if data[1] == 'yes':
                 with open(
                     path.join('db', 'crocodile_words.txt'),
@@ -411,14 +298,7 @@ async def bot():
                 )
             add_money(event.sender_id, -coofs.PriceForChangeNick)
             nicks(data[1], event.sender_id).link()
-            user_name = await client.get_entity(int(data[2]))
-            if user_name.username is None:
-                if user_name.last_name is None:
-                    user_name = user_name.first_name
-                else:
-                    user_name = user_name.first_name + " " + user_name.last_name
-            else:
-                user_name = f'@{user_name.username}'
+            user_name = await get_name(data[2])
             return await event.reply(
                 phrase.nick.buy_nick.format(
                     user=user_name,
@@ -427,6 +307,130 @@ async def bot():
                     )
                 )
             )
+
+    # Вспомогательные функции
+
+    async def get_name(id):
+        'Выдает @пуш, если нет - имя + фамилия'
+        user_name = await client.get_entity(int(id))
+        if user_name.username is None:
+            if user_name.last_name is None:
+                user_name = user_name.first_name
+            else:
+                user_name = user_name.first_name + " " + user_name.last_name
+        else:
+            user_name = user_name.username
+        return user_name
+
+    # Обработчики команд
+
+    async def link_nick(event):
+        nick = event.text.split(' ', maxsplit=1)[1].strip()
+        if len(nick) < 4:
+            return await event.reply(phrase.nick.too_short)
+        if len(nick) > 16:
+            return await event.reply(phrase.nick.too_big)
+        if not re.match("^[A-Za-z0-9_]*$", nick):
+            return await event.reply(phrase.nick.invalid)
+
+        if nicks(nick=nick).get() is not None:
+            if nicks(id=event.sender_id).get() == nick:
+                return await event.reply(phrase.nick.already_you)
+            return await event.reply(phrase.nick.taken)
+        elif nicks(id=event.sender_id).get() is not None:
+            if nicks(id=event.sender_id).get() == nick:
+                return await event.reply(phrase.nick.already_you)
+            keyboard = ReplyInlineMarkup(
+                [
+                    KeyboardButtonRow(
+                        [
+                            KeyboardButtonCallback(
+                                text="✅ Сменить",
+                                data=f'nick.{nick}.{event.sender_id}'.encode()
+                            )
+                        ]
+                    )
+                ]
+            )
+            return await event.reply(
+                phrase.nick.already_have.format(
+                    price=decline_number(
+                        coofs.PriceForChangeNick, 'изумруд'
+                    )
+                ),
+                buttons=keyboard
+            )
+
+        add_money(event.sender_id, coofs.LinkGift)
+        nicks(nick, event.sender_id).link()
+        return await event.reply(
+            phrase.nick.success.format(
+                decline_number(coofs.LinkGift, 'изумруд')
+            )
+        )
+
+    async def shop(event):
+        version = setting('shop_version')
+        keyboard = ReplyInlineMarkup(
+            [
+                KeyboardButtonRow(
+                    [
+                        KeyboardButtonCallback(
+                            text="1️⃣", data=f"shop.0.{version}".encode()
+                        ),
+                        KeyboardButtonCallback(
+                            text="2️⃣", data=f"shop.1.{version}".encode()
+                        ),
+                        KeyboardButtonCallback(
+                            text="3️⃣", data=f"shop.2.{version}".encode()
+                        ),
+                        KeyboardButtonCallback(
+                            text="4️⃣", data=f"shop.3.{version}".encode()
+                        ),
+                        KeyboardButtonCallback(
+                            text="5️⃣", data=f"shop.4.{version}".encode()
+                        ),
+                    ]
+                )
+            ]
+        )
+        shop = get_shop()
+        theme = shop['theme']
+        del shop['theme']
+        items = list(shop.keys())
+        return await event.reply(
+            phrase.shop.shop.format(
+                trade_1=items[0],
+                value_1=f' ({shop[items[0]]['value']})' if
+                shop[items[0]]['value'] != 1 else '',
+                price_1=decline_number(shop[items[0]]['price'], 'изумруд'),
+
+                trade_2=items[1],
+                value_2=f' ({shop[items[1]]['value']})' if
+                shop[items[1]]['value'] != 1 else '',
+                price_2=decline_number(shop[items[1]]['price'], 'изумруд'),
+
+                trade_3=items[2],
+                value_3=f' ({shop[items[2]]['value']})' if
+                shop[items[2]]['value'] != 1 else '',
+                price_3=decline_number(shop[items[2]]['price'], 'изумруд'),
+
+                trade_4=items[3],
+                value_4=f' ({shop[items[3]]['value']})' if
+                shop[items[3]]['value'] != 1 else '',
+                price_4=decline_number(shop[items[3]]['price'], 'изумруд'),
+
+                trade_5=items[4],
+                value_5=f' ({shop[items[4]]['value']})' if
+                shop[items[4]]['value'] != 1 else '',
+                price_5=decline_number(shop[items[4]]['price'], 'изумруд'),
+
+                quote=choice(phrase.shop_quotes[theme]['quotes']),
+                emo=phrase.shop_quotes[theme]['emo']
+            ),
+            buttons=keyboard,
+            parse_mode="html"
+        )
 
     async def host(event):
         await event.reply(phrase.server.host.format(setting("host")))
@@ -953,14 +957,7 @@ async def bot():
 
     async def leave_message(event):
         if event.user_left:
-            user_name = await client.get_entity(int(event.user_id))
-            if user_name.username is None:
-                if user_name.last_name is None:
-                    user_name = user_name.first_name
-                else:
-                    user_name = user_name.first_name + " " + user_name.last_name
-            else:
-                user_name = f'@{user_name.username}'
+            user_name = await get_name(event.user_id)
             return await client.send_message(
                 tokens.bot.chat,
                 phrase.leave_message.format(
