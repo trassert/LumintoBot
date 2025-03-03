@@ -516,8 +516,8 @@ async def bot():
         if random() < coofs.PercentForRandomLetter and last_hint != 0:
             n = 1
             for letter in list(db['unsec']):
-                if letter != '_':
-                    response = f'{n} буква в слове - **{letter}**'
+                if letter == '_':
+                    response = f'{n} буква в слове - **{db["word"][n-1]}**'
                     break
                 n += 1
         else:
@@ -540,8 +540,8 @@ async def bot():
                 db["hints"] = hint
                 setting("current_game", db)
                 return await event.reply(phrase.crocodile.error)
-        setting("crocodile_last_hint", response)
-        await event.reply(response)
+            setting("crocodile_last_hint", response)
+        return await event.reply(response)
 
     async def crocodile_handler(event):
         text = event.text.strip().lower()
