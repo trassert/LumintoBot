@@ -134,6 +134,20 @@ async def bot():
         use_ipv6=True
     )
 
+    # Вспомогательные функции
+
+    async def get_name(id):
+        'Выдает @пуш, если нет - имя + фамилия'
+        user_name = await client.get_entity(int(id))
+        if user_name.username is None:
+            if user_name.last_name is None:
+                user_name = user_name.first_name
+            else:
+                user_name = user_name.first_name + " " + user_name.last_name
+        else:
+            user_name = user_name.username
+        return user_name
+
     # Кнопки бота
 
     @client.on(events.CallbackQuery())
@@ -321,20 +335,6 @@ async def bot():
                 )
             )
 
-    # Вспомогательные функции
-
-    async def get_name(id):
-        'Выдает @пуш, если нет - имя + фамилия'
-        user_name = await client.get_entity(int(id))
-        if user_name.username is None:
-            if user_name.last_name is None:
-                user_name = user_name.first_name
-            else:
-                user_name = user_name.first_name + " " + user_name.last_name
-        else:
-            user_name = user_name.username
-        return user_name
-
     # Обработчики команд
 
     async def link_nick(event):
@@ -504,14 +504,14 @@ async def bot():
         return await event.reply(phrase.ping.set.format(ping)+''.join(all_servers_ping))
 
     async def crocodile_hint(event):
-        hint = setting("current_game")["hints"]
+        db = setting("current_game")
+        hint = db["hints"]
         if event.sender_id in hint:
             return await event.reply(phrase.crocodile.hints_all)
         hint.append(event.sender_id)
-        db = setting("current_game")
         db["hints"] = hint
         setting("current_game", db)
-        word = setting("current_game")["word"]
+        word = db["word"]
         last_hint = setting("crocodile_last_hint")
         if last_hint != 0:
             check_last = 'Так же учитывай, ' \
@@ -526,9 +526,9 @@ async def bot():
             'содержать слово в любом случае. ' + check_last
         )
         if response is None:
-            hint = setting("current_game")["hints"]
-            hint.remove(event.sender_id)
             db = setting("current_game")
+            hint = db["hints"]
+            hint.remove(event.sender_id)
             db["hints"] = hint
             setting("current_game", db)
             return await event.reply(phrase.crocodile.error)
