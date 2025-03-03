@@ -8,7 +8,7 @@ from time import time
 from hashlib import sha1, md5
 from os import listdir, path
 from datetime import timedelta
-from random import choice, randint
+from random import choice, randint, random
 from rich.logging import RichHandler
 from datetime import datetime
 from bestconfig import Config
@@ -513,25 +513,33 @@ async def bot():
         setting("current_game", db)
         word = db["word"]
         last_hint = setting("crocodile_last_hint")
-        if last_hint != 0:
-            check_last = 'Так же учитывай, ' \
-                f'что подсказка {last_hint} уже была.'
+        if random() < coofs.PercentForRandomLetter and last_hint != 0:
+            n = 1
+            for letter in list(db['unsec']):
+                if letter != '_':
+                    response = f'{n} буква в слове - **{letter}**'
+                    break
+                n += 1
         else:
-            check_last = ''
-        response = await ai_response(
-            f'Сделай подсказку для слова "{word}". '
-            'Ни в коем случае не добавляй никаких "подсказка для слова.." '
-            'и т.п, ответ должен содержать только подсказку. '
-            'Не забудь, что подсказка не должна '
-            'содержать слово в любом случае. ' + check_last
-        )
-        if response is None:
-            db = setting("current_game")
-            hint = db["hints"]
-            hint.remove(event.sender_id)
-            db["hints"] = hint
-            setting("current_game", db)
-            return await event.reply(phrase.crocodile.error)
+            if last_hint != 0:
+                check_last = 'Так же учитывай, ' \
+                    f'что подсказка {last_hint} уже была.'
+            else:
+                check_last = ''
+            response = await ai_response(
+                f'Сделай подсказку для слова "{word}". '
+                'Ни в коем случае не добавляй никаких "подсказка для слова.." '
+                'и т.п, ответ должен содержать только подсказку. '
+                'Не забудь, что подсказка не должна '
+                'содержать слово в любом случае. ' + check_last
+            )
+            if response is None:
+                db = setting("current_game")
+                hint = db["hints"]
+                hint.remove(event.sender_id)
+                db["hints"] = hint
+                setting("current_game", db)
+                return await event.reply(phrase.crocodile.error)
         setting("crocodile_last_hint", response)
         await event.reply(response)
 
