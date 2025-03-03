@@ -323,6 +323,8 @@ async def bot():
                 )
             )
 
+    # Обработчики событий
+
     @client.on(events.ChatAction(chats=tokens.bot.chat))
     async def chat_action(event):
         if event.user_left:
@@ -335,6 +337,21 @@ async def bot():
                 )
             )
 
+    # Статистика
+
+    @client.on(events.NewMessage(chats=tokens.bot.chat))
+    async def add_stat(event):
+        if event.text.startswith('‹'):
+            if event.sender_id in setting('api_bot_id', log=False):
+                id = nicks.get(
+                    event.text.split(
+                        '›'
+                    )[0].split(
+                        '‹'
+                    )[1]
+                )
+                if id is not None:
+                    add_stat(id)
     # Обработчики команд
 
     async def link_nick(event):

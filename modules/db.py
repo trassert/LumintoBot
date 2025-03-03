@@ -1,6 +1,7 @@
 import json
 import logging
 
+from datetime import datetime, timedelta
 from os import path
 from random import choice
 from .random import weighted_choice
@@ -8,6 +9,7 @@ from .random import weighted_choice
 logger = logging.getLogger(__name__)
 
 nick_path = path.join('db', 'minecraft.json')
+stats_path = path.join('db', 'chat_stats')
 
 
 def setting(key, value=None, delete=None, log=True):
@@ -262,3 +264,43 @@ class nicks:
                 load, f, indent=4, ensure_ascii=False, sort_keys=True
             )
         return True
+
+
+class statictic:
+    def __init__(self, nick=None, days=1):
+        self.nick = nick
+        self.days = days
+
+    def get(self):
+        'Получить статистику по заданным аргументам'
+        now = datetime.now().strftime("%Y.%m.%d")
+
+        # Если нет файла
+        if not path.exists(path.join(stats_path, f'{self.id}.json')):
+            with open(
+                path.join(stats_path, f'{self.id}.json'),
+                'w',
+                encoding='utf8'
+            ) as f:
+                stats = {}
+                stats[now] = 1
+                json.dump(
+                    stats, f, indent=4, ensure_ascii=False, sort_keys=True
+                )
+                return 1
+
+        # Если есть файл
+        with open(
+            path.join('db', 'user_stats', f'{id}.json'), 'r', encoding='utf8'
+        ) as f:
+            now = datetime.now()
+            stats = json.load(f)
+            dates = list(stats.keys())
+            dates.sort(reverse=True)
+            start_date = now - timedelta(days=self.days)
+            filtered_data = {
+                date: value for date, value in stats.items() if datetime.strptime(
+                    date, '%Y.%m.%d') >= start_date
+            }
+            return sum(filtered_data.values()) or 1
+    
