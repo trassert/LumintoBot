@@ -365,7 +365,8 @@ async def bot():
                 all_data = statistic().get_all()
         n = 1
         for data in all_data:
-            text += f'1. {data[0]} - {data[1]}\n'
+            text += f'{n}. {data[0]} - {data[1]}\n'
+            n += 1
         return await event.reply(text)
 
     async def link_nick(event):
@@ -1537,12 +1538,8 @@ async def web_server():
                 status=401
             )
         nick = request.query.get('nick')
-        message = request.query.get('message')
+        # ! message = request.query.get('message') Для будущих нужд
         statistic.add(nick=nick)
-        await client.send_message(
-            tokens.bot.chat,
-            f'Плагин отправил: <{nick}> {message}'
-        )
         return aiohttp.web.Response(text='ok')
 
     async def github(request):
