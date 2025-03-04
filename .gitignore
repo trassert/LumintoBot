@@ -1,4 +1,4 @@
-db/user_stats/*
+db/chat_stats/*
 db/data.json
 db/minecraft.json
 db/money.json

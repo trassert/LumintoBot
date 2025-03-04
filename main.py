@@ -33,7 +33,8 @@ from modules.db import (
     setting,
     update_shop,
     get_all_money,
-    nicks
+    nicks,
+    statistic
 )
 from modules.formatter import decline_number
 from modules.system_info import get_system_info
@@ -145,7 +146,7 @@ async def bot():
             else:
                 user_name = user_name.first_name + " " + user_name.last_name
         else:
-            user_name = user_name.username
+            user_name = '@'+user_name.username
         return user_name
 
     # Кнопки бота
@@ -337,22 +338,35 @@ async def bot():
                 )
             )
 
-    # Статистика
-
-    @client.on(events.NewMessage(chats=tokens.bot.chat))
-    async def add_stat(event):
-        if event.text.startswith('‹'):
-            if event.sender_id in setting('api_bot_id', log=False):
-                id = nicks.get(
-                    event.text.split(
-                        '›'
-                    )[0].split(
-                        '‹'
-                    )[1]
-                )
-                if id is not None:
-                    add_stat(id)
     # Обработчики команд
+
+    @client.on(events.NewMessage(incoming=True, pattern=r"/топ соо(.*)"))
+    @client.on(events.NewMessage(incoming=True, pattern=r"/топ сообщений(.*)"))
+    @client.on(events.NewMessage(incoming=True, pattern=r"/топ в чате(.*)"))
+    @client.on(events.NewMessage(incoming=True, pattern=r"/актив сервера(.*)"))
+    @client.on(events.NewMessage(incoming=True, pattern=r"/мчат(.*)"))
+    async def active_check(event):
+        arg = event.pattern_match.group(1).strip()
+        try:
+            days = int(arg)
+            text = phrase.stat_chat.format(decline_number(days, 'день'))
+            all_data = statistic(days=days).get_all()
+        except ValueError:
+            if arg in [
+                'весь',
+                'вся',
+                'общий',
+                'всего'
+            ]:
+                text = phrase.stat_chat.format('всё время')
+                all_data = statistic().get_all(all_days=True)
+            else:
+                text = phrase.stat_chat.format('день')
+                all_data = statistic().get_all()
+        n = 1
+        for data in all_data:
+            text += f'1. {data[0]} - {data[1]}\n'
+        return await event.reply(text)
 
     async def link_nick(event):
         nick = event.text.split(' ', maxsplit=1)[1].strip()
@@ -1444,7 +1458,8 @@ async def web_server():
             logger.warning(f'Должен быть: {sign}')
             logger.warning(f'Имеется: {hash}')
             return aiohttp.web.Response(
-                text='Переданные данные не прошли проверку.'
+                text='Переданные данные не прошли проверку.',
+                status=401
             )
         tg_id = nicks(nick=nick).get()
         if tg_id is not None:
@@ -1475,7 +1490,8 @@ async def web_server():
             logger.warning(f'Должен быть: {sign}')
             logger.warning(f'Имеется: {hash}')
             return aiohttp.web.Response(
-                text='Переданные данные не прошли проверку.'
+                text='Переданные данные не прошли проверку.',
+                status=401
             )
         tg_id = nicks(nick=username).get()
         if tg_id is not None:
@@ -1514,6 +1530,21 @@ async def web_server():
                 text="True"
             )
 
+    async def minecraft(request):
+        if request.query.get('password') != tokens.chattohttp:
+            return aiohttp.web.Response(
+                text='Неверный пароль.',
+                status=401
+            )
+        nick = request.query.get('nick')
+        message = request.query.get('message')
+        statistic.add(nick=nick)
+        await client.send_message(
+            tokens.bot.chat,
+            f'Плагин отправил: <{nick}> {message}'
+        )
+        return aiohttp.web.Response(text='ok')
+
     async def github(request):
         'Вебхук для гитхаба'
         load = await request.json()
@@ -1535,7 +1566,8 @@ async def web_server():
             aiohttp.web.post('/hotmc', hotmc),
             aiohttp.web.post('/servers', servers),
             aiohttp.web.post('/github', github),
-            aiohttp.web.get('/version', version)
+            aiohttp.web.get('/version', version),
+            aiohttp.web.get('/minecraft', minecraft)
         ]
     )
     runner = aiohttp.web.AppRunner(app)

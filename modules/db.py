@@ -2,7 +2,7 @@ import json
 import logging
 
 from datetime import datetime, timedelta
-from os import path
+from os import path, listdir
 from random import choice
 from .random import weighted_choice
 
@@ -266,21 +266,18 @@ class nicks:
         return True
 
 
-class statictic:
-    def __init__(self, nick=None, days=1):
-        self.nick = nick
+class statistic:
+    def __init__(self, days=1):
         self.days = days
 
-    def get(self):
+    def get(self, nick, all_days=False):
         'Получить статистику по заданным аргументам'
         now = datetime.now().strftime("%Y.%m.%d")
 
         # Если нет файла
-        if not path.exists(path.join(stats_path, f'{self.id}.json')):
+        if not path.exists(path.join(stats_path, f'{nick}.json')):
             with open(
-                path.join(stats_path, f'{self.id}.json'),
-                'w',
-                encoding='utf8'
+                path.join(stats_path, f'{nick}.json'), 'w', encoding='utf8'
             ) as f:
                 stats = {}
                 stats[now] = 1
@@ -291,16 +288,51 @@ class statictic:
 
         # Если есть файл
         with open(
-            path.join('db', 'user_stats', f'{id}.json'), 'r', encoding='utf8'
+            path.join(stats_path, f'{nick}.json'), 'r', encoding='utf8'
         ) as f:
-            now = datetime.now()
             stats = json.load(f)
+            if all_days:
+                return sum(stats.values()) or 1
             dates = list(stats.keys())
             dates.sort(reverse=True)
-            start_date = now - timedelta(days=self.days)
+            start_date = datetime.now() - timedelta(days=self.days)
             filtered_data = {
-                date: value for date, value in stats.items() if datetime.strptime(
-                    date, '%Y.%m.%d') >= start_date
+                date: value for date, value in stats.items()
+                if datetime.strptime(date, '%Y.%m.%d') >= start_date
             }
             return sum(filtered_data.values()) or 1
-    
+
+    def get_all(self, all_days=False):
+        data = {}
+        for file in listdir(stats_path):
+            nick = file.replace('.json', '')
+            data[nick] = self.get(nick, True if all_days else False)
+        return sorted(data.items(), key=lambda item: item[1], reverse=True)
+
+    def add(nick):
+        '+1 в статистику игрока'
+        now = datetime.now().strftime("%Y.%m.%d")
+
+        # Если нет файла
+        if not path.exists(path.join(stats_path, f'{nick}.json')):
+            with open(
+                path.join(stats_path, f'{nick}.json'), 'w', encoding='utf8'
+            ) as f:
+                stats = {}
+                stats[now] = 1
+                json.dump(
+                    stats, f, indent=4, ensure_ascii=False, sort_keys=True
+                )
+
+        # Если есть файл
+        with open(
+            path.join(stats_path, f'{nick}.json'), 'r', encoding='utf8'
+        ) as f:
+            stats = json.load(f)
+            stats[now] = stats[now] + 1
+        with open(
+            path.join(stats_path, f'{nick}.json'), 'w', encoding='utf8'
+        ) as f:
+            json.dump(
+                stats, f, indent=4, ensure_ascii=False, sort_keys=True
+            )
