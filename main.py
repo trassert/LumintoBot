@@ -922,7 +922,7 @@ async def bot():
             return await event.reply(phrase.perms.no)
         args = event.text.split(" ", maxsplit=3)
         try:
-            tag = args[2]
+            tag = args[3]
             user = await client(
                 GetFullUserRequest(tag)
             )
@@ -935,7 +935,7 @@ async def bot():
                 phrase.money.no_such_people+phrase.money.change_balance_use
             )
         try:
-            new = int(args[3])
+            new = int(args[2])
         except IndexError:
             return await event.reply(
                 phrase.money.no_count+phrase.money.change_balance_use

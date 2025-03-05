@@ -280,11 +280,11 @@ class statistic:
                 path.join(stats_path, f'{nick}.json'), 'w', encoding='utf8'
             ) as f:
                 stats = {}
-                stats[now] = 1
+                stats[now] = 0
                 json.dump(
                     stats, f, indent=4, ensure_ascii=False, sort_keys=True
                 )
-                return 1
+                return 0
 
         # Если есть файл
         with open(
@@ -292,7 +292,7 @@ class statistic:
         ) as f:
             stats = json.load(f)
             if all_days:
-                return sum(stats.values()) or 1
+                return sum(stats.values()) or 0
             dates = list(stats.keys())
             dates.sort(reverse=True)
             start_date = datetime.now() - timedelta(days=self.days)
@@ -300,7 +300,7 @@ class statistic:
                 date: value for date, value in stats.items()
                 if datetime.strptime(date, '%Y.%m.%d') >= start_date
             }
-            return sum(filtered_data.values()) or 1
+            return sum(filtered_data.values()) or 0
 
     def get_all(self, all_days=False):
         data = {}
