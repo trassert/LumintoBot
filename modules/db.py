@@ -306,7 +306,9 @@ class statistic:
         data = {}
         for file in listdir(stats_path):
             nick = file.replace('.json', '')
-            data[nick] = self.get(nick, True if all_days else False)
+            nick_stat = self.get(nick, True if all_days else False)
+            if nick_stat > 1:
+                data[nick] = nick_stat
         return sorted(data.items(), key=lambda item: item[1], reverse=True)
 
     def add(nick):
