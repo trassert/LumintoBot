@@ -229,6 +229,7 @@ class nicks:
     def __init__(self, nick=None, id=None):
         self.nick = nick
         self.id = id
+
     def get(self):
         if self.nick:
             'Получить id игрока по нику'
@@ -247,10 +248,12 @@ class nicks:
                 return None
         else:
             raise TypeError('Нужен ник или id!')
+
     def get_all(self):
         with open(nick_path, 'r', encoding='utf8') as f:
             load = json.load(f)
             return dict(sorted(load.items()))
+
     def link(self):
         with open(nick_path, 'r', encoding='utf8') as f:
             load = json.load(f)

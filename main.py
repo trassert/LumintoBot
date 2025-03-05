@@ -75,32 +75,30 @@ def remove_section_marks(text):
     return re.sub(pattern, "", text)
 
 
-def get_last_update():
-    last = setting('shop_update_time')
-    if last is not None:
-        last = last.replace(
-            ':', '-'
-        ).replace(
-            '.', '-'
-        ).replace(
-            ' ', '-'
-        ).split('-')
-    try:
-        return datetime(
-            int(last[0]),
-            int(last[1]),
-            int(last[2]),
-            int(last[3]),
-            int(last[4]),
-            int(last[5]),
-            int(last[6]),
-        )
-    except Exception:
-        setting('shop_update_time', str(datetime.now()))
-        return get_last_update()
-
-
 async def time_to_update_shop():
+    def get_last_update():
+        last = setting('shop_update_time')
+        if last is not None:
+            last = last.replace(
+                ':', '-'
+            ).replace(
+                '.', '-'
+            ).replace(
+                ' ', '-'
+            ).split('-')
+        try:
+            return datetime(
+                int(last[0]),
+                int(last[1]),
+                int(last[2]),
+                int(last[3]),
+                int(last[4]),
+                int(last[5]),
+                int(last[6]),
+            )
+        except Exception:
+            setting('shop_update_time', str(datetime.now()))
+            return get_last_update()
     await asyncio.sleep(10)  # ! Для предотвращения блокировки
     while True:
         today = datetime.now()
@@ -120,6 +118,59 @@ async def time_to_update_shop():
             setting('shop_version', setting('shop_version') + 1)
             setting(
                 'shop_update_time', str(today).split(':')[0]+':00:00.000000'
+            )
+        await asyncio.sleep(abs(seconds))
+
+
+async def time_to_rewards():
+    def get_last_update():
+        last = setting('stat_update_time')
+        if last is not None:
+            last = last.replace(
+                ':', '-'
+            ).replace(
+                '.', '-'
+            ).replace(
+                ' ', '-'
+            ).split('-')
+        try:
+            return datetime(
+                int(last[0]),
+                int(last[1]),
+                int(last[2]),
+                int(last[3]),
+                int(last[4]),
+                int(last[5]),
+                int(last[6]),
+            )
+        except Exception:
+            setting('stat_update_time', str(datetime.now()))
+            return get_last_update()
+    await asyncio.sleep(10)  # ! Для предотвращения блокировки
+    while True:
+        today = datetime.now()
+        last = get_last_update()
+        seconds = (
+            timedelta(hours=24) - (today - last)
+        ).total_seconds()
+        'Если время прошло'
+        if today - last > timedelta(hours=24):
+            day_stat = statistic().get_all()
+            for top in day_stat:
+                tg_id = nicks(nick=top[0]).get()
+                if tg_id != None:
+                    add_money(
+                        tg_id,
+                        coofs.ActiveGift
+                    )
+                    return await client.send_message(
+                        phrase.stat.gift.format(
+                            user=top[0],
+                            gift=decline_number(coofs.ActiveGift, 'изумруд')
+                        )
+                    )
+            setting(
+                'stat_update_time', str(today).split(':')[0]+':00:00.000000'
             )
         await asyncio.sleep(abs(seconds))
 
@@ -1585,7 +1636,8 @@ async def main():
             await asyncio.gather(
                 bot(),
                 time_to_update_shop(),
-                time_to_check_ip()
+                time_to_check_ip(),
+                time_to_rewards()
             )
         except ConnectionError:
             logger.error('Жду 20 секунд (нет подключения к интернету)')

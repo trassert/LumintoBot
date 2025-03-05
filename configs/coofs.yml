@@ -3,5 +3,6 @@ TopBets: 1.5
 WordRequest: 2
 IPSleepTime: 3600
 LinkGift: 5
+ActiveGift: 15
 PriceForChangeNick: 32
 PercentForRandomLetter: 0.2

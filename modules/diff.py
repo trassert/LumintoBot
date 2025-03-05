@@ -6,6 +6,7 @@ from os import path
 
 logger = logging.getLogger(__name__)
 
+
 def similar(word, list):
     max_ratio = 0
     max_simular = ''
@@ -20,6 +21,7 @@ def similar(word, list):
         f'Найдено: "{max_simular if max_simular != "" else "Ничего"}"'
     )
     return max_simular
+
 
 def get_enchant_desc(string):
     with open(path.join('db', 'enchants', 'ru.json'), encoding='utf-8') as f:
