@@ -349,7 +349,7 @@ async def bot():
         arg = event.pattern_match.group(1).strip()
         try:
             days = int(arg)
-            text = phrase.stat_chat.format(decline_number(days, 'день'))
+            text = phrase.stat.chat.format(decline_number(days, 'день'))
             all_data = statistic(days=days).get_all()
         except ValueError:
             if arg in [
@@ -358,11 +358,13 @@ async def bot():
                 'общий',
                 'всего'
             ]:
-                text = phrase.stat_chat.format('всё время')
+                text = phrase.stat.chat.format('всё время')
                 all_data = statistic().get_all(all_days=True)
             else:
-                text = phrase.stat_chat.format('день')
+                text = phrase.stat.chat.format('день')
                 all_data = statistic().get_all()
+        if all_data == []:
+            return await event.reply(phrase.stat.empty)
         n = 1
         for data in all_data:
             text += f'{n}. {data[0]} - {data[1]}\n'
@@ -897,7 +899,7 @@ async def bot():
                         await rcon.send('playtime top')
                     ).replace(
                         '(Лидеры по времени на сервере)',
-                        phrase.stat_server.format("ванильного")
+                        phrase.stat.server.format("ванильного")
                     ).replace(
                         '***',
                         ''
