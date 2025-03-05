@@ -331,7 +331,10 @@ class statistic:
             path.join(stats_path, f'{nick}.json'), 'r', encoding='utf8'
         ) as f:
             stats = json.load(f)
-            stats[now] = stats[now] + 1
+            if now in stats:
+                stats[now] = stats[now] + 1
+            else:
+                stats[now] = 1
         with open(
             path.join(stats_path, f'{nick}.json'), 'w', encoding='utf8'
         ) as f:
