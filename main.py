@@ -99,7 +99,7 @@ async def time_to_update_shop():
         except Exception:
             setting('shop_update_time', str(datetime.now()))
             return get_last_update()
-    await asyncio.sleep(10)  # ! Для предотвращения блокировки
+    await asyncio.sleep(3)  # ! Для предотвращения блокировки
     while True:
         today = datetime.now()
         last = get_last_update()
@@ -109,6 +109,7 @@ async def time_to_update_shop():
         'Если время прошло'
         if today - last > timedelta(hours=2):
             theme = update_shop()
+            logger.info('Изменена тема магазина')
             await client.send_message(
                 tokens.bot.chat,
                 phrase.shop.update.format(
@@ -119,6 +120,7 @@ async def time_to_update_shop():
             setting(
                 'shop_update_time', str(today).split(':')[0]+':00:00.000000'
             )
+        logger.info('Жду следующий ивент...')
         await asyncio.sleep(abs(seconds))
 
 
@@ -146,7 +148,7 @@ async def time_to_rewards():
         except Exception:
             setting('stat_update_time', str(datetime.now()))
             return get_last_update()
-    await asyncio.sleep(10)  # ! Для предотвращения блокировки
+    await asyncio.sleep(3)  # ! Для предотвращения блокировки
     while True:
         today = datetime.now()
         last = get_last_update()
@@ -158,21 +160,24 @@ async def time_to_rewards():
             day_stat = statistic().get_all()
             for top in day_stat:
                 tg_id = nicks(nick=top[0]).get()
-                if tg_id != None:
+                if tg_id is not None:
                     add_money(
                         tg_id,
                         coofs.ActiveGift
                     )
-                    return await client.send_message(
+                    await client.send_message(
                         tokens.bot.chat,
                         phrase.stat.gift.format(
                             user=top[0],
                             gift=decline_number(coofs.ActiveGift, 'изумруд')
                         )
                     )
+                    logger.info('Начислен подарок за активность!')
+                    break
             setting(
                 'stat_update_time', str(today).split(':')[0]+':00:00.000000'
             )
+        logger.info('Жду до следующей награды...')
         await asyncio.sleep(abs(seconds))
 
 
