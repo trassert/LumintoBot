@@ -164,6 +164,7 @@ async def time_to_rewards():
                         coofs.ActiveGift
                     )
                     return await client.send_message(
+                        tokens.bot.chat,
                         phrase.stat.gift.format(
                             user=top[0],
                             gift=decline_number(coofs.ActiveGift, 'изумруд')
