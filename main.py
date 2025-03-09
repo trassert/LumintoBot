@@ -1068,6 +1068,7 @@ async def bot():
             parse_mode="html"
         )
 
+    @client.on(events.NewMessage(incoming=True, pattern="/банк"))
     async def all_money(event):
         return await event.reply(
             phrase.money.all_money.format(
@@ -1075,6 +1076,11 @@ async def bot():
             )
         )
 
+    @client.on(events.NewMessage(incoming=True, pattern="/топ крокодил"))
+    @client.on(events.NewMessage(incoming=True, pattern="/топ слова"))
+    @client.on(events.NewMessage(incoming=True, pattern="/стат крокодил"))
+    @client.on(events.NewMessage(incoming=True, pattern="/стат слова"))
+    @client.on(events.NewMessage(incoming=True, pattern="топ крокодила"))
     async def crocodile_wins(event):
         all = crocodile_stat.get_all()
         text = ''
@@ -1183,18 +1189,6 @@ async def bot():
         return await event.reply(phrase.enchant.main.format(desc))
 
     await client.start(bot_token=tokens.bot.token)
-
-    'Все деньги'
-    client.add_event_handler(
-        all_money, events.NewMessage(incoming=True, pattern="/банк")
-    )
-
-    'Стата крокодила'
-    client.add_event_handler(
-        crocodile_wins, events.NewMessage(
-            incoming=True, pattern="/стат крокодил"
-        )
-    )
 
     'ДНС'
     client.add_event_handler(
