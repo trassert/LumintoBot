@@ -722,6 +722,9 @@ async def bot():
                         )
                     )
 
+    @client.on(events.NewMessage(incoming=True, pattern="/крокодил"))
+    @client.on(events.NewMessage(incoming=True, pattern="/crocodile"))
+    @client.on(events.NewMessage(incoming=True, pattern="старт крокодил"))
     async def crocodile(event):
         if not event.chat_id == setting("default_chat"):
             return await event.reply(phrase.default_chat)
@@ -1319,15 +1322,8 @@ async def bot():
 
     'Крокодил'
     client.add_event_handler(
-        crocodile, events.NewMessage(incoming=True, pattern="/крокодил")
-    )
-    client.add_event_handler(
-        crocodile, events.NewMessage(incoming=True, pattern="/crocodile")
-    )
-    client.add_event_handler(
         crocodile_bet, events.NewMessage(incoming=True, pattern="/ставка")
     )
-
     if setting("current_game") != 0:
         client.add_event_handler(
             crocodile_handler,
