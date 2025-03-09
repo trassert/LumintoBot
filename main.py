@@ -395,7 +395,7 @@ async def bot():
                 )
             )
 
-    # Обработчики команд
+    # ! Обработчики команд
 
     @client.on(events.NewMessage(incoming=True, pattern=r"/топ соо(.*)"))
     @client.on(events.NewMessage(incoming=True, pattern=r"/топ сообщений(.*)"))
@@ -542,6 +542,10 @@ async def bot():
             parse_mode="html"
         )
 
+    @client.on(events.NewMessage(incoming=True, pattern="/хост"))
+    @client.on(events.NewMessage(incoming=True, pattern="/host"))
+    @client.on(events.NewMessage(incoming=True, pattern="/айпи"))
+    @client.on(events.NewMessage(incoming=True, pattern="/ip"))
     async def host(event):
         await event.reply(phrase.server.host.format(setting("host")))
 
@@ -551,6 +555,12 @@ async def bot():
     async def sysinfo(event):
         await event.reply(get_system_info())
 
+    @client.on(events.NewMessage(incoming=True, pattern="/помощь"))
+    @client.on(events.NewMessage(incoming=True, pattern="/help"))
+    @client.on(events.NewMessage(incoming=True, pattern="/команды"))
+    @client.on(events.NewMessage(incoming=True, pattern="/commands"))
+    @client.on(events.NewMessage(incoming=True, pattern="команды"))
+    @client.on(events.NewMessage(incoming=True, pattern="бот помощь"))
     async def help(event):
         await event.reply(phrase.help.comm, link_preview=True)
 
@@ -1266,25 +1276,6 @@ async def bot():
     client.add_event_handler(
         server_top_list,
         events.NewMessage(incoming=True, pattern="/bestplayers")
-    )
-
-    'Айпи'
-    client.add_event_handler(
-        host, events.NewMessage(incoming=True, pattern="/хост")
-    )
-    client.add_event_handler(
-        host, events.NewMessage(incoming=True, pattern="/host")
-    )
-
-    'Помощь'
-    client.add_event_handler(
-        help, events.NewMessage(incoming=True, pattern="/помощь")
-    )
-    client.add_event_handler(
-        help, events.NewMessage(incoming=True, pattern="/команды")
-    )
-    client.add_event_handler(
-        help, events.NewMessage(incoming=True, pattern="/help")
     )
 
     'Пинг'
