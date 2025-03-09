@@ -1095,8 +1095,9 @@ async def bot():
             phrase.crocodile.stat.format(text)
         )
 
+    @client.on(events.NewMessage(incoming=True, pattern=r"/слово(.*)"))
     async def word_request(event):
-        word = event.text.split(' ', maxsplit=1)[1].lower()
+        word = event.pattern_match.group(1).strip().lower()
         with open(
             path.join('db', 'crocodile_words.txt'), 'r', encoding='utf-8'
         ) as f:
@@ -1145,8 +1146,8 @@ async def bot():
             phrase.word.set.format(word=word)
         )
 
-    @client.on(events.NewMessage(incoming=True, pattern="/nick(.*)"))
-    @client.on(events.NewMessage(incoming=True, pattern="/ник(.*)"))
+    @client.on(events.NewMessage(incoming=True, pattern=r"/nick(.*)"))
+    @client.on(events.NewMessage(incoming=True, pattern=r"/ник(.*)"))
     async def check_nick(event):
         try:
             user = await client(
@@ -1185,7 +1186,7 @@ async def bot():
 
     'Запрос на слово'
     client.add_event_handler(
-        word_request, events.NewMessage(incoming=True, pattern="/слово")
+        word_request, 
     )
 
     'Все деньги'
