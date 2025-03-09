@@ -473,6 +473,12 @@ async def bot():
             )
         )
 
+    @client.on(events.NewMessage(incoming=True, pattern="/shop"))
+    @client.on(events.NewMessage(incoming=True, pattern="/шоп"))
+    @client.on(events.NewMessage(incoming=True, pattern="/магазин"))
+    @client.on(events.NewMessage(incoming=True, pattern="магазин"))
+    @client.on(events.NewMessage(incoming=True, pattern="shop"))
+    @client.on(events.NewMessage(incoming=True, pattern="шоп"))
     async def shop(event):
         version = setting('shop_version')
         keyboard = ReplyInlineMarkup(
@@ -1060,6 +1066,8 @@ async def bot():
             )
         )
 
+    @client.on(events.NewMessage(incoming=True, pattern="/dns"))
+    @client.on(events.NewMessage(incoming=True, pattern="/днс"))
     async def tg_dns(event):
         if event.sender_id not in setting('admins_id'):
             return await event.reply(phrase.perms.no)
@@ -1190,14 +1198,6 @@ async def bot():
 
     await client.start(bot_token=tokens.bot.token)
 
-    'ДНС'
-    client.add_event_handler(
-        tg_dns, events.NewMessage(incoming=True, pattern="/днс")
-    )
-    client.add_event_handler(
-        tg_dns, events.NewMessage(incoming=True, pattern="/dns")
-    )
-
     'Супер-игра'
     client.add_event_handler(
         super_game, events.NewMessage(incoming=True, pattern="/суперигра")
@@ -1212,14 +1212,6 @@ async def bot():
     )
     client.add_event_handler(
         link_nick, events.NewMessage(incoming=True, pattern="/connect")
-    )
-
-    'Магазин'
-    client.add_event_handler(
-        shop, events.NewMessage(incoming=True, pattern="/shop")
-    )
-    client.add_event_handler(
-        shop, events.NewMessage(incoming=True, pattern="/магазин")
     )
 
     'Кошелек'
