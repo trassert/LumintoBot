@@ -545,6 +545,9 @@ async def bot():
     async def host(event):
         await event.reply(phrase.server.host.format(setting("host")))
 
+    @client.on(events.NewMessage(incoming=True, pattern="/серв"))
+    @client.on(events.NewMessage(incoming=True, pattern="/сервер"))
+    @client.on(events.NewMessage(incoming=True, pattern="/server"))
     async def sysinfo(event):
         await event.reply(get_system_info())
 
@@ -971,6 +974,12 @@ async def bot():
         except TimeoutError:
             return await event.reply(phrase.server.stopped)
 
+    @client.on(events.NewMessage(incoming=True, pattern="/баланс"))
+    @client.on(events.NewMessage(incoming=True, pattern="баланс"))
+    @client.on(events.NewMessage(incoming=True, pattern="/wallet"))
+    @client.on(events.NewMessage(incoming=True, pattern="wallet"))
+    @client.on(events.NewMessage(incoming=True, pattern="/мой баланс"))
+    @client.on(events.NewMessage(incoming=True, pattern="мой баланс"))
     async def get_balance(event):
         return await event.reply(
             phrase.money.wallet.format(
@@ -1214,20 +1223,6 @@ async def bot():
         link_nick, events.NewMessage(incoming=True, pattern="/connect")
     )
 
-    'Кошелек'
-    client.add_event_handler(
-        get_balance,
-        events.NewMessage(incoming=True, pattern="/баланс")
-    )
-    client.add_event_handler(
-        get_balance,
-        events.NewMessage(incoming=True, pattern="/мой баланс")
-    )
-    client.add_event_handler(
-        get_balance,
-        events.NewMessage(incoming=True, pattern="/wallet")
-    )
-
     'Добавить монет'
     client.add_event_handler(
         add_balance,
@@ -1268,17 +1263,6 @@ async def bot():
     client.add_event_handler(
         server_top_list,
         events.NewMessage(incoming=True, pattern="/bestplayers")
-    )
-
-    'Сервер'
-    client.add_event_handler(
-        sysinfo, events.NewMessage(incoming=True, pattern="/серв")
-    )
-    client.add_event_handler(
-        sysinfo, events.NewMessage(incoming=True, pattern="/сервер")
-    )
-    client.add_event_handler(
-        sysinfo, events.NewMessage(incoming=True, pattern="/server")
     )
 
     'Айпи'
