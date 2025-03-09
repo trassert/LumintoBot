@@ -1145,12 +1145,12 @@ async def bot():
             phrase.word.set.format(word=word)
         )
 
+    @client.on(events.NewMessage(incoming=True, pattern="/nick(.*)"))
+    @client.on(events.NewMessage(incoming=True, pattern="/ник(.*)"))
     async def check_nick(event):
-        args = event.text.split(' ', maxsplit=1)
         try:
-            tag = args[1]
             user = await client(
-                GetFullUserRequest(tag)
+                GetFullUserRequest(event.pattern_match.group(1).strip())
             )
             user = user.full_user.id
         except (TypeError, ValueError, IndexError):
@@ -1182,14 +1182,6 @@ async def bot():
         return await event.reply(phrase.enchant.main.format(desc))
 
     await client.start(bot_token=tokens.bot.token)
-
-    'Посмотреть ник'
-    client.add_event_handler(
-        check_nick, events.NewMessage(incoming=True, pattern="/ник")
-    )
-    client.add_event_handler(
-        check_nick, events.NewMessage(incoming=True, pattern="/nick")
-    )
 
     'Запрос на слово'
     client.add_event_handler(
