@@ -1166,11 +1166,21 @@ async def bot():
             ]
         )
         try:
+            hint = None
+            while hint is None:
+                hint = await ai_response(
+                    f'Сделай подсказку для слова "{word}". '
+                    'Ни в коем случае не добавляй никаких "подсказка для слова.." '
+                    'и т.п, ответ должен содержать только подсказку. '
+                    'Не забудь, что подсказка не должна '
+                    'содержать слово в любом случае. '
+                )
             await client.send_message(
                 tokens.bot.creator,
                 phrase.word.request.format(
                     user=f'@{entity}',
-                    word=word
+                    word=word,
+                    hint=hint
                 ),
                 buttons=keyboard
             )
