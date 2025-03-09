@@ -1184,11 +1184,6 @@ async def bot():
 
     await client.start(bot_token=tokens.bot.token)
 
-    'Запрос на слово'
-    client.add_event_handler(
-        word_request, 
-    )
-
     'Все деньги'
     client.add_event_handler(
         all_money, events.NewMessage(incoming=True, pattern="/банк")
