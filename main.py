@@ -545,8 +545,8 @@ async def bot():
     async def host(event):
         await event.reply(phrase.server.host.format(setting("host")))
 
-    @client.on(events.NewMessage(incoming=True, pattern="/серв"))
-    @client.on(events.NewMessage(incoming=True, pattern="/сервер"))
+    @client.on(events.NewMessage(incoming=True, pattern=r"/серв$"))
+    @client.on(events.NewMessage(incoming=True, pattern=r"/сервер"))
     @client.on(events.NewMessage(incoming=True, pattern="/server"))
     async def sysinfo(event):
         await event.reply(get_system_info())
