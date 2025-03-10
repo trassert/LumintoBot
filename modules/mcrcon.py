@@ -58,6 +58,7 @@ class MinecraftClient:
         ) + message.encode('utf8') + b'\x00\x00'
         out_len = struct.pack('<i', len(out))
         self._writer.write(out_len + out)
+        await self._writer.drain()
 
         in_len = struct.unpack('<i', await self._read_data(4))
         in_payload = await self._read_data(in_len[0])
@@ -69,7 +70,7 @@ class MinecraftClient:
             raise ClientError('Неправильное заполнение.')
         if in_id == -1:
             raise InvalidPassword('Неверный пароль.')
-        if in_type != typen:  # Проверка отклоняет дубляж пакета (мб)
+        if in_type == typen:  # Проверка отклоняет дубляж пакета (мб)
             raise ClientError('Получен пакет с неправильным типом.')
 
         data = in_data.decode('utf8')
