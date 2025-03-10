@@ -141,6 +141,10 @@ def add_money(id, count):
 def update_shop():
     'Обновляет магазин'
     'Возвращает тему магазина'
+    with open(
+        path.join('db', 'shop_current.json'), 'r', encoding='utf8'
+    ) as f:
+        last_theme = json.load(f)['theme']
     current_shop = {}
     with open(
         path.join('db', 'shop_all.json'), 'r', encoding='utf8'
@@ -150,10 +154,10 @@ def update_shop():
     for theme in load:
         themes.append(theme)
     current_shop['theme'] = weighted_choice(themes, setting('shop_weight'))
+    while current_shop['theme'] is last_theme:
+        current_shop['theme'] = weighted_choice(themes, setting('shop_weight'))
     current_items = []
     all_items = list(load[current_shop['theme']].keys())
-    while len(current_items) != 5:
-        current_items.append(choice(list(all_items)))
     while len(set(current_items)) != len(current_items) \
             or len(current_items) < 5:
         current_items = list(set(current_items))
