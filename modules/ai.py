@@ -18,6 +18,7 @@ ai_servers = [
     'trassert.pythonanywhere.com/'
 ]
 
+
 async def ai_response(message):
     "Запрос к Google Gemini"
     logger.info(
