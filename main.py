@@ -38,7 +38,8 @@ from modules.db import (
     update_shop,
     get_all_money,
     nicks,
-    statistic
+    statistic,
+    ticket
 )
 from modules.formatter import decline_number
 from modules.system_info import get_system_info
@@ -420,6 +421,59 @@ async def telegram_bot():
                 return await send()
 
     # Обработчики команд
+
+    @telegram.on(events.NewMessage(incoming=True, pattern=r"\+чек(.*)"))
+    @telegram.on(events.NewMessage(incoming=True, pattern=r"\+ticket(.*)"))
+    async def do_ticket(event):
+        if not event.is_private:
+            return await event.reply(phrase.ticket.in_chat)
+        arg = event.pattern_match.group(1).strip()
+        if arg == '':
+            return await event.reply(phrase.ticket.no_value)
+        try:
+            arg = int(arg)
+            if arg < 1:
+                return await event.reply(phrase.ticket.bigger_than_zero)
+        except ValueError:
+            return await event.reply(phrase.ticket.not_int)
+        balance = get_money(event.sender_id)
+        if balance < arg:
+            return await event.reply(
+                phrase.money.not_enough.format(
+                    decline_number(
+                        balance, 'изумруд'
+                    )
+                )
+            )
+        add_money(event.sender_id, -arg)
+        ticket_id = ticket.add(event.sender_id, arg)
+        return await event.reply(
+            phrase.ticket.added.format(
+                value=arg,
+                author=await get_name(event.sender_id),
+                id=ticket_id
+            )
+        )
+
+    @telegram.on(events.NewMessage(incoming=True, pattern=r"/чек(.*)"))
+    @telegram.on(events.NewMessage(incoming=True, pattern=r"/ticket(.*)"))
+    @telegram.on(events.NewMessage(incoming=True, pattern=r"/активировать(.*)"))
+    @telegram.on(events.NewMessage(incoming=True, pattern=r"/activate(.*)"))
+    async def get_ticket(event):
+        arg = event.pattern_match.group(1).strip()
+        if arg == '':
+            return await event.reply(phrase.ticket.no_value)
+        ticket_info = ticket.get(arg)
+        if ticket_info is None:
+            return await event.reply(phrase.ticket.no_such)
+        add_money(event.sender_id, ticket_info['value'])
+        ticket.delete(arg)
+        return await event.reply(
+            phrase.ticket.got.format(
+                author=await get_name(event.sender_id),
+                value=decline_number(ticket_info['value'], 'изумруд')
+            )
+        )
 
     @telegram.on(events.NewMessage(incoming=True, pattern=r"/топ соо(.*)"))
     @telegram.on(events.NewMessage(incoming=True, pattern=r"/топ сообщений(.*)"))

@@ -1,7 +1,5 @@
-import logging
 from random import choices
-
-logger = logging.getLogger(__name__)
+from loguru import logger
 
 
 def weighted_choice(strings, weights):

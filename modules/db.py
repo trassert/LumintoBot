@@ -1,15 +1,14 @@
 import json
-import logging
 
+from loguru import logger
 from datetime import datetime, timedelta
 from os import path, listdir
-from random import choice
+from random import choice, randint
 from .random import weighted_choice
-
-logger = logging.getLogger(__name__)
 
 nick_path = path.join('db', 'minecraft.json')
 stats_path = path.join('db', 'chat_stats')
+tickets_path = path.join('db', 'tickets.json')
 
 
 def setting(key, value=None, delete=None, log=True):
@@ -348,3 +347,76 @@ class statistic:
             json.dump(
                 stats, f, indent=4, ensure_ascii=False, sort_keys=True
             )
+
+
+class ticket:
+    def get(id):
+        id = str(id)
+        'Получить чек по id'
+        if path.exists(tickets_path):
+            with open(
+                tickets_path, 'r', encoding='utf8'
+            ) as f:
+                data = json.load(f)
+                if id in data:
+                    return data[id]
+                return None
+        else:
+            with open(
+                tickets_path, 'w', encoding='utf8'
+            ) as f:
+                json.dump({}, f, indent=4, ensure_ascii=False, sort_keys=True)
+            return None
+
+    def add(author, value):
+        if path.exists(tickets_path):
+            with open(
+                tickets_path, 'r', encoding='utf8'
+            ) as f:
+                data = json.load(f)
+            with open(
+                tickets_path, 'w', encoding='utf8'
+            ) as f:
+                random_id = randint(1000, 9999)
+                while random_id in data:
+                    random_id = randint(1000, 9999)
+                data[str(random_id)] = {
+                    'author': int(author),
+                    'value': int(value),
+                }
+                json.dump(data, f, indent=4, ensure_ascii=False, sort_keys=True)
+                logger
+                return random_id
+        else:
+            with open(
+                tickets_path, 'w', encoding='utf8'
+            ) as f:
+                random_id = str(randint(1000, 9999))
+                json.dump(
+                    {
+                        random_id: {
+                            'author': int(author),
+                            'value': int(value)
+                        }
+                    },
+                    f,
+                    indent=4,
+                    ensure_ascii=False,
+                    sort_keys=True
+                )
+            return random_id
+
+    def delete(id):
+        with open(
+            tickets_path, 'r', encoding='utf8'
+        ) as f:
+            data = json.load(f)
+            if id not in data:
+                return None
+            else:
+                del data[id]
+        with open(
+            tickets_path, 'w', encoding='utf8'
+        ) as f:
+            json.dump(data, f, indent=4, ensure_ascii=False, sort_keys=True)
+            return True

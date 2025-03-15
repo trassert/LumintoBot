@@ -1,12 +1,10 @@
-import logging
 import aiohttp
 
 from bestconfig import Config
 from requests import codes
 from os import path
 from .formatter import formatter
-
-logger = logging.getLogger(__name__)
+from loguru import logger
 
 tokens = Config(path.join('configs', 'tokens.yml'))
 

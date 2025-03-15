@@ -1,5 +1,7 @@
 import json
 
+# ! Не вызывается. Только для создания json файла
+
 with open('items.txt', encoding='utf-8') as f:
     r = f.read().split('\n')
 

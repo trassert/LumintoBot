@@ -1,10 +1,8 @@
 import difflib
 import json
-import logging
 
+from loguru import logger
 from os import path
-
-logger = logging.getLogger(__name__)
 
 
 def similar(word, list):
