@@ -24,6 +24,10 @@ from telethon.sync import TelegramClient
 from telethon import errors as TGErrors
 from telethon.tl.functions.users import GetFullUserRequest
 
+# VK модули
+from vkbottle.dispatch.rules import ABCRule
+from vkbottle.bot import Bot, Message
+
 from modules import phrases as phrase
 from modules.db import (
     add_money,
@@ -389,6 +393,27 @@ async def telegram_bot():
                     user_name
                 )
             )
+
+    # Обработчик чата
+
+    @telegram.on(events.NewMessage(tokens.bot.chat))
+    async def vk_chat(event):
+        async def send():
+            user_name = await telegram.get_entity(event.sender_id)
+            if user_name.last_name is None:
+                user_name = user_name.first_name
+            else:
+                user_name = user_name.first_name + " " + user_name.last_name
+            logger.info(f"ТГ>ВК: {user_name} > {event.text}")
+            await vk.api.messages.send(
+                chat_id=tokens.vk.chat_id,
+                message=f'{user_name}: {event.text}',
+                random_id=0
+            )
+        if event.reply_to_msg_id == tokens.bot.vk_topic:
+            return await send()
+        elif event.reply_to.reply_to_top_id == tokens.bot.vk_topic:
+            return await send()
 
     # Обработчики команд
 
@@ -1330,12 +1355,8 @@ async def telegram_bot():
 
 
 async def vk_bot():
-    from vkbottle import API
-    from vkbottle.dispatch.rules import ABCRule
-    from vkbottle.bot import Bot, Message  # Для отключения блокировки
-
-    api = API(tokens.vk.token)
-    bot = Bot(api=api)
+    global vk
+    vk = Bot(token=tokens.vk.token)
 
     class CaseRule(ABCRule[Message]):
         def __init__(self, command: str):
@@ -1344,15 +1365,29 @@ async def vk_bot():
         async def check(self, message: Message) -> bool:
             return message.text.lower() == self.command
 
-    @bot.on.message(text='/ip')
-    @bot.on.message(text='/айпи')
-    @bot.on.message(text='/хост')
-    @bot.on.message(CaseRule('/host'))
+    @vk.on.message(text='/ip')
+    @vk.on.message(text='/айпи')
+    @vk.on.message(text='/хост')
+    @vk.on.message(CaseRule('/host'))
     async def host(message: Message):
         logger.info('Запрошен IP в ВК')
         await message.answer(phrase.server.host.format(setting("host")))
 
-    await bot.run_polling()
+    @vk.on.chat_message()
+    async def tg_chat(message: Message):
+        try:
+            user_info = await vk.api.users.get(user_ids=message.from_id)
+            name = '{} {}'.format(user_info[0].first_name, user_info[0].last_name)
+        except IndexError:
+            return logger.info('Юзер не найден, пропускаем')
+        logger.info(f"ВК>ТГ: {name} > {message.text}")
+        return await telegram.send_message(
+            tokens.bot.chat,
+            reply_to=tokens.bot.vk_topic,
+            message=f'**{name}**\n{message.text}'
+        )
+
+    await vk.run_polling()
 
 
 async def setup_ip(check_set=True):
