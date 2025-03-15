@@ -1,3 +1,4 @@
+import nest_asyncio
 import asyncio
 import re
 import aiohttp
@@ -44,21 +45,20 @@ from modules.diff import get_enchant_desc
 from loguru import logger
 from sys import stderr
 
+nest_asyncio.apply()
 logger.remove()
 logger.add(
     stderr,
     format='<blue>{time:HH:mm:ss}</blue>'
     ' | <level>{level}</level>'
     ' | <green>{function}</green>'
-    ' > <cyan>{message}</cyan>',
+    ' <cyan>></cyan> {message}',
     level="INFO",
     colorize=True,
 )
 
 tokens = Config(path.join('configs', 'tokens.yml'))
 coofs = Config(path.join('configs', 'coofs.yml'))
-
-loop = asyncio.new_event_loop()
 
 
 def remove_section_marks(text):
@@ -182,8 +182,10 @@ async def telegram_bot():
         device_model="Bot",
         system_version="4.16.30-vxCUSTOM",
         use_ipv6=True,
-        loop=loop
     )
+
+    logger.info('Запуск telegram')
+    await telegram.start(bot_token=tokens.bot.token)
 
     # Вспомогательные функции
 
@@ -1221,8 +1223,6 @@ async def telegram_bot():
             return await event.reply(phrase.enchant.no_diff)
         return await event.reply(phrase.enchant.main.format(desc))
 
-    await telegram.start(bot_token=tokens.bot.token)
-
     'Супер-игра'
     telegram.add_event_handler(
         super_game, events.NewMessage(incoming=True, pattern="/суперигра")
@@ -1330,16 +1330,29 @@ async def telegram_bot():
 
 
 async def vk_bot():
-    from vkbottle.bot import Bot  # Важно! Импорт не работает вне функции
+    from vkbottle import API
+    from vkbottle.dispatch.rules import ABCRule
+    from vkbottle.bot import Bot, Message  # Для отключения блокировки
 
-    global bot
-    bot = Bot(tokens.vk.token)
+    api = API(tokens.vk.token)
+    bot = Bot(api=api)
 
-    @bot.on.message()
-    async def host(_) -> str:
-        return "Hello, World!"
+    class CaseRule(ABCRule[Message]):
+        def __init__(self, command: str):
+            self.command = command.lower()
 
-    bot.run_forever()
+        async def check(self, message: Message) -> bool:
+            return message.text.lower() == self.command
+
+    @bot.on.message(text='/ip')
+    @bot.on.message(text='/айпи')
+    @bot.on.message(text='/хост')
+    @bot.on.message(CaseRule('/host'))
+    async def host(message: Message):
+        logger.info('Запрошен IP в ВК')
+        await message.answer(phrase.server.host.format(setting("host")))
+
+    await bot.run_polling()
 
 
 async def setup_ip(check_set=True):
@@ -1586,24 +1599,37 @@ async def web_server():
         ]
     )
     runner = aiohttp.web.AppRunner(app)
-    await runner.setup()
-    ipv4 = aiohttp.web.TCPSite(runner, '0.0.0.0', 5000)
-    ipv6 = aiohttp.web.TCPSite(runner, setting('ipv6'), 5000)
-    await ipv4.start()
-    await ipv6.start()
+    try:
+        await runner.setup()
+        ipv4 = aiohttp.web.TCPSite(runner, '0.0.0.0', 5000)
+        ipv6 = aiohttp.web.TCPSite(runner, setting('ipv6'), 5000)
+        await ipv4.start()
+        await ipv6.start()
+    except asyncio.CancelledError:
+        return logger.warning('Веб сервер остановлен')
+
+
+async def main():
+    while True:
+        try:
+            await setup_ip()
+            await web_server()
+            await asyncio.gather(
+                telegram_bot(),
+                vk_bot(),
+                time_to_update_shop(),
+                time_to_check_ip(),
+                time_to_rewards()
+            )
+        except ConnectionError:
+            logger.error('Жду 20 секунд (нет подключения к интернету)')
+            await asyncio.sleep(20)
 
 
 if __name__ == "__main__":
     if sum(setting('shop_weight').values()) != 100:
         logger.error('Сумма процентов в магазине не равна 100!')
     try:
-        loop.create_task(setup_ip())
-        loop.create_task(web_server())
-        loop.create_task(time_to_update_shop())
-        loop.create_task(time_to_check_ip())
-        loop.create_task(time_to_rewards())
-        loop.create_task(telegram_bot())
-        loop.create_task(vk_bot())
-        loop.run_forever()
-    except KeyboardInterrupt:
+        asyncio.run(main())
+    except (KeyboardInterrupt, RuntimeError):
         logger.warning('Закрываю бота!')
