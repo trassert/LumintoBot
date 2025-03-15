@@ -116,7 +116,7 @@ async def time_to_update_shop():
             setting(
                 'shop_update_time', str(today).split(':')[0]+':00:00.000000'
             )
-        logger.info('Жду следующий ивент...')
+        logger.info(f'Жду следующий ивент... ({abs(seconds)})')
         await asyncio.sleep(abs(seconds))
 
 
@@ -1670,5 +1670,5 @@ if __name__ == "__main__":
         logger.error('Сумма процентов в магазине не равна 100!')
     try:
         asyncio.run(main())
-    except (KeyboardInterrupt, RuntimeError):
+    except (KeyboardInterrupt, RuntimeError, asyncio.CancelledError):
         logger.warning('Закрываю бота!')
