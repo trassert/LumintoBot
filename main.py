@@ -399,6 +399,8 @@ async def telegram_bot():
     @telegram.on(events.NewMessage(tokens.bot.chat))
     async def vk_chat(event):
         async def send():
+            if event.text == '':
+                return logger.info('Пустое сообщение')
             user_name = await telegram.get_entity(event.sender_id)
             if user_name.last_name is None:
                 user_name = user_name.first_name
@@ -410,10 +412,12 @@ async def telegram_bot():
                 message=f'{user_name}: {event.text}',
                 random_id=0
             )
+        
         if event.reply_to_msg_id == tokens.bot.vk_topic:
             return await send()
-        elif event.reply_to.reply_to_top_id == tokens.bot.vk_topic:
-            return await send()
+        if event.reply_to is not None:
+            if event.reply_to.reply_to_top_id == tokens.bot.vk_topic:
+                return await send()
 
     # Обработчики команд
 
