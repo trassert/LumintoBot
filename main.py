@@ -458,6 +458,7 @@ async def telegram_bot():
     @telegram.on(events.NewMessage(incoming=True, pattern=r"/чек(.*)"))
     @telegram.on(events.NewMessage(incoming=True, pattern=r"/ticket(.*)"))
     @telegram.on(events.NewMessage(incoming=True, pattern=r"/активировать(.*)"))
+    @telegram.on(events.NewMessage(incoming=True, pattern=r"активировать(.*)"))
     @telegram.on(events.NewMessage(incoming=True, pattern=r"/activate(.*)"))
     async def get_ticket(event):
         arg = event.pattern_match.group(1).strip()
@@ -470,7 +471,7 @@ async def telegram_bot():
         ticket.delete(arg)
         return await event.reply(
             phrase.ticket.got.format(
-                author=await get_name(event.sender_id),
+                author=await get_name(ticket_info['author']),
                 value=decline_number(ticket_info['value'], 'изумруд')
             )
         )
@@ -1039,8 +1040,8 @@ async def telegram_bot():
                     phrase.money.no_people
                 )
         admins = setting('admins_id')
-        while user.full_user.id in admins:
-            admins.remove(user.full_user.id)
+        while user in admins:
+            admins.remove(user)
         setting('admins_id', admins)
         return await event.reply(phrase.perms.admin_del)
 
@@ -1394,7 +1395,7 @@ async def telegram_bot():
         del_staff, events.NewMessage(incoming=True, pattern=r"\-стафф")
     )
     telegram.add_event_handler(
-        del_staff, events.NewMessage(incoming=True, pattern=r".\-staff")
+        del_staff, events.NewMessage(incoming=True, pattern=r"\-staff")
     )
 
     'Крокодил'
