@@ -991,5 +991,127 @@
             "price": 16,
             "value": 3
         }
+    },
+    "redstone": {
+        "Поршень": {
+            "name": "minecraft:piston",
+            "price": 3,
+            "value": 1
+        },
+        "Липкий поршень": {
+            "name": "minecraft:sticky_piston",
+            "price": 4,
+            "value": 1
+        },
+        "Компаратор": {
+            "name": "minecraft:comparator",
+            "price": 5,
+            "value": 1
+        },
+        "Повторитель": {
+            "name": "minecraft:repeater",
+            "price": 3,
+            "value": 1
+        },
+        "Редстоун": {
+            "name": "minecraft:redstone",
+            "price": 1,
+            "value": 16
+        },
+        "Редстоуновый факел": {
+            "name": "minecraft:redstone_torch",
+            "price": 2,
+            "value": 4
+        },
+        "Редстоуновый блок": {
+            "name": "minecraft:redstone_block",
+            "price": 9,
+            "value": 1
+        },
+        "Нажимная плита (камень)": {
+            "name": "minecraft:stone_pressure_plate",
+            "price": 2,
+            "value": 1
+        },
+        "Нажимная плита (дерево)": {
+            "name": "minecraft:oak_pressure_plate",
+            "price": 1,
+            "value": 1
+        },
+        "Нажимная плита (золото)": {
+            "name": "minecraft:light_weighted_pressure_plate",
+            "price": 5,
+            "value": 1
+        },
+        "Нажимная плита (железо)": {
+            "name": "minecraft:heavy_weighted_pressure_plate",
+            "price": 5,
+            "value": 1
+        },
+        "Наблюдатель": {
+            "name": "minecraft:observer",
+            "price": 6,
+            "value": 1
+        },
+        "Детектор света": {
+            "name": "minecraft:daylight_detector",
+            "price": 4,
+            "value": 1
+        },
+        "Раздатчик": {
+            "name": "minecraft:dispenser",
+            "price": 7,
+            "value": 1
+        },
+        "Выбрасыватель": {
+            "name": "minecraft:dropper",
+            "price": 7,
+            "value": 1
+        },
+        "Лампа из редстоуна": {
+            "name": "minecraft:redstone_lamp",
+            "price": 4,
+            "value": 1
+        },
+        "Наковальня": {
+            "name": "minecraft:anvil",
+            "price": 10,
+            "value": 1
+        },
+        "Рычаг": {
+            "name": "minecraft:lever",
+            "price": 1,
+            "value": 1
+        },
+        "Кнопка (камень)": {
+            "name": "minecraft:stone_button",
+            "price": 1,
+            "value": 1
+        },
+        "Кнопка (дерево)": {
+            "name": "minecraft:oak_button",
+            "price": 1,
+            "value": 1
+        },
+        "Натяжной датчик": {
+            "name": "minecraft:tripwire_hook",
+            "price": 2,
+            "value": 1
+        },
+        "Слизневый блок": {
+            "name": "minecraft:slime_block",
+            "price": 4,
+            "value": 1
+        },
+        "Медный блок": {
+            "name": "minecraft:copper_block",
+            "price": 9,
+            "value": 1
+        },
+        "Восковой медный блок": {
+            "name": "minecraft:waxed_copper_block",
+            "price": 10,
+            "value": 1
+        }
     }
 }
