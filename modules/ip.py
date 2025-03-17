@@ -225,14 +225,14 @@ async def setup(forced=False):
         try:
             async with session.get(ident_v4, timeout=5) as response:
                 v4 = await response.text()
-                logger.info(f'Новый IPv4 {v4}')
+                logger.info(f'Получен IPv4 {v4}')
         except Exception:
             v4 = setting('ipv4')
             logger.error('Не могу получить IPv4')
         try:
             async with session.get(ident_v6, timeout=5) as response:
                 v6 = await response.text()
-                logger.info(f'Новый IPv4 {v6}')
+                logger.info(f'Получен IPv6 {v6}')
         except Exception:
             v6 = setting('ipv6')
             logger.error('Не могу получить IPv4')
