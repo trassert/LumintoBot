@@ -10,8 +10,6 @@ from os import listdir, path
 from datetime import timedelta
 from random import choice, randint, random
 from datetime import datetime
-from bestconfig import Config
-from traceback import format_exc
 
 # TELEGRAM модули
 from telethon.tl.types import (
@@ -28,7 +26,10 @@ from telethon.tl.functions.users import GetFullUserRequest
 from vkbottle.dispatch.rules import ABCRule
 from vkbottle.bot import Bot, Message
 
-from modules import phrases as phrase
+from modules import phrase
+from modules import config
+from modules import ip
+
 from modules.db import (
     add_money,
     crocodile_stat,
@@ -41,7 +42,7 @@ from modules.db import (
     statistic,
     ticket
 )
-from modules.formatter import decline_number
+from modules.formatter import decline_number, remove_section_marks
 from modules.system_info import get_system_info
 from modules.mcrcon import MinecraftClient
 from modules.ai import ai_response, ai_servers
@@ -61,15 +62,6 @@ logger.add(
     level="INFO",
     colorize=True,
 )
-
-tokens = Config(path.join('configs', 'tokens.yml'))
-coofs = Config(path.join('configs', 'coofs.yml'))
-
-
-def remove_section_marks(text):
-    'Удаляет из текста все вхождения "§n", где n - цифра или буква.'
-    pattern = r"§[a-zA-Z0-9]"
-    return re.sub(pattern, "", text)
 
 
 async def time_to_update_shop():
@@ -108,7 +100,7 @@ async def time_to_update_shop():
             theme = update_shop()
             logger.info('Изменена тема магазина')
             await telegram.send_message(
-                tokens.bot.chat,
+                config.tokens.bot.chat,
                 phrase.shop.update.format(
                     theme=phrase.shop_quotes[theme]['translate']
                 )
@@ -160,13 +152,13 @@ async def time_to_rewards():
                 if tg_id is not None:
                     add_money(
                         tg_id,
-                        coofs.ActiveGift
+                        config.coofs.ActiveGift
                     )
                     await telegram.send_message(
-                        tokens.bot.chat,
+                        config.tokens.bot.chat,
                         phrase.stat.gift.format(
                             user=top[0],
-                            gift=decline_number(coofs.ActiveGift, 'изумруд')
+                            gift=decline_number(config.coofs.ActiveGift, 'изумруд')
                         )
                     )
                     logger.info('Начислен подарок за активность!')
@@ -182,15 +174,15 @@ async def telegram_bot():
     global telegram
     telegram = TelegramClient(
         session=path.join('db', 'bot'),
-        api_id=tokens.bot.id,
-        api_hash=tokens.bot.hash,
+        api_id=config.tokens.bot.id,
+        api_hash=config.tokens.bot.hash,
         device_model="Bot",
         system_version="4.16.30-vxCUSTOM",
         use_ipv6=True,
     )
 
     logger.info('Запуск telegram')
-    await telegram.start(bot_token=tokens.bot.token)
+    await telegram.start(bot_token=config.tokens.bot.token)
 
     # Вспомогательные функции
 
@@ -305,7 +297,7 @@ async def telegram_bot():
                 async with MinecraftClient(
                     host=setting('ipv4'),
                     port=setting('rcon_port_purpur'),
-                    password=tokens.rcon
+                    password=config.tokens.rcon
                 ) as rcon:
                     command = f'invgive {nick} {item["name"]} {item["value"]}'
                     logger.info(f'Выполняется команда: {command}')
@@ -328,14 +320,14 @@ async def telegram_bot():
                     encoding='utf-8'
                 ) as f:
                     f.write(f'\n{data[2]}')
-                add_money(data[3], coofs.WordRequest)
+                add_money(data[3], config.coofs.WordRequest)
                 await telegram.send_message(
-                    tokens.bot.chat,
+                    config.tokens.bot.chat,
                     phrase.word.success.format(
                         word=data[2],
                         user=user_name,
                         money=decline_number(
-                            coofs.WordRequest, 'изумруд'
+                            config.coofs.WordRequest, 'изумруд'
                         )
                     )
                 )
@@ -346,7 +338,7 @@ async def telegram_bot():
                 )
             if data[1] == 'no':
                 await telegram.send_message(
-                    tokens.bot.chat,
+                    config.tokens.bot.chat,
                     phrase.word.no.format(
                         word=data[2],
                         user=user_name
@@ -363,33 +355,33 @@ async def telegram_bot():
             if nicks(id=event.sender_id).get() == data[1]:
                 return await event.answer(phrase.nick.already_you, alert=True)
             balance = get_money(event.sender_id)
-            if balance - coofs.PriceForChangeNick < 0:
+            if balance - config.coofs.PriceForChangeNick < 0:
                 return await event.answer(
                     phrase.money.not_enough.format(
                         decline_number(balance, 'изумруд')
                     )
                 )
-            add_money(event.sender_id, -coofs.PriceForChangeNick)
+            add_money(event.sender_id, -config.coofs.PriceForChangeNick)
             nicks(data[1], event.sender_id).link()
             user_name = await get_name(data[2])
             return await event.reply(
                 phrase.nick.buy_nick.format(
                     user=user_name,
                     price=decline_number(
-                        coofs.PriceForChangeNick, 'изумруд'
+                        config.coofs.PriceForChangeNick, 'изумруд'
                     )
                 )
             )
 
     # Обработчики событий
 
-    @telegram.on(events.ChatAction(chats=tokens.bot.chat))
+    @telegram.on(events.ChatAction(chats=config.tokens.bot.chat))
     async def chat_action(event):
         # Если пользователь ушёл из чата
         if event.user_left:
             user_name = await get_name(event.user_id)
             return await telegram.send_message(
-                tokens.bot.chat,
+                config.tokens.bot.chat,
                 phrase.leave_message.format(
                     user_name
                 )
@@ -397,7 +389,7 @@ async def telegram_bot():
 
     # Обработчик чата
 
-    @telegram.on(events.NewMessage(tokens.bot.chat))
+    @telegram.on(events.NewMessage(config.tokens.bot.chat))
     async def vk_chat(event):
         async def send():
             if event.text == '':
@@ -409,15 +401,15 @@ async def telegram_bot():
                 user_name = user_name.first_name + " " + user_name.last_name
             logger.info(f"ТГ>ВК: {user_name} > {event.text}")
             await vk.api.messages.send(
-                chat_id=tokens.vk.chat_id,
+                chat_id=config.tokens.vk.chat_id,
                 message=f'{user_name}: {event.text}',
                 random_id=0
             )
         
-        if event.reply_to_msg_id == tokens.bot.vk_topic:
+        if event.reply_to_msg_id == config.tokens.bot.vk_topic:
             return await send()
         if event.reply_to is not None:
-            if event.reply_to.reply_to_top_id == tokens.bot.vk_topic:
+            if event.reply_to.reply_to_top_id == config.tokens.bot.vk_topic:
                 return await send()
 
     # Обработчики команд
@@ -538,17 +530,17 @@ async def telegram_bot():
             return await event.reply(
                 phrase.nick.already_have.format(
                     price=decline_number(
-                        coofs.PriceForChangeNick, 'изумруд'
+                        config.coofs.PriceForChangeNick, 'изумруд'
                     )
                 ),
                 buttons=keyboard
             )
 
-        add_money(event.sender_id, coofs.LinkGift)
+        add_money(event.sender_id, config.coofs.LinkGift)
         nicks(nick, event.sender_id).link()
         return await event.reply(
             phrase.nick.success.format(
-                decline_number(coofs.LinkGift, 'изумруд')
+                decline_number(config.coofs.LinkGift, 'изумруд')
             )
         )
 
@@ -702,7 +694,7 @@ async def telegram_bot():
         setting("current_game", db)
         word = db["word"]
         last_hint = setting("crocodile_last_hint")
-        if random() < coofs.PercentForRandomLetter and last_hint != 0:
+        if random() < config.coofs.PercentForRandomLetter and last_hint != 0:
             n = 1
             for letter in list(db['unsec']):
                 if letter == '_':
@@ -744,7 +736,7 @@ async def telegram_bot():
                 topers = []
                 n = 1
                 for toper in crocodile_stat.get_all().keys():
-                    if n > coofs.TopLowerBets:
+                    if n > config.coofs.TopLowerBets:
                         break
                     topers.append(toper)
                     n += 1
@@ -752,7 +744,7 @@ async def telegram_bot():
                     for key in list(bets.keys()):
                         if str(event.sender_id) == key:
                             if str(event.sender_id) in topers:
-                                all += round(bets[key]*coofs.TopBets)
+                                all += round(bets[key]*config.coofs.TopBets)
                             else:
                                 all += round(
                                     bets[key]*setting('crocodile_bet_coo')
@@ -904,13 +896,13 @@ async def telegram_bot():
             return await event.reply(phrase.perms.no)
         arg = event.text.lower().split(" ", maxsplit=1)[1]
         bets = setting('crocodile_bets')
-        bets[str(tokens.bot.creator)] = 50
+        bets[str(config.tokens.bot.creator)] = 50
         setting('crocodile_bets', bets)
         setting('crocodile_super_game', 1)
         setting('max_bet', 100)
         setting('min_bet', 50)
         await telegram.send_message(
-            tokens.bot.chat, phrase.crocodile.super_game_wait
+            config.tokens.bot.chat, phrase.crocodile.super_game_wait
         )
         await asyncio.sleep(60)
         setting(
@@ -927,10 +919,10 @@ async def telegram_bot():
         )
         telegram.add_event_handler(
             crocodile_handler,
-            events.NewMessage(incoming=True, chats=tokens.bot.chat)
+            events.NewMessage(incoming=True, chats=config.tokens.bot.chat)
         )
         return await telegram.send_message(
-            tokens.bot.chat, phrase.crocodile.super_game
+            config.tokens.bot.chat, phrase.crocodile.super_game
         )
 
     async def gemini(event):
@@ -952,11 +944,11 @@ async def telegram_bot():
         if event.text[0] == 'f':
             host = setting('ipv4')
             port = setting('rcon_port_fabric')
-            password = tokens.rcon
+            password = config.tokens.rcon
         elif event.text[0] == 'p':
             host = setting('ipv4')
             port = setting('rcon_port_purpur')
-            password = tokens.rcon
+            password = config.tokens.rcon
         else:
             return await event.reply(phrase.no.server)
 
@@ -981,7 +973,7 @@ async def telegram_bot():
             return await event.reply(phrase.server.stopped)
 
     async def add_staff(event):
-        if event.sender_id != tokens.bot.creator:
+        if event.sender_id != config.tokens.bot.creator:
             return await event.reply(phrase.perms.no)
         try:
             tag = event.text.split(" ", maxsplit=1)[1]
@@ -1014,7 +1006,7 @@ async def telegram_bot():
         )
 
     async def del_staff(event):
-        if event.sender_id != tokens.bot.creator:
+        if event.sender_id != config.tokens.bot.creator:
             return await event.reply(phrase.perms.no)
         try:
             tag = event.text.split(" ", maxsplit=1)[1]
@@ -1050,7 +1042,7 @@ async def telegram_bot():
             async with MinecraftClient(
                 host=setting('ipv4'),
                 port=setting('rcon_port_purpur'),
-                password=tokens.rcon
+                password=config.tokens.rcon
             ) as rcon:
                 await event.reply(
                     remove_section_marks(
@@ -1173,7 +1165,7 @@ async def telegram_bot():
         if event.sender_id not in setting('admins_id'):
             return await event.reply(phrase.perms.no)
         return await event.reply(
-            phrase.dns.format(await setup_ip(check_set=False)),
+            phrase.dns.format(await ip.setup(True)),
             parse_mode="html"
         )
 
@@ -1255,7 +1247,7 @@ async def telegram_bot():
                     'содержать слово в любом случае. '
                 )
             await telegram.send_message(
-                tokens.bot.creator,
+                config.tokens.bot.creator,
                 phrase.word.request.format(
                     user=f'@{entity}',
                     word=word,
@@ -1405,7 +1397,7 @@ async def telegram_bot():
     if setting("current_game") != 0:
         telegram.add_event_handler(
             crocodile_handler,
-            events.NewMessage(incoming=True, chats=tokens.bot.chat)
+            events.NewMessage(incoming=True, chats=config.tokens.bot.chat)
         )
         telegram.add_event_handler(
             crocodile_hint,
@@ -1415,7 +1407,7 @@ async def telegram_bot():
 
 async def vk_bot():
     global vk
-    vk = Bot(token=tokens.vk.token)
+    vk = Bot(token=config.tokens.vk.token)
 
     class CaseRule(ABCRule[Message]):
         def __init__(self, command: str):
@@ -1441,132 +1433,12 @@ async def vk_bot():
             return logger.info('Юзер не найден, пропускаем')
         logger.info(f"ВК>ТГ: {name} > {message.text}")
         return await telegram.send_message(
-            tokens.bot.chat,
-            reply_to=tokens.bot.vk_topic,
+            config.tokens.bot.chat,
+            reply_to=config.tokens.bot.vk_topic,
             message=f'**{name}**\n{message.text}'
         )
 
     await vk.run_polling()
-
-
-async def setup_ip(check_set=True):
-    '''
-    Обновляет динамику.
-    Параметр check_set отвечает за принудительность
-    '''
-
-    error_text = ''
-    try:
-        async with aiohttp.ClientSession() as session:
-            try:
-                async with session.get(
-                    "https://v4.ident.me", timeout=5
-                ) as v4_ident:
-                    v4 = await v4_ident.text()
-            except Exception:
-                v4 = False
-                error_text += 'Не могу получить IPv4.\n'
-            try:
-                async with session.get(
-                    "https://v6.ident.me", timeout=5
-                ) as v6_ident:
-                    v6 = await v6_ident.text()
-            except Exception:
-                v6 = False
-                error_text += 'Не могу получить IPv6.\n'
-            if not v4 and not v6:
-                return logger.error('Ошибка при получении IP.'
-                                    'Сервер может быть недоступен')
-            elif v4 == setting('ipv4') and v6 == setting('ipv6') and check_set:
-                return logger.warning("IPv4 и IPv6 не изменились")
-            if check_set:
-                logger.warning("IPv4 или IPv6 изменились")
-            else:
-                logger.warning('Принудительно выставляю IP')
-            setting('ipv4', v4)
-            setting('ipv6', v6)
-
-            "NOIP синхронизация"
-            async with session.get(
-                f'http://{tokens.noip.name}:{tokens.noip.password}'
-                '@dynupdate.no-ip.com/'
-                f'nic/update?hostname={setting("noip_host")}&myip={v4},{v6}',
-                headers={
-                    "User-Agent": "Trassert MinecraftServer' \
-                        '/Windows 11-22000 s3pple@yandex.ru"
-                },
-            ) as noip:
-                logger.info(f"Ответ NOIP: {await noip.text()}")
-                noip = await noip.text()
-
-            "REGru синхронизация"
-            input_data = {
-                "username": tokens.reg.email,
-                "password": tokens.reg.password,
-                "output_content_type": "plain",
-                "domain_name": setting('host')
-            }
-            post = await session.post(
-                'https://api.reg.ru/api/regru2/zone/clear',
-                data=input_data
-            )
-            out = await post.json(content_type='text/plain')
-            logger.warning(out)
-
-            input_data = {
-                "username": tokens.reg.email,
-                "password": tokens.reg.password,
-                "subdomain": "@",
-                "ipaddr": v4,
-                "output_content_type": "plain",
-                "domain_name": setting('host')
-            }
-            post = await session.post(
-                'https://api.reg.ru/api/regru2/zone/add_alias',
-                data=input_data
-            )
-            out = await post.json(content_type='text/plain')
-            logger.warning(out)
-
-            input_data = {
-                "username": tokens.reg.email,
-                "password": tokens.reg.password,
-                "subdomain": "@",
-                "ipaddr": v6,
-                "output_content_type": "plain",
-                "domain_name": setting('host')
-            }
-            post = await session.post(
-                'https://api.reg.ru/api/regru2/zone/add_aaaa',
-                data=input_data
-            )
-            out = await post.json(content_type='text/plain')
-            logger.warning(out)
-
-            input_data = {
-                "username": tokens.reg.email,
-                "password": tokens.reg.password,
-                "subdomain": "v6",
-                "ipaddr": v6,
-                "output_content_type": "plain",
-                "domain_name": setting('host')
-            }
-            post = await session.post(
-                'https://api.reg.ru/api/regru2/zone/add_aaaa',
-                data=input_data
-            )
-            out = await post.json(content_type='text/plain')
-            logger.warning(out)
-    except Exception:
-        error_text += format_exc()
-        logger.error(error_text)
-    return error_text if error_text != '' else noip
-
-
-async def time_to_check_ip():
-    while True:
-        await asyncio.sleep(coofs.IPSleepTime)
-        await setup_ip()
 
 
 async def web_server():
@@ -1577,7 +1449,7 @@ async def web_server():
         time = load['time']
         logger.warning(f'{nick} проголосовал в {time} с хешем {sign}')
         hash = sha1(
-            f'{nick}{time}{tokens.hotmc}'.encode()
+            f'{nick}{time}{config.tokens.hotmc}'.encode()
         ).hexdigest()
         if sign != hash:
             logger.warning('Хеш не совпал!')
@@ -1596,7 +1468,7 @@ async def web_server():
         else:
             give = ''
         await telegram.send_message(
-            tokens.bot.chat,
+            config.tokens.bot.chat,
             phrase.hotmc.format(nick=nick, money=give),
             link_preview=False
         )
@@ -1609,7 +1481,7 @@ async def web_server():
         time = load['time']
         logger.warning(f'{username} проголосовал в {time} с хешем {sign}')
         hash = md5(
-            f'{username}|{time}|{tokens.mcservers}'.encode()
+            f'{username}|{time}|{config.tokens.mcservers}'.encode()
         ).hexdigest()
         if sign != hash:
             logger.warning('Хеш не совпал!')
@@ -1628,7 +1500,7 @@ async def web_server():
         else:
             give = ''
         await telegram.send_message(
-            tokens.bot.chat,
+            config.tokens.bot.chat,
             phrase.servers.format(nick=username, money=give),
             link_preview=False
         )
@@ -1657,7 +1529,7 @@ async def web_server():
             )
 
     async def minecraft(request):
-        if request.query.get('password') != tokens.chattohttp:
+        if request.query.get('password') != config.tokens.chattohttp:
             return aiohttp.web.Response(
                 text='Неверный пароль.',
                 status=401
@@ -1672,7 +1544,7 @@ async def web_server():
         load = await request.json()
         head = load['head_commit']
         await telegram.send_message(
-            tokens.bot.chat,
+            config.tokens.bot.chat,
             phrase.github.format(
                 author=head["author"]["name"],
                 message=head["message"],
@@ -1706,13 +1578,12 @@ async def web_server():
 async def main():
     while True:
         try:
-            await setup_ip()
             await web_server()
             await asyncio.gather(
                 telegram_bot(),
                 vk_bot(),
                 time_to_update_shop(),
-                time_to_check_ip(),
+                ip.observe(),
                 time_to_rewards()
             )
         except ConnectionError:

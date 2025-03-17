@@ -1,12 +1,12 @@
 import aiohttp
 
-from bestconfig import Config
 from requests import codes
 from os import path
-from .formatter import formatter
 from loguru import logger
 
-tokens = Config(path.join('configs', 'tokens.yml'))
+from .formatter import formatter
+from . import config
+
 
 ai_servers = [
     'https://'
@@ -28,7 +28,10 @@ async def ai_response(message):
         for server in ai_servers:
             try:
                 async with session.get(
-                    server+'gemini?q={message}&token={token}'.format(message=message, token=tokens.google)
+                    server+'gemini?q={message}&token={token}'.format(
+                        message=message,
+                        token=config.tokens.google
+                    )
                 ) as request:
                     if request.status == codes.ok:
                         return formatter(await request.text())

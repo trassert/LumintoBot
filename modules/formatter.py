@@ -33,3 +33,9 @@ def formatter(text):
     ).replace(
         '\\cdot', '×'  # ! Экранизация необходима
     )
+
+
+def remove_section_marks(text):
+    'Удаляет из текста все вхождения "§n", где n - цифра или буква.'
+    pattern = r"§[a-zA-Z0-9]"
+    return re.sub(pattern, "", text)
