@@ -6,3 +6,5 @@ LinkGift: 5
 ActiveGift: 15
 PriceForChangeNick: 32
 PercentForRandomLetter: 0.2
+PriceForCasino: 5
+CasinoSleepTime: 150

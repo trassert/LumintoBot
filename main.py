@@ -29,6 +29,7 @@ from vkbottle.bot import Bot, Message
 from modules import phrase
 from modules import config
 from modules import ip
+from modules import dice
 
 from modules.db import (
     add_money,
@@ -372,6 +373,70 @@ async def telegram_bot():
                     )
                 )
             )
+        elif data[0] == 'casino':
+            if data[1] == 'start':
+                balance = get_money(event.sender_id)
+                if balance < config.coofs.PriceForCasino:
+                    return await event.answer(
+                        phrase.money.not_enough.format(
+                            decline_number(balance, 'изумруд')
+                        ), alert=True
+                    )
+                add_money(event.sender_id, -config.coofs.PriceForCasino)
+                await event.answer(phrase.casino.do)
+                response = []
+
+                async def check(event):
+                    if event.media is None:
+                        return
+                    if event.media.emoticon != '🎰':
+                        return
+                    pos = dice.get(event.media.value)
+                    if (
+                        pos[0] == pos[1]
+                    ) and (
+                        pos[1] == pos[2]
+                    ):
+                        logger.info(
+                            f'{event.sender_id} - победил в казино'
+                        )
+                        add_money(
+                            event.sender_id,
+                            config.coofs.PriceForCasino*2
+                        )
+                        await asyncio.sleep(2)
+                        await event.reply(
+                            phrase.casino.win.format(
+                                config.coofs.PriceForCasino*2
+                            )
+                        )
+                    elif (
+                        pos[0] == pos[1]
+                    ) or (
+                        pos[1] == pos[2]
+                    ):
+                        add_money(event.sender_id, config.coofs.PriceForCasino)
+                        await asyncio.sleep(2)
+                        await event.reply(phrase.casino.partially)
+                    else:
+                        logger.info(f'{event.sender_id} проиграл в казино')
+                        await asyncio.sleep(2)
+                        await event.reply(phrase.casino.lose)
+                    telegram.remove_event_handler(check)
+                    logger.info('Снят обработчик казино')
+                    response.append(1)
+
+                telegram.add_event_handler(
+                    check,
+                    events.NewMessage(config.tokens.bot.chat)
+                )
+                await asyncio.sleep(config.coofs.CasinoSleepTime)
+                if 1 not in response:
+                    return await event.answer(
+                        phrase.casino.timeout.format(
+                            await get_name(event.sender_id)
+                        )
+                    )
 
     # Обработчики событий
 
@@ -391,6 +456,7 @@ async def telegram_bot():
 
     @telegram.on(events.NewMessage(config.tokens.bot.chat))
     async def vk_chat(event):
+
         async def send():
             if event.text == '':
                 return logger.info('Пустое сообщение')
@@ -405,7 +471,7 @@ async def telegram_bot():
                 message=f'{user_name}: {event.text}',
                 random_id=0
             )
-        
+
         if event.reply_to_msg_id == config.tokens.bot.vk_topic:
             return await send()
         if event.reply_to is not None:
@@ -413,6 +479,26 @@ async def telegram_bot():
                 return await send()
 
     # Обработчики команд
+
+    @telegram.on(
+        events.NewMessage(chats=config.tokens.bot.chat, pattern=r'/казино$')
+    )
+    async def casino(event):
+        keyboard = ReplyInlineMarkup(
+            [
+                KeyboardButtonRow(
+                    [
+                        KeyboardButtonCallback(
+                            text="💎 Внести изумруды", data=b"casino.start"
+                        )
+                    ]
+                )
+            ]
+        )
+        return await event.reply(
+            phrase.casino.start.format(config.coofs.PriceForCasino),
+            buttons=keyboard
+        )
 
     @telegram.on(events.NewMessage(incoming=True, pattern=r"\+чек(.*)"))
     @telegram.on(events.NewMessage(incoming=True, pattern=r"\+ticket(.*)"))
