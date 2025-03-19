@@ -30,19 +30,20 @@ from modules import phrase
 from modules import config
 from modules import ip
 from modules import dice
+from modules import db
 
-from modules.db import (
-    add_money,
-    crocodile_stat,
-    get_money,
-    get_shop,
-    setting,
-    update_shop,
-    get_all_money,
-    nicks,
-    statistic,
-    ticket
-)
+# from modules.db import (
+#     add_money,
+#     crocodile_stat,
+#     get_money,
+#     get_shop,
+#     b,
+#     update_shop,
+#     get_all_money,
+#     nicks,
+#     statistic,
+#     ticket
+# )
 from modules.formatter import decline_number, remove_section_marks
 from modules.system_info import get_system_info
 from modules.mcrcon import MinecraftClient
@@ -67,7 +68,7 @@ logger.add(
 
 async def time_to_update_shop():
     def get_last_update():
-        last = setting('shop_update_time')
+        last = db.database('shop_update_time')
         if last is not None:
             last = last.replace(
                 ':', '-'
@@ -87,7 +88,7 @@ async def time_to_update_shop():
                 int(last[6]),
             )
         except Exception:
-            setting('shop_update_time', str(datetime.now()))
+            db.database('shop_update_time', str(datetime.now()))
             return get_last_update()
     await asyncio.sleep(3)  # ! Для предотвращения блокировки
     while True:
@@ -98,7 +99,7 @@ async def time_to_update_shop():
         ).total_seconds()
         'Если время прошло'
         if today - last > timedelta(hours=2):
-            theme = update_shop()
+            theme = db.update_shop()
             logger.info('Изменена тема магазина')
             await telegram.send_message(
                 config.tokens.bot.chat,
@@ -106,8 +107,8 @@ async def time_to_update_shop():
                     theme=phrase.shop_quotes[theme]['translate']
                 )
             )
-            setting('shop_version', setting('shop_version') + 1)
-            setting(
+            db.database('shop_version', db.database('shop_version') + 1)
+            db.database(
                 'shop_update_time', str(today).split(':')[0]+':00:00.000000'
             )
         logger.info(f'Жду следующий ивент... ({abs(seconds)})')
@@ -116,7 +117,7 @@ async def time_to_update_shop():
 
 async def time_to_rewards():
     def get_last_update():
-        last = setting('stat_update_time')
+        last = db.database('stat_update_time')
         if last is not None:
             last = last.replace(
                 ':', '-'
@@ -136,7 +137,7 @@ async def time_to_rewards():
                 int(last[6]),
             )
         except Exception:
-            setting('stat_update_time', str(datetime.now()))
+            db.database('stat_update_time', str(datetime.now()))
             return get_last_update()
     await asyncio.sleep(3)  # ! Для предотвращения блокировки
     while True:
@@ -147,11 +148,11 @@ async def time_to_rewards():
         ).total_seconds()
         'Если время прошло'
         if today - last > timedelta(hours=24):
-            day_stat = statistic().get_all()
+            day_stat = db.statistic().get_all()
             for top in day_stat:
-                tg_id = nicks(nick=top[0]).get()
+                tg_id = db.nicks(nick=top[0]).get()
                 if tg_id is not None:
-                    add_money(
+                    db.add_money(
                         tg_id,
                         config.coofs.ActiveGift
                     )
@@ -164,7 +165,7 @@ async def time_to_rewards():
                     )
                     logger.info('Начислен подарок за активность!')
                     break
-            setting(
+            db.database(
                 'stat_update_time', str(today).split(':')[0]+':00:00.000000'
             )
         logger.info('Жду до следующей награды...')
@@ -207,11 +208,11 @@ async def telegram_bot():
         logger.info(f'{event.sender_id} отправил КБ - {data}')
         if data[0] == 'crocodile':
             if data[1] == 'start':
-                if setting('crocodile_super_game') == 1:
+                if db.database('crocodile_super_game') == 1:
                     return await event.answer(
                         phrase.crocodile.super_game_here, alert=True
                     )
-                if setting("current_game") != 0:
+                if db.database("current_game") != 0:
                     return await event.answer(phrase.crocodile.no, alert=True)
                 with open("db\\crocodile_words.txt", 'r', encoding='utf8') as f:
                     word = choice(f.read().split('\n'))
@@ -221,7 +222,7 @@ async def telegram_bot():
                         unsec += "_"
                     elif x == " ":
                         unsec += x
-                setting(
+                db.database(
                     "current_game",
                     {"hints": [], "word": word, "unsec": unsec}
                 )
@@ -238,19 +239,19 @@ async def telegram_bot():
                 entity = await telegram.get_entity(event.sender_id)
                 user = f'@{entity.username}' if entity.username \
                     else entity.first_name + " " + entity.last_name
-                if setting("current_game") == 0:
+                if db.database("current_game") == 0:
                     return await event.answer(
                         phrase.crocodile.already_down, alert=True
                     )
-                if setting('crocodile_super_game') == 1:
+                if db.database('crocodile_super_game') == 1:
                     return await event.answer(
                         phrase.crocodile.super_game_here, alert=True
                     )
-                bets_json = setting('crocodile_bets')
+                bets_json = db.database('crocodile_bets')
                 if bets_json != {}:
                     bets = round(sum(list(bets_json.values())) / 2)
                     bets = 1 if bets < 1 else bets
-                    sender_balance = get_money(event.sender_id)
+                    sender_balance = db.get_money(event.sender_id)
                     if sender_balance < bets:
                         return await event.answer(
                             phrase.crocodile.not_enough.format(
@@ -258,10 +259,10 @@ async def telegram_bot():
                             ),
                             alert=True
                         )
-                    add_money(event.sender_id, -bets)
-                word = setting("current_game")["word"]
-                setting("current_game", 0)
-                setting('crocodile_last_hint', 0)
+                    db.add_money(event.sender_id, -bets)
+                word = db.database("current_game")["word"]
+                db.database("current_game", 0)
+                db.database('crocodile_last_hint', 0)
                 telegram.remove_event_handler(crocodile_hint)
                 telegram.remove_event_handler(crocodile_handler)
                 if bets_json != {}:
@@ -277,14 +278,14 @@ async def telegram_bot():
                     )
                 return await event.reply(phrase.crocodile.down.format(word))
         elif data[0] == 'shop':
-            if int(data[-1]) != setting("shop_version"):
+            if int(data[-1]) != db.database("shop_version"):
                 return await event.answer(phrase.shop.old, alert=True)
-            nick = nicks(id=event.sender_id).get()
+            nick = db.nicks(id=event.sender_id).get()
             if nick is None:
                 return await event.answer(phrase.nick.not_append, alert=True)
-            shop = get_shop()
+            shop = db.get_shop()
             del shop['theme']
-            balance = get_money(event.sender_id)
+            balance = db.get_money(event.sender_id)
             items = list(shop.keys())
             item = shop[items[int(data[1])]]
             if balance < item['price']:
@@ -296,8 +297,8 @@ async def telegram_bot():
                 )
             try:
                 async with MinecraftClient(
-                    host=setting('ipv4'),
-                    port=setting('rcon_port_purpur'),
+                    host=db.database('ipv4'),
+                    port=db.database('rcon_port_purpur'),
                     password=config.tokens.rcon
                 ) as rcon:
                     command = f'invgive {nick} {item["name"]} {item["value"]}'
@@ -305,7 +306,7 @@ async def telegram_bot():
                     await rcon.send(command)
             except TimeoutError:
                 return await event.answer(phrase.shop.timeout, alert=True)
-            add_money(event.sender_id, -item['price'])
+            db.add_money(event.sender_id, -item['price'])
             return await event.answer(
                 phrase.shop.buy.format(
                     items[int(data[1])]
@@ -321,7 +322,7 @@ async def telegram_bot():
                     encoding='utf-8'
                 ) as f:
                     f.write(f'\n{data[2]}')
-                add_money(data[3], config.coofs.WordRequest)
+                db.add_money(data[3], config.coofs.WordRequest)
                 await telegram.send_message(
                     config.tokens.bot.chat,
                     phrase.word.success.format(
@@ -353,17 +354,17 @@ async def telegram_bot():
         elif data[0] == 'nick':
             if event.sender_id != int(data[2]):
                 return await event.answer(phrase.not_for_you)
-            if nicks(id=event.sender_id).get() == data[1]:
+            if db.nicks(id=event.sender_id).get() == data[1]:
                 return await event.answer(phrase.nick.already_you, alert=True)
-            balance = get_money(event.sender_id)
+            balance = db.get_money(event.sender_id)
             if balance - config.coofs.PriceForChangeNick < 0:
                 return await event.answer(
                     phrase.money.not_enough.format(
                         decline_number(balance, 'изумруд')
                     )
                 )
-            add_money(event.sender_id, -config.coofs.PriceForChangeNick)
-            nicks(data[1], event.sender_id).link()
+            db.add_money(event.sender_id, -config.coofs.PriceForChangeNick)
+            db.nicks(data[1], event.sender_id).link()
             user_name = await get_name(data[2])
             return await event.reply(
                 phrase.nick.buy_nick.format(
@@ -375,37 +376,39 @@ async def telegram_bot():
             )
         elif data[0] == 'casino':
             if data[1] == 'start':
-                balance = get_money(event.sender_id)
+                balance = db.get_money(event.sender_id)
                 if balance < config.coofs.PriceForCasino:
                     return await event.answer(
                         phrase.money.not_enough.format(
                             decline_number(balance, 'изумруд')
                         ), alert=True
                     )
-                add_money(event.sender_id, -config.coofs.PriceForCasino)
+                db.add_money(event.sender_id, -config.coofs.PriceForCasino)
                 await event.answer(phrase.casino.do)
                 response = []
 
-                async def check(event):
-                    if event.media is None:
+                async def check(message):
+                    if event.sender_id != message.sender_id:
                         return
-                    if event.media.emoticon != '🎰':
+                    if message.media is None:
                         return
-                    pos = dice.get(event.media.value)
+                    if message.media.emoticon != '🎰':
+                        return
+                    pos = dice.get(message.media.value)
                     if (
                         pos[0] == pos[1]
                     ) and (
                         pos[1] == pos[2]
                     ):
                         logger.info(
-                            f'{event.sender_id} - победил в казино'
+                            f'{message.sender_id} - победил в казино'
                         )
-                        add_money(
-                            event.sender_id,
+                        db.add_money(
+                            message.sender_id,
                             config.coofs.PriceForCasino*2
                         )
                         await asyncio.sleep(2)
-                        await event.reply(
+                        await message.reply(
                             phrase.casino.win.format(
                                 config.coofs.PriceForCasino*2
                             )
@@ -415,13 +418,16 @@ async def telegram_bot():
                     ) or (
                         pos[1] == pos[2]
                     ):
-                        add_money(event.sender_id, config.coofs.PriceForCasino)
+                        db.add_money(
+                            message.sender_id,
+                            config.coofs.PriceForCasino
+                        )
                         await asyncio.sleep(2)
-                        await event.reply(phrase.casino.partially)
+                        await message.reply(phrase.casino.partially)
                     else:
-                        logger.info(f'{event.sender_id} проиграл в казино')
+                        logger.info(f'{message.sender_id} проиграл в казино')
                         await asyncio.sleep(2)
-                        await event.reply(phrase.casino.lose)
+                        await message.reply(phrase.casino.lose)
                     telegram.remove_event_handler(check)
                     logger.info('Снят обработчик казино')
                     response.append(1)
@@ -514,7 +520,7 @@ async def telegram_bot():
                 return await event.reply(phrase.ticket.bigger_than_zero)
         except ValueError:
             return await event.reply(phrase.ticket.not_int)
-        balance = get_money(event.sender_id)
+        balance = db.get_money(event.sender_id)
         if balance < arg:
             return await event.reply(
                 phrase.money.not_enough.format(
@@ -523,8 +529,8 @@ async def telegram_bot():
                     )
                 )
             )
-        add_money(event.sender_id, -arg)
-        ticket_id = ticket.add(event.sender_id, arg)
+        db.add_money(event.sender_id, -arg)
+        ticket_id = db.ticket.add(event.sender_id, arg)
         return await event.reply(
             phrase.ticket.added.format(
                 value=arg,
@@ -542,11 +548,11 @@ async def telegram_bot():
         arg = event.pattern_match.group(1).strip()
         if arg == '':
             return await event.reply(phrase.ticket.no_value)
-        ticket_info = ticket.get(arg)
+        ticket_info = db.ticket.get(arg)
         if ticket_info is None:
             return await event.reply(phrase.ticket.no_such)
-        add_money(event.sender_id, ticket_info['value'])
-        ticket.delete(arg)
+        db.add_money(event.sender_id, ticket_info['value'])
+        db.ticket.delete(arg)
         return await event.reply(
             phrase.ticket.got.format(
                 author=await get_name(ticket_info['author']),
@@ -564,7 +570,7 @@ async def telegram_bot():
         try:
             days = int(arg)
             text = phrase.stat.chat.format(decline_number(days, 'день'))
-            all_data = statistic(days=days).get_all()
+            all_data = db.statistic(days=days).get_all()
         except ValueError:
             if arg in [
                 'весь',
@@ -573,10 +579,10 @@ async def telegram_bot():
                 'всего'
             ]:
                 text = phrase.stat.chat.format('всё время')
-                all_data = statistic().get_all(all_days=True)
+                all_data = db.statistic().get_all(all_days=True)
             else:
                 text = phrase.stat.chat.format('день')
-                all_data = statistic().get_all()
+                all_data = db.statistic().get_all()
         if all_data == []:
             return await event.reply(phrase.stat.empty)
         n = 1
@@ -594,12 +600,12 @@ async def telegram_bot():
         if not re.match("^[A-Za-z0-9_]*$", nick):
             return await event.reply(phrase.nick.invalid)
 
-        if nicks(nick=nick).get() is not None:
-            if nicks(id=event.sender_id).get() == nick:
+        if db.nicks(nick=nick).get() is not None:
+            if db.nicks(id=event.sender_id).get() == nick:
                 return await event.reply(phrase.nick.already_you)
             return await event.reply(phrase.nick.taken)
-        elif nicks(id=event.sender_id).get() is not None:
-            if nicks(id=event.sender_id).get() == nick:
+        elif db.nicks(id=event.sender_id).get() is not None:
+            if db.nicks(id=event.sender_id).get() == nick:
                 return await event.reply(phrase.nick.already_you)
             keyboard = ReplyInlineMarkup(
                 [
@@ -622,8 +628,8 @@ async def telegram_bot():
                 buttons=keyboard
             )
 
-        add_money(event.sender_id, config.coofs.LinkGift)
-        nicks(nick, event.sender_id).link()
+        db.add_money(event.sender_id, config.coofs.LinkGift)
+        db.nicks(nick, event.sender_id).link()
         return await event.reply(
             phrase.nick.success.format(
                 decline_number(config.coofs.LinkGift, 'изумруд')
@@ -637,7 +643,7 @@ async def telegram_bot():
     @telegram.on(events.NewMessage(incoming=True, pattern="shop"))
     @telegram.on(events.NewMessage(incoming=True, pattern="шоп"))
     async def shop(event):
-        version = setting('shop_version')
+        version = db.database('shop_version')
         keyboard = ReplyInlineMarkup(
             [
                 KeyboardButtonRow(
@@ -661,7 +667,7 @@ async def telegram_bot():
                 )
             ]
         )
-        shop = get_shop()
+        shop = db.get_shop()
         theme = shop['theme']
         del shop['theme']
         items = list(shop.keys())
@@ -704,7 +710,7 @@ async def telegram_bot():
     @telegram.on(events.NewMessage(incoming=True, pattern="/айпи"))
     @telegram.on(events.NewMessage(incoming=True, pattern="/ip"))
     async def host(event):
-        await event.reply(phrase.server.host.format(setting("host")))
+        await event.reply(phrase.server.host.format(db.database("host")))
 
     @telegram.on(events.NewMessage(incoming=True, pattern=r"/серв$"))
     @telegram.on(events.NewMessage(incoming=True, pattern=r"/сервер"))
@@ -771,15 +777,15 @@ async def telegram_bot():
         return await event.reply(phrase.ping.set.format(ping)+''.join(all_servers_ping))
 
     async def crocodile_hint(event):
-        db = setting("current_game")
+        db = db.database("current_game")
         hint = db["hints"]
         if event.sender_id in hint:
             return await event.reply(phrase.crocodile.hints_all)
         hint.append(event.sender_id)
         db["hints"] = hint
-        setting("current_game", db)
+        db.database("current_game", db)
         word = db["word"]
-        last_hint = setting("crocodile_last_hint")
+        last_hint = db.database("crocodile_last_hint")
         if random() < config.coofs.PercentForRandomLetter and last_hint != 0:
             n = 1
             for letter in list(db['unsec']):
@@ -801,27 +807,27 @@ async def telegram_bot():
                 'содержать слово в любом случае. ' + check_last
             )
             if response is None:
-                db = setting("current_game")
+                db = db.database("current_game")
                 hint = db["hints"]
                 hint.remove(event.sender_id)
                 db["hints"] = hint
-                setting("current_game", db)
+                db.database("current_game", db)
                 return await event.reply(phrase.crocodile.error)
-            setting("crocodile_last_hint", response)
+            db.database("crocodile_last_hint", response)
         return await event.reply(response)
 
     async def crocodile_handler(event):
         text = event.text.strip().lower()
         if len(text) > 0:
-            current_word = setting("current_game")["word"]
-            current_mask = list(setting("current_game")["unsec"])
+            current_word = db.database("current_game")["word"]
+            current_mask = list(db.database("current_game")["unsec"])
             if text == current_word:
-                bets = setting('crocodile_bets')
+                bets = db.database('crocodile_bets')
                 all = 0
                 bets_str = ''
                 topers = []
                 n = 1
-                for toper in crocodile_stat.get_all().keys():
+                for toper in db.crocodile_stat.get_all().keys():
                     if n > config.coofs.TopLowerBets:
                         break
                     topers.append(toper)
@@ -833,24 +839,24 @@ async def telegram_bot():
                                 all += round(bets[key]*config.coofs.TopBets)
                             else:
                                 all += round(
-                                    bets[key]*setting('crocodile_bet_coo')
+                                    bets[key]*config.coofs.CrocodileBetCoo
                                 )
                         else:
                             all += bets[key]
-                    add_money(event.sender_id, all)
+                    db.add_money(event.sender_id, all)
                     bets_str = phrase.crocodile.bet_win.format(
                         decline_number(all, 'изумруд'),
                     )
-                setting("current_game", 0)
-                setting("crocodile_bets", {})
-                setting("crocodile_last_hint", 0)
-                if setting('crocodile_super_game') == 1:
-                    setting('crocodile_super_game', 0)
-                    setting('max_bet', setting('default_max_bet'))
-                    setting('min_bet', setting('default_min_bet'))
+                db.database("current_game", 0)
+                db.database("crocodile_bets", {})
+                db.database("crocodile_last_hint", 0)
+                if db.database('crocodile_super_game') == 1:
+                    db.database('crocodile_super_game', 0)
+                    db.database('max_bet', config.coofs.CrocodileDefaultMaxBet)
+                    db.database('min_bet', config.coofs.CrocodileDefaultMinBet)
                 telegram.remove_event_handler(crocodile_hint)
                 telegram.remove_event_handler(crocodile_handler)
-                crocodile_stat(event.sender_id).add()
+                db.crocodile_stat(event.sender_id).add()
                 return await event.reply(
                     phrase.crocodile.win.format(current_word)+bets_str
                 )
@@ -871,18 +877,18 @@ async def telegram_bot():
                         n = n + 1
                 if "".join(current_mask) == current_word:
                     current_mask[randint(0, len(current_mask)-1)] = '_'
-                    cgame = setting("current_game")
+                    cgame = db.database("current_game")
                     cgame["unsec"] = "".join(current_mask)
-                    setting("current_game", cgame)
+                    db.database("current_game", cgame)
                     return await event.reply(
                         phrase.crocodile.new.format(
                             "".join(current_mask).replace("_", "..")
                         )
                     )
-                if list(setting("current_game")["unsec"]) != current_mask:
-                    cgame = setting("current_game")
+                if list(db.database("current_game")["unsec"]) != current_mask:
+                    cgame = db.database("current_game")
                     cgame["unsec"] = "".join(current_mask)
-                    setting("current_game", cgame)
+                    db.database("current_game", cgame)
                     return await event.reply(
                         phrase.crocodile.new.format(
                             "".join(current_mask).replace("_", "..")
@@ -893,11 +899,11 @@ async def telegram_bot():
     @telegram.on(events.NewMessage(incoming=True, pattern="/crocodile"))
     @telegram.on(events.NewMessage(incoming=True, pattern="старт крокодил"))
     async def crocodile(event):
-        if not event.chat_id == setting("default_chat"):
+        if not event.chat_id == db.database("default_chat"):
             return await event.reply(phrase.default_chat)
         else:
             pass
-        if setting("current_game") == 0:
+        if db.database("current_game") == 0:
             keyboard = ReplyInlineMarkup(
                 [
                     KeyboardButtonRow(
@@ -934,43 +940,43 @@ async def telegram_bot():
             bet = int(
                 event.text.split(" ", maxsplit=1)[1]
             )
-            if bet < setting('min_bet'):
+            if bet < db.database('min_bet'):
                 return await event.reply(
                     phrase.money.min_count.format(
-                        decline_number(setting('min_bet'), 'изумруд')
+                        decline_number(db.database('min_bet'), 'изумруд')
                     )
                 )
-            elif bet > setting('max_bet'):
+            elif bet > db.database('max_bet'):
                 return await event.reply(
                     phrase.money.max_count.format(
-                        decline_number(setting('max_bet'), 'изумруд')
+                        decline_number(db.database('max_bet'), 'изумруд')
                     )
                 )
         except IndexError:
-            bet = setting('min_bet')
+            bet = db.database('min_bet')
         except ValueError:
             return await event.reply(
                 phrase.money.nan_count
             )
-        sender_balance = get_money(event.sender_id)
+        sender_balance = db.get_money(event.sender_id)
         if sender_balance < bet:
             return await event.reply(
                 phrase.money.not_enough.format(
                     decline_number(sender_balance, 'изумруд')
                 )
             )
-        if setting("current_game") != 0:
+        if db.database("current_game") != 0:
             return await event.reply(
                 phrase.crocodile.no
             )
-        all_bets = setting('crocodile_bets')
+        all_bets = db.database('crocodile_bets')
         if str(event.sender_id) in all_bets:
             return await event.reply(
                 phrase.crocodile.bet_already
             )
-        add_money(event.sender_id, -bet)
+        db.add_money(event.sender_id, -bet)
         all_bets[str(event.sender_id)] = bet
-        setting('crocodile_bets', all_bets)
+        db.database('crocodile_bets', all_bets)
         return await event.reply(
             phrase.crocodile.bet.format(
                 decline_number(bet, 'изумруд')
@@ -978,20 +984,20 @@ async def telegram_bot():
         )
 
     async def super_game(event):
-        if event.sender_id not in setting('admins_id'):
+        if event.sender_id not in db.database('admins_id'):
             return await event.reply(phrase.perms.no)
         arg = event.text.lower().split(" ", maxsplit=1)[1]
-        bets = setting('crocodile_bets')
+        bets = db.database('crocodile_bets')
         bets[str(config.tokens.bot.creator)] = 50
-        setting('crocodile_bets', bets)
-        setting('crocodile_super_game', 1)
-        setting('max_bet', 100)
-        setting('min_bet', 50)
+        db.database('crocodile_bets', bets)
+        db.database('crocodile_super_game', 1)
+        db.database('max_bet', 100)
+        db.database('min_bet', 50)
         await telegram.send_message(
             config.tokens.bot.chat, phrase.crocodile.super_game_wait
         )
         await asyncio.sleep(60)
-        setting(
+        db.database(
             'current_game',
             {
                 'hints': [],
@@ -1028,17 +1034,17 @@ async def telegram_bot():
     @telegram.on(events.NewMessage(incoming=True, pattern=r"f/|p/"))
     async def mcrcon(event):
         if event.text[0] == 'f':
-            host = setting('ipv4')
-            port = setting('rcon_port_fabric')
+            host = db.database('ipv4')
+            port = config.tokens.rcon.port_fabric
             password = config.tokens.rcon
         elif event.text[0] == 'p':
-            host = setting('ipv4')
-            port = setting('rcon_port_purpur')
-            password = config.tokens.rcon
+            host = db.database('ipv4')
+            port = config.tokens.rcon.port
+            password = config.tokens.rcon.password
         else:
             return await event.reply(phrase.no.server)
 
-        if event.sender_id not in setting('admins_id'):
+        if event.sender_id not in db.database('admins_id'):
             return await event.reply(phrase.perms.no)
         command = event.text[2:]
         logger.info(f'Выполняется команда: {command}')
@@ -1084,9 +1090,9 @@ async def telegram_bot():
                 return await event.reply(
                     phrase.money.no_people
                 )
-        admins = setting('admins_id')
+        admins = db.database('admins_id')
         admins.append(user)
-        setting('admins_id', admins)
+        db.database('admins_id', admins)
         return await event.reply(
             phrase.perms.admin_add.format(nick=tag, id=user)
         )
@@ -1117,17 +1123,17 @@ async def telegram_bot():
                 return await event.reply(
                     phrase.money.no_people
                 )
-        admins = setting('admins_id')
+        admins = db.database('admins_id')
         while user in admins:
             admins.remove(user)
-        setting('admins_id', admins)
+        db.database('admins_id', admins)
         return await event.reply(phrase.perms.admin_del)
 
     async def server_top_list(event):
         try:
             async with MinecraftClient(
-                host=setting('ipv4'),
-                port=setting('rcon_port_purpur'),
+                host=db.database('ipv4'),
+                port=db.database('rcon_port_purpur'),
                 password=config.tokens.rcon
             ) as rcon:
                 await event.reply(
@@ -1154,13 +1160,13 @@ async def telegram_bot():
         return await event.reply(
             phrase.money.wallet.format(
                 decline_number(
-                    get_money(event.sender_id), 'изумруд'
+                    db.get_money(event.sender_id), 'изумруд'
                 )
             )
         )
 
     async def add_balance(event):
-        if event.sender_id not in setting('admins_id'):
+        if event.sender_id not in db.database('admins_id'):
             return await event.reply(phrase.perms.no)
         args = event.text.split(" ", maxsplit=3)
         try:
@@ -1186,8 +1192,8 @@ async def telegram_bot():
             return await event.reply(
                 phrase.money.nan_count+phrase.money.change_balance_use
             )
-        old = get_money(user.full_user.id)
-        add_money(user.full_user.id, new)
+        old = db.get_money(user.full_user.id)
+        db.add_money(user.full_user.id, new)
         await event.reply(
             phrase.money.add_money.format(
                 name=tag,
@@ -1230,15 +1236,15 @@ async def telegram_bot():
                     phrase.money.no_people+phrase.money.swap_balance_use
                 )
 
-        sender_balance = get_money(event.sender_id)
+        sender_balance = db.get_money(event.sender_id)
         if sender_balance < count:
             return await event.reply(
                 phrase.money.not_enough.format(
                     decline_number(sender_balance, 'изумруд')
                 )
             )
-        add_money(event.sender_id, -count)
-        add_money(user, count)
+        db.add_money(event.sender_id, -count)
+        db.add_money(user, count)
         return await event.reply(
             phrase.money.swap_money.format(
                 decline_number(count, 'изумруд')
@@ -1248,7 +1254,7 @@ async def telegram_bot():
     @telegram.on(events.NewMessage(incoming=True, pattern="/dns"))
     @telegram.on(events.NewMessage(incoming=True, pattern="/днс"))
     async def tg_dns(event):
-        if event.sender_id not in setting('admins_id'):
+        if event.sender_id not in db.database('admins_id'):
             return await event.reply(phrase.perms.no)
         return await event.reply(
             phrase.dns.format(await ip.setup(True)),
@@ -1259,7 +1265,7 @@ async def telegram_bot():
     async def all_money(event):
         return await event.reply(
             phrase.money.all_money.format(
-                decline_number(get_all_money(), 'изумруд')
+                decline_number(db.get_all_money(), 'изумруд')
             )
         )
 
@@ -1269,7 +1275,7 @@ async def telegram_bot():
     @telegram.on(events.NewMessage(incoming=True, pattern="/стат слова"))
     @telegram.on(events.NewMessage(incoming=True, pattern="топ крокодила"))
     async def crocodile_wins(event):
-        all = crocodile_stat.get_all()
+        all = db.crocodile_stat.get_all()
         text = ''
         n = 1
         for id in all.keys():
@@ -1364,7 +1370,7 @@ async def telegram_bot():
                 user = reply_message.sender_id
             else:
                 return await event.reply(phrase.nick.who)
-        nick = nicks(id=user).get()
+        nick = db.nicks(id=user).get()
         if nick is None:
             return await event.reply(phrase.nick.no_nick)
         return await event.reply(phrase.nick.usernick.format(nick))
@@ -1480,7 +1486,7 @@ async def telegram_bot():
     telegram.add_event_handler(
         crocodile_bet, events.NewMessage(incoming=True, pattern="/ставка")
     )
-    if setting("current_game") != 0:
+    if db.database("current_game") != 0:
         telegram.add_event_handler(
             crocodile_handler,
             events.NewMessage(incoming=True, chats=config.tokens.bot.chat)
@@ -1508,7 +1514,7 @@ async def vk_bot():
     @vk.on.message(CaseRule('/host'))
     async def host(message: Message):
         logger.info('Запрошен IP в ВК')
-        await message.answer(phrase.server.host.format(setting("host")))
+        await message.answer(phrase.server.host.format(db.database("host")))
 
     @vk.on.chat_message()
     async def tg_chat(message: Message):
@@ -1545,9 +1551,9 @@ async def web_server():
                 text='Переданные данные не прошли проверку.',
                 status=401
             )
-        tg_id = nicks(nick=nick).get()
+        tg_id = db.nicks(nick=nick).get()
         if tg_id is not None:
-            add_money(tg_id, 10)
+            db.add_money(tg_id, 10)
             give = phrase.hotmc_money.format(
                 decline_number(10, 'изумруд')
             )
@@ -1577,9 +1583,9 @@ async def web_server():
                 text='Переданные данные не прошли проверку.',
                 status=401
             )
-        tg_id = nicks(nick=username).get()
+        tg_id = db.nicks(nick=username).get()
         if tg_id is not None:
-            add_money(tg_id, 10)
+            db.add_money(tg_id, 10)
             give = phrase.servers_money.format(
                 decline_number(10, 'изумруд')
             )
@@ -1622,7 +1628,7 @@ async def web_server():
             )
         nick = request.query.get('nick')
         # ! message = request.query.get('message') Для будущих нужд
-        statistic.add(nick=nick)
+        db.statistic.add(nick=nick)
         return aiohttp.web.Response(text='ok')
 
     async def github(request):
@@ -1654,7 +1660,7 @@ async def web_server():
     try:
         await runner.setup()
         ipv4 = aiohttp.web.TCPSite(runner, '0.0.0.0', 5000)
-        ipv6 = aiohttp.web.TCPSite(runner, setting('ipv6'), 5000)
+        ipv6 = aiohttp.web.TCPSite(runner, db.database('ipv6'), 5000)
         await ipv4.start()
         await ipv6.start()
     except asyncio.CancelledError:
@@ -1678,7 +1684,7 @@ async def main():
 
 
 if __name__ == "__main__":
-    if sum(setting('shop_weight').values()) != 100:
+    if sum(db.database('shop_weight').values()) != 100:
         logger.error('Сумма процентов в магазине не равна 100!')
     try:
         asyncio.run(main())

@@ -4,15 +4,17 @@ from loguru import logger
 from datetime import datetime, timedelta
 from os import path, listdir
 from random import choice, randint
+
 from .random import weighted_choice
 
 nick_path = path.join('db', 'minecraft.json')
 stats_path = path.join('db', 'chat_stats')
 tickets_path = path.join('db', 'tickets.json')
+times_path = path.join('db', 'time')
 
 
-def setting(key, value=None, delete=None, log=True):
-    "Изменить/получить ключ из настроек"
+def database(key, value=None, delete=None, log=True):
+    'Изменить/получить ключ из настроек'
     if value is not None:
         if log:
             logger.info(f"Значение {key} теперь {value}")
@@ -152,9 +154,9 @@ def update_shop():
     themes = []
     for theme in load:
         themes.append(theme)
-    current_shop['theme'] = weighted_choice(themes, setting('shop_weight'))
+    current_shop['theme'] = weighted_choice(themes, database('shop_weight'))
     while current_shop['theme'] is last_theme:
-        current_shop['theme'] = weighted_choice(themes, setting('shop_weight'))
+        current_shop['theme'] = weighted_choice(themes, database('shop_weight'))
     current_items = []
     all_items = list(load[current_shop['theme']].keys())
     while len(set(current_items)) != len(current_items) \
