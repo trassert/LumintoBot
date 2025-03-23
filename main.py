@@ -65,7 +65,7 @@ async def time_to_update_shop():
         if today - last > timedelta(hours=2):
             theme = db.update_shop()
             logger.info('Изменена тема магазина')
-            await telegram.telegram.send_message(
+            await telegram.client.send_message(
                 config.tokens.bot.chat,
                 phrase.shop.update.format(
                     theme=phrase.shop_quotes[theme]['translate']
@@ -120,7 +120,7 @@ async def time_to_rewards():
                         tg_id,
                         config.coofs.ActiveGift
                     )
-                    await telegram.send_message(
+                    await telegram.client.send_message(
                         config.tokens.bot.chat,
                         phrase.stat.gift.format(
                             user=top[0],
@@ -162,7 +162,7 @@ async def web_server():
             )
         else:
             give = ''
-        await telegram.send_message(
+        await telegram.client.send_message(
             config.tokens.bot.chat,
             phrase.hotmc.format(nick=nick, money=give),
             link_preview=False
@@ -194,7 +194,7 @@ async def web_server():
             )
         else:
             give = ''
-        await telegram.send_message(
+        await telegram.client.send_message(
             config.tokens.bot.chat,
             phrase.servers.format(nick=username, money=give),
             link_preview=False
@@ -218,7 +218,7 @@ async def web_server():
         'Вебхук для гитхаба'
         load = await request.json()
         head = load['head_commit']
-        await telegram.telegram.send_message(
+        await telegram.client.send_message(
             config.tokens.bot.chat,
             phrase.github.format(
                 author=head["author"]["name"],
@@ -254,7 +254,7 @@ async def main():
         try:
             await web_server()
             await asyncio.gather(
-                telegram.telegram.start(bot_token=config.tokens.bot.token),
+                telegram.client.start(bot_token=config.tokens.bot.token),
                 vk.vk.run_polling(),
                 time_to_update_shop(),
                 ip.observe(),
