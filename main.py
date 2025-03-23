@@ -225,7 +225,8 @@ async def web_server():
                 message=head["message"],
                 url=head["url"]
             ),
-            link_preview=False
+            link_preview=False,
+            reply_to=config.tokens.topics.updates
         )
         return aiohttp.web.Response(text='ok')
 
