@@ -341,7 +341,10 @@ async def vk_chat(event):
 
 # Обработчики команд
 
-@telegram.on(events.NewMessage(chats=config.tokens.bot.chat, pattern=r'/казино$'))
+
+@telegram.on(
+    events.NewMessage(chats=config.tokens.bot.chat, pattern=r'(?i)^/казино$')
+)
 async def casino(event):
     keyboard = ReplyInlineMarkup(
         [
@@ -359,8 +362,9 @@ async def casino(event):
         buttons=keyboard
     )
 
-@telegram.on(events.NewMessage(incoming=True, pattern=r"\+чек(.*)"))
-@telegram.on(events.NewMessage(incoming=True, pattern=r"\+ticket(.*)"))
+
+@telegram.on(events.NewMessage(incoming=True, pattern=r'(?i)^\+чек(.*)'))
+@telegram.on(events.NewMessage(incoming=True, pattern=r'(?i)^\+ticket(.*)'))
 async def do_ticket(event):
     if not event.is_private:
         return await event.reply(phrase.ticket.in_chat)
@@ -392,11 +396,12 @@ async def do_ticket(event):
         )
     )
 
-@telegram.on(events.NewMessage(incoming=True, pattern=r"/чек(.*)"))
-@telegram.on(events.NewMessage(incoming=True, pattern=r"/ticket(.*)"))
-@telegram.on(events.NewMessage(incoming=True, pattern=r"/активировать(.*)"))
-@telegram.on(events.NewMessage(incoming=True, pattern=r"активировать(.*)"))
-@telegram.on(events.NewMessage(incoming=True, pattern=r"/activate(.*)"))
+
+@telegram.on(events.NewMessage(incoming=True, pattern=r'(?i)^/чек(.*)'))
+@telegram.on(events.NewMessage(incoming=True, pattern=r'(?i)^/ticket(.*)'))
+@telegram.on(events.NewMessage(incoming=True, pattern=r'(?i)^/активировать(.*)'))
+@telegram.on(events.NewMessage(incoming=True, pattern=r'(?i)^активировать(.*)'))
+@telegram.on(events.NewMessage(incoming=True, pattern=r'(?i)^/activate(.*)'))
 async def get_ticket(event):
     arg = event.pattern_match.group(1).strip()
     if arg == '':
@@ -413,11 +418,11 @@ async def get_ticket(event):
         )
     )
 
-@telegram.on(events.NewMessage(incoming=True, pattern=r"/топ соо(.*)"))
-@telegram.on(events.NewMessage(incoming=True, pattern=r"/топ сообщений(.*)"))
-@telegram.on(events.NewMessage(incoming=True, pattern=r"/топ в чате(.*)"))
-@telegram.on(events.NewMessage(incoming=True, pattern=r"/актив сервера(.*)"))
-@telegram.on(events.NewMessage(incoming=True, pattern=r"/мчат(.*)"))
+@telegram.on(events.NewMessage(incoming=True, pattern=r'(?i)^/топ соо(.*)'))
+@telegram.on(events.NewMessage(incoming=True, pattern=r'(?i)^/топ сообщений(.*)'))
+@telegram.on(events.NewMessage(incoming=True, pattern=r'(?i)^/топ в чате(.*)'))
+@telegram.on(events.NewMessage(incoming=True, pattern=r'(?i)^/актив сервера(.*)'))
+@telegram.on(events.NewMessage(incoming=True, pattern=r'(?i)^/мчат(.*)'))
 async def active_check(event):
     arg = event.pattern_match.group(1).strip()
     try:
@@ -565,8 +570,8 @@ async def shop(event):
 async def host(event):
     await event.reply(phrase.server.host.format(db.database("host")))
 
-@telegram.on(events.NewMessage(incoming=True, pattern=r"/серв$"))
-@telegram.on(events.NewMessage(incoming=True, pattern=r"/сервер"))
+@telegram.on(events.NewMessage(incoming=True, pattern=r'(?i)^/серв$'))
+@telegram.on(events.NewMessage(incoming=True, pattern=r'(?i)^/сервер'))
 @telegram.on(events.NewMessage(incoming=True, pattern="/server"))
 async def sysinfo(event):
     await event.reply(get_system_info())
@@ -1147,7 +1152,7 @@ async def crocodile_wins(event):
         phrase.crocodile.stat.format(text)
     )
 
-@telegram.on(events.NewMessage(incoming=True, pattern=r"/слово(.*)"))
+@telegram.on(events.NewMessage(incoming=True, pattern=r'(?i)^/слово(.*)'))
 async def word_request(event):
     word = event.pattern_match.group(1).strip().lower()
     with open(
@@ -1208,8 +1213,8 @@ async def word_request(event):
         phrase.word.set.format(word=word)
     )
 
-@telegram.on(events.NewMessage(incoming=True, pattern=r"/nick(.*)"))
-@telegram.on(events.NewMessage(incoming=True, pattern=r"/ник(.*)"))
+@telegram.on(events.NewMessage(incoming=True, pattern=r'(?i)^/nick(.*)'))
+@telegram.on(events.NewMessage(incoming=True, pattern=r'(?i)^/ник(.*)'))
 async def check_nick(event):
     try:
         user = await telegram(
@@ -1228,10 +1233,10 @@ async def check_nick(event):
         return await event.reply(phrase.nick.no_nick)
     return await event.reply(phrase.nick.usernick.format(nick))
 
-@telegram.on(events.NewMessage(pattern=r'/чара(.*)'))
-@telegram.on(events.NewMessage(pattern=r'/чарка(.*)'))
-@telegram.on(events.NewMessage(pattern=r'/зачарование(.*)'))
-@telegram.on(events.NewMessage(pattern=r'/enchant(.*)'))
+@telegram.on(events.NewMessage(pattern=r'(?i)^/чара(.*)'))
+@telegram.on(events.NewMessage(pattern=r'(?i)^/чарка(.*)'))
+@telegram.on(events.NewMessage(pattern=r'(?i)^/зачарование(.*)'))
+@telegram.on(events.NewMessage(pattern=r'(?i)^/enchant(.*)'))
 @telegram.on(events.NewMessage(pattern=r'что за чара(.*)'))
 @telegram.on(events.NewMessage(pattern=r'чарка(.*)'))
 @telegram.on(events.NewMessage(pattern=r'зачарование(.*)'))

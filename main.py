@@ -4,7 +4,6 @@ import aiohttp
 import aiohttp.web
 
 from hashlib import sha1, md5
-from os import listdir, path
 from datetime import timedelta, datetime
 from loguru import logger
 from sys import stderr
