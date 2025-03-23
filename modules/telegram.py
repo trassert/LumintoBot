@@ -30,7 +30,7 @@ from .ai import ai_response, ai_servers
 from .diff import get_enchant_desc
 from .formatter import decline_number, remove_section_marks 
 
-telegram = TelegramClient(
+client = TelegramClient(
     session=path.join('db', 'bot'),
     api_id=config.tokens.bot.id,
     api_hash=config.tokens.bot.hash,
@@ -41,9 +41,10 @@ telegram = TelegramClient(
 
 # Вспомогательные функции
 
+
 async def get_name(id):
     'Выдает @пуш, если нет - имя + фамилия'
-    user_name = await telegram.get_entity(int(id))
+    user_name = await client.get_entity(int(id))
     if user_name.username is None:
         if user_name.last_name is None:
             user_name = user_name.first_name
@@ -53,9 +54,11 @@ async def get_name(id):
         user_name = '@'+user_name.username
     return user_name
 
-# Кнопки бота
 
-@telegram.on(events.CallbackQuery())
+'Кнопки бота'
+
+
+@client.on(events.CallbackQuery())
 async def callback_action(event):
     data = event.data.decode('utf-8').split('.')
     logger.info(f'{event.sender_id} отправил КБ - {data}')
@@ -79,17 +82,17 @@ async def callback_action(event):
                 "current_game",
                 {"hints": [], "word": word, "unsec": unsec}
             )
-            telegram.add_event_handler(
+            client.add_event_handler(
                 crocodile_hint,
                 events.NewMessage(incoming=True, pattern="/подсказка")
             )
-            telegram.add_event_handler(
+            client.add_event_handler(
                 crocodile_handler,
                 events.NewMessage(incoming=True, chats=event.chat_id)
             )
             return await event.reply(phrase.crocodile.up)
         elif data[1] == 'stop':
-            entity = await telegram.get_entity(event.sender_id)
+            entity = await client.get_entity(event.sender_id)
             user = f'@{entity.username}' if entity.username \
                 else entity.first_name + " " + entity.last_name
             if db.database("current_game") == 0:
@@ -116,8 +119,8 @@ async def callback_action(event):
             word = db.database("current_game")["word"]
             db.database("current_game", 0)
             db.database('crocodile_last_hint', 0)
-            telegram.remove_event_handler(crocodile_hint)
-            telegram.remove_event_handler(crocodile_handler)
+            client.remove_event_handler(crocodile_hint)
+            client.remove_event_handler(crocodile_handler)
             if bets_json != {}:
                 return await event.reply(
                     phrase.crocodile.down_payed.format(
@@ -176,7 +179,7 @@ async def callback_action(event):
             ) as f:
                 f.write(f'\n{data[2]}')
             db.add_money(data[3], config.coofs.WordRequest)
-            await telegram.send_message(
+            await client.send_message(
                 config.tokens.bot.chat,
                 phrase.word.success.format(
                     word=data[2],
@@ -186,20 +189,20 @@ async def callback_action(event):
                     )
                 )
             )
-            return await telegram.edit_message(
+            return await client.edit_message(
                 event.sender_id,
                 event.message_id,
                 phrase.word.add
             )
         if data[1] == 'no':
-            await telegram.send_message(
+            await client.send_message(
                 config.tokens.bot.chat,
                 phrase.word.no.format(
                     word=data[2],
                     user=user_name
                 )
             )
-            return await telegram.edit_message(
+            return await client.edit_message(
                 event.sender_id,
                 event.message_id,
                 phrase.word.noadd
@@ -283,11 +286,11 @@ async def callback_action(event):
                     logger.info(f'{message.sender_id} проиграл в казино')
                     await asyncio.sleep(2)
                     await message.reply(phrase.casino.lose)
-                telegram.remove_event_handler(check)
+                client.remove_event_handler(check)
                 logger.info('Снят обработчик казино')
                 response.append(1)
 
-            telegram.add_event_handler(
+            client.add_event_handler(
                 check,
                 events.NewMessage(config.tokens.bot.chat)
             )
@@ -299,29 +302,33 @@ async def callback_action(event):
                     )
                 )
 
-# Обработчики событий
 
-@telegram.on(events.ChatAction(chats=config.tokens.bot.chat))
+'Обработчики событий'
+
+
+@client.on(events.ChatAction(chats=config.tokens.bot.chat))
 async def chat_action(event):
     # Если пользователь ушёл из чата
     if event.user_left:
         user_name = await get_name(event.user_id)
-        return await telegram.send_message(
+        return await client.send_message(
             config.tokens.bot.chat,
             phrase.leave_message.format(
                 user_name
             )
         )
 
-# Обработчик чата
 
-@telegram.on(events.NewMessage(config.tokens.bot.chat))
+'Обработчик вк-чата'
+
+
+@client.on(events.NewMessage(config.tokens.bot.chat))
 async def vk_chat(event):
 
     async def send():
         if event.text == '':
             return logger.info('Пустое сообщение')
-        user_name = await telegram.get_entity(event.sender_id)
+        user_name = await client.get_entity(event.sender_id)
         if user_name.last_name is None:
             user_name = user_name.first_name
         else:
@@ -339,12 +346,11 @@ async def vk_chat(event):
         if event.reply_to.reply_to_top_id == config.tokens.bot.vk_topic:
             return await send()
 
-# Обработчики команд
+
+'Обработчики команд'
 
 
-@telegram.on(
-    events.NewMessage(chats=config.tokens.bot.chat, pattern=r'(?i)^/казино$')
-)
+@client.on(events.NewMessage(config.tokens.bot.chat, pattern=r'(?i)^/казино$'))
 async def casino(event):
     keyboard = ReplyInlineMarkup(
         [
@@ -363,8 +369,8 @@ async def casino(event):
     )
 
 
-@telegram.on(events.NewMessage(incoming=True, pattern=r'(?i)^\+чек(.*)'))
-@telegram.on(events.NewMessage(incoming=True, pattern=r'(?i)^\+ticket(.*)'))
+@client.on(events.NewMessage(incoming=True, pattern=r'(?i)^\+чек(.*)'))
+@client.on(events.NewMessage(incoming=True, pattern=r'(?i)^\+ticket(.*)'))
 async def do_ticket(event):
     if not event.is_private:
         return await event.reply(phrase.ticket.in_chat)
@@ -397,11 +403,11 @@ async def do_ticket(event):
     )
 
 
-@telegram.on(events.NewMessage(incoming=True, pattern=r'(?i)^/чек(.*)'))
-@telegram.on(events.NewMessage(incoming=True, pattern=r'(?i)^/ticket(.*)'))
-@telegram.on(events.NewMessage(incoming=True, pattern=r'(?i)^/активировать(.*)'))
-@telegram.on(events.NewMessage(incoming=True, pattern=r'(?i)^активировать(.*)'))
-@telegram.on(events.NewMessage(incoming=True, pattern=r'(?i)^/activate(.*)'))
+@client.on(events.NewMessage(incoming=True, pattern=r'(?i)^/чек(.*)'))
+@client.on(events.NewMessage(incoming=True, pattern=r'(?i)^/ticket(.*)'))
+@client.on(events.NewMessage(incoming=True, pattern=r'(?i)^/активировать(.*)'))
+@client.on(events.NewMessage(incoming=True, pattern=r'(?i)^активировать(.*)'))
+@client.on(events.NewMessage(incoming=True, pattern=r'(?i)^/activate(.*)'))
 async def get_ticket(event):
     arg = event.pattern_match.group(1).strip()
     if arg == '':
@@ -418,11 +424,12 @@ async def get_ticket(event):
         )
     )
 
-@telegram.on(events.NewMessage(incoming=True, pattern=r'(?i)^/топ соо(.*)'))
-@telegram.on(events.NewMessage(incoming=True, pattern=r'(?i)^/топ сообщений(.*)'))
-@telegram.on(events.NewMessage(incoming=True, pattern=r'(?i)^/топ в чате(.*)'))
-@telegram.on(events.NewMessage(incoming=True, pattern=r'(?i)^/актив сервера(.*)'))
-@telegram.on(events.NewMessage(incoming=True, pattern=r'(?i)^/мчат(.*)'))
+
+@client.on(events.NewMessage(incoming=True, pattern=r'(?i)^/топ соо(.*)'))
+@client.on(events.NewMessage(incoming=True, pattern=r'(?i)^/топ сообщений(.*)'))
+@client.on(events.NewMessage(incoming=True, pattern=r'(?i)^/топ в чате(.*)'))
+@client.on(events.NewMessage(incoming=True, pattern=r'(?i)^/актив сервера(.*)'))
+@client.on(events.NewMessage(incoming=True, pattern=r'(?i)^/мчат(.*)'))
 async def active_check(event):
     arg = event.pattern_match.group(1).strip()
     try:
@@ -494,12 +501,12 @@ async def link_nick(event):
         )
     )
 
-@telegram.on(events.NewMessage(incoming=True, pattern="/shop"))
-@telegram.on(events.NewMessage(incoming=True, pattern="/шоп"))
-@telegram.on(events.NewMessage(incoming=True, pattern="/магазин"))
-@telegram.on(events.NewMessage(incoming=True, pattern="магазин"))
-@telegram.on(events.NewMessage(incoming=True, pattern="shop"))
-@telegram.on(events.NewMessage(incoming=True, pattern="шоп"))
+@client.on(events.NewMessage(incoming=True, pattern="/shop"))
+@client.on(events.NewMessage(incoming=True, pattern="/шоп"))
+@client.on(events.NewMessage(incoming=True, pattern="/магазин"))
+@client.on(events.NewMessage(incoming=True, pattern="магазин"))
+@client.on(events.NewMessage(incoming=True, pattern="shop"))
+@client.on(events.NewMessage(incoming=True, pattern="шоп"))
 async def shop(event):
     version = db.database('shop_version')
     keyboard = ReplyInlineMarkup(
@@ -563,25 +570,25 @@ async def shop(event):
         parse_mode="html"
     )
 
-@telegram.on(events.NewMessage(incoming=True, pattern="/хост"))
-@telegram.on(events.NewMessage(incoming=True, pattern="/host"))
-@telegram.on(events.NewMessage(incoming=True, pattern="/айпи"))
-@telegram.on(events.NewMessage(incoming=True, pattern="/ip"))
+@client.on(events.NewMessage(incoming=True, pattern="/хост"))
+@client.on(events.NewMessage(incoming=True, pattern="/host"))
+@client.on(events.NewMessage(incoming=True, pattern="/айпи"))
+@client.on(events.NewMessage(incoming=True, pattern="/ip"))
 async def host(event):
     await event.reply(phrase.server.host.format(db.database("host")))
 
-@telegram.on(events.NewMessage(incoming=True, pattern=r'(?i)^/серв$'))
-@telegram.on(events.NewMessage(incoming=True, pattern=r'(?i)^/сервер'))
-@telegram.on(events.NewMessage(incoming=True, pattern="/server"))
+@client.on(events.NewMessage(incoming=True, pattern=r'(?i)^/серв$'))
+@client.on(events.NewMessage(incoming=True, pattern=r'(?i)^/сервер'))
+@client.on(events.NewMessage(incoming=True, pattern="/server"))
 async def sysinfo(event):
     await event.reply(get_system_info())
 
-@telegram.on(events.NewMessage(incoming=True, pattern="/помощь"))
-@telegram.on(events.NewMessage(incoming=True, pattern="/help"))
-@telegram.on(events.NewMessage(incoming=True, pattern="/команды"))
-@telegram.on(events.NewMessage(incoming=True, pattern="/commands"))
-@telegram.on(events.NewMessage(incoming=True, pattern="команды"))
-@telegram.on(events.NewMessage(incoming=True, pattern="бот помощь"))
+@client.on(events.NewMessage(incoming=True, pattern="/помощь"))
+@client.on(events.NewMessage(incoming=True, pattern="/help"))
+@client.on(events.NewMessage(incoming=True, pattern="/команды"))
+@client.on(events.NewMessage(incoming=True, pattern="/commands"))
+@client.on(events.NewMessage(incoming=True, pattern="команды"))
+@client.on(events.NewMessage(incoming=True, pattern="бот помощь"))
 async def help(event):
     await event.reply(phrase.help.comm, link_preview=True)
 
@@ -712,8 +719,8 @@ async def crocodile_handler(event):
                 db.database('crocodile_super_game', 0)
                 db.database('max_bet', config.coofs.CrocodileDefaultMaxBet)
                 db.database('min_bet', config.coofs.CrocodileDefaultMinBet)
-            telegram.remove_event_handler(crocodile_hint)
-            telegram.remove_event_handler(crocodile_handler)
+            client.remove_event_handler(crocodile_hint)
+            client.remove_event_handler(crocodile_handler)
             db.crocodile_stat(event.sender_id).add()
             return await event.reply(
                 phrase.crocodile.win.format(current_word)+bets_str
@@ -753,9 +760,9 @@ async def crocodile_handler(event):
                     )
                 )
 
-@telegram.on(events.NewMessage(incoming=True, pattern="/крокодил"))
-@telegram.on(events.NewMessage(incoming=True, pattern="/crocodile"))
-@telegram.on(events.NewMessage(incoming=True, pattern="старт крокодил"))
+@client.on(events.NewMessage(incoming=True, pattern="/крокодил"))
+@client.on(events.NewMessage(incoming=True, pattern="/crocodile"))
+@client.on(events.NewMessage(incoming=True, pattern="старт крокодил"))
 async def crocodile(event):
     if not event.chat_id == config.tokens.bot.chat:
         return await event.reply(phrase.default_chat)
@@ -851,7 +858,7 @@ async def super_game(event):
     db.database('crocodile_super_game', 1)
     db.database('max_bet', 100)
     db.database('min_bet', 50)
-    await telegram.send_message(
+    await client.send_message(
         config.tokens.bot.chat, phrase.crocodile.super_game_wait
     )
     await asyncio.sleep(60)
@@ -863,15 +870,15 @@ async def super_game(event):
             'word': arg
         }
     )
-    telegram.add_event_handler(
+    client.add_event_handler(
         crocodile_hint,
         events.NewMessage(incoming=True, pattern="/подсказка")
     )
-    telegram.add_event_handler(
+    client.add_event_handler(
         crocodile_handler,
         events.NewMessage(incoming=True, chats=config.tokens.bot.chat)
     )
-    return await telegram.send_message(
+    return await client.send_message(
         config.tokens.bot.chat, phrase.crocodile.super_game
     )
 
@@ -889,7 +896,7 @@ async def gemini(event):
     else:
         return await event.reply(response)
 
-@telegram.on(events.NewMessage(incoming=True, pattern=r"f/|p/"))
+@client.on(events.NewMessage(incoming=True, pattern=r"f/|p/"))
 async def mcrcon(event):
     if event.text[0] == 'f':
         host = db.database('ipv4')
@@ -927,7 +934,7 @@ async def add_staff(event):
         return await event.reply(phrase.perms.no)
     try:
         tag = event.text.split(" ", maxsplit=1)[1]
-        user = await telegram(
+        user = await client(
             GetFullUserRequest(tag)
         )
         user = user.full_user.id
@@ -936,7 +943,7 @@ async def add_staff(event):
         if reply_to_msg:
             reply_message = await event.get_reply_message()
             user = reply_message.sender_id
-            entity = await telegram.get_entity(user)
+            entity = await client.get_entity(user)
             if entity.username is None:
                 if entity.last_name is None:
                     tag = entity.first_name
@@ -960,7 +967,7 @@ async def del_staff(event):
         return await event.reply(phrase.perms.no)
     try:
         tag = event.text.split(" ", maxsplit=1)[1]
-        user = await telegram(
+        user = await client(
             GetFullUserRequest(tag)
         )
         user = user.full_user.id
@@ -969,7 +976,7 @@ async def del_staff(event):
         if reply_to_msg:
             reply_message = await event.get_reply_message()
             user = reply_message.sender_id
-            entity = await telegram.get_entity(user)
+            entity = await client.get_entity(user)
             if entity.username is None:
                 if entity.last_name is None:
                     tag = entity.first_name
@@ -1008,12 +1015,12 @@ async def server_top_list(event):
     except TimeoutError:
         return await event.reply(phrase.server.stopped)
 
-@telegram.on(events.NewMessage(incoming=True, pattern="/баланс"))
-@telegram.on(events.NewMessage(incoming=True, pattern="баланс"))
-@telegram.on(events.NewMessage(incoming=True, pattern="/wallet"))
-@telegram.on(events.NewMessage(incoming=True, pattern="wallet"))
-@telegram.on(events.NewMessage(incoming=True, pattern="/мой баланс"))
-@telegram.on(events.NewMessage(incoming=True, pattern="мой баланс"))
+@client.on(events.NewMessage(incoming=True, pattern="/баланс"))
+@client.on(events.NewMessage(incoming=True, pattern="баланс"))
+@client.on(events.NewMessage(incoming=True, pattern="/wallet"))
+@client.on(events.NewMessage(incoming=True, pattern="wallet"))
+@client.on(events.NewMessage(incoming=True, pattern="/мой баланс"))
+@client.on(events.NewMessage(incoming=True, pattern="мой баланс"))
 async def get_balance(event):
     return await event.reply(
         phrase.money.wallet.format(
@@ -1029,7 +1036,7 @@ async def add_balance(event):
     args = event.text.split(" ", maxsplit=3)
     try:
         tag = args[3]
-        user = await telegram(
+        user = await client(
             GetFullUserRequest(tag)
         )
     except IndexError:
@@ -1080,7 +1087,7 @@ async def swap_money(event):
 
     try:
         tag = args[2]
-        user = await telegram(
+        user = await client(
             GetFullUserRequest(tag)
         )
         user = user.full_user.id
@@ -1109,8 +1116,8 @@ async def swap_money(event):
         )
     )
 
-@telegram.on(events.NewMessage(incoming=True, pattern="/dns"))
-@telegram.on(events.NewMessage(incoming=True, pattern="/днс"))
+@client.on(events.NewMessage(incoming=True, pattern="/dns"))
+@client.on(events.NewMessage(incoming=True, pattern="/днс"))
 async def tg_dns(event):
     if event.sender_id not in db.database('admins_id'):
         return await event.reply(phrase.perms.no)
@@ -1119,7 +1126,7 @@ async def tg_dns(event):
         parse_mode="html"
     )
 
-@telegram.on(events.NewMessage(incoming=True, pattern="/банк"))
+@client.on(events.NewMessage(incoming=True, pattern="/банк"))
 async def all_money(event):
     return await event.reply(
         phrase.money.all_money.format(
@@ -1127,11 +1134,11 @@ async def all_money(event):
         )
     )
 
-@telegram.on(events.NewMessage(incoming=True, pattern="/топ крокодил"))
-@telegram.on(events.NewMessage(incoming=True, pattern="/топ слова"))
-@telegram.on(events.NewMessage(incoming=True, pattern="/стат крокодил"))
-@telegram.on(events.NewMessage(incoming=True, pattern="/стат слова"))
-@telegram.on(events.NewMessage(incoming=True, pattern="топ крокодила"))
+@client.on(events.NewMessage(incoming=True, pattern="/топ крокодил"))
+@client.on(events.NewMessage(incoming=True, pattern="/топ слова"))
+@client.on(events.NewMessage(incoming=True, pattern="/стат крокодил"))
+@client.on(events.NewMessage(incoming=True, pattern="/стат слова"))
+@client.on(events.NewMessage(incoming=True, pattern="топ крокодила"))
 async def crocodile_wins(event):
     all = db.crocodile_stat.get_all()
     text = ''
@@ -1140,7 +1147,7 @@ async def crocodile_wins(event):
         if n > 10:
             break
         try:
-            entity = await telegram.get_entity(int(id))
+            entity = await client.get_entity(int(id))
             name = entity.first_name
             if entity.last_name is not None:
                 name += f' {entity.last_name}'
@@ -1152,7 +1159,7 @@ async def crocodile_wins(event):
         phrase.crocodile.stat.format(text)
     )
 
-@telegram.on(events.NewMessage(incoming=True, pattern=r'(?i)^/слово(.*)'))
+@client.on(events.NewMessage(incoming=True, pattern=r'(?i)^/слово(.*)'))
 async def word_request(event):
     word = event.pattern_match.group(1).strip().lower()
     with open(
@@ -1163,7 +1170,7 @@ async def word_request(event):
                 phrase.word.exists
             )
     try:
-        entity = await telegram.get_entity(event.sender_id)
+        entity = await client.get_entity(event.sender_id)
     except TypeError:
         return await event.reply(
             phrase.word.no_user
@@ -1196,7 +1203,7 @@ async def word_request(event):
                 'Не забудь, что подсказка не должна '
                 'содержать слово в любом случае. '
             )
-        await telegram.send_message(
+        await client.send_message(
             config.tokens.bot.creator,
             phrase.word.request.format(
                 user=f'@{entity}',
@@ -1213,11 +1220,11 @@ async def word_request(event):
         phrase.word.set.format(word=word)
     )
 
-@telegram.on(events.NewMessage(incoming=True, pattern=r'(?i)^/nick(.*)'))
-@telegram.on(events.NewMessage(incoming=True, pattern=r'(?i)^/ник(.*)'))
+@client.on(events.NewMessage(incoming=True, pattern=r'(?i)^/nick(.*)'))
+@client.on(events.NewMessage(incoming=True, pattern=r'(?i)^/ник(.*)'))
 async def check_nick(event):
     try:
-        user = await telegram(
+        user = await client(
             GetFullUserRequest(event.pattern_match.group(1).strip())
         )
         user = user.full_user.id
@@ -1233,13 +1240,13 @@ async def check_nick(event):
         return await event.reply(phrase.nick.no_nick)
     return await event.reply(phrase.nick.usernick.format(nick))
 
-@telegram.on(events.NewMessage(pattern=r'(?i)^/чара(.*)'))
-@telegram.on(events.NewMessage(pattern=r'(?i)^/чарка(.*)'))
-@telegram.on(events.NewMessage(pattern=r'(?i)^/зачарование(.*)'))
-@telegram.on(events.NewMessage(pattern=r'(?i)^/enchant(.*)'))
-@telegram.on(events.NewMessage(pattern=r'что за чара(.*)'))
-@telegram.on(events.NewMessage(pattern=r'чарка(.*)'))
-@telegram.on(events.NewMessage(pattern=r'зачарование(.*)'))
+@client.on(events.NewMessage(pattern=r'(?i)^/чара(.*)'))
+@client.on(events.NewMessage(pattern=r'(?i)^/чарка(.*)'))
+@client.on(events.NewMessage(pattern=r'(?i)^/зачарование(.*)'))
+@client.on(events.NewMessage(pattern=r'(?i)^/enchant(.*)'))
+@client.on(events.NewMessage(pattern=r'(?i)^что за чара(.*)'))
+@client.on(events.NewMessage(pattern=r'(?i)^чарка(.*)'))
+@client.on(events.NewMessage(pattern=r'(?i)^зачарование(.*)'))
 async def get_enchant(event):
     arg = event.pattern_match.group(1)
     if arg.strip() == '':
@@ -1250,106 +1257,106 @@ async def get_enchant(event):
     return await event.reply(phrase.enchant.main.format(desc))
 
 'Супер-игра'
-telegram.add_event_handler(
+client.add_event_handler(
     super_game, events.NewMessage(incoming=True, pattern="/суперигра")
 )
 
 'Линк ника к майнкрафту'
-telegram.add_event_handler(
+client.add_event_handler(
     link_nick, events.NewMessage(incoming=True, pattern="/linknick")
 )
-telegram.add_event_handler(
+client.add_event_handler(
     link_nick, events.NewMessage(incoming=True, pattern="/привязать")
 )
-telegram.add_event_handler(
+client.add_event_handler(
     link_nick, events.NewMessage(incoming=True, pattern="/connect")
 )
 
 'Добавить монет'
-telegram.add_event_handler(
+client.add_event_handler(
     add_balance,
     events.NewMessage(incoming=True, pattern="/изменить баланс")
 )
-telegram.add_event_handler(
+client.add_event_handler(
     add_balance,
     events.NewMessage(incoming=True, pattern="/change balance")
 )
 
 'Переслать монет'
-telegram.add_event_handler(
+client.add_event_handler(
     swap_money,
     events.NewMessage(incoming=True, pattern="/скинуть")
 )
-telegram.add_event_handler(
+client.add_event_handler(
     swap_money,
     events.NewMessage(incoming=True, pattern="/переслать")
 )
-telegram.add_event_handler(
+client.add_event_handler(
     swap_money,
     events.NewMessage(incoming=True, pattern="/кинуть")
 )
-telegram.add_event_handler(
+client.add_event_handler(
     swap_money,
     events.NewMessage(incoming=True, pattern="/дать")
 )
 
 'Топ игроков'
-telegram.add_event_handler(
+client.add_event_handler(
     server_top_list,
     events.NewMessage(incoming=True, pattern="/топ игроков")
 )
-telegram.add_event_handler(
+client.add_event_handler(
     server_top_list,
     events.NewMessage(incoming=True, pattern="/top players")
 )
-telegram.add_event_handler(
+client.add_event_handler(
     server_top_list,
     events.NewMessage(incoming=True, pattern="/bestplayers")
 )
 
 'Пинг'
-telegram.add_event_handler(
+client.add_event_handler(
     ping, events.NewMessage(incoming=True, pattern="/пинг")
 )
-telegram.add_event_handler(
+client.add_event_handler(
     ping, events.NewMessage(incoming=True, pattern="/ping")
 )
 
 'ИИ'
-telegram.add_event_handler(
+client.add_event_handler(
     gemini, events.NewMessage(incoming=True, pattern="/ии")
 )
-telegram.add_event_handler(
+client.add_event_handler(
     gemini, events.NewMessage(incoming=True, pattern="ии")
 )
-telegram.add_event_handler(
+client.add_event_handler(
     gemini, events.NewMessage(incoming=True, pattern="/ai")
 )
 
 'Админы'
-telegram.add_event_handler(
+client.add_event_handler(
     add_staff, events.NewMessage(incoming=True, pattern=r"\+cтафф")
 )
-telegram.add_event_handler(
+client.add_event_handler(
     add_staff, events.NewMessage(incoming=True, pattern=r"\+staff")
 )
-telegram.add_event_handler(
+client.add_event_handler(
     del_staff, events.NewMessage(incoming=True, pattern=r"\-стафф")
 )
-telegram.add_event_handler(
+client.add_event_handler(
     del_staff, events.NewMessage(incoming=True, pattern=r"\-staff")
 )
 
 'Крокодил'
-telegram.add_event_handler(
+client.add_event_handler(
     crocodile_bet, events.NewMessage(incoming=True, pattern="/ставка")
 )
 if db.database("current_game", log=False) != 0:
-    telegram.add_event_handler(
+    client.add_event_handler(
         crocodile_handler,
         events.NewMessage(incoming=True, chats=config.tokens.bot.chat)
     )
-    telegram.add_event_handler(
+    client.add_event_handler(
         crocodile_hint,
         events.NewMessage(incoming=True, pattern="/подсказка")
     )
