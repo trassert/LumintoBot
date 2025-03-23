@@ -86,11 +86,11 @@ async def callback_action(event):
             )
             client.add_event_handler(
                 crocodile_hint,
-                events.NewMessage(incoming=True, pattern=r'(?i)^/подсказка')
+                events.NewMessage(pattern=r'(?i)^/подсказка')
             )
             client.add_event_handler(
                 crocodile_handler,
-                events.NewMessage(incoming=True, chats=event.chat_id)
+                events.NewMessage(chats=event.chat_id)
             )
             return await event.reply(phrase.crocodile.up)
         elif data[1] == 'stop':
@@ -371,8 +371,8 @@ async def casino(event):
     )
 
 
-@client.on(events.NewMessage(incoming=True, pattern=r'(?i)^\+чек(.*)'))
-@client.on(events.NewMessage(incoming=True, pattern=r'(?i)^\+ticket(.*)'))
+@client.on(events.NewMessage(pattern=r'(?i)^\+чек(.*)'))
+@client.on(events.NewMessage(pattern=r'(?i)^\+ticket(.*)'))
 async def do_ticket(event):
     if not event.is_private:
         return await event.reply(phrase.ticket.in_chat)
@@ -405,11 +405,11 @@ async def do_ticket(event):
     )
 
 
-@client.on(events.NewMessage(incoming=True, pattern=r'(?i)^/чек(.*)'))
-@client.on(events.NewMessage(incoming=True, pattern=r'(?i)^/ticket(.*)'))
-@client.on(events.NewMessage(incoming=True, pattern=r'(?i)^/активировать(.*)'))
-@client.on(events.NewMessage(incoming=True, pattern=r'(?i)^активировать(.*)'))
-@client.on(events.NewMessage(incoming=True, pattern=r'(?i)^/activate(.*)'))
+@client.on(events.NewMessage(pattern=r'(?i)^/чек(.*)'))
+@client.on(events.NewMessage(pattern=r'(?i)^/ticket(.*)'))
+@client.on(events.NewMessage(pattern=r'(?i)^/активировать(.*)'))
+@client.on(events.NewMessage(pattern=r'(?i)^активировать(.*)'))
+@client.on(events.NewMessage(pattern=r'(?i)^/activate(.*)'))
 async def get_ticket(event):
     arg = event.pattern_match.group(1).strip()
     if arg == '':
@@ -427,11 +427,11 @@ async def get_ticket(event):
     )
 
 
-@client.on(events.NewMessage(incoming=True, pattern=r'(?i)^/топ соо(.*)'))
-@client.on(events.NewMessage(incoming=True, pattern=r'(?i)^/топ сообщений(.*)'))
-@client.on(events.NewMessage(incoming=True, pattern=r'(?i)^/топ в чате(.*)'))
-@client.on(events.NewMessage(incoming=True, pattern=r'(?i)^/актив сервера(.*)'))
-@client.on(events.NewMessage(incoming=True, pattern=r'(?i)^/мчат(.*)'))
+@client.on(events.NewMessage(pattern=r'(?i)^/топ соо(.*)'))
+@client.on(events.NewMessage(pattern=r'(?i)^/топ сообщений(.*)'))
+@client.on(events.NewMessage(pattern=r'(?i)^/топ в чате(.*)'))
+@client.on(events.NewMessage(pattern=r'(?i)^/актив сервера(.*)'))
+@client.on(events.NewMessage(pattern=r'(?i)^/мчат(.*)'))
 async def active_check(event):
     arg = event.pattern_match.group(1).strip()
     try:
@@ -459,11 +459,11 @@ async def active_check(event):
     return await event.reply(text)
 
 
-@client.on(events.NewMessage(incoming=True, pattern=r'(?i)^/linknick(.*)'))
-@client.on(events.NewMessage(incoming=True, pattern=r'(?i)^/привязать(.*)'))
-@client.on(events.NewMessage(incoming=True, pattern=r'(?i)^привязать(.*)'))
-@client.on(events.NewMessage(incoming=True, pattern=r'(?i)^/новый ник(.*)'))
-@client.on(events.NewMessage(incoming=True, pattern=r'(?i)^/линкник(.*)'))
+@client.on(events.NewMessage(pattern=r'(?i)^/linknick(.*)'))
+@client.on(events.NewMessage(pattern=r'(?i)^/привязать(.*)'))
+@client.on(events.NewMessage(pattern=r'(?i)^привязать(.*)'))
+@client.on(events.NewMessage(pattern=r'(?i)^/новый ник(.*)'))
+@client.on(events.NewMessage(pattern=r'(?i)^/линкник(.*)'))
 async def link_nick(event):
     nick = event.pattern_match.group(1).strip()
     if len(nick) < 4:
@@ -510,12 +510,12 @@ async def link_nick(event):
     )
 
 
-@client.on(events.NewMessage(incoming=True, pattern=r'(?i)^/shop'))
-@client.on(events.NewMessage(incoming=True, pattern=r'(?i)^/шоп'))
-@client.on(events.NewMessage(incoming=True, pattern=r'(?i)^/магазин'))
-@client.on(events.NewMessage(incoming=True, pattern=r'(?i)^магазин'))
-@client.on(events.NewMessage(incoming=True, pattern=r'(?i)^shop'))
-@client.on(events.NewMessage(incoming=True, pattern=r'(?i)^шоп'))
+@client.on(events.NewMessage(pattern=r'(?i)^/shop'))
+@client.on(events.NewMessage(pattern=r'(?i)^/шоп'))
+@client.on(events.NewMessage(pattern=r'(?i)^/магазин'))
+@client.on(events.NewMessage(pattern=r'(?i)^магазин'))
+@client.on(events.NewMessage(pattern=r'(?i)^shop'))
+@client.on(events.NewMessage(pattern=r'(?i)^шоп'))
 async def shop(event):
     version = db.database('shop_version')
     keyboard = ReplyInlineMarkup(
@@ -580,34 +580,34 @@ async def shop(event):
     )
 
 
-@client.on(events.NewMessage(incoming=True, pattern=r'(?i)^/хост$'))
-@client.on(events.NewMessage(incoming=True, pattern=r'(?i)^/host$'))
-@client.on(events.NewMessage(incoming=True, pattern=r'(?i)^/айпи$'))
-@client.on(events.NewMessage(incoming=True, pattern=r'(?i)^/ip$'))
+@client.on(events.NewMessage(pattern=r'(?i)^/хост$'))
+@client.on(events.NewMessage(pattern=r'(?i)^/host$'))
+@client.on(events.NewMessage(pattern=r'(?i)^/айпи$'))
+@client.on(events.NewMessage(pattern=r'(?i)^/ip$'))
 async def host(event):
     await event.reply(phrase.server.host.format(db.database("host")))
 
 
-@client.on(events.NewMessage(incoming=True, pattern=r'(?i)^/серв$'))
-@client.on(events.NewMessage(incoming=True, pattern=r'(?i)^/сервер'))
-@client.on(events.NewMessage(incoming=True, pattern=r'(?i)^/server$'))
+@client.on(events.NewMessage(pattern=r'(?i)^/серв$'))
+@client.on(events.NewMessage(pattern=r'(?i)^/сервер'))
+@client.on(events.NewMessage(pattern=r'(?i)^/server$'))
 async def sysinfo(event):
     await event.reply(get_system_info())
 
 
-@client.on(events.NewMessage(incoming=True, pattern=r'(?i)^/помощь$'))
-@client.on(events.NewMessage(incoming=True, pattern=r'(?i)^/help$'))
-@client.on(events.NewMessage(incoming=True, pattern=r'(?i)^/команды$'))
-@client.on(events.NewMessage(incoming=True, pattern=r'(?i)^/commands$'))
-@client.on(events.NewMessage(incoming=True, pattern=r'(?i)^команды$'))
-@client.on(events.NewMessage(incoming=True, pattern=r'(?i)^бот помощь$'))
+@client.on(events.NewMessage(pattern=r'(?i)^/помощь$'))
+@client.on(events.NewMessage(pattern=r'(?i)^/help$'))
+@client.on(events.NewMessage(pattern=r'(?i)^/команды$'))
+@client.on(events.NewMessage(pattern=r'(?i)^/commands$'))
+@client.on(events.NewMessage(pattern=r'(?i)^команды$'))
+@client.on(events.NewMessage(pattern=r'(?i)^бот помощь$'))
 async def help(event):
     await event.reply(phrase.help.comm, link_preview=True)
 
 
-@client.on(events.NewMessage(incoming=True, pattern=r'(?i)^/пинг(.*)'))
-@client.on(events.NewMessage(incoming=True, pattern=r'(?i)^/ping(.*)'))
-@client.on(events.NewMessage(incoming=True, pattern=r'(?i)^пинг(.*)'))
+@client.on(events.NewMessage(pattern=r'(?i)^/пинг(.*)'))
+@client.on(events.NewMessage(pattern=r'(?i)^/ping(.*)'))
+@client.on(events.NewMessage(pattern=r'(?i)^пинг(.*)'))
 async def ping(event):
     timestamp = event.date.timestamp()
     ping = round(time() - timestamp, 2)
@@ -658,9 +658,9 @@ async def ping(event):
     return await event.reply(phrase.ping.set.format(ping)+''.join(all_servers_ping))
 
 
-@client.on(events.NewMessage(incoming=True, pattern=r'(?i)^/крокодил$'))
-@client.on(events.NewMessage(incoming=True, pattern=r'(?i)^/crocodile$'))
-@client.on(events.NewMessage(incoming=True, pattern=r'(?i)^старт крокодил$'))
+@client.on(events.NewMessage(pattern=r'(?i)^/крокодил$'))
+@client.on(events.NewMessage(pattern=r'(?i)^/crocodile$'))
+@client.on(events.NewMessage(pattern=r'(?i)^старт крокодил$'))
 async def crocodile(event):
     if not event.chat_id == config.tokens.bot.chat:
         return await event.reply(phrase.default_chat)
@@ -699,8 +699,8 @@ async def crocodile(event):
         return await event.reply(phrase.crocodile.no, buttons=keyboard)
 
 
-@client.on(events.NewMessage(incoming=True, pattern=r'(?i)^/ставка(.*)'))
-@client.on(events.NewMessage(incoming=True, pattern=r'(?i)^/крокоставка(.*)'))
+@client.on(events.NewMessage(pattern=r'(?i)^/ставка(.*)'))
+@client.on(events.NewMessage(pattern=r'(?i)^/крокоставка(.*)'))
 async def crocodile_bet(event):
     try:
         bet = int(
@@ -750,7 +750,7 @@ async def crocodile_bet(event):
     )
 
 
-@client.on(events.NewMessage(incoming=True, pattern=r'(?i)^/суперигра(.*)'))
+@client.on(events.NewMessage(pattern=r'(?i)^/суперигра(.*)'))
 async def super_game(event):
     if event.sender_id not in db.database('admins_id'):
         return await event.reply(phrase.perms.no)
@@ -775,21 +775,21 @@ async def super_game(event):
     )
     client.add_event_handler(
         crocodile_hint,
-        events.NewMessage(incoming=True, pattern=r'(?i)^/подсказка')
+        events.NewMessage(pattern=r'(?i)^/подсказка')
     )
     client.add_event_handler(
         crocodile_handler,
-        events.NewMessage(incoming=True, chats=config.tokens.bot.chat)
+        events.NewMessage(chats=config.tokens.bot.chat)
     )
     return await client.send_message(
         config.tokens.bot.chat, phrase.crocodile.super_game
     )
 
 
-@client.on(events.NewMessage(incoming=True, pattern=r'(?i)^/ии(.*)'))
-@client.on(events.NewMessage(incoming=True, pattern=r'(?i)^/ai(.*)'))
-@client.on(events.NewMessage(incoming=True, pattern=r'(?i)^ии(.*)'))
-@client.on(events.NewMessage(incoming=True, pattern=r'(?i)^/бот(.*)'))
+@client.on(events.NewMessage(pattern=r'(?i)^/ии(.*)'))
+@client.on(events.NewMessage(pattern=r'(?i)^/ai(.*)'))
+@client.on(events.NewMessage(pattern=r'(?i)^ии(.*)'))
+@client.on(events.NewMessage(pattern=r'(?i)^/бот(.*)'))
 async def gemini(event):
     arg = event.pattern_match.group(1).strip()
     if len(arg) < 1:
@@ -804,7 +804,7 @@ async def gemini(event):
         return await event.reply(response)
 
 
-@client.on(events.NewMessage(incoming=True, pattern=r'f/|p/'))
+@client.on(events.NewMessage(pattern=r'f/|p/'))
 async def mcrcon(event):
     if event.text[0] == 'f':
         host = db.database('ipv4')
@@ -838,8 +838,8 @@ async def mcrcon(event):
         return await event.reply(phrase.server.stopped)
 
 
-@client.on(events.NewMessage(incoming=True, pattern=r"\+cтафф(.*)"))
-@client.on(events.NewMessage(incoming=True, pattern=r"\+staff(.*)"))
+@client.on(events.NewMessage(pattern=r"\+cтафф(.*)"))
+@client.on(events.NewMessage(pattern=r"\+staff(.*)"))
 async def add_staff(event):
     if event.sender_id != config.tokens.bot.creator:
         return await event.reply(phrase.perms.no)
@@ -874,8 +874,8 @@ async def add_staff(event):
     )
 
 
-@client.on(events.NewMessage(incoming=True, pattern=r"\-cтафф(.*)"))
-@client.on(events.NewMessage(incoming=True, pattern=r"\-staff(.*)"))
+@client.on(events.NewMessage(pattern=r"\-cтафф(.*)"))
+@client.on(events.NewMessage(pattern=r"\-staff(.*)"))
 async def del_staff(event):
     if event.sender_id != config.tokens.bot.creator:
         return await event.reply(phrase.perms.no)
@@ -909,10 +909,10 @@ async def del_staff(event):
     return await event.reply(phrase.perms.admin_del)
 
 
-@client.on(events.NewMessage(incoming=True, pattern=r'(?i)^/топ игроков'))
-@client.on(events.NewMessage(incoming=True, pattern=r'(?i)^/topplayers'))
-@client.on(events.NewMessage(incoming=True, pattern=r'(?i)^/bestplayers'))
-@client.on(events.NewMessage(incoming=True, pattern=r'(?i)^/toppt'))
+@client.on(events.NewMessage(pattern=r'(?i)^/топ игроков'))
+@client.on(events.NewMessage(pattern=r'(?i)^/topplayers'))
+@client.on(events.NewMessage(pattern=r'(?i)^/bestplayers'))
+@client.on(events.NewMessage(pattern=r'(?i)^/toppt'))
 async def server_top_list(event):
     try:
         async with MinecraftClient(
@@ -935,12 +935,12 @@ async def server_top_list(event):
         return await event.reply(phrase.server.stopped)
 
 
-@client.on(events.NewMessage(incoming=True, pattern=r'(?i)^/баланс$'))
-@client.on(events.NewMessage(incoming=True, pattern=r'(?i)^баланс$'))
-@client.on(events.NewMessage(incoming=True, pattern=r'(?i)^/wallet$'))
-@client.on(events.NewMessage(incoming=True, pattern=r'(?i)^wallet$'))
-@client.on(events.NewMessage(incoming=True, pattern=r'(?i)^/мой баланс$'))
-@client.on(events.NewMessage(incoming=True, pattern=r'(?i)^мой баланс$'))
+@client.on(events.NewMessage(pattern=r'(?i)^/баланс$'))
+@client.on(events.NewMessage(pattern=r'(?i)^баланс$'))
+@client.on(events.NewMessage(pattern=r'(?i)^/wallet$'))
+@client.on(events.NewMessage(pattern=r'(?i)^wallet$'))
+@client.on(events.NewMessage(pattern=r'(?i)^/мой баланс$'))
+@client.on(events.NewMessage(pattern=r'(?i)^мой баланс$'))
 async def get_balance(event):
     return await event.reply(
         phrase.money.wallet.format(
@@ -951,12 +951,8 @@ async def get_balance(event):
     )
 
 
-@client.on(
-    events.NewMessage(incoming=True, pattern=r'(?i)^/изменить баланс(.*)')
-)
-@client.on(
-    events.NewMessage(incoming=True, pattern=r'(?i)^/change balance(.*)')
-)
+@client.on(events.NewMessage(pattern=r'(?i)^/изменить баланс(.*)'))
+@client.on(events.NewMessage(pattern=r'(?i)^/change balance(.*)'))
 async def add_balance(event):
     if event.sender_id not in db.database('admins_id'):
         return await event.reply(phrase.perms.no)
@@ -995,11 +991,11 @@ async def add_balance(event):
     )
 
 
-@client.on(events.NewMessage(incoming=True, pattern=r'(?i)^/скинуть(.*)'))
-@client.on(events.NewMessage(incoming=True, pattern=r'(?i)^/кинуть(.*)'))
-@client.on(events.NewMessage(incoming=True, pattern=r'(?i)^/дать(.*)'))
-@client.on(events.NewMessage(incoming=True, pattern=r'(?i)^/перевести(.*)'))
-@client.on(events.NewMessage(incoming=True, pattern=r'(?i)^перевести(.*)'))
+@client.on(events.NewMessage(pattern=r'(?i)^/скинуть(.*)'))
+@client.on(events.NewMessage(pattern=r'(?i)^/кинуть(.*)'))
+@client.on(events.NewMessage(pattern=r'(?i)^/дать(.*)'))
+@client.on(events.NewMessage(pattern=r'(?i)^/перевести(.*)'))
+@client.on(events.NewMessage(pattern=r'(?i)^перевести(.*)'))
 async def swap_money(event):
     args = event.pattern_match.group(1).strip()
     if len(args) < 1:
@@ -1047,8 +1043,8 @@ async def swap_money(event):
     )
 
 
-@client.on(events.NewMessage(incoming=True, pattern=r'(?i)^/dns$'))
-@client.on(events.NewMessage(incoming=True, pattern=r'(?i)^/днс$'))
+@client.on(events.NewMessage(pattern=r'(?i)^/dns$'))
+@client.on(events.NewMessage(pattern=r'(?i)^/днс$'))
 async def tg_dns(event):
     if event.sender_id not in db.database('admins_id'):
         return await event.reply(phrase.perms.no)
@@ -1058,7 +1054,7 @@ async def tg_dns(event):
     )
 
 
-@client.on(events.NewMessage(incoming=True, pattern=r'(?i)^/банк$'))
+@client.on(events.NewMessage(pattern=r'(?i)^/банк$'))
 async def all_money(event):
     return await event.reply(
         phrase.money.all_money.format(
@@ -1067,11 +1063,11 @@ async def all_money(event):
     )
 
 
-@client.on(events.NewMessage(incoming=True, pattern=r'(?i)^/топ крокодил$'))
-@client.on(events.NewMessage(incoming=True, pattern=r'(?i)^/топ слова$'))
-@client.on(events.NewMessage(incoming=True, pattern=r'(?i)^/стат крокодил$'))
-@client.on(events.NewMessage(incoming=True, pattern=r'(?i)^/стат слова$'))
-@client.on(events.NewMessage(incoming=True, pattern=r'(?i)^топ крокодила$'))
+@client.on(events.NewMessage(pattern=r'(?i)^/топ крокодил$'))
+@client.on(events.NewMessage(pattern=r'(?i)^/топ слова$'))
+@client.on(events.NewMessage(pattern=r'(?i)^/стат крокодил$'))
+@client.on(events.NewMessage(pattern=r'(?i)^/стат слова$'))
+@client.on(events.NewMessage(pattern=r'(?i)^топ крокодила$'))
 async def crocodile_wins(event):
     all = db.crocodile_stat.get_all()
     text = ''
@@ -1093,7 +1089,7 @@ async def crocodile_wins(event):
     )
 
 
-@client.on(events.NewMessage(incoming=True, pattern=r'(?i)^/слово(.*)'))
+@client.on(events.NewMessage(pattern=r'(?i)^/слово(.*)'))
 async def word_request(event):
     word = event.pattern_match.group(1).strip().lower()
     with open(
@@ -1155,8 +1151,8 @@ async def word_request(event):
     )
 
 
-@client.on(events.NewMessage(incoming=True, pattern=r'(?i)^/nick(.*)'))
-@client.on(events.NewMessage(incoming=True, pattern=r'(?i)^/ник(.*)'))
+@client.on(events.NewMessage(pattern=r'(?i)^/nick(.*)'))
+@client.on(events.NewMessage(pattern=r'(?i)^/ник(.*)'))
 async def check_nick(event):
     try:
         user = await client(
@@ -1320,9 +1316,9 @@ async def crocodile_handler(event):
 if db.database("current_game", log=False) != 0:
     client.add_event_handler(
         crocodile_handler,
-        events.NewMessage(incoming=True, chats=config.tokens.bot.chat)
+        events.NewMessage(chats=config.tokens.bot.chat)
     )
     client.add_event_handler(
         crocodile_hint,
-        events.NewMessage(incoming=True, pattern=r'(?i)^/подсказка$')
+        events.NewMessage(pattern=r'(?i)^/подсказка$')
     )
