@@ -405,3 +405,27 @@
 # await asyncio.sleep(1)
 
 # mods = '💻 : [Установка модов](https://teletype.in/@trassert/mods)'
+
+"Версия лаунчера"
+
+# async def version(request):
+#         q = request.query.get('q')
+#         try:
+#             version = int(request.query.get("version"))
+#         except (ValueError, TypeError):
+#             return aiohttp.web.Response(
+#                 text="versionerror"
+#             )
+#         if q not in ["prog", "mods"]:
+#             return aiohttp.web.Response(
+#                 text="typeerror"
+#             )
+#         current = max(list(map(int, listdir(path.join("update", q)))))
+#         if version < current:
+#             return aiohttp.web.Response(
+#                 text=str(version + 1)
+#             )
+#         else:
+#             return aiohttp.web.Response(
+#                 text="True"
+#             )

@@ -170,7 +170,7 @@ async def web_server():
         )
         return aiohttp.web.Response(text='ok')
 
-    async def servers(request):
+    async def mcservers(request):
         load = await request.post()
         username = load['username']
         sign = load['sign']
@@ -201,28 +201,6 @@ async def web_server():
             link_preview=False
         )
         return aiohttp.web.Response(text='ok')
-
-    async def version(request):
-        q = request.query.get('q')
-        try:
-            telegram_version = int(request.query.get("version"))
-        except (ValueError, TypeError):
-            return aiohttp.web.Response(
-                text="versionerror"
-            )
-        if q not in ["prog", "mods"]:
-            return aiohttp.web.Response(
-                text="typeerror"
-            )
-        current = max(list(map(int, listdir(path.join("update", q)))))
-        if telegram_version < current:
-            return aiohttp.web.Response(
-                text=str(telegram_version + 1)
-            )
-        else:
-            return aiohttp.web.Response(
-                text="True"
-            )
 
     async def minecraft(request):
         if request.query.get('password') != config.tokens.chattohttp:
@@ -256,9 +234,8 @@ async def web_server():
     app.add_routes(
         [
             aiohttp.web.post('/hotmc', hotmc),
-            aiohttp.web.post('/servers', servers),
+            aiohttp.web.post('/servers', mcservers),
             aiohttp.web.post('/github', github),
-            aiohttp.web.get('/version', version),
             aiohttp.web.get('/minecraft', minecraft)
         ]
     )
