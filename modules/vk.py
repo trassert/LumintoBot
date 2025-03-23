@@ -39,6 +39,6 @@ async def tg_chat(message: Message):
     logger.info(f"ВК>ТГ: {name} > {message.text}")
     return await telegram.telegram.send_message(
         config.tokens.bot.chat,
-        reply_to=config.tokens.bot.vk_topic,
+        reply_to=config.tokens.topics.vk,
         message=f'**{name}**\n{message.text}'
     )

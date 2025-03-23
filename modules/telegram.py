@@ -340,10 +340,10 @@ async def vk_chat(event):
             random_id=0
         )
 
-    if event.reply_to_msg_id == config.tokens.bot.vk_topic:
+    if event.reply_to_msg_id == config.tokens.topics.vk:
         return await send()
     if event.reply_to is not None:
-        if event.reply_to.reply_to_top_id == config.tokens.bot.vk_topic:
+        if event.reply_to.reply_to_top_id == config.tokens.topics.vk:
             return await send()
 
 
