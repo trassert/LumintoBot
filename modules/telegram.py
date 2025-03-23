@@ -30,6 +30,7 @@ from .ai import ai_response, ai_servers
 from .diff import get_enchant_desc
 from .formatter import decline_number, remove_section_marks 
 
+
 client = TelegramClient(
     session=path.join('db', 'bot'),
     api_id=config.tokens.bot.id,
@@ -39,7 +40,8 @@ client = TelegramClient(
     use_ipv6=True
 )
 
-# Вспомогательные функции
+
+'Вспомогательные функции'
 
 
 async def get_name(id):
@@ -84,7 +86,7 @@ async def callback_action(event):
             )
             client.add_event_handler(
                 crocodile_hint,
-                events.NewMessage(incoming=True, pattern="/подсказка")
+                events.NewMessage(incoming=True, pattern=r'(?i)^/подсказка')
             )
             client.add_event_handler(
                 crocodile_handler,
@@ -319,7 +321,7 @@ async def chat_action(event):
         )
 
 
-'Обработчик вк-чата'
+'Обработчик вк-топика'
 
 
 @client.on(events.NewMessage(config.tokens.bot.chat))
@@ -456,8 +458,14 @@ async def active_check(event):
         n += 1
     return await event.reply(text)
 
+
+@client.on(events.NewMessage(incoming=True, pattern=r'(?i)^/linknick(.*)'))
+@client.on(events.NewMessage(incoming=True, pattern=r'(?i)^/привязать(.*)'))
+@client.on(events.NewMessage(incoming=True, pattern=r'(?i)^привязать(.*)'))
+@client.on(events.NewMessage(incoming=True, pattern=r'(?i)^/новый ник(.*)'))
+@client.on(events.NewMessage(incoming=True, pattern=r'(?i)^/линкник(.*)'))
 async def link_nick(event):
-    nick = event.text.split(' ', maxsplit=1)[1].strip()
+    nick = event.pattern_match.group(1).strip()
     if len(nick) < 4:
         return await event.reply(phrase.nick.too_short)
     if len(nick) > 16:
@@ -501,12 +509,13 @@ async def link_nick(event):
         )
     )
 
-@client.on(events.NewMessage(incoming=True, pattern="/shop"))
-@client.on(events.NewMessage(incoming=True, pattern="/шоп"))
-@client.on(events.NewMessage(incoming=True, pattern="/магазин"))
-@client.on(events.NewMessage(incoming=True, pattern="магазин"))
-@client.on(events.NewMessage(incoming=True, pattern="shop"))
-@client.on(events.NewMessage(incoming=True, pattern="шоп"))
+
+@client.on(events.NewMessage(incoming=True, pattern=r'(?i)^/shop'))
+@client.on(events.NewMessage(incoming=True, pattern=r'(?i)^/шоп'))
+@client.on(events.NewMessage(incoming=True, pattern=r'(?i)^/магазин'))
+@client.on(events.NewMessage(incoming=True, pattern=r'(?i)^магазин'))
+@client.on(events.NewMessage(incoming=True, pattern=r'(?i)^shop'))
+@client.on(events.NewMessage(incoming=True, pattern=r'(?i)^шоп'))
 async def shop(event):
     version = db.database('shop_version')
     keyboard = ReplyInlineMarkup(
@@ -570,28 +579,35 @@ async def shop(event):
         parse_mode="html"
     )
 
-@client.on(events.NewMessage(incoming=True, pattern="/хост"))
-@client.on(events.NewMessage(incoming=True, pattern="/host"))
-@client.on(events.NewMessage(incoming=True, pattern="/айпи"))
-@client.on(events.NewMessage(incoming=True, pattern="/ip"))
+
+@client.on(events.NewMessage(incoming=True, pattern=r'(?i)^/хост$'))
+@client.on(events.NewMessage(incoming=True, pattern=r'(?i)^/host$'))
+@client.on(events.NewMessage(incoming=True, pattern=r'(?i)^/айпи$'))
+@client.on(events.NewMessage(incoming=True, pattern=r'(?i)^/ip$'))
 async def host(event):
     await event.reply(phrase.server.host.format(db.database("host")))
 
+
 @client.on(events.NewMessage(incoming=True, pattern=r'(?i)^/серв$'))
 @client.on(events.NewMessage(incoming=True, pattern=r'(?i)^/сервер'))
-@client.on(events.NewMessage(incoming=True, pattern="/server"))
+@client.on(events.NewMessage(incoming=True, pattern=r'(?i)^/server$'))
 async def sysinfo(event):
     await event.reply(get_system_info())
 
-@client.on(events.NewMessage(incoming=True, pattern="/помощь"))
-@client.on(events.NewMessage(incoming=True, pattern="/help"))
-@client.on(events.NewMessage(incoming=True, pattern="/команды"))
-@client.on(events.NewMessage(incoming=True, pattern="/commands"))
-@client.on(events.NewMessage(incoming=True, pattern="команды"))
-@client.on(events.NewMessage(incoming=True, pattern="бот помощь"))
+
+@client.on(events.NewMessage(incoming=True, pattern=r'(?i)^/помощь$'))
+@client.on(events.NewMessage(incoming=True, pattern=r'(?i)^/help$'))
+@client.on(events.NewMessage(incoming=True, pattern=r'(?i)^/команды$'))
+@client.on(events.NewMessage(incoming=True, pattern=r'(?i)^/commands$'))
+@client.on(events.NewMessage(incoming=True, pattern=r'(?i)^команды$'))
+@client.on(events.NewMessage(incoming=True, pattern=r'(?i)^бот помощь$'))
 async def help(event):
     await event.reply(phrase.help.comm, link_preview=True)
 
+
+@client.on(events.NewMessage(incoming=True, pattern=r'(?i)^/пинг(.*)'))
+@client.on(events.NewMessage(incoming=True, pattern=r'(?i)^/ping(.*)'))
+@client.on(events.NewMessage(incoming=True, pattern=r'(?i)^пинг(.*)'))
 async def ping(event):
     timestamp = event.date.timestamp()
     ping = round(time() - timestamp, 2)
@@ -600,7 +616,7 @@ async def ping(event):
     else:
         ping = f"за {str(ping)} сек."
     try:
-        arg = event.text.split(' ')[1].lower()
+        arg = event.pattern_match.group(1).strip()
     except IndexError:
         arg = None
     all_servers_ping = []
@@ -641,6 +657,545 @@ async def ping(event):
                 n += 1
     return await event.reply(phrase.ping.set.format(ping)+''.join(all_servers_ping))
 
+
+@client.on(events.NewMessage(incoming=True, pattern=r'(?i)^/крокодил$'))
+@client.on(events.NewMessage(incoming=True, pattern=r'(?i)^/crocodile$'))
+@client.on(events.NewMessage(incoming=True, pattern=r'(?i)^старт крокодил$'))
+async def crocodile(event):
+    if not event.chat_id == config.tokens.bot.chat:
+        return await event.reply(phrase.default_chat)
+    else:
+        pass
+    if db.database("current_game") == 0:
+        keyboard = ReplyInlineMarkup(
+            [
+                KeyboardButtonRow(
+                    [
+                        KeyboardButtonCallback(
+                            text="✅ Играть", data=b"crocodile.start"
+                        ),
+                        KeyboardButtonCallback(
+                            text="❌ Остановить игру",
+                            data=b"crocodile.stop"
+                        )
+                    ]
+                )
+            ]
+        )
+        return await event.reply(phrase.crocodile.game, buttons=keyboard)
+    else:
+        keyboard = ReplyInlineMarkup(
+            [
+                KeyboardButtonRow(
+                    [
+                        KeyboardButtonCallback(
+                            text="❌ Остановить игру",
+                            data=b"crocodile.stop"
+                        )
+                    ]
+                )
+            ]
+        )
+        return await event.reply(phrase.crocodile.no, buttons=keyboard)
+
+
+@client.on(events.NewMessage(incoming=True, pattern=r'(?i)^/ставка(.*)'))
+@client.on(events.NewMessage(incoming=True, pattern=r'(?i)^/крокоставка(.*)'))
+async def crocodile_bet(event):
+    try:
+        bet = int(
+            event.pattern_match.group(1).strip()
+        )
+        if bet < db.database('min_bet'):
+            return await event.reply(
+                phrase.money.min_count.format(
+                    decline_number(db.database('min_bet'), 'изумруд')
+                )
+            )
+        elif bet > db.database('max_bet'):
+            return await event.reply(
+                phrase.money.max_count.format(
+                    decline_number(db.database('max_bet'), 'изумруд')
+                )
+            )
+    except IndexError:
+        bet = db.database('min_bet')
+    except ValueError:
+        return await event.reply(
+            phrase.money.nan_count
+        )
+    sender_balance = db.get_money(event.sender_id)
+    if sender_balance < bet:
+        return await event.reply(
+            phrase.money.not_enough.format(
+                decline_number(sender_balance, 'изумруд')
+            )
+        )
+    if db.database("current_game") != 0:
+        return await event.reply(
+            phrase.crocodile.no
+        )
+    all_bets = db.database('crocodile_bets')
+    if str(event.sender_id) in all_bets:
+        return await event.reply(
+            phrase.crocodile.bet_already
+        )
+    db.add_money(event.sender_id, -bet)
+    all_bets[str(event.sender_id)] = bet
+    db.database('crocodile_bets', all_bets)
+    return await event.reply(
+        phrase.crocodile.bet.format(
+            decline_number(bet, 'изумруд')
+        )
+    )
+
+
+@client.on(events.NewMessage(incoming=True, pattern=r'(?i)^/суперигра(.*)'))
+async def super_game(event):
+    if event.sender_id not in db.database('admins_id'):
+        return await event.reply(phrase.perms.no)
+    arg = event.pattern_match.group(1).strip()
+    bets = db.database('crocodile_bets')
+    bets[str(config.tokens.bot.creator)] = 50
+    db.database('crocodile_bets', bets)
+    db.database('crocodile_super_game', 1)
+    db.database('max_bet', 100)
+    db.database('min_bet', 50)
+    await client.send_message(
+        config.tokens.bot.chat, phrase.crocodile.super_game_wait
+    )
+    await asyncio.sleep(60)
+    db.database(
+        'current_game',
+        {
+            'hints': [],
+            'unsec': '_'*len(arg),
+            'word': arg
+        }
+    )
+    client.add_event_handler(
+        crocodile_hint,
+        events.NewMessage(incoming=True, pattern=r'(?i)^/подсказка')
+    )
+    client.add_event_handler(
+        crocodile_handler,
+        events.NewMessage(incoming=True, chats=config.tokens.bot.chat)
+    )
+    return await client.send_message(
+        config.tokens.bot.chat, phrase.crocodile.super_game
+    )
+
+
+@client.on(events.NewMessage(incoming=True, pattern=r'(?i)^/ии(.*)'))
+@client.on(events.NewMessage(incoming=True, pattern=r'(?i)^/ai(.*)'))
+@client.on(events.NewMessage(incoming=True, pattern=r'(?i)^ии(.*)'))
+@client.on(events.NewMessage(incoming=True, pattern=r'(?i)^/бот(.*)'))
+async def gemini(event):
+    arg = event.pattern_match.group(1).strip()
+    if len(arg) < 1:
+        return await event.reply(phrase.no.response)
+    response = await ai_response(arg)
+    if response is None:
+        return await event.reply(phrase.server.overload)
+    if len(response) > 4096:
+        for x in range(0, len(response), 4096):
+            await event.reply(response[x:x+4096])
+    else:
+        return await event.reply(response)
+
+
+@client.on(events.NewMessage(incoming=True, pattern=r'f/|p/'))
+async def mcrcon(event):
+    if event.text[0] == 'f':
+        host = db.database('ipv4')
+        port = config.tokens.rcon.port_fabric
+        password = config.tokens.rcon
+    elif event.text[0] == 'p':
+        host = db.database('ipv4')
+        port = config.tokens.rcon.port
+        password = config.tokens.rcon.password
+    else:
+        return await event.reply(phrase.no.server)
+
+    if event.sender_id not in db.database('admins_id'):
+        return await event.reply(phrase.perms.no)
+    command = event.text[2:]
+    logger.info(f'Выполняется команда: {command}')
+    try:
+        async with MinecraftClient(
+            host=host,
+            port=port,
+            password=password
+        ) as rcon:
+            resp = remove_section_marks(await rcon.send(command))
+            logger.info(f'Ответ команды:\n{resp}')
+            if len(resp) > 4096:
+                for x in range(0, len(resp), 4096):
+                    await event.reply(f'```{resp[x:x+4096]}```')
+            else:
+                return await event.reply(f'```{resp}```')
+    except TimeoutError:
+        return await event.reply(phrase.server.stopped)
+
+
+@client.on(events.NewMessage(incoming=True, pattern=r"\+cтафф(.*)"))
+@client.on(events.NewMessage(incoming=True, pattern=r"\+staff(.*)"))
+async def add_staff(event):
+    if event.sender_id != config.tokens.bot.creator:
+        return await event.reply(phrase.perms.no)
+    try:
+        tag = event.pattern_match.group(1).strip()
+        user = await client(
+            GetFullUserRequest(tag)
+        )
+        user = user.full_user.id
+    except IndexError:
+        reply_to_msg = event.reply_to_msg_id
+        if reply_to_msg:
+            reply_message = await event.get_reply_message()
+            user = reply_message.sender_id
+            entity = await client.get_entity(user)
+            if entity.username is None:
+                if entity.last_name is None:
+                    tag = entity.first_name
+                else:
+                    tag = entity.first_name + " " + entity.last_name
+            else:
+                tag = f'@{entity.username}'
+        else:
+            return await event.reply(
+                phrase.money.no_people
+            )
+    admins = db.database('admins_id')
+    admins.append(user)
+    db.database('admins_id', admins)
+    return await event.reply(
+        phrase.perms.admin_add.format(nick=tag, id=user)
+    )
+
+
+@client.on(events.NewMessage(incoming=True, pattern=r"\-cтафф(.*)"))
+@client.on(events.NewMessage(incoming=True, pattern=r"\-staff(.*)"))
+async def del_staff(event):
+    if event.sender_id != config.tokens.bot.creator:
+        return await event.reply(phrase.perms.no)
+    try:
+        tag = event.pattern_match.group(1).strip()
+        user = await client(
+            GetFullUserRequest(tag)
+        )
+        user = user.full_user.id
+    except IndexError:
+        reply_to_msg = event.reply_to_msg_id
+        if reply_to_msg:
+            reply_message = await event.get_reply_message()
+            user = reply_message.sender_id
+            entity = await client.get_entity(user)
+            if entity.username is None:
+                if entity.last_name is None:
+                    tag = entity.first_name
+                else:
+                    tag = entity.first_name + " " + entity.last_name
+            else:
+                tag = f'@{entity.username}'
+        else:
+            return await event.reply(
+                phrase.money.no_people
+            )
+    admins = db.database('admins_id')
+    while user in admins:
+        admins.remove(user)
+    db.database('admins_id', admins)
+    return await event.reply(phrase.perms.admin_del)
+
+
+@client.on(events.NewMessage(incoming=True, pattern=r'(?i)^/топ игроков'))
+@client.on(events.NewMessage(incoming=True, pattern=r'(?i)^/topplayers'))
+@client.on(events.NewMessage(incoming=True, pattern=r'(?i)^/bestplayers'))
+@client.on(events.NewMessage(incoming=True, pattern=r'(?i)^/toppt'))
+async def server_top_list(event):
+    try:
+        async with MinecraftClient(
+            host=db.database('ipv4'),
+            port=config.tokens.rcon.port,
+            password=config.tokens.rcon.password
+        ) as rcon:
+            await event.reply(
+                remove_section_marks(
+                    await rcon.send('playtime top')
+                ).replace(
+                    '(Лидеры по времени на сервере)',
+                    phrase.stat.server.format("ванильного")
+                ).replace(
+                    '***',
+                    ''
+                )
+            )
+    except TimeoutError:
+        return await event.reply(phrase.server.stopped)
+
+
+@client.on(events.NewMessage(incoming=True, pattern=r'(?i)^/баланс$'))
+@client.on(events.NewMessage(incoming=True, pattern=r'(?i)^баланс$'))
+@client.on(events.NewMessage(incoming=True, pattern=r'(?i)^/wallet$'))
+@client.on(events.NewMessage(incoming=True, pattern=r'(?i)^wallet$'))
+@client.on(events.NewMessage(incoming=True, pattern=r'(?i)^/мой баланс$'))
+@client.on(events.NewMessage(incoming=True, pattern=r'(?i)^мой баланс$'))
+async def get_balance(event):
+    return await event.reply(
+        phrase.money.wallet.format(
+            decline_number(
+                db.get_money(event.sender_id), 'изумруд'
+            )
+        )
+    )
+
+
+@client.on(
+    events.NewMessage(incoming=True, pattern=r'(?i)^/изменить баланс(.*)')
+)
+@client.on(
+    events.NewMessage(incoming=True, pattern=r'(?i)^/change balance(.*)')
+)
+async def add_balance(event):
+    if event.sender_id not in db.database('admins_id'):
+        return await event.reply(phrase.perms.no)
+    args = event.pattern_match.group(1).strip().split()
+    try:
+        tag = args[1]
+        user = await client(
+            GetFullUserRequest(tag)
+        )
+    except IndexError:
+        return await event.reply(
+            phrase.money.no_people+phrase.money.change_balance_use
+        )
+    except ValueError:
+        return await event.reply(
+            phrase.money.no_such_people+phrase.money.change_balance_use
+        )
+    try:
+        new = int(args[0])
+    except IndexError:
+        return await event.reply(
+            phrase.money.no_count+phrase.money.change_balance_use
+        )
+    except ValueError:
+        return await event.reply(
+            phrase.money.nan_count+phrase.money.change_balance_use
+        )
+    old = db.get_money(user.full_user.id)
+    db.add_money(user.full_user.id, new)
+    await event.reply(
+        phrase.money.add_money.format(
+            name=tag,
+            old=old,
+            new=old+new
+        )
+    )
+
+
+@client.on(events.NewMessage(incoming=True, pattern=r'(?i)^/скинуть(.*)'))
+@client.on(events.NewMessage(incoming=True, pattern=r'(?i)^/кинуть(.*)'))
+@client.on(events.NewMessage(incoming=True, pattern=r'(?i)^/дать(.*)'))
+@client.on(events.NewMessage(incoming=True, pattern=r'(?i)^/перевести(.*)'))
+@client.on(events.NewMessage(incoming=True, pattern=r'(?i)^перевести(.*)'))
+async def swap_money(event):
+    args = event.pattern_match.group(1).strip()
+    if len(args) < 1:
+        return await event.reply(phrase.money.no_count+phrase.money.swap_balance_use)
+    args = args.split()
+
+    try:
+        count = int(args[0])
+        if count <= 0:
+            return await event.reply(phrase.money.negative_count)
+    except ValueError:
+        return await event.reply(
+            phrase.money.nan_count+phrase.money.swap_balance_use
+        )
+
+    try:
+        tag = args[2]
+        user = await client(
+            GetFullUserRequest(tag)
+        )
+        user = user.full_user.id
+    except (TypeError, ValueError, IndexError):
+        reply_to_msg = event.reply_to_msg_id
+        if reply_to_msg:
+            reply_message = await event.get_reply_message()
+            user = reply_message.sender_id
+        else:
+            return await event.reply(
+                phrase.money.no_people+phrase.money.swap_balance_use
+            )
+
+    sender_balance = db.get_money(event.sender_id)
+    if sender_balance < count:
+        return await event.reply(
+            phrase.money.not_enough.format(
+                decline_number(sender_balance, 'изумруд')
+            )
+        )
+    db.add_money(event.sender_id, -count)
+    db.add_money(user, count)
+    return await event.reply(
+        phrase.money.swap_money.format(
+            decline_number(count, 'изумруд')
+        )
+    )
+
+
+@client.on(events.NewMessage(incoming=True, pattern=r'(?i)^/dns$'))
+@client.on(events.NewMessage(incoming=True, pattern=r'(?i)^/днс$'))
+async def tg_dns(event):
+    if event.sender_id not in db.database('admins_id'):
+        return await event.reply(phrase.perms.no)
+    return await event.reply(
+        phrase.dns.format(await ip.setup(True)),
+        parse_mode="html"
+    )
+
+
+@client.on(events.NewMessage(incoming=True, pattern=r'(?i)^/банк$'))
+async def all_money(event):
+    return await event.reply(
+        phrase.money.all_money.format(
+            decline_number(db.get_all_money(), 'изумруд')
+        )
+    )
+
+
+@client.on(events.NewMessage(incoming=True, pattern=r'(?i)^/топ крокодил$'))
+@client.on(events.NewMessage(incoming=True, pattern=r'(?i)^/топ слова$'))
+@client.on(events.NewMessage(incoming=True, pattern=r'(?i)^/стат крокодил$'))
+@client.on(events.NewMessage(incoming=True, pattern=r'(?i)^/стат слова$'))
+@client.on(events.NewMessage(incoming=True, pattern=r'(?i)^топ крокодила$'))
+async def crocodile_wins(event):
+    all = db.crocodile_stat.get_all()
+    text = ''
+    n = 1
+    for id in all.keys():
+        if n > 10:
+            break
+        try:
+            entity = await client.get_entity(int(id))
+            name = entity.first_name
+            if entity.last_name is not None:
+                name += f' {entity.last_name}'
+        except:
+            name = 'Неопознанный персонаж'
+        text += f'{n}. {name}: {all[id]}\n'
+        n += 1
+    return await event.reply(
+        phrase.crocodile.stat.format(text)
+    )
+
+
+@client.on(events.NewMessage(incoming=True, pattern=r'(?i)^/слово(.*)'))
+async def word_request(event):
+    word = event.pattern_match.group(1).strip().lower()
+    with open(
+        path.join('db', 'crocodile_words.txt'), 'r', encoding='utf-8'
+    ) as f:
+        if f'\n{word}\n' in f.read():
+            return await event.reply(
+                phrase.word.exists
+            )
+    try:
+        entity = await client.get_entity(event.sender_id)
+    except TypeError:
+        return await event.reply(
+            phrase.word.no_user
+        )
+    entity = entity.username
+    logger.info(f'Пользователь {entity} хочет добавить слово "{word}"')
+    keyboard = ReplyInlineMarkup(
+        [
+            KeyboardButtonRow(
+                [
+                    KeyboardButtonCallback(
+                        text="✅ Добавить",
+                        data=f"word.yes.{word}.{event.sender_id}".encode()
+                    ),
+                    KeyboardButtonCallback(
+                        text="❌ Отклонить",
+                        data=f"word.no.{word}.{event.sender_id}".encode()
+                    )
+                ]
+            )
+        ]
+    )
+    try:
+        hint = None
+        while hint is None:
+            hint = await ai_response(
+                f'Сделай подсказку для слова "{word}". '
+                'Ни в коем случае не добавляй никаких "подсказка для слова.." '
+                'и т.п, ответ должен содержать только подсказку. '
+                'Не забудь, что подсказка не должна '
+                'содержать слово в любом случае. '
+            )
+        await client.send_message(
+            config.tokens.bot.creator,
+            phrase.word.request.format(
+                user=f'@{entity}',
+                word=word,
+                hint=hint
+            ),
+            buttons=keyboard
+        )
+    except TGErrors.ButtonDataInvalidError:
+        return await event.reply(
+            phrase.word.long
+        )
+    return await event.reply(
+        phrase.word.set.format(word=word)
+    )
+
+
+@client.on(events.NewMessage(incoming=True, pattern=r'(?i)^/nick(.*)'))
+@client.on(events.NewMessage(incoming=True, pattern=r'(?i)^/ник(.*)'))
+async def check_nick(event):
+    try:
+        user = await client(
+            GetFullUserRequest(event.pattern_match.group(1).strip())
+        )
+        user = user.full_user.id
+    except (TypeError, ValueError, IndexError):
+        reply_to_msg = event.reply_to_msg_id
+        if reply_to_msg:
+            reply_message = await event.get_reply_message()
+            user = reply_message.sender_id
+        else:
+            return await event.reply(phrase.nick.who)
+    nick = db.nicks(id=user).get()
+    if nick is None:
+        return await event.reply(phrase.nick.no_nick)
+    return await event.reply(phrase.nick.usernick.format(nick))
+
+
+@client.on(events.NewMessage(pattern=r'(?i)^/чара(.*)'))
+@client.on(events.NewMessage(pattern=r'(?i)^/чарка(.*)'))
+@client.on(events.NewMessage(pattern=r'(?i)^/зачарование(.*)'))
+@client.on(events.NewMessage(pattern=r'(?i)^/enchant(.*)'))
+@client.on(events.NewMessage(pattern=r'(?i)^что за чара(.*)'))
+@client.on(events.NewMessage(pattern=r'(?i)^чарка(.*)'))
+@client.on(events.NewMessage(pattern=r'(?i)^зачарование(.*)'))
+async def get_enchant(event):
+    arg = event.pattern_match.group(1)
+    if arg.strip() == '':
+        return await event.reply(phrase.enchant.no_arg)
+    desc = get_enchant_desc(arg)
+    if desc is None:
+        return await event.reply(phrase.enchant.no_diff)
+    return await event.reply(phrase.enchant.main.format(desc))
+
+
+'Эвенты для крокодила'
+
+
 async def crocodile_hint(event):
     game = db.database("current_game")
     hint = game["hints"]
@@ -680,6 +1235,7 @@ async def crocodile_hint(event):
             return await event.reply(phrase.crocodile.error)
         db.database("crocodile_last_hint", response)
     return await event.reply(response)
+
 
 async def crocodile_handler(event):
     text = event.text.strip().lower()
@@ -760,597 +1316,7 @@ async def crocodile_handler(event):
                     )
                 )
 
-@client.on(events.NewMessage(incoming=True, pattern="/крокодил"))
-@client.on(events.NewMessage(incoming=True, pattern="/crocodile"))
-@client.on(events.NewMessage(incoming=True, pattern="старт крокодил"))
-async def crocodile(event):
-    if not event.chat_id == config.tokens.bot.chat:
-        return await event.reply(phrase.default_chat)
-    else:
-        pass
-    if db.database("current_game") == 0:
-        keyboard = ReplyInlineMarkup(
-            [
-                KeyboardButtonRow(
-                    [
-                        KeyboardButtonCallback(
-                            text="✅ Играть", data=b"crocodile.start"
-                        ),
-                        KeyboardButtonCallback(
-                            text="❌ Остановить игру",
-                            data=b"crocodile.stop"
-                        )
-                    ]
-                )
-            ]
-        )
-        return await event.reply(phrase.crocodile.game, buttons=keyboard)
-    else:
-        keyboard = ReplyInlineMarkup(
-            [
-                KeyboardButtonRow(
-                    [
-                        KeyboardButtonCallback(
-                            text="❌ Остановить игру",
-                            data=b"crocodile.stop"
-                        )
-                    ]
-                )
-            ]
-        )
-        return await event.reply(phrase.crocodile.no, buttons=keyboard)
 
-async def crocodile_bet(event):
-    try:
-        bet = int(
-            event.text.split(" ", maxsplit=1)[1]
-        )
-        if bet < db.database('min_bet'):
-            return await event.reply(
-                phrase.money.min_count.format(
-                    decline_number(db.database('min_bet'), 'изумруд')
-                )
-            )
-        elif bet > db.database('max_bet'):
-            return await event.reply(
-                phrase.money.max_count.format(
-                    decline_number(db.database('max_bet'), 'изумруд')
-                )
-            )
-    except IndexError:
-        bet = db.database('min_bet')
-    except ValueError:
-        return await event.reply(
-            phrase.money.nan_count
-        )
-    sender_balance = db.get_money(event.sender_id)
-    if sender_balance < bet:
-        return await event.reply(
-            phrase.money.not_enough.format(
-                decline_number(sender_balance, 'изумруд')
-            )
-        )
-    if db.database("current_game") != 0:
-        return await event.reply(
-            phrase.crocodile.no
-        )
-    all_bets = db.database('crocodile_bets')
-    if str(event.sender_id) in all_bets:
-        return await event.reply(
-            phrase.crocodile.bet_already
-        )
-    db.add_money(event.sender_id, -bet)
-    all_bets[str(event.sender_id)] = bet
-    db.database('crocodile_bets', all_bets)
-    return await event.reply(
-        phrase.crocodile.bet.format(
-            decline_number(bet, 'изумруд')
-        )
-    )
-
-async def super_game(event):
-    if event.sender_id not in db.database('admins_id'):
-        return await event.reply(phrase.perms.no)
-    arg = event.text.lower().split(" ", maxsplit=1)[1]
-    bets = db.database('crocodile_bets')
-    bets[str(config.tokens.bot.creator)] = 50
-    db.database('crocodile_bets', bets)
-    db.database('crocodile_super_game', 1)
-    db.database('max_bet', 100)
-    db.database('min_bet', 50)
-    await client.send_message(
-        config.tokens.bot.chat, phrase.crocodile.super_game_wait
-    )
-    await asyncio.sleep(60)
-    db.database(
-        'current_game',
-        {
-            'hints': [],
-            'unsec': '_'*len(arg),
-            'word': arg
-        }
-    )
-    client.add_event_handler(
-        crocodile_hint,
-        events.NewMessage(incoming=True, pattern="/подсказка")
-    )
-    client.add_event_handler(
-        crocodile_handler,
-        events.NewMessage(incoming=True, chats=config.tokens.bot.chat)
-    )
-    return await client.send_message(
-        config.tokens.bot.chat, phrase.crocodile.super_game
-    )
-
-async def gemini(event):
-    try:
-        arg = event.text.split(" ", maxsplit=1)[1]
-    except IndexError:
-        return await event.reply(phrase.no.response)
-    response = await ai_response(arg)
-    if response is None:
-        return await event.reply(phrase.server.overload)
-    if len(response) > 4096:
-        for x in range(0, len(response), 4096):
-            await event.reply(response[x:x+4096])
-    else:
-        return await event.reply(response)
-
-@client.on(events.NewMessage(incoming=True, pattern=r"f/|p/"))
-async def mcrcon(event):
-    if event.text[0] == 'f':
-        host = db.database('ipv4')
-        port = config.tokens.rcon.port_fabric
-        password = config.tokens.rcon
-    elif event.text[0] == 'p':
-        host = db.database('ipv4')
-        port = config.tokens.rcon.port
-        password = config.tokens.rcon.password
-    else:
-        return await event.reply(phrase.no.server)
-
-    if event.sender_id not in db.database('admins_id'):
-        return await event.reply(phrase.perms.no)
-    command = event.text[2:]
-    logger.info(f'Выполняется команда: {command}')
-    try:
-        async with MinecraftClient(
-            host=host,
-            port=port,
-            password=password
-        ) as rcon:
-            resp = remove_section_marks(await rcon.send(command))
-            logger.info(f'Ответ команды:\n{resp}')
-            if len(resp) > 4096:
-                for x in range(0, len(resp), 4096):
-                    await event.reply(f'```{resp[x:x+4096]}```')
-            else:
-                return await event.reply(f'```{resp}```')
-    except TimeoutError:
-        return await event.reply(phrase.server.stopped)
-
-async def add_staff(event):
-    if event.sender_id != config.tokens.bot.creator:
-        return await event.reply(phrase.perms.no)
-    try:
-        tag = event.text.split(" ", maxsplit=1)[1]
-        user = await client(
-            GetFullUserRequest(tag)
-        )
-        user = user.full_user.id
-    except IndexError:
-        reply_to_msg = event.reply_to_msg_id
-        if reply_to_msg:
-            reply_message = await event.get_reply_message()
-            user = reply_message.sender_id
-            entity = await client.get_entity(user)
-            if entity.username is None:
-                if entity.last_name is None:
-                    tag = entity.first_name
-                else:
-                    tag = entity.first_name + " " + entity.last_name
-            else:
-                tag = f'@{entity.username}'
-        else:
-            return await event.reply(
-                phrase.money.no_people
-            )
-    admins = db.database('admins_id')
-    admins.append(user)
-    db.database('admins_id', admins)
-    return await event.reply(
-        phrase.perms.admin_add.format(nick=tag, id=user)
-    )
-
-async def del_staff(event):
-    if event.sender_id != config.tokens.bot.creator:
-        return await event.reply(phrase.perms.no)
-    try:
-        tag = event.text.split(" ", maxsplit=1)[1]
-        user = await client(
-            GetFullUserRequest(tag)
-        )
-        user = user.full_user.id
-    except IndexError:
-        reply_to_msg = event.reply_to_msg_id
-        if reply_to_msg:
-            reply_message = await event.get_reply_message()
-            user = reply_message.sender_id
-            entity = await client.get_entity(user)
-            if entity.username is None:
-                if entity.last_name is None:
-                    tag = entity.first_name
-                else:
-                    tag = entity.first_name + " " + entity.last_name
-            else:
-                tag = f'@{entity.username}'
-        else:
-            return await event.reply(
-                phrase.money.no_people
-            )
-    admins = db.database('admins_id')
-    while user in admins:
-        admins.remove(user)
-    db.database('admins_id', admins)
-    return await event.reply(phrase.perms.admin_del)
-
-async def server_top_list(event):
-    try:
-        async with MinecraftClient(
-            host=db.database('ipv4'),
-            port=config.tokens.rcon.port,
-            password=config.tokens.rcon.password
-        ) as rcon:
-            await event.reply(
-                remove_section_marks(
-                    await rcon.send('playtime top')
-                ).replace(
-                    '(Лидеры по времени на сервере)',
-                    phrase.stat.server.format("ванильного")
-                ).replace(
-                    '***',
-                    ''
-                )
-            )
-    except TimeoutError:
-        return await event.reply(phrase.server.stopped)
-
-@client.on(events.NewMessage(incoming=True, pattern="/баланс"))
-@client.on(events.NewMessage(incoming=True, pattern="баланс"))
-@client.on(events.NewMessage(incoming=True, pattern="/wallet"))
-@client.on(events.NewMessage(incoming=True, pattern="wallet"))
-@client.on(events.NewMessage(incoming=True, pattern="/мой баланс"))
-@client.on(events.NewMessage(incoming=True, pattern="мой баланс"))
-async def get_balance(event):
-    return await event.reply(
-        phrase.money.wallet.format(
-            decline_number(
-                db.get_money(event.sender_id), 'изумруд'
-            )
-        )
-    )
-
-async def add_balance(event):
-    if event.sender_id not in db.database('admins_id'):
-        return await event.reply(phrase.perms.no)
-    args = event.text.split(" ", maxsplit=3)
-    try:
-        tag = args[3]
-        user = await client(
-            GetFullUserRequest(tag)
-        )
-    except IndexError:
-        return await event.reply(
-            phrase.money.no_people+phrase.money.change_balance_use
-        )
-    except ValueError:
-        return await event.reply(
-            phrase.money.no_such_people+phrase.money.change_balance_use
-        )
-    try:
-        new = int(args[2])
-    except IndexError:
-        return await event.reply(
-            phrase.money.no_count+phrase.money.change_balance_use
-        )
-    except ValueError:
-        return await event.reply(
-            phrase.money.nan_count+phrase.money.change_balance_use
-        )
-    old = db.get_money(user.full_user.id)
-    db.add_money(user.full_user.id, new)
-    await event.reply(
-        phrase.money.add_money.format(
-            name=tag,
-            old=old,
-            new=old+new
-        )
-    )
-
-async def swap_money(event):
-    args = event.text.split(" ", maxsplit=2)
-
-    try:
-        count = int(args[1])
-        if count <= 0:
-            return await event.reply(
-                phrase.money.negative_count
-            )
-    except IndexError:
-        return await event.reply(
-            phrase.money.no_count+phrase.money.swap_balance_use
-        )
-    except ValueError:
-        return await event.reply(
-            phrase.money.nan_count+phrase.money.swap_balance_use
-        )
-
-    try:
-        tag = args[2]
-        user = await client(
-            GetFullUserRequest(tag)
-        )
-        user = user.full_user.id
-    except (TypeError, ValueError, IndexError):
-        reply_to_msg = event.reply_to_msg_id
-        if reply_to_msg:
-            reply_message = await event.get_reply_message()
-            user = reply_message.sender_id
-        else:
-            return await event.reply(
-                phrase.money.no_people+phrase.money.swap_balance_use
-            )
-
-    sender_balance = db.get_money(event.sender_id)
-    if sender_balance < count:
-        return await event.reply(
-            phrase.money.not_enough.format(
-                decline_number(sender_balance, 'изумруд')
-            )
-        )
-    db.add_money(event.sender_id, -count)
-    db.add_money(user, count)
-    return await event.reply(
-        phrase.money.swap_money.format(
-            decline_number(count, 'изумруд')
-        )
-    )
-
-@client.on(events.NewMessage(incoming=True, pattern="/dns"))
-@client.on(events.NewMessage(incoming=True, pattern="/днс"))
-async def tg_dns(event):
-    if event.sender_id not in db.database('admins_id'):
-        return await event.reply(phrase.perms.no)
-    return await event.reply(
-        phrase.dns.format(await ip.setup(True)),
-        parse_mode="html"
-    )
-
-@client.on(events.NewMessage(incoming=True, pattern="/банк"))
-async def all_money(event):
-    return await event.reply(
-        phrase.money.all_money.format(
-            decline_number(db.get_all_money(), 'изумруд')
-        )
-    )
-
-@client.on(events.NewMessage(incoming=True, pattern="/топ крокодил"))
-@client.on(events.NewMessage(incoming=True, pattern="/топ слова"))
-@client.on(events.NewMessage(incoming=True, pattern="/стат крокодил"))
-@client.on(events.NewMessage(incoming=True, pattern="/стат слова"))
-@client.on(events.NewMessage(incoming=True, pattern="топ крокодила"))
-async def crocodile_wins(event):
-    all = db.crocodile_stat.get_all()
-    text = ''
-    n = 1
-    for id in all.keys():
-        if n > 10:
-            break
-        try:
-            entity = await client.get_entity(int(id))
-            name = entity.first_name
-            if entity.last_name is not None:
-                name += f' {entity.last_name}'
-        except:
-            name = 'Неопознанный персонаж'
-        text += f'{n}. {name}: {all[id]}\n'
-        n += 1
-    return await event.reply(
-        phrase.crocodile.stat.format(text)
-    )
-
-@client.on(events.NewMessage(incoming=True, pattern=r'(?i)^/слово(.*)'))
-async def word_request(event):
-    word = event.pattern_match.group(1).strip().lower()
-    with open(
-        path.join('db', 'crocodile_words.txt'), 'r', encoding='utf-8'
-    ) as f:
-        if f'\n{word}\n' in f.read():
-            return await event.reply(
-                phrase.word.exists
-            )
-    try:
-        entity = await client.get_entity(event.sender_id)
-    except TypeError:
-        return await event.reply(
-            phrase.word.no_user
-        )
-    entity = entity.username
-    logger.info(f'Пользователь {entity} хочет добавить слово "{word}"')
-    keyboard = ReplyInlineMarkup(
-        [
-            KeyboardButtonRow(
-                [
-                    KeyboardButtonCallback(
-                        text="✅ Добавить",
-                        data=f"word.yes.{word}.{event.sender_id}".encode()
-                    ),
-                    KeyboardButtonCallback(
-                        text="❌ Отклонить",
-                        data=f"word.no.{word}.{event.sender_id}".encode()
-                    )
-                ]
-            )
-        ]
-    )
-    try:
-        hint = None
-        while hint is None:
-            hint = await ai_response(
-                f'Сделай подсказку для слова "{word}". '
-                'Ни в коем случае не добавляй никаких "подсказка для слова.." '
-                'и т.п, ответ должен содержать только подсказку. '
-                'Не забудь, что подсказка не должна '
-                'содержать слово в любом случае. '
-            )
-        await client.send_message(
-            config.tokens.bot.creator,
-            phrase.word.request.format(
-                user=f'@{entity}',
-                word=word,
-                hint=hint
-            ),
-            buttons=keyboard
-        )
-    except TGErrors.ButtonDataInvalidError:
-        return await event.reply(
-            phrase.word.long
-        )
-    return await event.reply(
-        phrase.word.set.format(word=word)
-    )
-
-@client.on(events.NewMessage(incoming=True, pattern=r'(?i)^/nick(.*)'))
-@client.on(events.NewMessage(incoming=True, pattern=r'(?i)^/ник(.*)'))
-async def check_nick(event):
-    try:
-        user = await client(
-            GetFullUserRequest(event.pattern_match.group(1).strip())
-        )
-        user = user.full_user.id
-    except (TypeError, ValueError, IndexError):
-        reply_to_msg = event.reply_to_msg_id
-        if reply_to_msg:
-            reply_message = await event.get_reply_message()
-            user = reply_message.sender_id
-        else:
-            return await event.reply(phrase.nick.who)
-    nick = db.nicks(id=user).get()
-    if nick is None:
-        return await event.reply(phrase.nick.no_nick)
-    return await event.reply(phrase.nick.usernick.format(nick))
-
-@client.on(events.NewMessage(pattern=r'(?i)^/чара(.*)'))
-@client.on(events.NewMessage(pattern=r'(?i)^/чарка(.*)'))
-@client.on(events.NewMessage(pattern=r'(?i)^/зачарование(.*)'))
-@client.on(events.NewMessage(pattern=r'(?i)^/enchant(.*)'))
-@client.on(events.NewMessage(pattern=r'(?i)^что за чара(.*)'))
-@client.on(events.NewMessage(pattern=r'(?i)^чарка(.*)'))
-@client.on(events.NewMessage(pattern=r'(?i)^зачарование(.*)'))
-async def get_enchant(event):
-    arg = event.pattern_match.group(1)
-    if arg.strip() == '':
-        return await event.reply(phrase.enchant.no_arg)
-    desc = get_enchant_desc(arg)
-    if desc is None:
-        return await event.reply(phrase.enchant.no_diff)
-    return await event.reply(phrase.enchant.main.format(desc))
-
-'Супер-игра'
-client.add_event_handler(
-    super_game, events.NewMessage(incoming=True, pattern="/суперигра")
-)
-
-'Линк ника к майнкрафту'
-client.add_event_handler(
-    link_nick, events.NewMessage(incoming=True, pattern="/linknick")
-)
-client.add_event_handler(
-    link_nick, events.NewMessage(incoming=True, pattern="/привязать")
-)
-client.add_event_handler(
-    link_nick, events.NewMessage(incoming=True, pattern="/connect")
-)
-
-'Добавить монет'
-client.add_event_handler(
-    add_balance,
-    events.NewMessage(incoming=True, pattern="/изменить баланс")
-)
-client.add_event_handler(
-    add_balance,
-    events.NewMessage(incoming=True, pattern="/change balance")
-)
-
-'Переслать монет'
-client.add_event_handler(
-    swap_money,
-    events.NewMessage(incoming=True, pattern="/скинуть")
-)
-client.add_event_handler(
-    swap_money,
-    events.NewMessage(incoming=True, pattern="/переслать")
-)
-client.add_event_handler(
-    swap_money,
-    events.NewMessage(incoming=True, pattern="/кинуть")
-)
-client.add_event_handler(
-    swap_money,
-    events.NewMessage(incoming=True, pattern="/дать")
-)
-
-'Топ игроков'
-client.add_event_handler(
-    server_top_list,
-    events.NewMessage(incoming=True, pattern="/топ игроков")
-)
-client.add_event_handler(
-    server_top_list,
-    events.NewMessage(incoming=True, pattern="/top players")
-)
-client.add_event_handler(
-    server_top_list,
-    events.NewMessage(incoming=True, pattern="/bestplayers")
-)
-
-'Пинг'
-client.add_event_handler(
-    ping, events.NewMessage(incoming=True, pattern="/пинг")
-)
-client.add_event_handler(
-    ping, events.NewMessage(incoming=True, pattern="/ping")
-)
-
-'ИИ'
-client.add_event_handler(
-    gemini, events.NewMessage(incoming=True, pattern="/ии")
-)
-client.add_event_handler(
-    gemini, events.NewMessage(incoming=True, pattern="ии")
-)
-client.add_event_handler(
-    gemini, events.NewMessage(incoming=True, pattern="/ai")
-)
-
-'Админы'
-client.add_event_handler(
-    add_staff, events.NewMessage(incoming=True, pattern=r"\+cтафф")
-)
-client.add_event_handler(
-    add_staff, events.NewMessage(incoming=True, pattern=r"\+staff")
-)
-client.add_event_handler(
-    del_staff, events.NewMessage(incoming=True, pattern=r"\-стафф")
-)
-client.add_event_handler(
-    del_staff, events.NewMessage(incoming=True, pattern=r"\-staff")
-)
-
-'Крокодил'
-client.add_event_handler(
-    crocodile_bet, events.NewMessage(incoming=True, pattern="/ставка")
-)
 if db.database("current_game", log=False) != 0:
     client.add_event_handler(
         crocodile_handler,
@@ -1358,5 +1324,5 @@ if db.database("current_game", log=False) != 0:
     )
     client.add_event_handler(
         crocodile_hint,
-        events.NewMessage(incoming=True, pattern="/подсказка")
+        events.NewMessage(incoming=True, pattern=r'(?i)^/подсказка$')
     )
