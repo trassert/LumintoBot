@@ -104,6 +104,16 @@
             "name": "minecraft:diamond_boots",
             "price": 13,
             "value": 1
+        },
+        "Корона героя (книга)": {
+            "name": "enchanted_book[stored_enchantments={levels:{\"enchantencore:heroes_crown\":1}}]",
+            "price": 34,
+            "value": 1
+        },
+        "Дополнительные жизни IV (книга)": {
+            "name": "enchanted_book[stored_enchantments={levels:{\"enchantencore:rejuvenation\":1}}]",
+            "price": 34,
+            "value": 1
         }
     },
     "desert": {
@@ -245,7 +255,7 @@
     "mine": {
         "Алмаз": {
             "name": "minecraft:diamond",
-            "price": 32,
+            "price": 21,
             "value": 8
         },
         "Древесный уголь": {
@@ -281,6 +291,11 @@
         "Уголь": {
             "name": "minecraft:coal",
             "price": 1,
+            "value": 1
+        },
+        "Мощность (книга)": {
+            "name": "enchanted_book[stored_enchantments={levels:{\"detonate:detonate\":1}}]",
+            "price": 64,
             "value": 1
         }
     },
@@ -503,6 +518,11 @@
             "name": "minecraft:name_tag",
             "price": 20,
             "value": 1
+        },
+        "Проклятие разбойников V (книга)": {
+            "name": "enchanted_book[stored_enchantments={levels:{\"enchantencore:bane_of_raiders\":5}}]",
+            "price": 50,
+            "value": 1
         }
     },
     "remains": {
@@ -724,6 +744,11 @@
             "name": "minecraft:sponge",
             "price": 8,
             "value": 1
+        },
+        "Подводник (книга)": {
+            "name": "enchanted_book[stored_enchantments={levels:{\"minecraft:aqua_affinity\":1}}]",
+            "price": 24,
+            "value": 1
         }
     },
     "witch": {
@@ -810,6 +835,11 @@
         "Аспект невидимости (книга)": {
             "name": "enchanted_book[stored_enchantments={levels:{\"enchantencore:invisibility_splash\":1}}]",
             "price": 32,
+            "value": 1
+        },
+        "След ведьмы (книга)": {
+            "name": "enchanted_book[stored_enchantments={levels:{\"enchantencore:witch_trail\":1}}]",
+            "price": 13,
             "value": 1
         }
     },
@@ -952,6 +982,11 @@
         "Яйцо призыва железного голема": {
             "name": "minecraft:iron_golem_spawn_egg",
             "price": 26,
+            "value": 1
+        },
+        "Выстрел кузнеца (книга)": {
+            "name": "enchanted_book[stored_enchantments={levels:{\"enchantencore:forge_shot\":1}}]",
+            "price": 27,
             "value": 1
         }
     },

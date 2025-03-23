@@ -1,11 +1,12 @@
 import json
+import aiomysql
 
 from loguru import logger
 from datetime import datetime, timedelta
 from os import path, listdir
 from random import choice, randint
 
-from .random import weighted_choice
+from .get_theme import weighted_choice
 
 nick_path = path.join('db', 'minecraft.json')
 stats_path = path.join('db', 'chat_stats')
@@ -422,3 +423,30 @@ class ticket:
         ) as f:
             json.dump(data, f, indent=4, ensure_ascii=False, sort_keys=True)
             return True
+
+
+class AsyncSQLDatabase:
+    def __init__(self, host, user, password, database, table):
+        self.host = host
+        self.user = user
+        self.password = password
+        self.database = database
+        self.table = table
+        self.pool = None
+
+    async def connect(self):
+        self.pool = await aiomysql.create_pool(
+            host=self.host,
+            user=self.user,
+            password=self.password,
+            db=self.database,
+            autocommit=True
+        )
+
+    async def get(self):
+        query = f"SELECT * FROM {self.table}"
+        async with self.pool.acquire() as conn:
+            async with conn.cursor() as cursor:
+                await cursor.execute(query)
+                result = await cursor.fetchall()
+                return result

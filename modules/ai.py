@@ -1,7 +1,6 @@
 import aiohttp
 
 from requests import codes
-from os import path
 from loguru import logger
 
 from .formatter import formatter
@@ -9,11 +8,8 @@ from . import config
 
 
 ai_servers = [
-    'https://'
-    'trassert0reserve.pythonanywhere.com/',
-
-    'https://'
-    'trassert.pythonanywhere.com/'
+    'trassert0reserve.pythonanywhere.com',
+    'trassert.pythonanywhere.com'
 ]
 
 
@@ -28,7 +24,9 @@ async def ai_response(message):
         for server in ai_servers:
             try:
                 async with session.get(
-                    server+'gemini?q={message}&token={token}'.format(
+                    'https://' +
+                    server +
+                    '/gemini?q={message}&token={token}'.format(
                         message=message,
                         token=config.tokens.google
                     )
