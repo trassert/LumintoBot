@@ -10,7 +10,6 @@ db/shop_current.json
 db/tickets.json
 
 images/*
-logs/*
 
 update/mods/*
 update/prog/*
