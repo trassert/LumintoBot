@@ -12,3 +12,5 @@ CasinoSleepTime: 150
 CrocodileBetCoo: 2
 CrocodileDefaultMaxBet: 5
 CrocodileDefaultMinBet: 1
+
+MaxStatPlayers: 10

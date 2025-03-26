@@ -157,7 +157,7 @@ async def web_server():
         tg_id = db.nicks(nick=nick).get()
         if tg_id is not None:
             db.add_money(tg_id, 10)
-            give = phrase.hotmc_money.format(
+            give = phrase.vote_money.format(
                 decline_number(10, 'изумруд')
             )
         else:
@@ -189,7 +189,7 @@ async def web_server():
         tg_id = db.nicks(nick=username).get()
         if tg_id is not None:
             db.add_money(tg_id, 10)
-            give = phrase.servers_money.format(
+            give = phrase.vote_money.format(
                 decline_number(10, 'изумруд')
             )
         else:

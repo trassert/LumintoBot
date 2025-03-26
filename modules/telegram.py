@@ -23,6 +23,7 @@ from . import phrase
 from . import dice
 from . import ip
 from . import vk
+from . import chart
 
 from .system_info import get_system_info
 from .mcrcon import MinecraftClient
@@ -434,26 +435,34 @@ async def get_ticket(event):
 @client.on(events.NewMessage(pattern=r'(?i)^/мчат(.*)'))
 async def active_check(event):
     arg = event.pattern_match.group(1).strip()
+    if arg in phrase.all_arg:
+        text = phrase.stat.chat.format('всё время')
+        all_data = db.statistic().get_all(all_days=True)
+        chart.create_plot(db.statistic().get_raw())
+        n = 1
+        for data in all_data:
+            if n > config.coofs.MaxStatPlayers:
+                break
+            text += f'{n}. {data[0]} - {data[1]}\n'
+            n += 1
+        return await client.send_file(
+            event.chat_id,
+            chart.chart_path,
+            caption=text
+        )
     try:
         days = int(arg)
         text = phrase.stat.chat.format(decline_number(days, 'день'))
         all_data = db.statistic(days=days).get_all()
     except ValueError:
-        if arg in [
-            'весь',
-            'вся',
-            'общий',
-            'всего'
-        ]:
-            text = phrase.stat.chat.format('всё время')
-            all_data = db.statistic().get_all(all_days=True)
-        else:
-            text = phrase.stat.chat.format('день')
-            all_data = db.statistic().get_all()
+        text = phrase.stat.chat.format('день')
+        all_data = db.statistic().get_all()
     if all_data == []:
         return await event.reply(phrase.stat.empty)
     n = 1
     for data in all_data:
+        if n > config.coofs.MaxStatPlayers:
+            break
         text += f'{n}. {data[0]} - {data[1]}\n'
         n += 1
     return await event.reply(text)

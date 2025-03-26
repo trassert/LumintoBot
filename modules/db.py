@@ -354,7 +354,7 @@ class statistic:
                 stats, f, indent=4, ensure_ascii=False, sort_keys=True
             )
 
-    def get_raw(self, reverse=False):
+    def get_raw(self, reverse=False) -> dict[str, int]:
         'Выдаёт {дата: сообщения} от всех'
         'Если days не указан, выдаст все'
         totals = defaultdict(int)
@@ -374,6 +374,7 @@ class statistic:
                 if datetime.strptime(date, '%Y.%m.%d') >= start_date
             }
         return dict(sorted(totals.items(), key=lambda item: item[0]))
+
 
 class ticket:
     def get(id):
