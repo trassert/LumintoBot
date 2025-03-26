@@ -5,6 +5,7 @@ from loguru import logger
 from datetime import datetime, timedelta
 from os import path, listdir
 from random import choice, randint
+from collections import defaultdict
 
 from .get_theme import weighted_choice
 
@@ -280,7 +281,7 @@ class statistic:
         self.days = days
 
     def get(self, nick, all_days=False):
-        'Получить статистику по заданным аргументам'
+        'Выдаст статистику по заданным аргументам'
         now = datetime.now().strftime("%Y.%m.%d")
 
         # Если нет файла
@@ -312,6 +313,8 @@ class statistic:
             return sum(filtered_data.values()) or 0
 
     def get_all(self, all_days=False):
+        'Выдаст игрок: сообщения за days дней'
+        'Если all_days указан, выдаст все дни'
         data = {}
         for file in listdir(stats_path):
             nick = file.replace('.json', '')
@@ -351,6 +354,26 @@ class statistic:
                 stats, f, indent=4, ensure_ascii=False, sort_keys=True
             )
 
+    def get_raw(self, reverse=False):
+        'Выдаёт {дата: сообщения} от всех'
+        'Если days не указан, выдаст все'
+        totals = defaultdict(int)
+        for json_file in listdir(stats_path):
+            try:
+                with open(path.join(stats_path, json_file), 'r', encoding='utf-8') as f:
+                    data = json.load(f)
+                    for date, count in data.items():
+                        totals[date] += count
+            except (json.JSONDecodeError, UnicodeDecodeError) as e:
+                logger.error(f"Ошибка при чтении файла - {json_file}")
+                continue
+        if self.days != 1:
+            start_date = datetime.now() - timedelta(days=self.days)
+            return {
+                date: value for date, value in totals.items()
+                if datetime.strptime(date, '%Y.%m.%d') >= start_date
+            }
+        return dict(sorted(totals.items(), key=lambda item: item[0]))
 
 class ticket:
     def get(id):
