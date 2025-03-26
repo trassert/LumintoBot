@@ -510,12 +510,12 @@ async def link_nick(event):
     )
 
 
-@client.on(events.NewMessage(pattern=r'(?i)^/shop'))
-@client.on(events.NewMessage(pattern=r'(?i)^/шоп'))
-@client.on(events.NewMessage(pattern=r'(?i)^/магазин'))
-@client.on(events.NewMessage(pattern=r'(?i)^магазин'))
-@client.on(events.NewMessage(pattern=r'(?i)^shop'))
-@client.on(events.NewMessage(pattern=r'(?i)^шоп'))
+@client.on(events.NewMessage(pattern=r'(?i)^/shop$'))
+@client.on(events.NewMessage(pattern=r'(?i)^/шоп$'))
+@client.on(events.NewMessage(pattern=r'(?i)^/магазин$'))
+@client.on(events.NewMessage(pattern=r'(?i)^магазин$'))
+@client.on(events.NewMessage(pattern=r'(?i)^shop$'))
+@client.on(events.NewMessage(pattern=r'(?i)^шоп$'))
 async def shop(event):
     version = db.database('shop_version')
     keyboard = ReplyInlineMarkup(
@@ -909,10 +909,10 @@ async def del_staff(event):
     return await event.reply(phrase.perms.admin_del)
 
 
-@client.on(events.NewMessage(pattern=r'(?i)^/топ игроков'))
-@client.on(events.NewMessage(pattern=r'(?i)^/topplayers'))
-@client.on(events.NewMessage(pattern=r'(?i)^/bestplayers'))
-@client.on(events.NewMessage(pattern=r'(?i)^/toppt'))
+@client.on(events.NewMessage(pattern=r'(?i)^/топ игроков$'))
+@client.on(events.NewMessage(pattern=r'(?i)^/topplayers$'))
+@client.on(events.NewMessage(pattern=r'(?i)^/bestplayers$'))
+@client.on(events.NewMessage(pattern=r'(?i)^/toppt$'))
 async def server_top_list(event):
     try:
         async with MinecraftClient(
