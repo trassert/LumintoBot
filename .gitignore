@@ -16,8 +16,7 @@ update/prog/*
 
 charts/*
 
-test.py
-test.txt
+test.*
 
 **/__pycache__/
 

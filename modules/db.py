@@ -323,9 +323,11 @@ class statistic:
                 data[nick] = nick_stat
         return sorted(data.items(), key=lambda item: item[1], reverse=True)
 
-    def add(nick):
+    def add(nick, date=None):
         '+1 в статистику игрока'
-        now = datetime.now().strftime("%Y.%m.%d")
+        'datе указывать при перерасчёте и т.д.'
+
+        now = date if date else datetime.now().strftime("%Y.%m.%d")
 
         # Если нет файла
         if not path.exists(path.join(stats_path, f'{nick}.json')):

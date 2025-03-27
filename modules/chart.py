@@ -70,9 +70,9 @@ def create_plot(data_dict, output_file=chart_path, time_range_days=None):
         x=dates,
         y=values,
         marker='o',
-        color='#FF7F50',
-        linewidth=2.5,
-        markersize=8,
+        color='#ff8222',
+        linewidth=3,
+        markersize=0,
         markerfacecolor='white',
         ax=ax
     )
@@ -99,22 +99,26 @@ def create_plot(data_dict, output_file=chart_path, time_range_days=None):
     ax.grid(True, linestyle='--', alpha=0.5, color='#3d3d3d')
 
     'Подписи'
+    n = 0
+    
     for date, value in zip(dates, values):
-        ax.text(
-            date,
-            value + 5,
-            str(value),
-            ha='center',
-            va='bottom',
-            fontsize=9,
-            color='white',
-            bbox=dict(
-                facecolor='#333333',
-                alpha=0.7,
-                edgecolor='none',
-                boxstyle='round,pad=0.2'
+        if n % 2 == 0:
+            ax.text(
+                date,
+                value + 5,
+                str(value),
+                ha='center',
+                va='bottom',
+                fontsize=9,
+                color='white',
+                bbox=dict(
+                    facecolor='#333333',
+                    alpha=0.7,
+                    edgecolor='none',
+                    boxstyle='round,pad=0.2'
+                )
             )
-        )
+        n += 1
     ax.set_facecolor('#1e1e1e')
     plt.tight_layout()
 
