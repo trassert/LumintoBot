@@ -454,6 +454,19 @@ async def active_check(event):
         days = int(arg)
         text = phrase.stat.chat.format(decline_number(days, 'день'))
         all_data = db.statistic(days=days).get_all()
+        if days >= 7:
+            chart.create_plot(db.statistic().get_raw())
+            n = 1
+            for data in all_data:
+                if n > config.coofs.MaxStatPlayers:
+                    break
+                text += f'{n}. {data[0]} - {data[1]}\n'
+                n += 1
+            return await client.send_file(
+                event.chat_id,
+                chart.chart_path,
+                caption=text
+            )
     except ValueError:
         text = phrase.stat.chat.format('день')
         all_data = db.statistic().get_all()
