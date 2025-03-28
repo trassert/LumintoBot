@@ -1212,6 +1212,22 @@ async def get_enchant(event):
     return await event.reply(phrase.enchant.main.format(desc))
 
 
+@client.on(events.NewMessage(pattern=r'(?i)^/госва$'))
+@client.on(events.NewMessage(pattern=r'(?i)^/государства$'))
+@client.on(events.NewMessage(pattern=r'(?i)^государства$'))
+@client.on(events.NewMessage(pattern=r'(?i)^список госв$'))
+async def states_all(event):
+    data = db.states.get_all()
+    if data == {}:
+        return await event.reply(phrase.state.empty_list)
+    text = phrase.state.all
+    n = 1
+    for state in data:
+        text += f'{n}. **{state}** - {len(data[state]["players"])} чел.\n'
+        n += 1
+    return await event.reply(text)
+
+
 'Эвенты для крокодила'
 
 

@@ -499,6 +499,13 @@ class states:
                 }
             )
 
+    def get_all():
+        all = {}
+        for file in listdir(states_path):
+            with open(path.join(states_path, file), encoding='utf8') as f:
+                all[file.replace('.json', '')] = json.load(f)
+        return dict(sorted(all.items(), key=lambda item: item[1]["money"], reverse=True))
+
 
 class AsyncSQLDatabase:
     def __init__(self, host, user, password, database, table):
