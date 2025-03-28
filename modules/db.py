@@ -12,6 +12,7 @@ from .get_theme import weighted_choice
 nick_path = path.join('db', 'minecraft.json')
 stats_path = path.join('db', 'chat_stats')
 tickets_path = path.join('db', 'tickets.json')
+states_path = path.join('db', 'states')
 times_path = path.join('db', 'time')
 
 
@@ -449,6 +450,54 @@ class ticket:
         ) as f:
             json.dump(data, f, indent=4, ensure_ascii=False, sort_keys=True)
             return True
+
+
+class state:
+    def __init__(self, name):
+        self.name = name
+        if not path.exists(path.join(states_path, f'{name}.json')):
+            return
+        with open(path.join(states_path, f'{name}.json'), encoding='utf8') as f:
+            all = json.load(f)
+        self.all = all
+        self.price = all['price']
+        self.enter = all['enter']
+        self.desc = all['desc']
+        self.players = all['players']
+        self.type = all['type']
+        self.date = all['date']
+        self.author = all['author']
+
+    def change(self, key, value):
+        if not path.exists(path.join(states_path, f'{self.name}.json')):
+            return
+        with open(
+            path.join(states_path, f'{self.name}.json'), 'w', encoding='utf8'
+        ) as f:
+            self.all[key] = value
+            json.dump(
+                self.all, f, indent=4, ensure_ascii=False, sort_keys=True
+            )
+            return True
+
+
+class states:
+    def add(name, author):
+        if path.exists(path.join(states_path, f'{name}.json')):
+            return
+        with open(path.join(states_path, f"{name}.json"), 'w', encoding='utf8') as f:
+            json.dump(
+                {
+                    "price": 0,
+                    "enter": True,
+                    "desc": "Пусто",
+                    "players": [],
+                    "type": 0,
+                    "date": datetime.now().strftime("%Y.%m.%d"),
+                    "money": 0,
+                    "author": author
+                }
+            )
 
 
 class AsyncSQLDatabase:

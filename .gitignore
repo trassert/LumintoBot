@@ -1,4 +1,5 @@
 db/chat_stats/*
+db/states/*
 db/data.json
 db/minecraft.json
 db/money.json
