@@ -433,6 +433,7 @@ async def get_ticket(event):
 @client.on(events.NewMessage(pattern=r'(?i)^/топ в чате(.*)'))
 @client.on(events.NewMessage(pattern=r'(?i)^/актив сервера(.*)'))
 @client.on(events.NewMessage(pattern=r'(?i)^/мчат(.*)'))
+@client.on(events.NewMessage(pattern=r'(?i)^/мстат(.*)'))
 async def active_check(event):
     arg = event.pattern_match.group(1).strip()
     if arg in phrase.all_arg:
