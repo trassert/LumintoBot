@@ -507,7 +507,10 @@ class states:
         all = {}
         for file in listdir(states_path):
             with open(path.join(states_path, file), encoding='utf8') as f:
-                all[file.replace('.json', '')] = json.load(f)
+                try:
+                    all[file.replace('.json', '')] = json.load(f)
+                except json.decoder.JSONDecodeError:
+                    logger.error(f'Не удалось просмотреть гос-во {file}')
         return dict(sorted(all.items(), key=lambda item: item[1]["money"], reverse=True))
 
 
