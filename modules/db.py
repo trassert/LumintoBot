@@ -357,7 +357,7 @@ class statistic:
                 stats, f, indent=4, ensure_ascii=False, sort_keys=True
             )
 
-    def get_raw(self, reverse=False) -> dict[str, int]:
+    def get_raw(self) -> dict[str, int]:
         'Выдаёт {дата: сообщения} от всех'
         'Если days не указан, выдаст все'
         totals = defaultdict(int)
@@ -502,6 +502,7 @@ class states:
                 ensure_ascii=False,
                 sort_keys=True
             )
+            return True
 
     def get_all():
         all = {}

@@ -456,7 +456,7 @@ async def active_check(event):
         text = phrase.stat.chat.format(decline_number(days, 'день'))
         all_data = db.statistic(days=days).get_all()
         if days >= 7:
-            chart.create_plot(db.statistic().get_raw())
+            chart.create_plot(db.statistic(days=days).get_raw())
             n = 1
             for data in all_data:
                 if n > config.coofs.MaxStatPlayers:
@@ -1240,13 +1240,11 @@ async def states_make(event):
         re.fullmatch(r'^[\- ]+$', arg)
     ):
         return await event.reply(phrase.state.not_valid)
-    data = db.states.get_all()
-    if arg in data:
-        return await event.reply(phrase.state.already_here)
     nick = db.nicks(id=event.sender_id).get()
     if nick is None:
         return await event.reply(phrase.state.not_connected)
-    db.states.add(arg, event.sender_id)
+    if db.states.add(arg, event.sender_id) is not True:
+        return await event.reply(phrase.state.already_here)
     await client.send_message(
         entity=config.chats.chat,
         message=phrase.state.make.format(arg),
