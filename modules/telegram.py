@@ -1240,9 +1240,12 @@ async def states_make(event):
         re.fullmatch(r'^[\- ]+$', arg)
     ):
         return await event.reply(phrase.state.not_valid)
-    nick = db.nicks(id=event.sender_id).get()
-    if nick is None:
+    if db.nicks(id=event.sender_id).get() is None:
         return await event.reply(phrase.state.not_connected)
+    if db.states.if_author(event.sender_id):
+        return await event.reply(phrase.state.already_author)
+    if db.states.if_player(event.sender_id):
+        return await event.reply(phrase.state.already_player)
     if db.states.add(arg, event.sender_id) is not True:
         return await event.reply(phrase.state.already_here)
     await client.send_message(
@@ -1251,6 +1254,33 @@ async def states_make(event):
         reply_to=config.chats.topics.rp
     )
     return await event.reply(phrase.state.make.format(arg))
+
+
+@client.on(events.NewMessage(pattern=r'(?i)^/вступить(.*)'))
+@client.on(events.NewMessage(pattern=r'(?i)^вступить(.*)'))
+async def states_enter(event):
+    arg = event.pattern_match.group(1).strip()
+    if arg == '':
+        return await event.reply(phrase.state.no_name)
+    if db.states.find(arg) is False:
+        return await event.reply(phrase.state.not_find)
+    nick = db.nicks(id=event.sender_id).get()
+    if nick is None:
+        return await event.reply(phrase.state.not_connected)
+    state = db.state(arg)
+    players = state.players
+    players.append(event.sender_id)
+    if state.change("players", players) is not True:
+        return await event.reply(phrase.state.error)
+    await client.send_message(
+        entity=config.chats.chat,
+        message=phrase.state.new_player.format(
+            state=state.name,
+            player=nick
+        ),
+        reply_to=config.chats.topics.rp
+    )
+    return await event.reply(phrase.state.admit.format(state.name))
 
 
 'Эвенты для крокодила'

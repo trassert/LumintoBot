@@ -455,8 +455,6 @@ class ticket:
 class state:
     def __init__(self, name):
         self.name = name
-        if not path.exists(path.join(states_path, f'{name}.json')):
-            return
         with open(path.join(states_path, f'{name}.json'), encoding='utf8') as f:
             all = json.load(f)
         self.all = all
@@ -469,8 +467,6 @@ class state:
         self.author = all['author']
 
     def change(self, key, value):
-        if not path.exists(path.join(states_path, f'{self.name}.json')):
-            return
         with open(
             path.join(states_path, f'{self.name}.json'), 'w', encoding='utf8'
         ) as f:
@@ -514,6 +510,25 @@ class states:
                     logger.error(f'Не удалось просмотреть гос-во {file}')
         return dict(sorted(all.items(), key=lambda item: item[1]["money"], reverse=True))
 
+    def if_author(id: int) -> bool:
+        for file in listdir(states_path):
+            with open(path.join(states_path, file), encoding='utf8') as f:
+                if json.load(f)['author'] == id:
+                    return True
+        return False
+
+    def if_player(id: int) -> bool:
+        for file in listdir(states_path):
+            with open(path.join(states_path, file), encoding='utf8') as f:
+                for player in json.load(f)['players']:
+                    if player == id:
+                        return True
+        return False
+
+    def find(name: str) -> bool:
+        if path.exists(path.join(states_path, f'{name}.json')):
+            return True
+        return False
 
 class AsyncSQLDatabase:
     def __init__(self, host, user, password, database, table):
