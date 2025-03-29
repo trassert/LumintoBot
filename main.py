@@ -66,7 +66,7 @@ async def time_to_update_shop():
             theme = db.update_shop()
             logger.info('Изменена тема магазина')
             await telegram.client.send_message(
-                config.tokens.bot.chat,
+                config.chats.chat,
                 phrase.shop.update.format(
                     theme=phrase.shop_quotes[theme]['translate']
                 )
@@ -121,7 +121,7 @@ async def time_to_rewards():
                         config.coofs.ActiveGift
                     )
                     await telegram.client.send_message(
-                        config.tokens.bot.chat,
+                        config.chats.chat,
                         phrase.stat.gift.format(
                             user=top[0],
                             gift=decline_number(config.coofs.ActiveGift, 'изумруд')
@@ -163,7 +163,7 @@ async def web_server():
         else:
             give = ''
         await telegram.client.send_message(
-            config.tokens.bot.chat,
+            config.chats.chat,
             phrase.hotmc.format(nick=nick, money=give),
             link_preview=False
         )
@@ -195,7 +195,7 @@ async def web_server():
         else:
             give = ''
         await telegram.client.send_message(
-            config.tokens.bot.chat,
+            config.chats.chat,
             phrase.servers.format(nick=username, money=give),
             link_preview=False
         )
@@ -219,14 +219,14 @@ async def web_server():
         load = await request.json()
         head = load['head_commit']
         await telegram.client.send_message(
-            config.tokens.bot.chat,
+            config.chats.chat,
             phrase.github.format(
                 author=head["author"]["name"],
                 message=head["message"],
                 url=head["url"]
             ),
             link_preview=False,
-            reply_to=config.tokens.topics.updates
+            reply_to=config.chats.topics.updates
         )
         return aiohttp.web.Response(text='ok')
 

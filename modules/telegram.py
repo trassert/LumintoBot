@@ -183,7 +183,7 @@ async def callback_action(event):
                 f.write(f'\n{data[2]}')
             db.add_money(data[3], config.coofs.WordRequest)
             await client.send_message(
-                config.tokens.bot.chat,
+                config.chats.chat,
                 phrase.word.success.format(
                     word=data[2],
                     user=user_name,
@@ -199,7 +199,7 @@ async def callback_action(event):
             )
         if data[1] == 'no':
             await client.send_message(
-                config.tokens.bot.chat,
+                config.chats.chat,
                 phrase.word.no.format(
                     word=data[2],
                     user=user_name
@@ -295,7 +295,7 @@ async def callback_action(event):
 
             client.add_event_handler(
                 check,
-                events.NewMessage(config.tokens.bot.chat)
+                events.NewMessage(config.chats.chat)
             )
             await asyncio.sleep(config.coofs.CasinoSleepTime)
             if 1 not in response:
@@ -309,13 +309,13 @@ async def callback_action(event):
 'Обработчики событий'
 
 
-@client.on(events.ChatAction(chats=config.tokens.bot.chat))
+@client.on(events.ChatAction(chats=config.chats.chat))
 async def chat_action(event):
     # Если пользователь ушёл из чата
     if event.user_left:
         user_name = await get_name(event.user_id)
         return await client.send_message(
-            config.tokens.bot.chat,
+            config.chats.chat,
             phrase.leave_message.format(
                 user_name
             )
@@ -325,7 +325,7 @@ async def chat_action(event):
 'Обработчик вк-топика'
 
 
-@client.on(events.NewMessage(config.tokens.bot.chat))
+@client.on(events.NewMessage(config.chats.chat))
 async def vk_chat(event):
 
     async def send():
@@ -343,17 +343,17 @@ async def vk_chat(event):
             random_id=0
         )
 
-    if event.reply_to_msg_id == config.tokens.topics.vk:
+    if event.reply_to_msg_id == config.chats.topics.vk:
         return await send()
     if event.reply_to is not None:
-        if event.reply_to.reply_to_top_id == config.tokens.topics.vk:
+        if event.reply_to.reply_to_top_id == config.chats.topics.vk:
             return await send()
 
 
 'Обработчики команд'
 
 
-@client.on(events.NewMessage(config.tokens.bot.chat, pattern=r'(?i)^/казино$'))
+@client.on(events.NewMessage(config.chats.chat, pattern=r'(?i)^/казино$'))
 async def casino(event):
     keyboard = ReplyInlineMarkup(
         [
@@ -685,7 +685,7 @@ async def ping(event):
 @client.on(events.NewMessage(pattern=r'(?i)^/crocodile$'))
 @client.on(events.NewMessage(pattern=r'(?i)^старт крокодил$'))
 async def crocodile(event):
-    if not event.chat_id == config.tokens.bot.chat:
+    if not event.chat_id == config.chats.chat:
         return await event.reply(phrase.default_chat)
     else:
         pass
@@ -785,7 +785,7 @@ async def super_game(event):
     db.database('max_bet', 100)
     db.database('min_bet', 50)
     await client.send_message(
-        config.tokens.bot.chat, phrase.crocodile.super_game_wait
+        config.chats.chat, phrase.crocodile.super_game_wait
     )
     await asyncio.sleep(60)
     db.database(
@@ -802,10 +802,10 @@ async def super_game(event):
     )
     client.add_event_handler(
         crocodile_handler,
-        events.NewMessage(chats=config.tokens.bot.chat)
+        events.NewMessage(chats=config.chats.chat)
     )
     return await client.send_message(
-        config.tokens.bot.chat, phrase.crocodile.super_game
+        config.chats.chat, phrase.crocodile.super_game
     )
 
 
@@ -1228,6 +1228,33 @@ async def states_all(event):
     return await event.reply(text)
 
 
+@client.on(events.NewMessage(pattern=r'(?i)^\+госво(.*)'))
+@client.on(events.NewMessage(pattern=r'(?i)^\+государство(.*)'))
+async def states_make(event):
+    arg = event.pattern_match.group(1).strip()
+    if arg == '':
+        return await event.reply(phrase.state.no_name)
+    if (
+        not re.fullmatch(r'^[а-яА-ЯёЁa-zA-Z\- ]+$', arg)
+    ) or (
+        re.fullmatch(r'^[\- ]+$', arg)
+    ):
+        return await event.reply(phrase.state.not_valid)
+    data = db.states.get_all()
+    if arg in data:
+        return await event.reply(phrase.state.already_here)
+    nick = db.nicks(id=event.sender_id).get()
+    if nick is None:
+        return await event.reply(phrase.state.not_connected)
+    db.states.add(arg, event.sender_id)
+    await client.send_message(
+        entity=config.chats.chat,
+        message=phrase.state.make.format(arg),
+        reply_to=config.chats.topics.rp
+    )
+    return await event.reply(phrase.state.make.format(arg))
+
+
 'Эвенты для крокодила'
 
 
@@ -1355,7 +1382,7 @@ async def crocodile_handler(event):
 if db.database("current_game", log=False) != 0:
     client.add_event_handler(
         crocodile_handler,
-        events.NewMessage(chats=config.tokens.bot.chat)
+        events.NewMessage(chats=config.chats.chat)
     )
     client.add_event_handler(
         crocodile_hint,
