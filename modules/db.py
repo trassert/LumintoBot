@@ -496,7 +496,11 @@ class states:
                     "date": datetime.now().strftime("%Y.%m.%d"),
                     "money": 0,
                     "author": author
-                }
+                },
+                f,
+                indent=4,
+                ensure_ascii=False,
+                sort_keys=True
             )
 
     def get_all():
