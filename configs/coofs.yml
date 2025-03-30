@@ -14,3 +14,7 @@ CrocodileDefaultMaxBet: 5
 CrocodileDefaultMinBet: 1
 
 MaxStatPlayers: 10
+
+Type0Players: 1
+Type1Players: 3
+Type2Players: 5

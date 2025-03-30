@@ -1272,6 +1272,34 @@ async def states_enter(event):
     players.append(event.sender_id)
     if state.change("players", players) is not True:
         return await event.reply(phrase.state.error)
+    if (
+        state.type == 0
+    ) and (
+        len(players) >= config.coofs.Type1Players
+    ):
+        await client.send_message(
+            entity=config.chats.chat,
+            message=phrase.state.up.format(
+                name=state.name,
+                type='Государство'
+            ),
+            reply_to=config.chats.topics.rp
+        )
+        state.change('type', 1)
+    if (
+        state.type == 1
+    ) and (
+        len(players) >= config.coofs.Type2Players
+    ):
+        await client.send_message(
+            entity=config.chats.chat,
+            message=phrase.state.up.format(
+                name=state.name,
+                type='Империя'
+            ),
+            reply_to=config.chats.topics.rp
+        )
+        state.change('type', 2)
     await client.send_message(
         entity=config.chats.chat,
         message=phrase.state.new_player.format(
@@ -1283,16 +1311,18 @@ async def states_enter(event):
     return await event.reply(phrase.state.admit.format(state.name))
 
 
-@client.on(events.NewMessage(pattern=r'(?i)^/госво(.*)'))
-@client.on(events.NewMessage(pattern=r'(?i)^/осударство(.*)'))
-async def states_get(event):
-    arg = event.pattern_match.group(1).strip()
-    if arg == '':
-        return await event.reply(phrase.state.no_name)
-    if db.states.find(arg) is False:
-        return await event.reply(phrase.state.not_find)
-    state = db.state(arg)
-    
+# @client.on(events.NewMessage(pattern=r'(?i)^/госво(.*)'))
+# @client.on(events.NewMessage(pattern=r'(?i)^/осударство(.*)'))
+# async def states_get(event):
+#     arg = event.pattern_match.group(1).strip()
+#     if arg == '':
+#         return await event.reply(phrase.state.no_name)
+#     if db.states.find(arg) is False:
+#         return await event.reply(phrase.state.not_find)
+#     state = db.state(arg)
+#     return await event.answer(
+#         phrase.state.get
+#     )
 
 'Эвенты для крокодила'
 
