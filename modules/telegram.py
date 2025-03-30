@@ -1283,6 +1283,17 @@ async def states_enter(event):
     return await event.reply(phrase.state.admit.format(state.name))
 
 
+@client.on(events.NewMessage(pattern=r'(?i)^/госво(.*)'))
+@client.on(events.NewMessage(pattern=r'(?i)^/осударство(.*)'))
+async def states_get(event):
+    arg = event.pattern_match.group(1).strip()
+    if arg == '':
+        return await event.reply(phrase.state.no_name)
+    if db.states.find(arg) is False:
+        return await event.reply(phrase.state.not_find)
+    state = db.state(arg)
+    
+
 'Эвенты для крокодила'
 
 

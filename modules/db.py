@@ -465,6 +465,7 @@ class state:
         self.type = all['type']
         self.date = all['date']
         self.author = all['author']
+        self.coordinates = all['coordinates']
 
     def change(self, key, value):
         with open(
@@ -491,7 +492,8 @@ class states:
                     "type": 0,
                     "date": datetime.now().strftime("%Y.%m.%d"),
                     "money": 0,
-                    "author": author
+                    "author": author,
+                    "coordinates": "Не найдено"
                 },
                 f,
                 indent=4,
@@ -529,6 +531,7 @@ class states:
         if path.exists(path.join(states_path, f'{name}.json')):
             return True
         return False
+
 
 class AsyncSQLDatabase:
     def __init__(self, host, user, password, database, table):
