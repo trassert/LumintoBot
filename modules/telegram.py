@@ -1244,7 +1244,7 @@ async def states_make(event):
         return await event.reply(phrase.state.not_connected)
     if db.states.if_author(event.sender_id):
         return await event.reply(phrase.state.already_author)
-    if db.states.if_player(event.sender_id):
+    if db.states.if_player(event.sender_id) is not False:
         return await event.reply(phrase.state.already_player)
     if db.states.add(arg, event.sender_id) is not True:
         return await event.reply(phrase.state.already_here)
@@ -1272,6 +1272,14 @@ async def states_enter(event):
     players.append(event.sender_id)
     if state.change("players", players) is not True:
         return await event.reply(phrase.state.error)
+    await client.send_message(
+        entity=config.chats.chat,
+        message=phrase.state.new_player.format(
+            state=state.name,
+            player=nick
+        ),
+        reply_to=config.chats.topics.rp
+    )
     if (
         state.type == 0
     ) and (
@@ -1300,14 +1308,6 @@ async def states_enter(event):
             reply_to=config.chats.topics.rp
         )
         state.change('type', 2)
-    await client.send_message(
-        entity=config.chats.chat,
-        message=phrase.state.new_player.format(
-            state=state.name,
-            player=nick
-        ),
-        reply_to=config.chats.topics.rp
-    )
     return await event.reply(phrase.state.admit.format(state.name))
 
 
@@ -1340,6 +1340,60 @@ async def states_get(event):
             xyz=state.coordinates
         )
     )
+
+
+@client.on(events.NewMessage(pattern=r'(?i)^/ливнуть'))
+@client.on(events.NewMessage(pattern=r'(?i)^/покинуть госво'))
+@client.on(events.NewMessage(pattern=r'(?i)^/покинуть государство'))
+@client.on(events.NewMessage(pattern=r'(?i)^выйти из государства'))
+@client.on(events.NewMessage(pattern=r'(?i)^выйти из госва'))
+@client.on(events.NewMessage(pattern=r'(?i)^/г покинуть'))
+@client.on(events.NewMessage(pattern=r'(?i)^/г выйти'))
+async def states_leave(event):
+    state_name = db.states.if_player(event.sender_id)
+    if state_name is False:
+        return await event.reply(phrase.state.not_a_member)
+    state = db.state(state_name)
+    state.players.remove(event.sender_id)
+    state.change('players', state.players)
+    await client.send_message(
+        entity=config.chats.chat,
+        message=phrase.state.leave_player.format(
+            state=state.name,
+            player=db.nicks(id=event.sender_id).get()
+        ),
+        reply_to=config.chats.topics.rp
+    )
+    if (
+        state.type == 2
+    ) and (
+        len(state.players) < config.coofs.Type2Players
+    ):
+        await client.send_message(
+            entity=config.chats.chat,
+            message=phrase.state.up.format(
+                name=state.name,
+                type='Государство'
+            ),
+            reply_to=config.chats.topics.rp
+        )
+        state.change('type', 1)
+    if (
+        state.type == 1
+    ) and (
+        len(state.players) < config.coofs.Type1Players
+    ):
+        await client.send_message(
+            entity=config.chats.chat,
+            message=phrase.state.up.format(
+                name=state.name,
+                type='Княжество'
+            ),
+            reply_to=config.chats.topics.rp
+        )
+        state.change('type', 0)
+    return await event.reply(phrase.state.leave)
+
 
 'Эвенты для крокодила'
 

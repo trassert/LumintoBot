@@ -525,7 +525,7 @@ class states:
             with open(path.join(states_path, file), encoding='utf8') as f:
                 for player in json.load(f)['players']:
                     if player == id:
-                        return True
+                        return file.replace('.json', '')
         return False
 
     def find(name: str) -> bool:
