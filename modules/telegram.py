@@ -1311,18 +1311,35 @@ async def states_enter(event):
     return await event.reply(phrase.state.admit.format(state.name))
 
 
-# @client.on(events.NewMessage(pattern=r'(?i)^/госво(.*)'))
-# @client.on(events.NewMessage(pattern=r'(?i)^/осударство(.*)'))
-# async def states_get(event):
-#     arg = event.pattern_match.group(1).strip()
-#     if arg == '':
-#         return await event.reply(phrase.state.no_name)
-#     if db.states.find(arg) is False:
-#         return await event.reply(phrase.state.not_find)
-#     state = db.state(arg)
-#     return await event.answer(
-#         phrase.state.get
-#     )
+@client.on(events.NewMessage(pattern=r'(?i)^/госво(.*)'))
+@client.on(events.NewMessage(pattern=r'(?i)^/государство(.*)'))
+async def states_get(event):
+    arg = event.pattern_match.group(1).strip()
+    if arg == '':
+        return await event.reply(phrase.state.no_name)
+    if db.states.find(arg) is False:
+        return await event.reply(phrase.state.not_find)
+    state = db.state(arg)
+    enter = "Свободный" if state.enter else "Закрыт"
+    if state.price > 0:
+        enter = decline_number(state.price, 'изумруд')
+
+    def ident_player(id):
+        return db.nicks(id=id).get()
+    return await event.reply(
+        phrase.state.get.format(
+            type=phrase.state_types[state.type],
+            name=state.name,
+            money=state.money,
+            author=db.nicks(id=state.author).get(),
+            enter=enter,
+            desc=state.desc,
+            date=state.date,
+            players=len(state.players),
+            list_players=', '.join(list(map(ident_player, state.players))),
+            xyz=state.coordinates
+        )
+    )
 
 'Эвенты для крокодила'
 

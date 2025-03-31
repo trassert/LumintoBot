@@ -466,6 +466,7 @@ class state:
         self.date = all['date']
         self.author = all['author']
         self.coordinates = all['coordinates']
+        self.money = all['money']
 
     def change(self, key, value):
         with open(
