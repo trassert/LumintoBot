@@ -1403,6 +1403,23 @@ async def states_leave(event):
     return await event.reply(phrase.state.leave)
 
 
+@client.on(events.NewMessage(pattern=r'(?i)^/г описание$'))
+@client.on(events.NewMessage(pattern=r'(?i)^/о госве$'))
+async def states_desc_empty(event):
+    return await event.reply(phrase.state.no_desc)
+
+
+@client.on(events.NewMessage(pattern=r'(?i)^/г описание\s(.+)'))
+@client.on(events.NewMessage(pattern=r'(?i)^/о госве\s(.+)'))
+async def states_desc(event):
+    state_name = db.states.if_author(event.sender_id)
+    if state_name is False:
+        return await event.reply(phrase.state.not_a_author)
+    new_desc = event.pattern_match.group(1).strip()
+    db.state(state_name).change('desc', new_desc)
+    return await event.reply(phrase.state.change_desc)
+
+
 'Эвенты для крокодила'
 
 
