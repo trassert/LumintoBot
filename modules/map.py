@@ -1,8 +1,5 @@
 import folium
 import aiohttp
-import io
-
-from PIL import Image
 
 from .ip import get_loc, ident_v4
 from .ai import ai_servers

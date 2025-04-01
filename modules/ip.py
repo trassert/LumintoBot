@@ -3,7 +3,6 @@ import asyncio
 import json
 import socket
 
-from traceback import format_exc
 from loguru import logger
 
 from .db import database

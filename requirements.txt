@@ -1,0 +1,14 @@
+nest_asyncio
+orjson
+loguru
+aiohttp
+telethon
+requests
+matplotlib
+seaborn
+bestconfig
+aiomysql
+pymorphy3
+folium
+psutil
+vkbottle
