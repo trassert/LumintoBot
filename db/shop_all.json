@@ -499,9 +499,9 @@
             "price": 8,
             "value": 32
         },
-        "Кузнечный шаблон": {
+        "Кузнечный шаблон «Молния»": {
             "name": "minecraft:bolt_armor_trim_smithing_template",
-            "price": 40,
+            "price": 26,
             "value": 1
         },
         "Пузырёк опыта": {

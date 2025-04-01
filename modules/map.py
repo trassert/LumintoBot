@@ -71,4 +71,4 @@ async def get_full_map():
                 weight=2.5,
                 opacity=0.8
             ).add_to(map)
-    # ! TODO
+    map.save('map.html')
