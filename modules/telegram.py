@@ -1242,7 +1242,7 @@ async def states_make(event):
         return await event.reply(phrase.state.not_valid)
     if db.nicks(id=event.sender_id).get() is None:
         return await event.reply(phrase.state.not_connected)
-    if db.states.if_author(event.sender_id):
+    if db.states.if_author(event.sender_id) is not False:
         return await event.reply(phrase.state.already_author)
     if db.states.if_player(event.sender_id) is not False:
         return await event.reply(phrase.state.already_player)
@@ -1267,11 +1267,12 @@ async def states_enter(event):
     nick = db.nicks(id=event.sender_id).get()
     if nick is None:
         return await event.reply(phrase.state.not_connected)
+    if db.states.if_player(event.sender_id) is not False:
+        return await event.reply(phrase.state.already_player)
     state = db.state(arg)
     players = state.players
     players.append(event.sender_id)
-    if state.change("players", players) is not True:
-        return await event.reply(phrase.state.error)
+    state.change("players", players)
     await client.send_message(
         entity=config.chats.chat,
         message=phrase.state.new_player.format(
@@ -1316,7 +1317,14 @@ async def states_enter(event):
 async def states_get(event):
     arg = event.pattern_match.group(1).strip()
     if arg == '':
-        return await event.reply(phrase.state.no_name)
+        player_in = db.states.if_player(event.sender_id)
+        if player_in is not False:
+            arg = player_in
+        author_in = db.states.if_author(event.sender_id)
+        if author_in is not False:
+            arg = author_in
+        else:
+            return await event.reply(phrase.state.no_name)
     if db.states.find(arg) is False:
         return await event.reply(phrase.state.not_find)
     state = db.state(arg)

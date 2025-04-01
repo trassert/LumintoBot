@@ -476,7 +476,6 @@ class state:
             json.dump(
                 self.all, f, indent=4, ensure_ascii=False, sort_keys=True
             )
-            return True
 
 
 class states:
@@ -517,7 +516,7 @@ class states:
         for file in listdir(states_path):
             with open(path.join(states_path, file), encoding='utf8') as f:
                 if json.load(f)['author'] == id:
-                    return True
+                    return file.replace('.json', '')
         return False
 
     def if_player(id: int) -> bool:
