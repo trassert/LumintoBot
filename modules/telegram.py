@@ -1420,6 +1420,29 @@ async def states_desc(event):
     return await event.reply(phrase.state.change_desc)
 
 
+@client.on(events.NewMessage(pattern=r'(?i)^/г корды$'))
+@client.on(events.NewMessage(pattern=r'(?i)^/г координаты$'))
+async def states_coords_empty(event):
+    return await event.reply(phrase.state.howto_change_coords)
+
+
+@client.on(events.NewMessage(pattern=r'(?i)^/г корды\s(.+)'))
+@client.on(events.NewMessage(pattern=r'(?i)^/г координаты\s(.+)'))
+async def states_coords(event):
+    state_name = db.states.if_author(event.sender_id)
+    if state_name is False:
+        return await event.reply(phrase.state.not_a_author)
+    arg = event.pattern_match.group(1).strip()
+    try:
+        arg = list(map(int, arg.split()))
+    except ValueError:
+        return await event.reply(phrase.state.howto_change_coords)
+    if len(arg) != 3:
+        return await event.reply(phrase.state.howto_change_coords)
+    db.state(state_name).change('coordinates', ", ".join(list(map(str, arg))))
+    return await event.reply(phrase.state.change_coords)
+
+
 'Эвенты для крокодила'
 
 
