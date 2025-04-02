@@ -401,7 +401,7 @@ async def vk_chat(event):
         else:
             user_name = user_name.first_name + " " + user_name.last_name
         logger.info(f"ТГ>ВК: {user_name} > {event.text}")
-        await vk.vk.api.messages.send(
+        await vk.client.api.messages.send(
             chat_id=config.tokens.vk.chat_id,
             message=f'{user_name}: {event.text}',
             random_id=0
@@ -891,28 +891,17 @@ async def gemini(event):
         return await event.reply(response)
 
 
-@client.on(events.NewMessage(pattern=r'f/|p/'))
+@client.on(events.NewMessage(pattern=r'//\s(.+)'))
 async def mcrcon(event):
-    if event.text[0] == 'f':
-        host = db.database('ipv4')
-        port = config.tokens.rcon.port_fabric
-        password = config.tokens.rcon
-    elif event.text[0] == 'p':
-        host = db.database('ipv4')
-        port = config.tokens.rcon.port
-        password = config.tokens.rcon.password
-    else:
-        return await event.reply(phrase.no.server)
-
     if event.sender_id not in db.database('admins_id'):
         return await event.reply(phrase.perms.no)
-    command = event.text[2:]
+    command = event.pattern_match.group(1).strip()
     logger.info(f'Выполняется команда: {command}')
     try:
         async with MinecraftClient(
-            host=host,
-            port=port,
-            password=password
+            host=db.database('ipv4'),
+            port=config.tokens.rcon.port,
+            password=config.tokens.rcon.password
         ) as rcon:
             resp = remove_section_marks(await rcon.send(command))
             logger.info(f'Ответ команды:\n{resp}')

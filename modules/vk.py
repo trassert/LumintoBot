@@ -9,7 +9,7 @@ from . import phrase
 from . import telegram
 
 
-vk = Bot(token=config.tokens.vk.token)
+client = Bot(token=config.tokens.vk.token)
 
 
 class CaseRule(ABCRule[Message]):
@@ -20,19 +20,19 @@ class CaseRule(ABCRule[Message]):
         return message.text.lower() == self.command
 
 
-@vk.on.message(text='/ip')
-@vk.on.message(text='/айпи')
-@vk.on.message(text='/хост')
-@vk.on.message(CaseRule('/host'))
+@client.on.message(text='/ip')
+@client.on.message(text='/айпи')
+@client.on.message(text='/хост')
+@client.on.message(CaseRule('/host'))
 async def host(message: Message):
     logger.info('Запрошен IP в ВК')
     await message.answer(phrase.server.host.format(db.database("host")))
 
 
-@vk.on.chat_message()
+@client.on.chat_message()
 async def tg_chat(message: Message):
     try:
-        user_info = await vk.api.users.get(user_ids=message.from_id)
+        user_info = await client.api.users.get(user_ids=message.from_id)
         name = '{} {}'.format(user_info[0].first_name, user_info[0].last_name)
     except IndexError:
         return logger.info('Юзер не найден, пропускаем')

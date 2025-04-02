@@ -256,7 +256,7 @@ async def main():
             await web_server()
             await asyncio.gather(
                 telegram.client.start(bot_token=config.tokens.bot.token),
-                vk.vk.run_polling(),
+                vk.client.run_polling(),
                 time_to_update_shop(),
                 ip.observe(),
                 time_to_rewards()
