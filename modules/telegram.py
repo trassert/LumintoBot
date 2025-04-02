@@ -1246,6 +1246,7 @@ async def states_make(event):
         return await event.reply(phrase.state.already_author)
     if db.states.if_player(event.sender_id) is not False:
         return await event.reply(phrase.state.already_player)
+    arg = arg.capitalize()
     if db.states.add(arg, event.sender_id) is not True:
         return await event.reply(phrase.state.already_here)
     await client.send_message(
