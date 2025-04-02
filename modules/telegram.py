@@ -891,7 +891,7 @@ async def gemini(event):
         return await event.reply(response)
 
 
-@client.on(events.NewMessage(pattern=r'//\s(.+)'))
+@client.on(events.NewMessage(pattern=r'//(.+)'))
 async def mcrcon(event):
     if event.sender_id not in db.database('admins_id'):
         return await event.reply(phrase.perms.no)
@@ -910,6 +910,29 @@ async def mcrcon(event):
                     await event.reply(f'```{resp[x:x+4096]}```')
             else:
                 return await event.reply(f'```{resp}```')
+    except TimeoutError:
+        return await event.reply(phrase.server.stopped)
+
+
+@client.on(events.NewMessage(pattern=r'(?i)^\+вт\s(.+)'))
+@client.on(events.NewMessage(pattern=r'(?i)^\-вт\s(.+)'))
+async def whitelist(event):
+    if event.sender_id not in db.database('admins_id'):
+        return await event.reply(phrase.perms.no)
+    if event.text[0] == '-':
+        command = f'swl remove {event.pattern_match.group(1).strip()}'
+    else:
+        command = f'swl add {event.pattern_match.group(1).strip()}'
+    logger.info(f'Выполняется команда: {command}')
+    try:
+        async with MinecraftClient(
+            host=db.database('ipv4'),
+            port=config.tokens.rcon.port,
+            password=config.tokens.rcon.password
+        ) as rcon:
+            resp = remove_section_marks(await rcon.send(command))
+            logger.info(f'Ответ команды:\n{resp}')
+            return await event.reply(f'✍🏻 : {resp}')
     except TimeoutError:
         return await event.reply(phrase.server.stopped)
 
