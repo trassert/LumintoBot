@@ -317,7 +317,7 @@ async def callback_action(event):
             if state.price > balance:
                 return await event.answer(
                     phrase.money.not_enough.format(
-                        decline_number(sender_balance, 'изумруд')
+                        decline_number(balance, 'изумруд')
                     ),
                     alert=True
                 )
@@ -362,7 +362,7 @@ async def callback_action(event):
                     reply_to=config.chats.topics.rp
                 )
                 state.change('type', 2)
-            return await event.alert(
+            return await event.answer(
                 phrase.state.admit.format(state.name),
                 alert=True
             )
@@ -750,7 +750,7 @@ async def ping(event):
 @client.on(events.NewMessage(pattern=r'(?i)^старт крокодил$'))
 async def crocodile(event):
     if not event.chat_id == config.chats.chat:
-        return await event.reply(phrase.default_chat)
+        return await event.reply(phrase.crocodile.chat)
     else:
         pass
     if db.database("current_game") == 0:
