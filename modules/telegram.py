@@ -304,6 +304,70 @@ async def callback_action(event):
                         await get_name(event.sender_id)
                     )
                 )
+    elif data[0] == 'state':
+        if data[1] == 'pay':
+            nick = db.nicks(id=event.sender_id).get()
+            if nick is None:
+                return await event.answer(
+                    phrase.state.not_connected,
+                    alert=True
+                )
+            balance = db.get_money(event.sender_id)
+            state = db.state(data[2])
+            if state.price > balance:
+                return await event.answer(
+                    phrase.money.not_enough.format(
+                        decline_number(sender_balance, 'изумруд')
+                    ),
+                    alert=True
+                )
+            db.add_money(event.sender_id, -state.price)
+            state.change('money', state.money+state.price)
+            players = state.players
+            players.append(event.sender_id)
+            state.change("players", players)
+            await client.send_message(
+                entity=config.chats.chat,
+                message=phrase.state.new_player.format(
+                    state=state.name,
+                    player=nick
+                ),
+                reply_to=config.chats.topics.rp
+            )
+            if (
+                state.type == 0
+            ) and (
+                len(players) >= config.coofs.Type1Players
+            ):
+                await client.send_message(
+                    entity=config.chats.chat,
+                    message=phrase.state.up.format(
+                        name=state.name,
+                        type='Государство'
+                    ),
+                    reply_to=config.chats.topics.rp
+                )
+                state.change('type', 1)
+            if (
+                state.type == 1
+            ) and (
+                len(players) >= config.coofs.Type2Players
+            ):
+                await client.send_message(
+                    entity=config.chats.chat,
+                    message=phrase.state.up.format(
+                        name=state.name,
+                        type='Империя'
+                    ),
+                    reply_to=config.chats.topics.rp
+                )
+                state.change('type', 2)
+            return await event.alert(
+                phrase.state.admit.format(state.name),
+                alert=True
+            )
+    else:
+        pass
 
 
 'Обработчики событий'
@@ -1234,6 +1298,8 @@ async def states_make(event):
     arg = event.pattern_match.group(1).strip()
     if arg == '':
         return await event.reply(phrase.state.no_name)
+    if len(arg) > 28:
+        return await event.reply(phrase.state.too_long)
     if (
         not re.fullmatch(r'^[а-яА-ЯёЁa-zA-Z\- ]+$', arg)
     ) or (
@@ -1271,6 +1337,22 @@ async def states_enter(event):
     if db.states.if_player(event.sender_id) is not False:
         return await event.reply(phrase.state.already_player)
     state = db.state(arg)
+    if state.price != 0:
+        return await event.reply(
+            phrase.state.pay_to_enter,
+            buttons=ReplyInlineMarkup(
+                [
+                    KeyboardButtonRow(
+                        [
+                            KeyboardButtonCallback(
+                                text=f"✅ Оплатить вход ({state.price})",
+                                data=f'state.pay.{state.name}'.encode()
+                            )
+                        ]
+                    )
+                ]
+            )
+        )
     players = state.players
     players.append(event.sender_id)
     state.change("players", players)
