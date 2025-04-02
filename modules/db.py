@@ -510,7 +510,13 @@ class states:
                     all[file.replace('.json', '')] = json.load(f)
                 except json.decoder.JSONDecodeError:
                     logger.error(f'Не удалось просмотреть гос-во {file}')
-        return dict(sorted(all.items(), key=lambda item: item[1]["money"], reverse=True))
+        return dict(
+            sorted(
+                all.items(),
+                key=lambda item: len(item[1]["players"]),
+                reverse=True
+            )
+        )
 
     def if_author(id: int) -> bool:
         for file in listdir(states_path):
