@@ -111,8 +111,8 @@
             "value": 1
         },
         "Дополнительные жизни IV (книга)": {
-            "name": "enchanted_book[stored_enchantments={levels:{\"enchantencore:rejuvenation\":1}}]",
-            "price": 34,
+            "name": "enchanted_book[stored_enchantments={levels:{\"enchantencore:rejuvenation\":4}}]",
+            "price": 36,
             "value": 1
         }
     },
