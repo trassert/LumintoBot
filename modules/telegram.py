@@ -268,12 +268,12 @@ async def callback_action(event):
                     )
                     db.add_money(
                         message.sender_id,
-                        config.coofs.PriceForCasino*2
+                        config.coofs.PriceForCasino*config.coofs.CasinoWinRatio
                     )
                     await asyncio.sleep(2)
                     await message.reply(
                         phrase.casino.win.format(
-                            config.coofs.PriceForCasino*2
+                            config.coofs.PriceForCasino*config.coofs.CasinoWinRatio
                         )
                     )
                 elif (
