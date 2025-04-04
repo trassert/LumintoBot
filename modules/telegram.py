@@ -73,7 +73,9 @@ async def callback_action(event):
                 )
             if db.database("current_game") != 0:
                 return await event.answer(phrase.crocodile.no, alert=True)
-            with open("db\\crocodile_words.txt", 'r', encoding='utf8') as f:
+            with open(
+                path.join(["db", "crocodile_words.txt"]), 'r', encoding='utf8'
+            ) as f:
                 word = choice(f.read().split('\n'))
             unsec = ""
             for x in list(word):
