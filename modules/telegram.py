@@ -916,6 +916,8 @@ async def mcrcon(event):
 
 @client.on(events.NewMessage(pattern=r'(?i)^\+вт\s(.+)'))
 @client.on(events.NewMessage(pattern=r'(?i)^\-вт\s(.+)'))
+@client.on(events.NewMessage(pattern=r'(?i)^\+wl\s(.+)'))
+@client.on(events.NewMessage(pattern=r'(?i)^\-wl\s(.+)'))
 async def whitelist(event):
     if event.sender_id not in db.database('admins_id'):
         return await event.reply(phrase.perms.no)
@@ -1337,6 +1339,8 @@ async def states_make(event):
 
 @client.on(events.NewMessage(pattern=r'(?i)^/вступить(.*)'))
 @client.on(events.NewMessage(pattern=r'(?i)^вступить(.*)'))
+@client.on(events.NewMessage(pattern=r'(?i)^/г вступить(.*)'))
+@client.on(events.NewMessage(pattern=r'(?i)^/г войти(.*)'))
 async def states_enter(event):
     arg = event.pattern_match.group(1).strip()
     if arg == '':
@@ -1500,12 +1504,14 @@ async def states_leave(event):
 
 @client.on(events.NewMessage(pattern=r'(?i)^/г описание$'))
 @client.on(events.NewMessage(pattern=r'(?i)^/о госве$'))
+@client.on(events.NewMessage(pattern=r'(?i)^/г о госве$'))
 async def states_desc_empty(event):
     return await event.reply(phrase.state.no_desc)
 
 
 @client.on(events.NewMessage(pattern=r'(?i)^/г описание\s(.+)'))
 @client.on(events.NewMessage(pattern=r'(?i)^/о госве\s(.+)'))
+@client.on(events.NewMessage(pattern=r'(?i)^/г о госве\s(.+)'))
 async def states_desc(event):
     state_name = db.states.if_author(event.sender_id)
     if state_name is False:

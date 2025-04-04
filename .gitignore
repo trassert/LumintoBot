@@ -20,5 +20,7 @@ charts/*
 test.*
 
 **/__pycache__/
+.venv
+.env
 
 tokens.yml
