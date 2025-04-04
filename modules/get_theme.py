@@ -3,8 +3,7 @@ from loguru import logger
 
 
 def weighted_choice(strings, weights):
-    if not isinstance(strings, list) or \
-            not all(isinstance(s, str) for s in strings):
+    if not isinstance(strings, list) or not all(isinstance(s, str) for s in strings):
         logger.error("Strings должен быть списком строк.")
         return None
 
@@ -15,8 +14,7 @@ def weighted_choice(strings, weights):
 
     # Проверка, что все ключи в weights есть в strings и веса - числа
     valid_weights = {
-        k: v for k, v in weights.items()
-        if k in strings and isinstance(v, (int, float))
+        k: v for k, v in weights.items() if k in strings and isinstance(v, (int, float))
     }
     if not all(v >= 0 for v in valid_weights.values()):
         logger.error("Веса должны быть неотрицательными числами.")

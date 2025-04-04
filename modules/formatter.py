@@ -18,21 +18,17 @@ def decline_number(number, noun):
     p = morph.parse(noun)[0]
 
     if number == 1:
-        word = p.inflect({'nomn', 'sing'}).word
+        word = p.inflect({"nomn", "sing"}).word
     elif 2 <= number <= 4:
-        word = p.inflect({'gent', 'sing'}).word
+        word = p.inflect({"gent", "sing"}).word
     else:
-        word = p.inflect({'gent', 'plur'}).word
+        word = p.inflect({"gent", "plur"}).word
     return f"{number} {word}"
 
 
 def formatter(text):
     text = re.sub(r"\\boxed\{.*?\}", "", text)
-    return text.replace(
-        '$', '**'
-    ).replace(
-        '\\cdot', '×'  # ! Экранизация необходима
-    )
+    return text.replace("$", "**").replace("\\cdot", "×")  # ! Экранизация необходима
 
 
 def remove_section_marks(text):

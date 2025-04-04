@@ -6,8 +6,8 @@ from .ai import ai_servers
 from .db import AsyncSQLDatabase
 from .config import tokens
 
-'Модуль, созданный для отображения карты подключений'
-'Необходима база Authy'
+"Модуль, созданный для отображения карты подключений"
+"Необходима база Authy"
 
 
 players = {}
@@ -25,7 +25,7 @@ async def get_full_map():
         user=tokens.mysql.user,
         password=tokens.mysql.password,
         database=tokens.mysql.database,
-        table=tokens.mysql.table
+        table=tokens.mysql.table,
     )
     await authy.connect()
     for player in await authy.get():
@@ -38,34 +38,26 @@ async def get_full_map():
             me.append(me_loc[1])
     map = folium.Map(location=me, zoom_start=5)
     folium.Marker(
-        location=me,
-        popup="Сервер",
-        icon=folium.Icon(color="red", icon="server")
+        location=me, popup="Сервер", icon=folium.Icon(color="red", icon="server")
     ).add_to(map)
     for nick in players:
         if players[nick] is not None:
             folium.Marker(
                 location=players[nick],
                 popup=nick,
-                icon=folium.Icon(color="blue", icon="user")
+                icon=folium.Icon(color="blue", icon="user"),
             ).add_to(map)
             folium.PolyLine(
-                locations=[players[nick], me],
-                color="green",
-                weight=2.5,
-                opacity=0.8
+                locations=[players[nick], me], color="green", weight=2.5, opacity=0.8
             ).add_to(map)
     for server in servers:
         if servers[server] is not None:
             folium.Marker(
                 location=servers[server],
                 popup=server,
-                icon=folium.Icon(color="red", icon="server")
+                icon=folium.Icon(color="red", icon="server"),
             ).add_to(map)
             folium.PolyLine(
-                locations=[servers[server], me],
-                color="green",
-                weight=2.5,
-                opacity=0.8
+                locations=[servers[server], me], color="green", weight=2.5, opacity=0.8
             ).add_to(map)
-    map.save('map.html')
+    map.save("map.html")

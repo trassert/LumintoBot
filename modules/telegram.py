@@ -46,7 +46,7 @@ client = TelegramClient(
 
 
 async def get_name(id):
-    'Выдает @пуш, если нет - имя + фамилия'
+    "Выдает @пуш, если нет - имя + фамилия"
     user_name = await client.get_entity(int(id))
     if user_name.username is None:
         if user_name.last_name is None:
@@ -54,7 +54,7 @@ async def get_name(id):
         else:
             user_name = user_name.first_name + " " + user_name.last_name
     else:
-        user_name = '@'+user_name.username
+        user_name = "@" + user_name.username
     return user_name
 
 

@@ -9,12 +9,12 @@ def get_system_info():
     days = int(uptime_seconds / (24 * 3600))
     hours = int((uptime_seconds % (24 * 3600)) / 3600)
     minutes = int((uptime_seconds % 3600) / 60)
-    result = ''
+    result = ""
     if days > 0:
-        result += f'{days} дн. '
+        result += f"{days} дн. "
     if hours > 0:
-        result += f'{hours:02} ч. '
-    result += f'{minutes} мин.'
+        result += f"{hours:02} ч. "
+    result += f"{minutes} мин."
     cpu_freq = int(psutil.cpu_freq().current)
     cpu_cores_phys = psutil.cpu_count(logical=False)
     cpu_cores_log = psutil.cpu_count(logical=True)
@@ -23,12 +23,12 @@ def get_system_info():
     mem_avail = psutil.virtual_memory().available / (1024 * 1024 * 1024)
     mem_used = psutil.virtual_memory().used / (1024 * 1024 * 1024)
     mem_percent = psutil.virtual_memory().percent
-    disk_usage = psutil.disk_usage('/')
+    disk_usage = psutil.disk_usage("/")
     disk_total = disk_usage.total / (1024 * 1024 * 1024)
     disk_used = disk_usage.used / (1024 * 1024 * 1024)
     disk_free = disk_usage.free / (1024 * 1024 * 1024)
     disk_percent = disk_usage.percent
-    system_info = f'''⚙️ : Информация о хостинге:
+    system_info = f"""⚙️ : Информация о хостинге:
     Время работы: {result}
     Процессор:
         Частота: {cpu_freq} МГц
@@ -44,5 +44,5 @@ def get_system_info():
         Используется: {disk_used:.1f} ГБ
         Свободно: {disk_free:.1f} ГБ
         Загрузка: {disk_percent} %
-    '''
+    """
     return system_info
