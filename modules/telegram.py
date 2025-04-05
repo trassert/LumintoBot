@@ -10,7 +10,7 @@ from time import time
 from telethon.tl.types import (
     ReplyInlineMarkup,
     KeyboardButtonRow,
-    KeyboardButtonCallback
+    KeyboardButtonCallback,
 )
 from telethon import events
 from telethon.sync import TelegramClient
@@ -29,7 +29,7 @@ from .system_info import get_system_info
 from .mcrcon import MinecraftClient
 from .ai import ai_response, ai_servers
 from .diff import get_enchant_desc
-from .formatter import decline_number, remove_section_marks 
+from .formatter import decline_number, remove_section_marks
 
 
 client = TelegramClient(
@@ -45,17 +45,26 @@ client = TelegramClient(
 'Вспомогательные функции'
 
 
-async def get_name(id):
+async def get_name(id, push=True):
     "Выдает @пуш, если нет - имя + фамилия"
-    user_name = await client.get_entity(int(id))
-    if user_name.username is None:
-        if user_name.last_name is None:
-            user_name = user_name.first_name
+    try:
+        user_name = await client.get_entity(int(id))
+        if user_name.username is None or push is False:
+            if user_name.last_name is None:
+                user_name = (
+                    f"[{user_name.first_name}]"
+                    f"(tg://user?id={id})"
+                )
+            else:
+                user_name = (
+                    f"[{user_name.first_name} {user_name.last_name}]"
+                    f"(tg://user?id={id})"
+                )
         else:
-            user_name = user_name.first_name + " " + user_name.last_name
-    else:
-        user_name = "@" + user_name.username
-    return user_name
+            user_name = "@" + user_name.username
+        return user_name
+    except Exception as e:
+        return 'Неопознанный персонаж'
 
 
 'Кнопки бота'
@@ -691,7 +700,17 @@ async def sysinfo(event):
 @client.on(events.NewMessage(pattern=r'(?i)^команды$'))
 @client.on(events.NewMessage(pattern=r'(?i)^бот помощь$'))
 async def help(event):
-    await event.reply(phrase.help.comm, link_preview=True)
+    return await event.reply(phrase.help.comm, link_preview=True)
+
+
+@client.on(events.NewMessage(pattern=r'(?i)^/start$'))
+@client.on(events.NewMessage(pattern=r'(?i)^/старт$'))
+async def start(event):
+    return await event.reply(
+        phrase.start.format(
+            get_name(event.sender_id)
+        )
+    )
 
 
 @client.on(events.NewMessage(pattern=r'(?i)^/пинг(.*)'))
@@ -1178,14 +1197,7 @@ async def crocodile_wins(event):
     for id in all.keys():
         if n > 10:
             break
-        try:
-            entity = await client.get_entity(int(id))
-            name = entity.first_name
-            if entity.last_name is not None:
-                name += f' {entity.last_name}'
-        except:
-            name = 'Неопознанный персонаж'
-        text += f'{n}. {name}: {all[id]}\n'
+        text += f'{n}. {await get_name(id, push=False)}: {all[id]}\n'
         n += 1
     return await event.reply(
         phrase.crocodile.stat.format(text)
@@ -1432,9 +1444,11 @@ async def states_get(event):
     enter = "Свободный" if state.enter else "Закрыт"
     if state.price > 0:
         enter = decline_number(state.price, 'изумруд')
-
     def ident_player(id):
-        return db.nicks(id=id).get()
+        return (
+            f"[{db.nicks(id=id).get()}]"
+            f"(tg://user?id={id})"
+        )
     return await event.reply(
         phrase.state.get.format(
             type=phrase.state_types[state.type],
@@ -1545,6 +1559,12 @@ async def states_coords(event):
     db.state(state_name).change('coordinates', ", ".join(list(map(str, arg))))
     return await event.reply(phrase.state.change_coords)
 
+
+@client.on(events.NewMessage(pattern=r'(?i)^/тест\s(.+)'))
+async def test(event):
+    if event.sender_id not in db.database('admins_id'):
+        return await event.reply(phrase.perms.no)
+    return event.reply(event.stringify())
 
 'Эвенты для крокодила'
 
@@ -1672,10 +1692,8 @@ async def crocodile_handler(event):
 
 if db.database("current_game", log=False) != 0:
     client.add_event_handler(
-        crocodile_handler,
-        events.NewMessage(chats=config.chats.chat)
+        crocodile_handler, events.NewMessage(chats=config.chats.chat)
     )
     client.add_event_handler(
-        crocodile_hint,
-        events.NewMessage(pattern=r'(?i)^/подсказка$')
+        crocodile_hint, events.NewMessage(pattern=r"(?i)^/подсказка$")
     )
