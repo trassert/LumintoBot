@@ -1564,7 +1564,7 @@ async def states_coords(event):
 @client.on(events.NewMessage(pattern=r'(?i)^/time$'))
 @client.on(events.NewMessage(pattern=r'(?i)^/время$'))
 @client.on(events.NewMessage(pattern=r'(?i)^/мск$'))
-@client.on(events.NewMessage(pattern=r'(?i)^/мск$'))
+@client.on(events.NewMessage(pattern=r'(?i)^/msk$'))
 async def time(event):
     return await event.reply(phrase.time.format(datetime.now().strftime("%H:%M:%S")))
 
