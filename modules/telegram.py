@@ -4,8 +4,9 @@ import aiohttp
 
 from os import path
 from loguru import logger
-from random import choice, randint, random
+from random import choice
 from time import time
+from datetime import datetime
 
 from telethon.tl.types import (
     ReplyInlineMarkup,
@@ -1558,6 +1559,14 @@ async def states_coords(event):
         return await event.reply(phrase.state.howto_change_coords)
     db.state(state_name).change('coordinates', ", ".join(list(map(str, arg))))
     return await event.reply(phrase.state.change_coords)
+
+
+@client.on(events.NewMessage(pattern=r'(?i)^/time$'))
+@client.on(events.NewMessage(pattern=r'(?i)^/время$'))
+@client.on(events.NewMessage(pattern=r'(?i)^/мск$'))
+@client.on(events.NewMessage(pattern=r'(?i)^/мск$'))
+async def time(event):
+    return await event.reply(phrase.time.format(datetime.now().strftime("%H:%M:%S")))
 
 
 @client.on(events.NewMessage(pattern=r'(?i)^/тест\s(.+)'))
