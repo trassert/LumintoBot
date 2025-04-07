@@ -4,7 +4,7 @@ import aiohttp
 
 from os import path
 from loguru import logger
-from random import choice
+from random import choice, random, randint
 from time import time
 from datetime import datetime
 
@@ -46,24 +46,30 @@ client = TelegramClient(
 'Вспомогательные функции'
 
 
-async def get_name(id, push=True):
+async def get_name(id, push=True, minecraft=False):
     "Выдает @пуш, если нет - имя + фамилия"
     try:
+        if minecraft is True:
+            nick = db.nicks(id=int(id)).get()
+            if nick is not None:
+                return (
+                    f"[{nick}]"
+                    f"(tg://user?id={id})"
+                )
         user_name = await client.get_entity(int(id))
         if user_name.username is None or push is False:
             if user_name.last_name is None:
-                user_name = (
+                return (
                     f"[{user_name.first_name}]"
                     f"(tg://user?id={id})"
                 )
             else:
-                user_name = (
+                return (
                     f"[{user_name.first_name} {user_name.last_name}]"
                     f"(tg://user?id={id})"
                 )
         else:
-            user_name = "@" + user_name.username
-        return user_name
+            return "@" + user_name.username
     except Exception as e:
         return 'Неопознанный персонаж'
 
@@ -1198,10 +1204,11 @@ async def crocodile_wins(event):
     for id in all.keys():
         if n > 10:
             break
-        text += f'{n}. {await get_name(id, push=False)}: {all[id]}\n'
+        text += f'{n}. {await get_name(id, minecraft=True)}: {all[id]}\n'
         n += 1
     return await event.reply(
-        phrase.crocodile.stat.format(text)
+        phrase.crocodile.stat.format(text),
+        silent=True
     )
 
 
@@ -1445,11 +1452,8 @@ async def states_get(event):
     enter = "Свободный" if state.enter else "Закрыт"
     if state.price > 0:
         enter = decline_number(state.price, 'изумруд')
-    def ident_player(id):
-        return (
-            f"[{db.nicks(id=id).get()}]"
-            f"(tg://user?id={id})"
-        )
+    tasks = [get_name(player, minecraft=True) for player in state.players]
+    idented_players = await asyncio.gather(*tasks)
     return await event.reply(
         phrase.state.get.format(
             type=phrase.state_types[state.type],
@@ -1460,9 +1464,10 @@ async def states_get(event):
             desc=state.desc,
             date=state.date,
             players=len(state.players),
-            list_players=', '.join(list(map(ident_player, state.players))),
+            list_players=', '.join(idented_players),
             xyz=state.coordinates
-        )
+        ),
+        silent=True
     )
 
 
@@ -1565,7 +1570,7 @@ async def states_coords(event):
 @client.on(events.NewMessage(pattern=r'(?i)^/время$'))
 @client.on(events.NewMessage(pattern=r'(?i)^/мск$'))
 @client.on(events.NewMessage(pattern=r'(?i)^/msk$'))
-async def time(event):
+async def msktime(event):
     return await event.reply(phrase.time.format(datetime.now().strftime("%H:%M:%S")))
 
 
