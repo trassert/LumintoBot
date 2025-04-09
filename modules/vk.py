@@ -37,7 +37,7 @@ async def tg_chat(message: Message):
     except IndexError:
         return logger.info("Юзер не найден, пропускаем")
     logger.info(f"ВК>ТГ: {name} > {message.text}")
-    return await telegram.telegram.send_message(
+    return await telegram.client.send_message(
         config.chats.chat,
         reply_to=config.chats.topics.vk,
         message=f"**{name}**\n{message.text}",
