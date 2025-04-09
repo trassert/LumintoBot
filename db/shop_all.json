@@ -105,14 +105,24 @@
             "price": 13,
             "value": 1
         },
-        "Корона героя (книга)": {
+        "Книга «Корона героя»": {
             "name": "enchanted_book[stored_enchantments={levels:{\"enchantencore:heroes_crown\":1}}]",
             "price": 34,
             "value": 1
         },
-        "Дополнительные жизни IV (книга)": {
+        "Книга «Дополнительные жизни IV»": {
             "name": "enchanted_book[stored_enchantments={levels:{\"enchantencore:rejuvenation\":4}}]",
             "price": 36,
+            "value": 1
+        },
+        "Книга «Защита IV»": {
+            "name": "enchanted_book[stored_enchantments={levels:{protection:4}}]",
+            "price": 32,
+            "value": 1
+        },
+        "Книга «Защита от стрел IV»": {
+            "name": "enchanted_book[stored_enchantments={levels:{projectile_protection:4}}]",
+            "price": 27,
             "value": 1
         }
     },
@@ -293,9 +303,24 @@
             "price": 1,
             "value": 1
         },
-        "Мощность (книга)": {
+        "Книга «Мощность»": {
             "name": "enchanted_book[stored_enchantments={levels:{\"detonate:detonate\":1}}]",
             "price": 64,
+            "value": 1
+        },
+        "Книга «Защита от взрыва IV»": {
+            "name": "enchanted_book[stored_enchantments={levels:{blast_protection:4}}]",
+            "price": 30,
+            "value": 1
+        },
+        "Книга «Удача III»": {
+            "name": "enchanted_book[stored_enchantments={levels:{fortune:3}}]",
+            "price": 55,
+            "value": 1
+        },
+        "Книга «Эффективность V»": {
+            "name": "enchanted_book[stored_enchantments={levels:{efficiency:5}}]",
+            "price": 36,
             "value": 1
         }
     },
@@ -461,6 +486,11 @@
             "name": "minecraft:warped_fungus_on_a_stick",
             "price": 6,
             "value": 1
+        },
+        "Книга «Защита от огня IV»": {
+            "name": "enchanted_book[stored_enchantments={levels:{fire_protection:4}}]",
+            "price": 25,
+            "value": 1
         }
     },
     "raiders": {
@@ -519,9 +549,19 @@
             "price": 20,
             "value": 1
         },
-        "Проклятие разбойников V (книга)": {
+        "Книга «Проклятие разбойников V»": {
             "name": "enchanted_book[stored_enchantments={levels:{\"enchantencore:bane_of_raiders\":5}}]",
             "price": 50,
+            "value": 1
+        },
+        "Книга «Мультивыстрел»": {
+            "name": "enchanted_book[stored_enchantments={levels:{multishot:1}}]",
+            "price": 20,
+            "value": 1
+        },
+        "Книга «Починка»": {
+            "name": "enchanted_book[stored_enchantments={levels:{mending:1}}]",
+            "price": 56,
             "value": 1
         }
     },
@@ -745,7 +785,7 @@
             "price": 8,
             "value": 1
         },
-        "Подводник (книга)": {
+        "Книга «Подводник»": {
             "name": "enchanted_book[stored_enchantments={levels:{\"minecraft:aqua_affinity\":1}}]",
             "price": 24,
             "value": 1
@@ -832,12 +872,12 @@
             "price": 32,
             "value": 1
         },
-        "Аспект невидимости (книга)": {
+        "Книга «Аспект невидимости»": {
             "name": "enchanted_book[stored_enchantments={levels:{\"enchantencore:invisibility_splash\":1}}]",
             "price": 32,
             "value": 1
         },
-        "След ведьмы (книга)": {
+        "Книга «След ведьмы»": {
             "name": "enchanted_book[stored_enchantments={levels:{\"enchantencore:witch_trail\":1}}]",
             "price": 13,
             "value": 1
@@ -984,9 +1024,19 @@
             "price": 26,
             "value": 1
         },
-        "Выстрел кузнеца (книга)": {
+        "Книга «Выстрел кузнеца»": {
             "name": "enchanted_book[stored_enchantments={levels:{\"enchantencore:forge_shot\":1}}]",
             "price": 27,
+            "value": 1
+        },
+        "Книга «Острота V»": {
+            "name": "enchanted_book[stored_enchantments={levels:{sharpness:5}}]",
+            "price": 55,
+            "value": 1
+        },
+        "Книга «Отдача II»": {
+            "name": "enchanted_book[stored_enchantments={levels:{knockback:2}}]",
+            "price": 20,
             "value": 1
         }
     },
@@ -1025,6 +1075,11 @@
             "name": "minecraft:chorus_fruit",
             "price": 16,
             "value": 3
+        },
+        "Книга «Мягкое падение IV»": {
+            "name": "enchanted_book[stored_enchantments={levels:{feather_falling:4}}]",
+            "price": 25,
+            "value": 1
         }
     },
     "redstone": {
