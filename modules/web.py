@@ -9,7 +9,7 @@ from . import config
 from . import db
 from . import phrase
 from . import telegram
-from formatter import decline_number
+from .formatter import decline_number
 
 
 async def server():

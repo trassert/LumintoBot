@@ -615,7 +615,7 @@ async def link_nick(event):
     )
 
 
-@client.on(events.NewMessage(pattern=r'(?i)^/shop$'))
+@client.on(events.NewMessage(pattern=r'(?i)^/shop'))
 @client.on(events.NewMessage(pattern=r'(?i)^/шоп$'))
 @client.on(events.NewMessage(pattern=r'(?i)^/магазин$'))
 @client.on(events.NewMessage(pattern=r'(?i)^магазин$'))
@@ -695,13 +695,13 @@ async def host(event):
 
 @client.on(events.NewMessage(pattern=r'(?i)^/серв$'))
 @client.on(events.NewMessage(pattern=r'(?i)^/сервер'))
-@client.on(events.NewMessage(pattern=r'(?i)^/server$'))
+@client.on(events.NewMessage(pattern=r'(?i)^/server'))
 async def sysinfo(event):
     await event.reply(get_system_info())
 
 
 @client.on(events.NewMessage(pattern=r'(?i)^/помощь$'))
-@client.on(events.NewMessage(pattern=r'(?i)^/help$'))
+@client.on(events.NewMessage(pattern=r'(?i)^/help'))
 @client.on(events.NewMessage(pattern=r'(?i)^/команды$'))
 @client.on(events.NewMessage(pattern=r'(?i)^/commands$'))
 @client.on(events.NewMessage(pattern=r'(?i)^команды$'))
@@ -1066,7 +1066,7 @@ async def server_top_list(event):
 
 @client.on(events.NewMessage(pattern=r'(?i)^/баланс$'))
 @client.on(events.NewMessage(pattern=r'(?i)^баланс$'))
-@client.on(events.NewMessage(pattern=r'(?i)^/wallet$'))
+@client.on(events.NewMessage(pattern=r'(?i)^/wallet'))
 @client.on(events.NewMessage(pattern=r'(?i)^wallet$'))
 @client.on(events.NewMessage(pattern=r'(?i)^/мой баланс$'))
 @client.on(events.NewMessage(pattern=r'(?i)^мой баланс$'))
@@ -1566,7 +1566,7 @@ async def states_coords(event):
     return await event.reply(phrase.state.change_coords)
 
 
-@client.on(events.NewMessage(pattern=r'(?i)^/time$'))
+@client.on(events.NewMessage(pattern=r'(?i)^/time'))
 @client.on(events.NewMessage(pattern=r'(?i)^/время$'))
 @client.on(events.NewMessage(pattern=r'(?i)^/мск$'))
 @client.on(events.NewMessage(pattern=r'(?i)^/msk$'))

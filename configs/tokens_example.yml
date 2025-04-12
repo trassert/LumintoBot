@@ -20,8 +20,8 @@ noip:
 
 # Для REG.RU, если DDNS
 reg:
-  email: s3pple@yandex.ru
-  password: monarchAG23
+  email: -------@yandex.ru
+  password: --------
 
 vk:
   token: vk1.a.token
