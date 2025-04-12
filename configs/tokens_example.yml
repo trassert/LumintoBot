@@ -1,0 +1,46 @@
+# Переменуйте файл после в tokens.yml
+
+bot:
+  id: id телеграм бота
+  hash: хеш телеграм бота
+  chat: основной чат (с минусом)
+  creator: id создателя (для стафф)
+  token: токен бота
+
+topics:
+  vk: для трансляции из тг в вк
+  updates: для публикования обновлений
+  rp: для рп
+
+# Для NOIP, если DDNS
+noip:
+  email: ------@yandex.ru
+  password: --------
+  name: trassert
+
+# Для REG.RU, если DDNS
+reg:
+  email: s3pple@yandex.ru
+  password: monarchAG23
+
+vk:
+  token: vk1.a.token
+  group: основной вк чат
+  chat_id: вк айди чата
+
+rcon: 
+  password: пароль для RCON из тг
+  port: 25575
+  port_fabric: порт для еще одного сервера
+
+mysql:
+  host: localhost
+  user: trassert
+  password: пароль для карты
+  database: authy
+  table: players
+
+hotmc: токен для хотмс
+mcservers: токен для мсерверс
+google: токен для ИИ гугл
+chattohttp: пароль для C2HTTP
