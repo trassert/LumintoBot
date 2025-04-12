@@ -1,4 +1,5 @@
 import psutil
+import platform
 from time import time
 
 
@@ -28,8 +29,10 @@ def get_system_info():
     disk_used = disk_usage.used / (1024 * 1024 * 1024)
     disk_free = disk_usage.free / (1024 * 1024 * 1024)
     disk_percent = disk_usage.percent
-    system_info = f"""⚙️ : Информация о хостинге:
+    os = platform.system()
+    return f"""⚙️ : Информация о хостинге:
     Время работы: {result}
+    ОС: {platform.system()} {platform.version()}
     Процессор:
         Частота: {cpu_freq} МГц
         Ядра/Потоки: {cpu_cores_phys}/{cpu_cores_log}
@@ -45,4 +48,3 @@ def get_system_info():
         Свободно: {disk_free:.1f} ГБ
         Загрузка: {disk_percent} %
     """
-    return system_info
