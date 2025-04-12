@@ -32,7 +32,7 @@ def get_system_info():
     os = platform.system()
     return f"""⚙️ : Информация о хостинге:
     Время работы: {result}
-    ОС: {platform.system()} {platform.version()}
+    ОС: {platform.system()} {platform.release()}
     Процессор:
         Частота: {cpu_freq} МГц
         Ядра/Потоки: {cpu_cores_phys}/{cpu_cores_log}
