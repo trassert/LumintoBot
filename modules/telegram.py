@@ -25,6 +25,7 @@ from . import dice
 from . import ip
 from . import vk
 from . import chart
+from . import crosssocial
 
 from .system_info import get_system_info
 from .mcrcon import MinecraftClient
@@ -724,53 +725,12 @@ async def start(event):
 @client.on(events.NewMessage(pattern=r'(?i)^/ping(.*)'))
 @client.on(events.NewMessage(pattern=r'(?i)^пинг(.*)'))
 async def ping(event):
-    timestamp = event.date.timestamp()
-    ping = round(time() - timestamp, 2)
-    if ping < 0:
-        ping = phrase.ping.min
-    else:
-        ping = f"за {str(ping)} сек."
-    try:
-        arg = event.pattern_match.group(1).strip()
-    except IndexError:
-        arg = None
-    all_servers_ping = []
-    if arg in [
-        'all',
-        'подробно',
-        'подробный',
-        'полн',
-        'полный',
-        'весь',
-        'ии',
-        'фулл',
-        'full'
-    ]:
-        async with aiohttp.ClientSession() as session:
-            n = 1
-            for server in ai_servers:
-                timestamp = time()
-                async with session.get('https://'+server+'/') as request:
-                    try:
-                        if await request.text() == 'ok':
-                            server_ping = round(time() - timestamp, 2)
-                            if server_ping > 0:
-                                server_ping = f"за {server_ping} сек."
-                            else:
-                                server_ping = phrase.ping.min
-                            all_servers_ping.append(
-                                f'\n🌐 : Сервер {n} ответил {server_ping}'
-                            )
-                        else:
-                            all_servers_ping.append(
-                                f'\n❌ : Сервер {n} - Ошибка!'
-                            )
-                    except TimeoutError:
-                        all_servers_ping.append(
-                            f'❌ : Сервер {n} - Нет подключения!'
-                        )
-                n += 1
-    return await event.reply(phrase.ping.set.format(ping)+''.join(all_servers_ping))
+    return await event.reply(
+        await crosssocial.ping(
+            event.pattern_match.group(1).strip(),
+            event.date.timestamp()
+        )
+    )
 
 
 @client.on(events.NewMessage(pattern=r'(?i)^/крокодил$'))
@@ -1576,6 +1536,7 @@ async def msktime(event):
 
 @client.on(events.NewMessage(pattern=r'(?i)^/тест\s(.+)'))
 async def test(event):
+    arg = event.pattern_match.group(1).strip()
     if event.sender_id not in db.database('admins_id'):
         return await event.reply(phrase.perms.no)
     return event.reply(event.stringify())
