@@ -35,7 +35,7 @@ async def host(message: Message):
 @client.on.message(regex=r"(?i)^/пинг(.*)")
 async def ping(message: Message, match: tuple):
     return await message.reply(
-        crosssocial.ping(
+        await crosssocial.ping(
             match[0].strip(),
             message.date
         )

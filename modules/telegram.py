@@ -716,7 +716,7 @@ async def help(event):
 async def start(event):
     return await event.reply(
         phrase.start.format(
-            get_name(event.sender_id)
+            await get_name(event.sender_id)
         )
     )
 
