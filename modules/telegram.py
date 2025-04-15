@@ -26,10 +26,10 @@ from . import ip
 from . import vk
 from . import chart
 from . import crosssocial
+from . import ai
 
 from .system_info import get_system_info
 from .mcrcon import MinecraftClient
-from .ai import ai_response, ai_servers
 from .diff import get_enchant_desc
 from .formatter import decline_number, remove_section_marks
 
@@ -716,8 +716,9 @@ async def help(event):
 async def start(event):
     return await event.reply(
         phrase.start.format(
-            await get_name(event.sender_id)
-        )
+            await get_name(event.sender_id, push=False)
+        ),
+        silent=True
     )
 
 
@@ -869,7 +870,7 @@ async def gemini(event):
     arg = event.pattern_match.group(1).strip()
     if len(arg) < 1:
         return await event.reply(phrase.no.response)
-    response = await ai_response(arg)
+    response = await ai.response(arg)
     if response is None:
         return await event.reply(phrase.server.overload)
     if len(response) > 4096:
@@ -1209,7 +1210,7 @@ async def word_request(event):
     try:
         hint = None
         while hint is None:
-            hint = await ai_response(
+            hint = await ai.response(
                 f'Сделай подсказку для слова "{word}". '
                 'Ни в коем случае не добавляй никаких "подсказка для слова.." '
                 'и т.п, ответ должен содержать только подсказку. '
@@ -1335,6 +1336,8 @@ async def states_enter(event):
     if db.states.if_player(event.sender_id) is not False:
         return await event.reply(phrase.state.already_player)
     state = db.state(arg)
+    if state.enter != True:
+        return await event.reply(phrase.state.enter_exit)
     if state.price != 0:
         return await event.reply(
             phrase.state.pay_to_enter,
@@ -1526,6 +1529,82 @@ async def states_coords(event):
     return await event.reply(phrase.state.change_coords)
 
 
+@client.on(events.NewMessage(pattern=r'(?i)^/г входы\s(.+)'))
+@client.on(events.NewMessage(pattern=r'(?i)^/г вступления\s(.+)'))
+async def states_enter(event):
+    state_name = db.states.if_author(event.sender_id)
+    if state_name is False:
+        return await event.reply(phrase.state.not_a_author)
+    arg = event.pattern_match.group(1).strip()
+    state = db.state(state_name)
+    if arg in [
+        'да',
+        '+',
+        'разрешить',
+        'открыть',
+        'true',
+        'ok',
+        'ок',
+        'можно'
+    ]:
+        if state.enter is True:
+            return await event.reply(
+                phrase.state.already_open
+            )
+        state.change("enter", True)
+        return await event.reply(
+            phrase.state.enter_open
+        )
+    elif arg in [
+        'нет',
+        '-',
+        'запретить',
+        'закрыть',
+        'false',
+        'no',
+        'нельзя',
+        'закрыто'
+    ]:
+        if state.enter is False:
+            return await event.reply(
+                phrase.state.already_close
+            )
+        state.change("enter", False)
+        return await event.reply(
+            phrase.state.enter_close
+        )
+    elif arg.isdigit():
+        arg = int(arg)
+        state.change("price", arg)
+        state.change("enter", True)
+        return await event.reply(
+            phrase.state.enter_price.format(
+                decline_number(arg, "изумруд")
+            )
+        )
+    else:
+        return await event.reply(
+            phrase.state.howto_enter
+        )
+
+
+@client.on(events.NewMessage(pattern=r'(?i)^/г входы$'))
+@client.on(events.NewMessage(pattern=r'(?i)^/г вступления$'))
+async def states_enter(event):
+    state_name = db.states.if_author(event.sender_id)
+    if state_name is False:
+        return await event.reply(phrase.state.not_a_author)
+    state = db.state(state_name)
+    if state.enter is True:
+        if state.price != 0:
+            state.change("price", 0)
+        state.change("enter", False)
+        return await event.reply(phrase.state.enter_close)
+    elif state.enter is False:
+        state.change("enter", True)
+        return await event.reply(phrase.state.enter_open)
+
+
 @client.on(events.NewMessage(pattern=r'(?i)^/time'))
 @client.on(events.NewMessage(pattern=r'(?i)^/время$'))
 @client.on(events.NewMessage(pattern=r'(?i)^/мск$'))
@@ -1540,6 +1619,7 @@ async def test(event):
     if event.sender_id not in db.database('admins_id'):
         return await event.reply(phrase.perms.no)
     return event.reply(event.stringify())
+
 
 'Эвенты для крокодила'
 
@@ -1567,7 +1647,7 @@ async def crocodile_hint(event):
                 f'что подсказка {last_hint} уже была.'
         else:
             check_last = ''
-        response = await ai_response(
+        response = await ai.response(
             f'Сделай подсказку для слова "{word}". '
             'Ни в коем случае не добавляй никаких "подсказка для слова.." '
             'и т.п, ответ должен содержать только подсказку. '

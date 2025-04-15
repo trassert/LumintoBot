@@ -1,7 +1,4 @@
-import aiohttp
-
 from loguru import logger
-from time import time
 
 from vkbottle.dispatch.rules import ABCRule
 from vkbottle.bot import Bot, Message
@@ -19,6 +16,7 @@ client = Bot(token=config.tokens.vk.token)
 class CaseRule(ABCRule[Message]):
     def __init__(self, command: str):
         self.command = command.lower()
+
     async def check(self, message: Message) -> bool:
         return message.text.lower() == self.command
 
@@ -36,11 +34,11 @@ async def host(message: Message):
 async def ping(message: Message, match: tuple):
     return await message.reply(
         await crosssocial.ping(
+            message.date,
             match[0].strip(),
-            message.date
+            vk=True
         )
     )
-    
 
 
 @client.on.chat_message()

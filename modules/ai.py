@@ -13,7 +13,7 @@ ai_servers = [
 ]
 
 
-async def ai_response(message):
+async def response(message):
     "Запрос к Google Gemini"
     (
         logger.info(f"Выполняю запрос к AI: {message}")

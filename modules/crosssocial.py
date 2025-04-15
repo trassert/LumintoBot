@@ -5,7 +5,7 @@ from time import time
 from . import phrase
 from .ai import ai_servers
 
-async def ping(arg, timestamp) -> str:
+async def ping(arg, timestamp, vk=False) -> str:
     ping = round(time() - timestamp, 2)
     if ping < 0:
         ping = phrase.ping.min
@@ -47,4 +47,6 @@ async def ping(arg, timestamp) -> str:
                             f'❌ : Сервер {n} - Нет подключения!'
                         )
                 n += 1
-    return phrase.ping.set.format(ping)+''.join(all_servers_ping)
+    text = phrase.ping.set.format(ping)+''.join(all_servers_ping)
+    if vk: text = text.replace('**', '')
+    return text

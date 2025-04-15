@@ -1,7 +1,6 @@
 import nest_asyncio
 import asyncio
 
-from datetime import timedelta, datetime
 from loguru import logger
 from sys import stderr
 
@@ -13,8 +12,6 @@ from modules import config
 from modules import phrase
 from modules import web
 from modules import time_to
-
-from modules.formatter import decline_number
 
 nest_asyncio.apply()
 logger.remove()
