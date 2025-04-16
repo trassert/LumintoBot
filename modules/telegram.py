@@ -44,6 +44,10 @@ client = TelegramClient(
 )
 
 
+crocodile_path = path.join("db", "crocodile", "all.txt")
+crocodile_blacklist_path = path.join("db", "crocodile", "blacklist.txt")
+
+
 'Вспомогательные функции'
 
 
@@ -91,7 +95,7 @@ async def callback_action(event):
             if db.database("current_game") != 0:
                 return await event.answer(phrase.crocodile.no, alert=True)
             with open(
-                path.join("db", "crocodile_words.txt"), 'r', encoding='utf8'
+                crocodile_path, 'r', encoding='utf8'
             ) as f:
                 word = choice(f.read().split('\n'))
             unsec = ""
@@ -195,7 +199,7 @@ async def callback_action(event):
         user_name = await get_name(data[3])
         if data[1] == 'yes':
             with open(
-                path.join('db', 'crocodile_words.txt'),
+                crocodile_path,
                 'a',
                 encoding='utf-8'
             ) as f:
@@ -217,6 +221,12 @@ async def callback_action(event):
                 phrase.word.add
             )
         if data[1] == 'no':
+            with open(
+                crocodile_blacklist_path,
+                'a',
+                encoding='utf-8'
+            ) as f:
+                f.write(f'\n{data[2]}')
             await client.send_message(
                 config.chats.chat,
                 phrase.word.no.format(
@@ -1177,11 +1187,18 @@ async def crocodile_wins(event):
 async def word_request(event):
     word = event.pattern_match.group(1).strip().lower()
     with open(
-        path.join('db', 'crocodile_words.txt'), 'r', encoding='utf-8'
+        crocodile_path, 'r', encoding='utf-8'
     ) as f:
         if f'\n{word}\n' in f.read():
             return await event.reply(
                 phrase.word.exists
+            )
+    with open(
+        crocodile_blacklist_path, 'r', encoding='utf-8'
+    ) as f:
+        if f'\n{word}\n' in f.read():
+            return await event.reply(
+                phrase.word.in_blacklist
             )
     try:
         entity = await client.get_entity(event.sender_id)
@@ -1463,7 +1480,7 @@ async def states_leave(event):
     ):
         await client.send_message(
             entity=config.chats.chat,
-            message=phrase.state.up.format(
+            message=phrase.state.down.format(
                 name=state.name,
                 type='Государство'
             ),
@@ -1477,7 +1494,7 @@ async def states_leave(event):
     ):
         await client.send_message(
             entity=config.chats.chat,
-            message=phrase.state.up.format(
+            message=phrase.state.down.format(
                 name=state.name,
                 type='Княжество'
             ),

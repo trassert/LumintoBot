@@ -9,6 +9,7 @@ db/bot.session
 db/bot.session-journal
 db/shop_current.json
 db/tickets.json
+db/crocodile/*
 
 images/*
 
