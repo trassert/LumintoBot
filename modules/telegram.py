@@ -736,12 +736,12 @@ async def start(event):
 @client.on(events.NewMessage(pattern=r'(?i)^/ping(.*)'))
 @client.on(events.NewMessage(pattern=r'(?i)^пинг(.*)'))
 async def ping(event):
-    return await event.reply(
-        await crosssocial.ping(
-            event.pattern_match.group(1).strip(),
-            event.date.timestamp()
-        )
+    text = await crosssocial.ping(
+        event.pattern_match.group(1).strip(),
+        event.date.timestamp()
     )
+    if text is None: return
+    return await event.reply(text)
 
 
 @client.on(events.NewMessage(pattern=r'(?i)^/крокодил$'))
@@ -1024,8 +1024,8 @@ async def server_top_list(event):
                 remove_section_marks(
                     await rcon.send('playtime top')
                 ).replace(
-                    '(Лидеры по времени на сервере)',
-                    phrase.stat.server.format("ванильного")
+                    '[i] Лидеры по времени на сервере',
+                    phrase.stat.server
                 ).replace(
                     '***',
                     ''
@@ -1189,14 +1189,14 @@ async def word_request(event):
     with open(
         crocodile_path, 'r', encoding='utf-8'
     ) as f:
-        if f'\n{word}\n' in f.read():
+        if word in f.read().split('\n'):
             return await event.reply(
                 phrase.word.exists
             )
     with open(
         crocodile_blacklist_path, 'r', encoding='utf-8'
     ) as f:
-        if f'\n{word}\n' in f.read():
+        if word in f.read().split('\n'):
             return await event.reply(
                 phrase.word.in_blacklist
             )
@@ -1271,23 +1271,6 @@ async def check_nick(event):
     if nick is None:
         return await event.reply(phrase.nick.no_nick)
     return await event.reply(phrase.nick.usernick.format(nick))
-
-
-@client.on(events.NewMessage(pattern=r'(?i)^/чара(.*)'))
-@client.on(events.NewMessage(pattern=r'(?i)^/чарка(.*)'))
-@client.on(events.NewMessage(pattern=r'(?i)^/зачарование(.*)'))
-@client.on(events.NewMessage(pattern=r'(?i)^/enchant(.*)'))
-@client.on(events.NewMessage(pattern=r'(?i)^что за чара(.*)'))
-@client.on(events.NewMessage(pattern=r'(?i)^чарка(.*)'))
-@client.on(events.NewMessage(pattern=r'(?i)^зачарование(.*)'))
-async def get_enchant(event):
-    arg = event.pattern_match.group(1)
-    if arg.strip() == '':
-        return await event.reply(phrase.enchant.no_arg)
-    desc = get_enchant_desc(arg)
-    if desc is None:
-        return await event.reply(phrase.enchant.no_diff)
-    return await event.reply(phrase.enchant.main.format(desc))
 
 
 @client.on(events.NewMessage(pattern=r'(?i)^/госва$'))

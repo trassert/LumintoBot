@@ -105,16 +105,6 @@
             "price": 13,
             "value": 1
         },
-        "Книга «Корона героя»": {
-            "name": "enchanted_book[stored_enchantments={levels:{\"enchantencore:heroes_crown\":1}}]",
-            "price": 34,
-            "value": 1
-        },
-        "Книга «Дополнительные жизни IV»": {
-            "name": "enchanted_book[stored_enchantments={levels:{\"enchantencore:rejuvenation\":4}}]",
-            "price": 36,
-            "value": 1
-        },
         "Книга «Защита IV»": {
             "name": "enchanted_book[stored_enchantments={levels:{protection:4}}]",
             "price": 32,
@@ -301,11 +291,6 @@
         "Уголь": {
             "name": "minecraft:coal",
             "price": 1,
-            "value": 1
-        },
-        "Книга «Мощность»": {
-            "name": "enchanted_book[stored_enchantments={levels:{\"detonate:detonate\":1}}]",
-            "price": 64,
             "value": 1
         },
         "Книга «Защита от взрыва IV»": {
@@ -547,11 +532,6 @@
         "Бирка": {
             "name": "minecraft:name_tag",
             "price": 20,
-            "value": 1
-        },
-        "Книга «Проклятие разбойников V»": {
-            "name": "enchanted_book[stored_enchantments={levels:{\"enchantencore:bane_of_raiders\":5}}]",
-            "price": 50,
             "value": 1
         },
         "Книга «Мультивыстрел»": {
@@ -871,16 +851,6 @@
             "name": "minecraft:potion[custom_name='{\"text\":\"Зелье возврата\",\"italic\":false}',custom_data='{recallpotion:1}',hide_additional_tooltip={},enchantment_glint_override=true,potion_contents={custom_color:249343},rarity=\"rare\"]",
             "price": 32,
             "value": 1
-        },
-        "Книга «Аспект невидимости»": {
-            "name": "enchanted_book[stored_enchantments={levels:{\"enchantencore:invisibility_splash\":1}}]",
-            "price": 32,
-            "value": 1
-        },
-        "Книга «След ведьмы»": {
-            "name": "enchanted_book[stored_enchantments={levels:{\"enchantencore:witch_trail\":1}}]",
-            "price": 13,
-            "value": 1
         }
     },
     "blacksmith": {
@@ -1022,11 +992,6 @@
         "Яйцо призыва железного голема": {
             "name": "minecraft:iron_golem_spawn_egg",
             "price": 26,
-            "value": 1
-        },
-        "Книга «Выстрел кузнеца»": {
-            "name": "enchanted_book[stored_enchantments={levels:{\"enchantencore:forge_shot\":1}}]",
-            "price": 27,
             "value": 1
         },
         "Книга «Острота V»": {

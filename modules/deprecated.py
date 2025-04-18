@@ -1,4 +1,24 @@
-# async def stat(event):
+# @client.on(events.NewMessage(pattern=r'(?i)^/чара(.*)'))
+# @client.on(events.NewMessage(pattern=r'(?i)^/чарка(.*)'))
+# @client.on(events.NewMessage(pattern=r'(?i)^/зачарование(.*)'))
+# @client.on(events.NewMessage(pattern=r'(?i)^/enchant(.*)'))
+# @client.on(events.NewMessage(pattern=r'(?i)^что за чара(.*)'))
+# @client.on(events.NewMessage(pattern=r'(?i)^чарка(.*)'))
+# @client.on(events.NewMessage(pattern=r'(?i)^зачарование(.*)'))
+# async def get_enchant(event):
+#     arg = event.pattern_match.group(1)
+#     if arg.strip() == '':
+#         return await event.reply(phrase.enchant.no_arg)
+#     desc = get_enchant_desc(arg)
+#     if desc is None:
+#         return await event.reply(phrase.enchant.no_diff)
+#     return await event.reply(phrase.enchant.main.format(desc))
+
+
+
+
+
+# # async def stat(event):
 #     entity = await client.get_entity(event.sender_id)
 #     if event.text.startswith('‹'):
 #         if event.sender_id in settings('api_bot_id', log=False):

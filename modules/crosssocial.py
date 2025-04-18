@@ -47,6 +47,7 @@ async def ping(arg, timestamp, vk=False) -> str:
                             f'❌ : Сервер {n} - Нет подключения!'
                         )
                 n += 1
+    elif arg != "": return
     text = phrase.ping.set.format(ping)+''.join(all_servers_ping)
     if vk: text = text.replace('**', '')
     return text

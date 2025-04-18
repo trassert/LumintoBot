@@ -9,7 +9,6 @@ from modules import telegram
 from modules import db
 from modules import ip
 from modules import config
-from modules import phrase
 from modules import web
 from modules import time_to
 
