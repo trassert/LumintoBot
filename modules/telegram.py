@@ -1,11 +1,9 @@
 import asyncio
 import re
-import aiohttp
 
 from os import path
 from loguru import logger
 from random import choice, random, randint
-from time import time
 from datetime import datetime
 
 from telethon.tl.types import (
@@ -17,6 +15,7 @@ from telethon import events
 from telethon.sync import TelegramClient
 from telethon import errors as TGErrors
 from telethon.tl.functions.users import GetFullUserRequest
+from telethon.tl.custom import Message
 
 from . import config
 from . import db
@@ -30,7 +29,6 @@ from . import ai
 
 from .system_info import get_system_info
 from .mcrcon import MinecraftClient
-from .diff import get_enchant_desc
 from .formatter import decline_number, remove_section_marks
 
 
@@ -83,7 +81,7 @@ async def get_name(id, push=True, minecraft=False):
 
 
 @client.on(events.CallbackQuery())
-async def callback_action(event):
+async def callback_action(event: events.CallbackQuery.Event):
     data = event.data.decode('utf-8').split('.')
     logger.info(f'{event.sender_id} отправил КБ - {data}')
     if data[0] == 'crocodile':
@@ -447,7 +445,7 @@ async def vk_chat(event):
 
 
 @client.on(events.NewMessage(config.chats.chat, pattern=r'(?i)^/казино$'))
-async def casino(event):
+async def casino(event: Message):
     keyboard = ReplyInlineMarkup(
         [
             KeyboardButtonRow(
@@ -467,7 +465,7 @@ async def casino(event):
 
 @client.on(events.NewMessage(pattern=r'(?i)^\+чек(.*)'))
 @client.on(events.NewMessage(pattern=r'(?i)^\+ticket(.*)'))
-async def do_ticket(event):
+async def do_ticket(event: Message):
     if not event.is_private:
         return await event.reply(phrase.ticket.in_chat)
     arg = event.pattern_match.group(1).strip()
@@ -504,7 +502,7 @@ async def do_ticket(event):
 @client.on(events.NewMessage(pattern=r'(?i)^/активировать(.*)'))
 @client.on(events.NewMessage(pattern=r'(?i)^активировать(.*)'))
 @client.on(events.NewMessage(pattern=r'(?i)^/activate(.*)'))
-async def get_ticket(event):
+async def get_ticket(event: Message):
     arg = event.pattern_match.group(1).strip()
     if arg == '':
         return await event.reply(phrase.ticket.no_value)
@@ -527,7 +525,7 @@ async def get_ticket(event):
 @client.on(events.NewMessage(pattern=r'(?i)^/актив сервера(.*)'))
 @client.on(events.NewMessage(pattern=r'(?i)^/мчат(.*)'))
 @client.on(events.NewMessage(pattern=r'(?i)^/мстат(.*)'))
-async def active_check(event):
+async def active_check(event: Message):
     arg = event.pattern_match.group(1).strip()
     if arg in phrase.all_arg:
         text = phrase.stat.chat.format('всё время')
@@ -580,7 +578,7 @@ async def active_check(event):
 @client.on(events.NewMessage(pattern=r'(?i)^привязать(.*)'))
 @client.on(events.NewMessage(pattern=r'(?i)^/новый ник(.*)'))
 @client.on(events.NewMessage(pattern=r'(?i)^/линкник(.*)'))
-async def link_nick(event):
+async def link_nick(event: Message):
     nick = event.pattern_match.group(1).strip()
     if len(nick) < 4:
         return await event.reply(phrase.nick.too_short)
@@ -632,7 +630,7 @@ async def link_nick(event):
 @client.on(events.NewMessage(pattern=r'(?i)^магазин$'))
 @client.on(events.NewMessage(pattern=r'(?i)^shop$'))
 @client.on(events.NewMessage(pattern=r'(?i)^шоп$'))
-async def shop(event):
+async def shop(event: Message):
     version = db.database('shop_version')
     keyboard = ReplyInlineMarkup(
         [
@@ -700,14 +698,14 @@ async def shop(event):
 @client.on(events.NewMessage(pattern=r'(?i)^/host$'))
 @client.on(events.NewMessage(pattern=r'(?i)^/айпи$'))
 @client.on(events.NewMessage(pattern=r'(?i)^/ip$'))
-async def host(event):
+async def host(event: Message):
     await event.reply(phrase.server.host.format(db.database("host")))
 
 
 @client.on(events.NewMessage(pattern=r'(?i)^/серв$'))
 @client.on(events.NewMessage(pattern=r'(?i)^/сервер'))
 @client.on(events.NewMessage(pattern=r'(?i)^/server'))
-async def sysinfo(event):
+async def sysinfo(event: Message):
     await event.reply(get_system_info())
 
 
@@ -717,13 +715,13 @@ async def sysinfo(event):
 @client.on(events.NewMessage(pattern=r'(?i)^/commands$'))
 @client.on(events.NewMessage(pattern=r'(?i)^команды$'))
 @client.on(events.NewMessage(pattern=r'(?i)^бот помощь$'))
-async def help(event):
+async def help(event: Message):
     return await event.reply(phrase.help.comm, link_preview=True)
 
 
 @client.on(events.NewMessage(pattern=r'(?i)^/start$'))
 @client.on(events.NewMessage(pattern=r'(?i)^/старт$'))
-async def start(event):
+async def start(event: Message):
     return await event.reply(
         phrase.start.format(
             await get_name(event.sender_id, push=False)
@@ -735,7 +733,7 @@ async def start(event):
 @client.on(events.NewMessage(pattern=r'(?i)^/пинг(.*)'))
 @client.on(events.NewMessage(pattern=r'(?i)^/ping(.*)'))
 @client.on(events.NewMessage(pattern=r'(?i)^пинг(.*)'))
-async def ping(event):
+async def ping(event: Message):
     text = await crosssocial.ping(
         event.pattern_match.group(1).strip(),
         event.date.timestamp()
@@ -747,7 +745,7 @@ async def ping(event):
 @client.on(events.NewMessage(pattern=r'(?i)^/крокодил$'))
 @client.on(events.NewMessage(pattern=r'(?i)^/crocodile$'))
 @client.on(events.NewMessage(pattern=r'(?i)^старт крокодил$'))
-async def crocodile(event):
+async def crocodile(event: Message):
     if not event.chat_id == config.chats.chat:
         return await event.reply(phrase.crocodile.chat)
     else:
@@ -787,7 +785,7 @@ async def crocodile(event):
 
 @client.on(events.NewMessage(pattern=r'(?i)^/ставка(.*)'))
 @client.on(events.NewMessage(pattern=r'(?i)^/крокоставка(.*)'))
-async def crocodile_bet(event):
+async def crocodile_bet(event: Message):
     try:
         bet = int(
             event.pattern_match.group(1).strip()
@@ -837,7 +835,7 @@ async def crocodile_bet(event):
 
 
 @client.on(events.NewMessage(pattern=r'(?i)^/суперигра(.*)'))
-async def super_game(event):
+async def super_game(event: Message):
     if event.sender_id not in db.database('admins_id'):
         return await event.reply(phrase.perms.no)
     arg = event.pattern_match.group(1).strip()
@@ -876,7 +874,7 @@ async def super_game(event):
 @client.on(events.NewMessage(pattern=r'(?i)^/ai(.*)'))
 @client.on(events.NewMessage(pattern=r'(?i)^ии(.*)'))
 @client.on(events.NewMessage(pattern=r'(?i)^/бот(.*)'))
-async def gemini(event):
+async def gemini(event: Message):
     arg = event.pattern_match.group(1).strip()
     if len(arg) < 1:
         return await event.reply(phrase.no.response)
@@ -891,7 +889,7 @@ async def gemini(event):
 
 
 @client.on(events.NewMessage(pattern=r'//(.+)'))
-async def mcrcon(event):
+async def mcrcon(event: Message):
     if event.sender_id not in db.database('admins_id'):
         return await event.reply(phrase.perms.no)
     command = event.pattern_match.group(1).strip()
@@ -917,7 +915,7 @@ async def mcrcon(event):
 @client.on(events.NewMessage(pattern=r'(?i)^\-вт\s(.+)'))
 @client.on(events.NewMessage(pattern=r'(?i)^\+wl\s(.+)'))
 @client.on(events.NewMessage(pattern=r'(?i)^\-wl\s(.+)'))
-async def whitelist(event):
+async def whitelist(event: Message):
     if event.sender_id not in db.database('admins_id'):
         return await event.reply(phrase.perms.no)
     if event.text[0] == '-':
@@ -940,7 +938,7 @@ async def whitelist(event):
 
 @client.on(events.NewMessage(pattern=r"\+cтафф(.*)"))
 @client.on(events.NewMessage(pattern=r"\+staff(.*)"))
-async def add_staff(event):
+async def add_staff(event: Message):
     if event.sender_id != config.tokens.bot.creator:
         return await event.reply(phrase.perms.no)
     try:
@@ -976,7 +974,7 @@ async def add_staff(event):
 
 @client.on(events.NewMessage(pattern=r"\-cтафф(.*)"))
 @client.on(events.NewMessage(pattern=r"\-staff(.*)"))
-async def del_staff(event):
+async def del_staff(event: Message):
     if event.sender_id != config.tokens.bot.creator:
         return await event.reply(phrase.perms.no)
     try:
@@ -1013,7 +1011,7 @@ async def del_staff(event):
 @client.on(events.NewMessage(pattern=r'(?i)^/topplayers$'))
 @client.on(events.NewMessage(pattern=r'(?i)^/bestplayers$'))
 @client.on(events.NewMessage(pattern=r'(?i)^/toppt$'))
-async def server_top_list(event):
+async def server_top_list(event: Message):
     try:
         async with MinecraftClient(
             host=db.database('ipv4'),
@@ -1041,7 +1039,7 @@ async def server_top_list(event):
 @client.on(events.NewMessage(pattern=r'(?i)^wallet$'))
 @client.on(events.NewMessage(pattern=r'(?i)^/мой баланс$'))
 @client.on(events.NewMessage(pattern=r'(?i)^мой баланс$'))
-async def get_balance(event):
+async def get_balance(event: Message):
     return await event.reply(
         phrase.money.wallet.format(
             decline_number(
@@ -1053,7 +1051,7 @@ async def get_balance(event):
 
 @client.on(events.NewMessage(pattern=r'(?i)^/изменить баланс(.*)'))
 @client.on(events.NewMessage(pattern=r'(?i)^/change balance(.*)'))
-async def add_balance(event):
+async def add_balance(event: Message):
     if event.sender_id not in db.database('admins_id'):
         return await event.reply(phrase.perms.no)
     args = event.pattern_match.group(1).strip().split()
@@ -1096,7 +1094,7 @@ async def add_balance(event):
 @client.on(events.NewMessage(pattern=r'(?i)^/дать(.*)'))
 @client.on(events.NewMessage(pattern=r'(?i)^/перевести(.*)'))
 @client.on(events.NewMessage(pattern=r'(?i)^перевести(.*)'))
-async def swap_money(event):
+async def swap_money(event: Message):
     args = event.pattern_match.group(1).strip()
     if len(args) < 1:
         return await event.reply(phrase.money.no_count+phrase.money.swap_balance_use)
@@ -1145,7 +1143,7 @@ async def swap_money(event):
 
 @client.on(events.NewMessage(pattern=r'(?i)^/dns$'))
 @client.on(events.NewMessage(pattern=r'(?i)^/днс$'))
-async def tg_dns(event):
+async def tg_dns(event: Message):
     if event.sender_id not in db.database('admins_id'):
         return await event.reply(phrase.perms.no)
     return await event.reply(
@@ -1155,7 +1153,7 @@ async def tg_dns(event):
 
 
 @client.on(events.NewMessage(pattern=r'(?i)^/банк$'))
-async def all_money(event):
+async def all_money(event: Message):
     return await event.reply(
         phrase.money.all_money.format(
             decline_number(db.get_all_money(), 'изумруд')
@@ -1168,7 +1166,7 @@ async def all_money(event):
 @client.on(events.NewMessage(pattern=r'(?i)^/стат крокодил$'))
 @client.on(events.NewMessage(pattern=r'(?i)^/стат слова$'))
 @client.on(events.NewMessage(pattern=r'(?i)^топ крокодила$'))
-async def crocodile_wins(event):
+async def crocodile_wins(event: Message):
     all = db.crocodile_stat.get_all()
     text = ''
     n = 1
@@ -1184,7 +1182,7 @@ async def crocodile_wins(event):
 
 
 @client.on(events.NewMessage(pattern=r'(?i)^/слово(.*)'))
-async def word_request(event):
+async def word_request(event: Message):
     word = event.pattern_match.group(1).strip().lower()
     with open(
         crocodile_path, 'r', encoding='utf-8'
@@ -1254,7 +1252,7 @@ async def word_request(event):
 
 @client.on(events.NewMessage(pattern=r'(?i)^/nick(.*)'))
 @client.on(events.NewMessage(pattern=r'(?i)^/ник(.*)'))
-async def check_nick(event):
+async def check_nick(event: Message):
     try:
         user = await client(
             GetFullUserRequest(event.pattern_match.group(1).strip())
@@ -1277,7 +1275,7 @@ async def check_nick(event):
 @client.on(events.NewMessage(pattern=r'(?i)^/государства$'))
 @client.on(events.NewMessage(pattern=r'(?i)^государства$'))
 @client.on(events.NewMessage(pattern=r'(?i)^список госв$'))
-async def states_all(event):
+async def states_all(event: Message):
     data = db.states.get_all()
     if data == {}:
         return await event.reply(phrase.state.empty_list)
@@ -1291,7 +1289,7 @@ async def states_all(event):
 
 @client.on(events.NewMessage(pattern=r'(?i)^\+госво(.*)'))
 @client.on(events.NewMessage(pattern=r'(?i)^\+государство(.*)'))
-async def states_make(event):
+async def states_make(event: Message):
     arg = event.pattern_match.group(1).strip()
     if arg == '':
         return await event.reply(phrase.state.no_name)
@@ -1324,7 +1322,7 @@ async def states_make(event):
 @client.on(events.NewMessage(pattern=r'(?i)^вступить(.*)'))
 @client.on(events.NewMessage(pattern=r'(?i)^/г вступить(.*)'))
 @client.on(events.NewMessage(pattern=r'(?i)^/г войти(.*)'))
-async def states_enter(event):
+async def states_enter(event: Message):
     arg = event.pattern_match.group(1).strip()
     if arg == '':
         return await event.reply(phrase.state.no_name)
@@ -1398,7 +1396,7 @@ async def states_enter(event):
 
 @client.on(events.NewMessage(pattern=r'(?i)^/госво(.*)'))
 @client.on(events.NewMessage(pattern=r'(?i)^/государство(.*)'))
-async def states_get(event):
+async def states_get(event: Message):
     arg = event.pattern_match.group(1).strip()
     if arg == '':
         player_in = db.states.if_player(event.sender_id)
@@ -1441,7 +1439,7 @@ async def states_get(event):
 @client.on(events.NewMessage(pattern=r'(?i)^выйти из госва'))
 @client.on(events.NewMessage(pattern=r'(?i)^/г покинуть'))
 @client.on(events.NewMessage(pattern=r'(?i)^/г выйти'))
-async def states_leave(event):
+async def states_leave(event: Message):
     state_name = db.states.if_player(event.sender_id)
     if state_name is False:
         return await event.reply(phrase.state.not_a_member)
@@ -1490,14 +1488,14 @@ async def states_leave(event):
 @client.on(events.NewMessage(pattern=r'(?i)^/г описание$'))
 @client.on(events.NewMessage(pattern=r'(?i)^/о госве$'))
 @client.on(events.NewMessage(pattern=r'(?i)^/г о госве$'))
-async def states_desc_empty(event):
+async def states_desc_empty(event: Message):
     return await event.reply(phrase.state.no_desc)
 
 
 @client.on(events.NewMessage(pattern=r'(?i)^/г описание\s(.+)'))
 @client.on(events.NewMessage(pattern=r'(?i)^/о госве\s(.+)'))
 @client.on(events.NewMessage(pattern=r'(?i)^/г о госве\s(.+)'))
-async def states_desc(event):
+async def states_desc(event: Message):
     state_name = db.states.if_author(event.sender_id)
     if state_name is False:
         return await event.reply(phrase.state.not_a_author)
@@ -1508,13 +1506,13 @@ async def states_desc(event):
 
 @client.on(events.NewMessage(pattern=r'(?i)^/г корды$'))
 @client.on(events.NewMessage(pattern=r'(?i)^/г координаты$'))
-async def states_coords_empty(event):
+async def states_coords_empty(event: Message):
     return await event.reply(phrase.state.howto_change_coords)
 
 
 @client.on(events.NewMessage(pattern=r'(?i)^/г корды\s(.+)'))
 @client.on(events.NewMessage(pattern=r'(?i)^/г координаты\s(.+)'))
-async def states_coords(event):
+async def states_coords(event: Message):
     state_name = db.states.if_author(event.sender_id)
     if state_name is False:
         return await event.reply(phrase.state.not_a_author)
@@ -1531,7 +1529,7 @@ async def states_coords(event):
 
 @client.on(events.NewMessage(pattern=r'(?i)^/г входы\s(.+)'))
 @client.on(events.NewMessage(pattern=r'(?i)^/г вступления\s(.+)'))
-async def states_enter(event):
+async def states_enter(event: Message):
     state_name = db.states.if_author(event.sender_id)
     if state_name is False:
         return await event.reply(phrase.state.not_a_author)
@@ -1590,7 +1588,7 @@ async def states_enter(event):
 
 @client.on(events.NewMessage(pattern=r'(?i)^/г входы$'))
 @client.on(events.NewMessage(pattern=r'(?i)^/г вступления$'))
-async def states_enter(event):
+async def states_enter(event: Message):
     state_name = db.states.if_author(event.sender_id)
     if state_name is False:
         return await event.reply(phrase.state.not_a_author)
@@ -1609,12 +1607,12 @@ async def states_enter(event):
 @client.on(events.NewMessage(pattern=r'(?i)^/время$'))
 @client.on(events.NewMessage(pattern=r'(?i)^/мск$'))
 @client.on(events.NewMessage(pattern=r'(?i)^/msk$'))
-async def msktime(event):
+async def msktime(event: Message):
     return await event.reply(phrase.time.format(datetime.now().strftime("%H:%M:%S")))
 
 
 @client.on(events.NewMessage(pattern=r'(?i)^/тест\s(.+)'))
-async def test(event):
+async def test(event: Message):
     arg = event.pattern_match.group(1).strip()
     if event.sender_id not in db.database('admins_id'):
         return await event.reply(phrase.perms.no)
@@ -1624,7 +1622,7 @@ async def test(event):
 'Эвенты для крокодила'
 
 
-async def crocodile_hint(event):
+async def crocodile_hint(event: Message):
     game = db.database("current_game")
     hint = game["hints"]
     if event.sender_id in hint:
@@ -1665,7 +1663,7 @@ async def crocodile_hint(event):
     return await event.reply(response)
 
 
-async def crocodile_handler(event):
+async def crocodile_handler(event: Message):
     text = event.text.strip().lower()
     if len(text) > 0:
         current_word = db.database("current_game")["word"]
