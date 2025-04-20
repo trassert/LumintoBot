@@ -60,7 +60,9 @@ async def get_name(id, push=True, minecraft=False):
                     f"(tg://user?id={id})"
                 )
         user_name = await client.get_entity(int(id))
-        if user_name.username is None or push is False:
+        if push and user_name.username is not None:
+            return "@" + user_name.username
+        elif user_name.username is None:
             if user_name.last_name is None:
                 return (
                     f"[{user_name.first_name}]"
@@ -70,10 +72,10 @@ async def get_name(id, push=True, minecraft=False):
                 return (
                     f"[{user_name.first_name} {user_name.last_name}]"
                     f"(tg://user?id={id})"
-                )
+                )  
         else:
             return "@" + user_name.username
-    except Exception as e:
+    except Exception:
         return 'Неопознанный персонаж'
 
 
@@ -1289,7 +1291,7 @@ async def states_all(event: Message):
 
 @client.on(events.NewMessage(pattern=r'(?i)^\+госво(.*)'))
 @client.on(events.NewMessage(pattern=r'(?i)^\+государство(.*)'))
-async def states_make(event: Message):
+async def state_make(event: Message):
     arg = event.pattern_match.group(1).strip()
     if arg == '':
         return await event.reply(phrase.state.no_name)
@@ -1322,7 +1324,7 @@ async def states_make(event: Message):
 @client.on(events.NewMessage(pattern=r'(?i)^вступить(.*)'))
 @client.on(events.NewMessage(pattern=r'(?i)^/г вступить(.*)'))
 @client.on(events.NewMessage(pattern=r'(?i)^/г войти(.*)'))
-async def states_enter(event: Message):
+async def state_enter(event: Message):
     arg = event.pattern_match.group(1).strip()
     if arg == '':
         return await event.reply(phrase.state.no_name)
@@ -1396,7 +1398,7 @@ async def states_enter(event: Message):
 
 @client.on(events.NewMessage(pattern=r'(?i)^/госво(.*)'))
 @client.on(events.NewMessage(pattern=r'(?i)^/государство(.*)'))
-async def states_get(event: Message):
+async def state_get(event: Message):
     arg = event.pattern_match.group(1).strip()
     if arg == '':
         player_in = db.states.if_player(event.sender_id)
@@ -1419,7 +1421,7 @@ async def states_get(event: Message):
         phrase.state.get.format(
             type=phrase.state_types[state.type],
             name=state.name,
-            money=state.money,
+            money=decline_number(int(state.money), "изумруд"),
             author=db.nicks(id=state.author).get(),
             enter=enter,
             desc=state.desc,
@@ -1439,7 +1441,7 @@ async def states_get(event: Message):
 @client.on(events.NewMessage(pattern=r'(?i)^выйти из госва'))
 @client.on(events.NewMessage(pattern=r'(?i)^/г покинуть'))
 @client.on(events.NewMessage(pattern=r'(?i)^/г выйти'))
-async def states_leave(event: Message):
+async def state_leave(event: Message):
     state_name = db.states.if_player(event.sender_id)
     if state_name is False:
         return await event.reply(phrase.state.not_a_member)
@@ -1488,14 +1490,14 @@ async def states_leave(event: Message):
 @client.on(events.NewMessage(pattern=r'(?i)^/г описание$'))
 @client.on(events.NewMessage(pattern=r'(?i)^/о госве$'))
 @client.on(events.NewMessage(pattern=r'(?i)^/г о госве$'))
-async def states_desc_empty(event: Message):
+async def state_desc_empty(event: Message):
     return await event.reply(phrase.state.no_desc)
 
 
 @client.on(events.NewMessage(pattern=r'(?i)^/г описание\s(.+)'))
 @client.on(events.NewMessage(pattern=r'(?i)^/о госве\s(.+)'))
 @client.on(events.NewMessage(pattern=r'(?i)^/г о госве\s(.+)'))
-async def states_desc(event: Message):
+async def state_desc(event: Message):
     state_name = db.states.if_author(event.sender_id)
     if state_name is False:
         return await event.reply(phrase.state.not_a_author)
@@ -1506,13 +1508,13 @@ async def states_desc(event: Message):
 
 @client.on(events.NewMessage(pattern=r'(?i)^/г корды$'))
 @client.on(events.NewMessage(pattern=r'(?i)^/г координаты$'))
-async def states_coords_empty(event: Message):
+async def state_coords_empty(event: Message):
     return await event.reply(phrase.state.howto_change_coords)
 
 
 @client.on(events.NewMessage(pattern=r'(?i)^/г корды\s(.+)'))
 @client.on(events.NewMessage(pattern=r'(?i)^/г координаты\s(.+)'))
-async def states_coords(event: Message):
+async def state_coords(event: Message):
     state_name = db.states.if_author(event.sender_id)
     if state_name is False:
         return await event.reply(phrase.state.not_a_author)
@@ -1529,7 +1531,7 @@ async def states_coords(event: Message):
 
 @client.on(events.NewMessage(pattern=r'(?i)^/г входы\s(.+)'))
 @client.on(events.NewMessage(pattern=r'(?i)^/г вступления\s(.+)'))
-async def states_enter(event: Message):
+async def state_enter(event: Message):
     state_name = db.states.if_author(event.sender_id)
     if state_name is False:
         return await event.reply(phrase.state.not_a_author)
@@ -1588,7 +1590,7 @@ async def states_enter(event: Message):
 
 @client.on(events.NewMessage(pattern=r'(?i)^/г входы$'))
 @client.on(events.NewMessage(pattern=r'(?i)^/г вступления$'))
-async def states_enter(event: Message):
+async def state_enter(event: Message):
     state_name = db.states.if_author(event.sender_id)
     if state_name is False:
         return await event.reply(phrase.state.not_a_author)
@@ -1601,6 +1603,47 @@ async def states_enter(event: Message):
     elif state.enter is False:
         state.change("enter", True)
         return await event.reply(phrase.state.enter_open)
+
+
+@client.on(events.NewMessage(pattern=r'(?i)^/пополнить казну\s(.+)'))
+@client.on(events.NewMessage(pattern=r'(?i)^/г пополнить\s(.+)'))
+@client.on(events.NewMessage(pattern=r'(?i)^\+казна\s(.+)'))
+@client.on(events.NewMessage(pattern=r'(?i)^г пополнить\s(.+)'))
+async def state_add_money(event: Message):
+    state_name = db.states.if_player(event.sender_id)
+    if state_name is False:
+        state_name = db.states.if_author(event.sender_id)
+        if state_name is False:
+            return await event.reply(phrase.state.not_a_member)
+    arg = event.pattern_match.group(1).strip()
+    if not arg.isdigit():
+        return await event.reply(phrase.state.howto_add_balance)
+    try:
+        arg = int(arg)
+    except Exception:
+        return await event.reply(phrase.state.howto_add_balance)
+    balance = db.get_money(event.sender_id)
+    if arg > balance:
+        return await event.reply(
+            phrase.money.not_enough.format(decline_number(balance, "изумруд"))
+        )
+    db.add_money(event.sender_id, -arg)
+    state = db.state(state_name)
+    state.change("money", state.money+arg)
+    logger.info(f'Казна {state_name} пополнена на {arg}')
+    return await event.reply(
+        phrase.state.add_treasury.format(
+            decline_number(arg, "изумруд")
+        )
+    )
+
+
+@client.on(events.NewMessage(pattern=r'(?i)^/пополнить казну$'))
+@client.on(events.NewMessage(pattern=r'(?i)^/г пополнить$'))
+@client.on(events.NewMessage(pattern=r'(?i)^\+казна$'))
+@client.on(events.NewMessage(pattern=r'(?i)^г пополнить$'))
+async def state_add_money_empty(event: Message):
+    return await event.reply(phrase.state.howto_add_balance)
 
 
 @client.on(events.NewMessage(pattern=r'(?i)^/time'))
