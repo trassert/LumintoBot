@@ -733,11 +733,16 @@ async def start(event: Message):
 
 
 @client.on(events.NewMessage(pattern=r'(?i)^/пинг(.*)'))
+@client.on(events.NewMessage(pattern=r'(?i)^/ping'))
 @client.on(events.NewMessage(pattern=r'(?i)^/ping(.*)'))
 @client.on(events.NewMessage(pattern=r'(?i)^пинг(.*)'))
 async def ping(event: Message):
+    try:
+        arg = event.pattern_match.group(1).strip()
+    except IndexError:
+        arg = ''
     text = await crosssocial.ping(
-        event.pattern_match.group(1).strip(),
+        arg,
         event.date.timestamp()
     )
     if text is None: return

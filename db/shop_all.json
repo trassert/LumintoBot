@@ -2,17 +2,17 @@
     "armorer": {
         "Алмазный меч": {
             "name": "minecraft:diamond_sword",
-            "price": 10,
+            "price": 8,
             "value": 1
         },
         "Деревянный меч": {
             "name": "minecraft:wooden_sword",
-            "price": 2,
+            "price": 1,
             "value": 1
         },
         "Железные ботинки": {
             "name": "minecraft:iron_boots",
-            "price": 4,
+            "price": 3,
             "value": 1
         },
         "Железные поножи": {
@@ -22,27 +22,27 @@
         },
         "Железный меч": {
             "name": "minecraft:iron_sword",
-            "price": 5,
+            "price": 4,
             "value": 1
         },
         "Железный нагрудник": {
             "name": "minecraft:iron_chestplate",
-            "price": 5,
+            "price": 6,
             "value": 1
         },
         "Железный шлем": {
             "name": "minecraft:iron_helmet",
-            "price": 5,
+            "price": 4,
             "value": 1
         },
         "Золотой меч": {
             "name": "minecraft:golden_sword",
-            "price": 3,
+            "price": 2,
             "value": 1
         },
         "Каменный меч": {
             "name": "minecraft:stone_sword",
-            "price": 3,
+            "price": 1,
             "value": 1
         },
         "Кожаная куртка": {
@@ -52,17 +52,17 @@
         },
         "Кожаные ботинки": {
             "name": "minecraft:leather_boots",
-            "price": 2,
+            "price": 1,
             "value": 1
         },
         "Кожаные штаны": {
             "name": "minecraft:leather_leggings",
-            "price": 3,
+            "price": 2,
             "value": 1
         },
         "Кожаный шлем": {
             "name": "minecraft:leather_helmet",
-            "price": 3,
+            "price": 1,
             "value": 1
         },
         "Койф": {
@@ -72,7 +72,7 @@
         },
         "Кольчуга": {
             "name": "minecraft:chainmail_chestplate",
-            "price": 6,
+            "price": 7,
             "value": 1
         },
         "Кольчужные ботинки": {
@@ -82,27 +82,27 @@
         },
         "Кольчужные поножи": {
             "name": "minecraft:chainmail_leggings",
-            "price": 4,
+            "price": 5,
             "value": 1
         },
         "Алмазный шлем": {
             "name": "minecraft:diamond_helmet",
-            "price": 20,
+            "price": 15,
             "value": 1
         },
         "Алмазный нагрудник": {
             "name": "minecraft:diamond_chestplate",
-            "price": 30,
+            "price": 20,
             "value": 1
         },
         "Алмазные поножи": {
             "name": "minecraft:diamond_leggings",
-            "price": 20,
+            "price": 18,
             "value": 1
         },
         "Алмазные ботинки": {
             "name": "minecraft:diamond_boots",
-            "price": 13,
+            "price": 10,
             "value": 1
         },
         "Книга «Защита IV»": {
@@ -112,7 +112,7 @@
         },
         "Книга «Защита от стрел IV»": {
             "name": "enchanted_book[stored_enchantments={levels:{projectile_protection:4}}]",
-            "price": 27,
+            "price": 23,
             "value": 1
         }
     },
