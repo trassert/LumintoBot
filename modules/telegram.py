@@ -1117,7 +1117,7 @@ async def swap_money(event: Message):
         )
 
     try:
-        tag = args[2]
+        tag = args[1]
         user = await client(
             GetFullUserRequest(tag)
         )
