@@ -1668,7 +1668,6 @@ async def mine(event: Message):
         db.states.if_author(event.sender_id) is False
     ):
         return await event.reply(phrase.mine.not_in_state)
-    
     if db.ready_to_mine(event.sender_id) is False:
         return await event.reply(choice(phrase.mine.not_ready))
     added = randint(1, config.coofs.MineMaxGems)
