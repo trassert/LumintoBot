@@ -10,6 +10,7 @@ db/bot.session-journal
 db/shop_current.json
 db/tickets.json
 db/crocodile/*
+db/timings/*
 
 images/*
 

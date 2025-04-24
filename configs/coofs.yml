@@ -20,3 +20,7 @@ MaxStatPlayers: 10
 Type0Players: 1
 Type1Players: 3
 Type2Players: 5
+
+# Время ожидания копания в секундах
+MineWait: 14400
+MineMaxGems: 15

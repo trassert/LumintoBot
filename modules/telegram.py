@@ -1651,6 +1651,35 @@ async def state_add_money_empty(event: Message):
     return await event.reply(phrase.state.howto_add_balance)
 
 
+@client.on(events.NewMessage(pattern=r'(?i)^/г шахта$'))
+@client.on(events.NewMessage(pattern=r'(?i)^/г майнить$'))
+@client.on(events.NewMessage(pattern=r'(?i)^/г копать$'))
+@client.on(events.NewMessage(pattern=r'(?i)^/шахта$'))
+@client.on(events.NewMessage(pattern=r'(?i)^/майнить$'))
+@client.on(events.NewMessage(pattern=r'(?i)^/копать$'))
+@client.on(events.NewMessage(pattern=r'(?i)^шахта$'))
+@client.on(events.NewMessage(pattern=r'(?i)^майнить$'))
+@client.on(events.NewMessage(pattern=r'(?i)^копать$'))
+@client.on(events.NewMessage(pattern=r'(?i)^/mine'))
+async def mine(event: Message):
+    if (
+        db.states.if_player(event.sender_id) is False
+    ) and (
+        db.states.if_author(event.sender_id) is False
+    ):
+        return await event.reply(phrase.mine.not_in_state)
+    
+    if db.ready_to_mine(event.sender_id) is False:
+        return await event.reply(choice(phrase.mine.not_ready))
+    added = randint(1, config.coofs.MineMaxGems)
+    db.add_money(event.sender_id, added)
+    return await event.reply(
+        phrase.mine.done.format(
+            decline_number(added, 'изумруд')
+        )
+    )
+    
+
 @client.on(events.NewMessage(pattern=r'(?i)^/time'))
 @client.on(events.NewMessage(pattern=r'(?i)^/время$'))
 @client.on(events.NewMessage(pattern=r'(?i)^/мск$'))

@@ -4,9 +4,11 @@ import aiomysql
 from loguru import logger
 from datetime import datetime, timedelta
 from os import path, listdir
+from time import time
 from random import choice, randint
 from collections import defaultdict
 
+from . import config
 from .get_theme import weighted_choice
 
 nick_path = path.join("db", "minecraft.json")
@@ -14,6 +16,7 @@ stats_path = path.join("db", "chat_stats")
 tickets_path = path.join("db", "tickets.json")
 states_path = path.join("db", "states")
 times_path = path.join("db", "time")
+mine_path = path.join("db", "timings", "mine.json")
 
 
 def database(key, value=None, delete=None, log=True):
@@ -416,14 +419,14 @@ class states:
             sorted(all.items(), key=lambda item: len(item[1]["players"]), reverse=True)
         )
 
-    def if_author(id: int) -> bool:
+    def if_author(id: int):
         for file in listdir(states_path):
             with open(path.join(states_path, file), encoding="utf8") as f:
                 if json.load(f)["author"] == id:
                     return file.replace(".json", "")
         return False
 
-    def if_player(id: int) -> bool:
+    def if_player(id: int):
         for file in listdir(states_path):
             with open(path.join(states_path, file), encoding="utf8") as f:
                 for player in json.load(f)["players"]:
@@ -462,3 +465,19 @@ class AsyncSQLDatabase:
                 await cursor.execute(query)
                 result = await cursor.fetchall()
                 return result
+
+
+def ready_to_mine(id: str) -> bool:
+    id = str(id)
+    with open(mine_path, encoding="utf8") as f:
+        data = json.load(f)
+    if (
+        id not in data
+    ) or (
+        int(time()) - data.get(id, int(time())) > config.coofs.MineWait
+    ):
+        data[id] = int(time())
+        with open(mine_path, "w", encoding="utf8") as f:
+            json.dump(data, f, indent=4, ensure_ascii=False, sort_keys=True)
+        return True
+    return False
