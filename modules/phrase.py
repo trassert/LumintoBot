@@ -79,7 +79,7 @@ class money:
 
 
 class help:
-    comm = "🤖 : [Помощь по командам](https://teletype.in/@trassert/commandsv2)"
+    comm = "🤖 : [Помощь по командам](https://t.me/trassert_help)"
 
 
 class server:
