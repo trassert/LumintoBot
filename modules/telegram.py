@@ -1362,10 +1362,11 @@ async def state_enter(event: Message):
     players = state.players
     players.append(event.sender_id)
     state.change("players", players)
+    state_name = state.name.capitalize()
     await client.send_message(
         entity=config.chats.chat,
         message=phrase.state.new_player.format(
-            state=state.name,
+            state=state_name,
             player=nick
         ),
         reply_to=config.chats.topics.rp
@@ -1378,7 +1379,7 @@ async def state_enter(event: Message):
         await client.send_message(
             entity=config.chats.chat,
             message=phrase.state.up.format(
-                name=state.name,
+                name=state_name,
                 type='Государство'
             ),
             reply_to=config.chats.topics.rp
@@ -1392,13 +1393,13 @@ async def state_enter(event: Message):
         await client.send_message(
             entity=config.chats.chat,
             message=phrase.state.up.format(
-                name=state.name,
+                name=state_name,
                 type='Империя'
             ),
             reply_to=config.chats.topics.rp
         )
         state.change('type', 2)
-    return await event.reply(phrase.state.admit.format(state.name))
+    return await event.reply(phrase.state.admit.format(state_name))
 
 
 @client.on(events.NewMessage(pattern=r'(?i)^/госво(.*)'))
@@ -1453,10 +1454,11 @@ async def state_leave(event: Message):
     state = db.state(state_name)
     state.players.remove(event.sender_id)
     state.change('players', state.players)
+    state_name = state.name.capitalize()
     await client.send_message(
         entity=config.chats.chat,
         message=phrase.state.leave_player.format(
-            state=state.name,
+            state=state_name,
             player=db.nicks(id=event.sender_id).get()
         ),
         reply_to=config.chats.topics.rp
@@ -1483,7 +1485,7 @@ async def state_leave(event: Message):
         await client.send_message(
             entity=config.chats.chat,
             message=phrase.state.down.format(
-                name=state.name,
+                name=state_name,
                 type='Княжество'
             ),
             reply_to=config.chats.topics.rp
