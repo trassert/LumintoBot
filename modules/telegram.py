@@ -1625,6 +1625,8 @@ async def state_add_money(event: Message):
     arg = event.pattern_match.group(1).strip()
     if not arg.isdigit():
         return await event.reply(phrase.state.howto_add_balance)
+    if arg < 1:
+        return await event.reply(phrase.money.negative_count)
     try:
         arg = int(arg)
     except Exception:
@@ -1651,6 +1653,38 @@ async def state_add_money(event: Message):
 @client.on(events.NewMessage(pattern=r'(?i)^г пополнить$'))
 async def state_add_money_empty(event: Message):
     return await event.reply(phrase.state.howto_add_balance)
+
+
+@client.on(events.NewMessage(pattern=r'(?i)^/забрать из казны\s(.+)'))
+@client.on(events.NewMessage(pattern=r'(?i)^/г снять\s(.+)'))
+@client.on(events.NewMessage(pattern=r'(?i)^\-казна\s(.+)'))
+@client.on(events.NewMessage(pattern=r'(?i)^г снять\s(.+)'))
+async def state_rem_money(event: Message):
+    state_name = db.states.if_author(event.sender_id)
+    if state_name is False:
+        return await event.reply(phrase.state.not_a_author)
+    arg = event.pattern_match.group(1).strip()
+    if not arg.isdigit():
+        return await event.reply(phrase.state.howto_add_balance)
+    if arg < 1:
+        return await event.reply(phrase.money.negative_count)
+    arg = int(arg)
+    state = db.state(state_name)
+    if state.money < arg:
+        return await event.reply(phrase.state.too_low)
+    state.change("money", state.money-arg)
+    db.add_money(event.sender_id, arg)
+    return await event.reply(
+        phrase.state.rem_treasury.format(decline_number(arg, "изумруд"))
+    )
+
+
+@client.on(events.NewMessage(pattern=r'(?i)^/забрать из казны$'))
+@client.on(events.NewMessage(pattern=r'(?i)^/г снять$'))
+@client.on(events.NewMessage(pattern=r'(?i)^\-казна$'))
+@client.on(events.NewMessage(pattern=r'(?i)^г снять$'))
+async def state_rem_money_empty(event: Message):
+    return await event.reply(phrase.state.howto_rem_balance)
 
 
 @client.on(events.NewMessage(pattern=r'(?i)^/г шахта$'))
