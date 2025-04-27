@@ -1665,10 +1665,13 @@ async def state_rem_money(event: Message):
         return await event.reply(phrase.state.not_a_author)
     arg = event.pattern_match.group(1).strip()
     if not arg.isdigit():
-        return await event.reply(phrase.state.howto_add_balance)
+        return await event.reply(phrase.state.howto_rem_balance)
+    try:
+        arg = int(arg)
+    except Exception:
+        return await event.reply(phrase.state.howto_rem_balance)
     if arg < 1:
         return await event.reply(phrase.money.negative_count)
-    arg = int(arg)
     state = db.state(state_name)
     if state.money < arg:
         return await event.reply(phrase.state.too_low)
