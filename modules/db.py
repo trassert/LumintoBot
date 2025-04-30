@@ -471,9 +471,7 @@ def ready_to_mine(id: str) -> bool:
     id = str(id)
     with open(mine_path, encoding="utf8") as f:
         data = json.load(f)
-    if (
-        id not in data
-    ) or (
+    if (id not in data) or (
         int(time()) - data.get(id, int(time())) > config.coofs.MineWait
     ):
         data[id] = int(time())

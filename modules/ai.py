@@ -7,10 +7,7 @@ from .formatter import formatter
 from . import config
 
 
-ai_servers = [
-    'trassert0reserve.pythonanywhere.com',
-    'trassert.pythonanywhere.com'
-]
+ai_servers = ["trassert0reserve.pythonanywhere.com", "trassert.pythonanywhere.com"]
 
 
 async def response(message):

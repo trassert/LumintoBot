@@ -4,12 +4,12 @@ from loguru import logger
 
 def weighted_choice(strings, weights):
     if not isinstance(strings, list) or not all(isinstance(s, str) for s in strings):
-        logger.error("Strings должен быть списком строк.")
+        logger.error("Все элементы должны быть строками!")
         return None
 
     # Проверка на словарь
     if not isinstance(weights, dict):
-        logger.error("Weights должен быть словарем.")
+        logger.error("Веса должны быть словарем.")
         return None
 
     # Проверка, что все ключи в weights есть в strings и веса - числа
