@@ -721,14 +721,12 @@ async def super_game(event: Message):
     return await client.send_message(config.chats.chat, phrase.crocodile.super_game)
 
 
-@client.on(events.NewMessage(pattern=r"(?i)^/ии(.*)"))
-@client.on(events.NewMessage(pattern=r"(?i)^/ai(.*)"))
-@client.on(events.NewMessage(pattern=r"(?i)^ии(.*)"))
-@client.on(events.NewMessage(pattern=r"(?i)^/бот(.*)"))
+@client.on(events.NewMessage(pattern=r"(?i)^/ии\s(.+)"))
+@client.on(events.NewMessage(pattern=r"(?i)^/ai\s(.+)"))
+@client.on(events.NewMessage(pattern=r"(?i)^ии\s(.+)"))
+@client.on(events.NewMessage(pattern=r"(?i)^/бот\s(.+)"))
 async def gemini(event: Message):
     arg = event.pattern_match.group(1).strip()
-    if len(arg) < 1:
-        return await event.reply(phrase.no.response)
     response = await ai.response(arg)
     if response is None:
         return await event.reply(phrase.server.overload)
@@ -737,6 +735,14 @@ async def gemini(event: Message):
             await event.reply(response[x : x + 4096])
     else:
         return await event.reply(response)
+
+
+@client.on(events.NewMessage(pattern=r"(?i)^/ии$"))
+@client.on(events.NewMessage(pattern=r"(?i)^/ai$"))
+@client.on(events.NewMessage(pattern=r"(?i)^ии$"))
+@client.on(events.NewMessage(pattern=r"(?i)^/бот$"))
+async def gemini_empty(event: Message):
+    return await event.reply(phrase.no.response)
 
 
 @client.on(events.NewMessage(pattern=r"//(.+)"))
