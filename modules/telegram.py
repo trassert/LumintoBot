@@ -1263,6 +1263,10 @@ async def state_desc(event: Message):
     if state_name is False:
         return await event.reply(phrase.state.not_a_author)
     new_desc = event.pattern_match.group(1).strip()
+    if len(new_desc) > config.coofs.DescriptionsMaxLen:
+        return await event.reply(
+            phrase.state.max_len.format(config.coofs.DescriptionsMaxLen)
+        )
     db.state(state_name).change("desc", new_desc)
     return await event.reply(phrase.state.change_desc)
 
