@@ -996,7 +996,7 @@ async def crocodile_wins(event: Message):
     return await event.reply(phrase.crocodile.stat.format(text), silent=True)
 
 
-@client.on(events.NewMessage(pattern=r"(?i)^/слово(.*)"))
+@client.on(events.NewMessage(pattern=r"(?i)^/слово\s(.+)"))
 async def word_request(event: Message):
     word = event.pattern_match.group(1).strip().lower()
     with open(crocodile_path, "r", encoding="utf-8") as f:
@@ -1005,11 +1005,7 @@ async def word_request(event: Message):
     with open(crocodile_blacklist_path, "r", encoding="utf-8") as f:
         if word in f.read().split("\n"):
             return await event.reply(phrase.word.in_blacklist)
-    try:
-        entity = await client.get_entity(event.sender_id)
-    except TypeError:
-        return await event.reply(phrase.word.no_user)
-    entity = entity.username
+    entity = get_name(event.sender_id)
     logger.info(f'Пользователь {entity} хочет добавить слово "{word}"')
     keyboard = ReplyInlineMarkup(
         [
@@ -1027,16 +1023,16 @@ async def word_request(event: Message):
             )
         ]
     )
+    hint = None
+    while hint is None:
+        hint = await ai.response(
+            f'Сделай подсказку для слова "{word}". '
+            'Ни в коем случае не добавляй никаких "подсказка для слова.." '
+            "и т.п, ответ должен содержать только подсказку. "
+            "Не забудь, что подсказка не должна "
+            "содержать слово в любом случае. "
+        )
     try:
-        hint = None
-        while hint is None:
-            hint = await ai.response(
-                f'Сделай подсказку для слова "{word}". '
-                'Ни в коем случае не добавляй никаких "подсказка для слова.." '
-                "и т.п, ответ должен содержать только подсказку. "
-                "Не забудь, что подсказка не должна "
-                "содержать слово в любом случае. "
-            )
         await client.send_message(
             config.tokens.bot.creator,
             phrase.word.request.format(user=f"@{entity}", word=word, hint=hint),
@@ -1045,6 +1041,11 @@ async def word_request(event: Message):
     except TGErrors.ButtonDataInvalidError:
         return await event.reply(phrase.word.long)
     return await event.reply(phrase.word.set.format(word=word))
+
+
+@client.on(events.NewMessage(pattern=r"(?i)^/слово$"))
+async def word_request(event: Message):
+    return await event.reply(phrase.word.empty)
 
 
 @client.on(events.NewMessage(pattern=r"(?i)^/nick(.*)"))
