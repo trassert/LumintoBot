@@ -1035,7 +1035,7 @@ async def word_request(event: Message):
     try:
         await client.send_message(
             config.tokens.bot.creator,
-            phrase.word.request.format(user=f"@{entity}", word=word, hint=hint),
+            phrase.word.request.format(user=entity, word=word, hint=hint),
             buttons=keyboard,
         )
     except TGErrors.ButtonDataInvalidError:
