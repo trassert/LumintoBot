@@ -1126,6 +1126,8 @@ async def state_enter(event: Message):
         return await event.reply(phrase.state.not_connected)
     if db.states.if_player(event.sender_id) is not False:
         return await event.reply(phrase.state.already_player)
+    if db.states.if_author(event.sender_id) is not False:
+        return await event.reply(phrase.state.already_author)
     state = db.state(arg)
     if state.enter != True:
         return await event.reply(phrase.state.enter_exit)
