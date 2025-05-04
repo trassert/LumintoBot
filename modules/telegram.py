@@ -379,10 +379,10 @@ async def do_ticket(event: Message):
         return await event.reply(phrase.ticket.no_value)
     try:
         arg = int(arg)
-        if arg < 1:
-            return await event.reply(phrase.ticket.bigger_than_zero)
     except ValueError:
         return await event.reply(phrase.ticket.not_int)
+    if arg < 1:
+        return await event.reply(phrase.ticket.bigger_than_zero)
     balance = db.get_money(event.sender_id)
     if balance < arg:
         return await event.reply(
@@ -1362,12 +1362,12 @@ async def state_add_money(event: Message):
     arg = event.pattern_match.group(1).strip()
     if not arg.isdigit():
         return await event.reply(phrase.state.howto_add_balance)
-    if arg < 1:
-        return await event.reply(phrase.money.negative_count)
     try:
         arg = int(arg)
     except Exception:
         return await event.reply(phrase.state.howto_add_balance)
+    if arg < 1:
+        return await event.reply(phrase.money.negative_count)
     balance = db.get_money(event.sender_id)
     if arg > balance:
         return await event.reply(
