@@ -1005,7 +1005,7 @@ async def word_request(event: Message):
     with open(crocodile_blacklist_path, "r", encoding="utf-8") as f:
         if word in f.read().split("\n"):
             return await event.reply(phrase.word.in_blacklist)
-    entity = get_name(event.sender_id)
+    entity = await get_name(event.sender_id)
     logger.info(f'Пользователь {entity} хочет добавить слово "{word}"')
     keyboard = ReplyInlineMarkup(
         [
