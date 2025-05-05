@@ -126,8 +126,8 @@ class shop:
 
 class perms:
     no = "❌ : Вы не админ!"
-    admin_add = "✅ : **Новый администратор!**\nНик - {nick}\nID - {id}"
-    admin_del = "❌ : **Администратор удалён!**"
+    upgrade = "✅ : **{nick} повышен ({staff})**"
+    downgrade = "❌ : **{nick} понижен ({staff})**"
 
 
 class no:

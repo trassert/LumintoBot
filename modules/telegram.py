@@ -77,7 +77,8 @@ async def get_name(id, push=True, minecraft=False):
 
 
 async def checks(event):
-    if db.roles().get_role(event.sender_id) == -1:
+    roles = db.roles()
+    if roles.get(event.sender_id) == roles.BLACKLIST:
         if isinstance(event, events.CallbackQuery.Event):
             await event.answer(phrase.blacklisted, alert=True)
         await event.reply(phrase.blacklisted)
@@ -712,7 +713,8 @@ async def crocodile_bet(event: Message):
 
 @client.on(events.NewMessage(pattern=r"(?i)^/суперигра(.*)", func=checks))
 async def super_game(event: Message):
-    if event.sender_id not in db.database("admins_id"):
+    roles = db.roles()
+    if roles.get(event.sender_id) < roles.ADMIN:
         return await event.reply(phrase.perms.no)
     arg = event.pattern_match.group(1).strip()
     bets = db.database("crocodile_bets")
@@ -759,7 +761,8 @@ async def gemini_empty(event: Message):
 
 @client.on(events.NewMessage(pattern=r"//(.+)", func=checks))
 async def mcrcon(event: Message):
-    if event.sender_id not in db.database("admins_id"):
+    roles = db.roles()
+    if roles.get(event.sender_id) < roles.ADMIN:
         return await event.reply(phrase.perms.no)
     command = event.pattern_match.group(1).strip()
     logger.info(f"Выполняется команда: {command}")
@@ -785,7 +788,8 @@ async def mcrcon(event: Message):
 @client.on(events.NewMessage(pattern=r"(?i)^\+wl\s(.+)", func=checks))
 @client.on(events.NewMessage(pattern=r"(?i)^\-wl\s(.+)", func=checks))
 async def whitelist(event: Message):
-    if event.sender_id not in db.database("admins_id"):
+    roles = db.roles()
+    if roles.get(event.sender_id) < roles.VIP:
         return await event.reply(phrase.perms.no)
     if event.text[0] == "-":
         command = f"swl remove {event.pattern_match.group(1).strip()}"
@@ -805,65 +809,52 @@ async def whitelist(event: Message):
         return await event.reply(phrase.server.stopped)
 
 
-@client.on(events.NewMessage(pattern=r"\+cтафф(.*)", func=checks))
-@client.on(events.NewMessage(pattern=r"\+staff(.*)", func=checks))
+@client.on(events.NewMessage(pattern=r"\/повысить(.*)", func=checks))
+@client.on(events.NewMessage(pattern=r"\/upgrade(.*)", func=checks))
 async def add_staff(event: Message):
-    if event.sender_id != config.tokens.bot.creator:
+    roles = db.roles()
+    if roles.get(event.sender_id) < roles.OWNER:
         return await event.reply(phrase.perms.no)
+    arg = event.pattern_match.group(1).strip()
     try:
-        tag = event.pattern_match.group(1).strip()
-        user = await client(GetFullUserRequest(tag))
+        user = await client(GetFullUserRequest(arg))
         user = user.full_user.id
+        tag = await get_name(user)
     except IndexError:
         reply_to_msg = event.reply_to_msg_id
         if reply_to_msg:
             reply_message = await event.get_reply_message()
             user = reply_message.sender_id
-            entity = await client.get_entity(user)
-            if entity.username is None:
-                if entity.last_name is None:
-                    tag = entity.first_name
-                else:
-                    tag = entity.first_name + " " + entity.last_name
-            else:
-                tag = f"@{entity.username}"
+            tag = await get_name(user)
         else:
             return await event.reply(phrase.money.no_people)
-    admins = db.database("admins_id")
-    admins.append(user)
-    db.database("admins_id", admins)
-    return await event.reply(phrase.perms.admin_add.format(nick=tag, id=user))
+    new_role = roles.get(user)+1
+    roles.set(user, new_role)
+    return await event.reply(phrase.perms.upgrade.format(nick=tag, staff=new_role))
 
 
-@client.on(events.NewMessage(pattern=r"\-cтафф(.*)", func=checks))
-@client.on(events.NewMessage(pattern=r"\-staff(.*)", func=checks))
-async def del_staff(event: Message):
-    if event.sender_id != config.tokens.bot.creator:
+@client.on(events.NewMessage(pattern=r"\/понизить(.*)", func=checks))
+@client.on(events.NewMessage(pattern=r"\/downgrade(.*)", func=checks))
+async def add_staff(event: Message):
+    roles = db.roles()
+    if roles.get(event.sender_id) < roles.OWNER:
         return await event.reply(phrase.perms.no)
+    arg = event.pattern_match.group(1).strip()
     try:
-        tag = event.pattern_match.group(1).strip()
-        user = await client(GetFullUserRequest(tag))
+        user = await client(GetFullUserRequest(arg))
         user = user.full_user.id
+        tag = await get_name(user)
     except IndexError:
         reply_to_msg = event.reply_to_msg_id
         if reply_to_msg:
             reply_message = await event.get_reply_message()
             user = reply_message.sender_id
-            entity = await client.get_entity(user)
-            if entity.username is None:
-                if entity.last_name is None:
-                    tag = entity.first_name
-                else:
-                    tag = entity.first_name + " " + entity.last_name
-            else:
-                tag = f"@{entity.username}"
+            tag = await get_name(user)
         else:
             return await event.reply(phrase.money.no_people)
-    admins = db.database("admins_id")
-    while user in admins:
-        admins.remove(user)
-    db.database("admins_id", admins)
-    return await event.reply(phrase.perms.admin_del)
+    new_role = roles.get(user)-1
+    roles.set(user, new_role)
+    return await event.reply(phrase.perms.downgrade.format(nick=tag, staff=new_role))
 
 
 @client.on(events.NewMessage(pattern=r"(?i)^/топ игроков$", func=checks))

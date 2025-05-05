@@ -160,18 +160,32 @@ def ready_to_mine(id: str) -> bool:
 
 
 class roles:
-    def __init__(self):
-        self.blacklisted = -1
-        self.user = 0
-        self.vip = 1
-        self.admin = 2
-    def get_role(self, id: str) -> bool:
+    BLACKLIST = -1
+    USER = 0
+    VIP = 1
+    INTERN = 2
+    MODER = 3
+    ADMIN = 4
+    OWNER = 5
+    def get(self, id: str) -> int:
+        "Получить роль пользователя (U0, если не найдено)"
         id = str(id)
-        with open(roles_path, encoding="utf8") as f:
+        with open(self.roles_path, "r", encoding="utf-8") as f:
+            return json.load(f).get(str(id), self.USER)
+    def set(self, id: str, role: int) -> bool:
+        "Установить роль пользователя"
+        id = str(id)
+        role = int(role)
+        with open(roles_path) as f:
             data = json.load(f)
-        if id in data:
-            return data[id]
-        return 0
+        data[id] = role
+        with open(roles_path, "w", encoding='utf-8') as f:
+            json.dump(
+                dict(sorted(data.items(), key=lambda x: (-x[1], x[0]))),
+                f,
+                indent=4,
+                ensure_ascii=False
+            )
 
 
 class crocodile_stat:
