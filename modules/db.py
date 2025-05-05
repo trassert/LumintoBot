@@ -11,12 +11,16 @@ from collections import defaultdict
 from . import config
 from .get_theme import weighted_choice
 
-nick_path = path.join("db", "minecraft.json")
-stats_path = path.join("db", "chat_stats")
+crocodile_stats_path = path.join("db", "users", "crocodile_stat.json")
+mine_path = path.join("db", "timings", "mine.json")
+roles_path = path.join("db", "users", "roles.json")
+money_path = path.join("db", "users", "money.json")
+nick_path = path.join("db", "users", "nicks.json")
 tickets_path = path.join("db", "tickets.json")
+stats_path = path.join("db", "chat_stats")
+
 states_path = path.join("db", "states")
 times_path = path.join("db", "time")
-mine_path = path.join("db", "timings", "mine.json")
 
 
 def database(key, value=None, delete=None, log=True):
@@ -72,12 +76,12 @@ def database(key, value=None, delete=None, log=True):
 
 def get_money(id):
     id = str(id)
-    with open(path.join("db", "money.json"), "r", encoding="utf8") as f:
+    with open(money_path, "r", encoding="utf8") as f:
         load = json.load(f)
         if id in load:
             return load[id]
 
-    with open(path.join("db", "money.json"), "w", encoding="utf8") as f:
+    with open(money_path, "w", encoding="utf8") as f:
         load[id] = 0
         json.dump(load, f, indent=4, ensure_ascii=False, sort_keys=True)
         return 0
@@ -85,14 +89,14 @@ def get_money(id):
 
 def get_all_money():
     "Получить все деньги"
-    with open(path.join("db", "money.json"), "r", encoding="utf8") as f:
+    with open(money_path, "r", encoding="utf8") as f:
         load = json.load(f)
         return sum(load.values())
 
 
 def add_money(id, count):
     id = str(id)
-    with open(path.join("db", "money.json"), "r", encoding="utf8") as f:
+    with open(money_path, "r", encoding="utf8") as f:
         load = json.load(f)
         if id in load:
             old = load[id]
@@ -103,7 +107,7 @@ def add_money(id, count):
 
     if load[id] < 0:
         load[id] = 0
-    with open(path.join("db", "money.json"), "w", encoding="utf8") as f:
+    with open(money_path, "w", encoding="utf8") as f:
         json.dump(load, f, indent=4, ensure_ascii=False, sort_keys=True)
         logger.info(f"Изменён баланс {id} ({old} -> {load[id]})")
         return load[id]
@@ -141,13 +145,42 @@ def get_shop():
     return load
 
 
+def ready_to_mine(id: str) -> bool:
+    id = str(id)
+    with open(mine_path, encoding="utf8") as f:
+        data = json.load(f)
+    if (id not in data) or (
+        int(time()) - data.get(id, int(time())) > config.coofs.MineWait
+    ):
+        data[id] = int(time())
+        with open(mine_path, "w", encoding="utf8") as f:
+            json.dump(data, f, indent=4, ensure_ascii=False, sort_keys=True)
+        return True
+    return False
+
+
+class roles:
+    def __init__(self):
+        self.blacklisted = -1
+        self.user = 0
+        self.vip = 1
+        self.admin = 2
+    def get_role(self, id: str) -> bool:
+        id = str(id)
+        with open(roles_path, encoding="utf8") as f:
+            data = json.load(f)
+        if id in data:
+            return data[id]
+        return 0
+
+
 class crocodile_stat:
     def __init__(self, id=False):
         if id:
             self.id = str(id)
 
     def get(self):
-        with open(path.join("db", "crocodile_stat.json"), "r", encoding="utf8") as f:
+        with open(crocodile_stats_path, "r", encoding="utf8") as f:
             load = json.load(f)
         if self.id in load:
             return load[self.id]
@@ -160,17 +193,17 @@ class crocodile_stat:
             return 0
 
     def add(self):
-        with open(path.join("db", "crocodile_stat.json"), "r", encoding="utf8") as f:
+        with open(crocodile_stats_path, "r", encoding="utf8") as f:
             load = json.load(f)
         if self.id in load:
             load[self.id] += 1
         else:
             load[self.id] = 1
-        with open(path.join("db", "crocodile_stat.json"), "w", encoding="utf8") as f:
+        with open(crocodile_stats_path, "w", encoding="utf8") as f:
             json.dump(load, f, indent=4, ensure_ascii=False, sort_keys=True)
 
     def get_all(self=False):
-        with open(path.join("db", "crocodile_stat.json"), "r", encoding="utf8") as f:
+        with open(crocodile_stats_path, "r", encoding="utf8") as f:
             load = json.load(f)
         return dict(sorted(load.items(), key=lambda item: item[1], reverse=True))
 
@@ -465,17 +498,3 @@ class AsyncSQLDatabase:
                 await cursor.execute(query)
                 result = await cursor.fetchall()
                 return result
-
-
-def ready_to_mine(id: str) -> bool:
-    id = str(id)
-    with open(mine_path, encoding="utf8") as f:
-        data = json.load(f)
-    if (id not in data) or (
-        int(time()) - data.get(id, int(time())) > config.coofs.MineWait
-    ):
-        data[id] = int(time())
-        with open(mine_path, "w", encoding="utf8") as f:
-            json.dump(data, f, indent=4, ensure_ascii=False, sort_keys=True)
-        return True
-    return False
