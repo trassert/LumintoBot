@@ -1083,6 +1083,68 @@ async def word_request(event: Message):
     return await event.reply(phrase.word.set.format(word=word))
 
 
+@client.on(events.NewMessage(pattern=r"(?i)^/слова\s(.+)", func=checks))
+async def word_request(event: Message):
+    words = event.pattern_match.group(1).strip().lower().split()
+    text = ""
+    message = await event.reply(phrase.word.checker)
+    with open(crocodile_path, "r", encoding="utf-8") as f:
+        all_words = f.read().split("\n")
+        for word in words:
+            if word in all_words:
+                text += f"Слово **{word}** - есть\n"
+                await message.edit(text)
+                words.remove(word)
+    with open(crocodile_blacklist_path, "r", encoding="utf-8") as f:
+        all_blacklist = f.read().split("\n")
+        for word in words:
+            if word in all_blacklist:
+                text += f"Слово **{word}** - в ЧС\n"
+                await message.edit(text)
+                words.remove(word)
+    if len(words) == 0:
+        return
+    entity = await get_name(event.sender_id)
+    for word in words:
+        logger.info(f'Пользователь {entity} хочет добавить слово "{word}"')
+        keyboard = ReplyInlineMarkup(
+            [
+                KeyboardButtonRow(
+                    [
+                        KeyboardButtonCallback(
+                            text="✅ Добавить",
+                            data=f"word.yes.{word}.{event.sender_id}".encode(),
+                        ),
+                        KeyboardButtonCallback(
+                            text="❌ Отклонить",
+                            data=f"word.no.{word}.{event.sender_id}".encode(),
+                        ),
+                    ]
+                )
+            ]
+        )
+        hint = None
+        while hint is None:
+            hint = await ai.response(
+                f'Сделай подсказку для слова "{word}". '
+                'Ни в коем случае не добавляй никаких "подсказка для слова.." '
+                "и т.п, ответ должен содержать только подсказку. "
+                "Не забудь, что подсказка не должна "
+                "содержать слово в любом случае. "
+            )
+        try:
+            await client.send_message(
+                config.tokens.bot.creator,
+                phrase.word.request.format(user=entity, word=word, hint=hint),
+                buttons=keyboard,
+            )
+            text += f"Слово **{word}** - проверяется\n"
+            await message.edit(text)
+        except TGErrors.ButtonDataInvalidError:
+            text += f"Слово **{word}** - слишком длинное\n"
+            await message.edit(text)
+
+
 @client.on(events.NewMessage(pattern=r"(?i)^/слово$", func=checks))
 async def word_request(event: Message):
     return await event.reply(phrase.word.empty)
