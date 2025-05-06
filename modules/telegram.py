@@ -715,7 +715,12 @@ async def crocodile_bet(event: Message):
 async def super_game(event: Message):
     roles = db.roles()
     if roles.get(event.sender_id) < roles.ADMIN:
-        return await event.reply(phrase.perms.no)
+        return await event.reply(
+            phrase.roles.no_perms.format(
+                level=roles.ADMIN,
+                name=phrase.roles.admin
+            )
+        )
     arg = event.pattern_match.group(1).strip()
     bets = db.database("crocodile_bets")
     bets[str(config.tokens.bot.creator)] = 50
@@ -763,7 +768,12 @@ async def gemini_empty(event: Message):
 async def mcrcon(event: Message):
     roles = db.roles()
     if roles.get(event.sender_id) < roles.ADMIN:
-        return await event.reply(phrase.perms.no)
+        return await event.reply(
+            phrase.roles.no_perms.format(
+                level=roles.ADMIN,
+                name=phrase.roles.admin
+            )
+        )
     command = event.pattern_match.group(1).strip()
     logger.info(f"Выполняется команда: {command}")
     try:
@@ -790,7 +800,12 @@ async def mcrcon(event: Message):
 async def whitelist(event: Message):
     roles = db.roles()
     if roles.get(event.sender_id) < roles.VIP:
-        return await event.reply(phrase.perms.no)
+        return await event.reply(
+            phrase.roles.no_perms.format(
+                level=roles.VIP,
+                name=phrase.roles.vip
+            )
+        )
     if event.text[0] == "-":
         command = f"swl remove {event.pattern_match.group(1).strip()}"
     else:
@@ -809,18 +824,23 @@ async def whitelist(event: Message):
         return await event.reply(phrase.server.stopped)
 
 
-@client.on(events.NewMessage(pattern=r"\/повысить(.*)", func=checks))
-@client.on(events.NewMessage(pattern=r"\/upgrade(.*)", func=checks))
+@client.on(events.NewMessage(pattern=r"\+стафф(.*)", func=checks))
+@client.on(events.NewMessage(pattern=r"\+staff(.*)", func=checks))
 async def add_staff(event: Message):
     roles = db.roles()
     if roles.get(event.sender_id) < roles.OWNER:
-        return await event.reply(phrase.perms.no)
+        return await event.reply(
+            phrase.roles.no_perms.format(
+                level=roles.OWNER,
+                name=phrase.roles.owner
+            )
+        )
     arg = event.pattern_match.group(1).strip()
     try:
         user = await client(GetFullUserRequest(arg))
         user = user.full_user.id
         tag = await get_name(user)
-    except IndexError:
+    except (IndexError, ValueError):
         reply_to_msg = event.reply_to_msg_id
         if reply_to_msg:
             reply_message = await event.get_reply_message()
@@ -833,18 +853,23 @@ async def add_staff(event: Message):
     return await event.reply(phrase.perms.upgrade.format(nick=tag, staff=new_role))
 
 
-@client.on(events.NewMessage(pattern=r"\/понизить(.*)", func=checks))
-@client.on(events.NewMessage(pattern=r"\/downgrade(.*)", func=checks))
+@client.on(events.NewMessage(pattern=r"\-staff(.*)", func=checks))
+@client.on(events.NewMessage(pattern=r"\-стафф(.*)", func=checks))
 async def add_staff(event: Message):
     roles = db.roles()
     if roles.get(event.sender_id) < roles.OWNER:
-        return await event.reply(phrase.perms.no)
+        return await event.reply(
+            phrase.roles.no_perms.format(
+                level=roles.OWNER,
+                name=phrase.roles.owner
+            )
+        )
     arg = event.pattern_match.group(1).strip()
     try:
         user = await client(GetFullUserRequest(arg))
         user = user.full_user.id
         tag = await get_name(user)
-    except IndexError:
+    except (IndexError, ValueError):
         reply_to_msg = event.reply_to_msg_id
         if reply_to_msg:
             reply_message = await event.get_reply_message()
@@ -894,8 +919,14 @@ async def get_balance(event: Message):
 @client.on(events.NewMessage(pattern=r"(?i)^/изменить баланс(.*)", func=checks))
 @client.on(events.NewMessage(pattern=r"(?i)^/change balance(.*)", func=checks))
 async def add_balance(event: Message):
-    if event.sender_id not in db.database("admins_id"):
-        return await event.reply(phrase.perms.no)
+    roles = db.roles()
+    if roles.get(event.sender_id) < roles.ADMIN:
+        return await event.reply(
+            phrase.roles.no_perms.format(
+                level=roles.ADMIN,
+                name=phrase.roles.admin
+            )
+        )
     args = event.pattern_match.group(1).strip().split()
     try:
         tag = args[1]
@@ -970,8 +1001,14 @@ async def swap_money(event: Message):
 @client.on(events.NewMessage(pattern=r"(?i)^/dns$", func=checks))
 @client.on(events.NewMessage(pattern=r"(?i)^/днс$", func=checks))
 async def tg_dns(event: Message):
-    if event.sender_id not in db.database("admins_id"):
-        return await event.reply(phrase.perms.no)
+    roles = db.roles()
+    if roles.get(event.sender_id) < roles.ADMIN:
+        return await event.reply(
+            phrase.roles.no_perms.format(
+                level=roles.ADMIN,
+                name=phrase.roles.admin
+            )
+        )
     return await event.reply(phrase.dns.format(await ip.setup(True)), parse_mode="html")
 
 
@@ -1464,8 +1501,14 @@ async def msktime(event: Message):
 @client.on(events.NewMessage(pattern=r"(?i)^/тест\s(.+)", func=checks))
 async def test(event: Message):
     arg = event.pattern_match.group(1).strip()
-    if event.sender_id not in db.database("admins_id"):
-        return await event.reply(phrase.perms.no)
+    roles = db.roles()
+    if roles.get(event.sender_id) < roles.ADMIN:
+        return await event.reply(
+            phrase.roles.no_perms.format(
+                level=roles.ADMIN,
+                name=phrase.roles.admin
+            )
+        )
     return event.reply(event.stringify())
 
 

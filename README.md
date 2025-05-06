@@ -8,6 +8,8 @@
 
 **[Телеграм - чат, где используется бот](https://t.me/lumintomc)**
 
+При использовании кода отсюда укажи автора!
+
 # EN
 
 ## Bot for minecraft server
@@ -15,3 +17,5 @@
 It is actively maintained and updated - you can use its modules or copy the code from here with the author's name - @trassert
 
 **[Telegram chat where the bot is used](https://t.me/lumintomc)**
+
+When using the code from here, specify the author!

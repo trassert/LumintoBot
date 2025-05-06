@@ -170,7 +170,7 @@ class roles:
     def get(self, id: str) -> int:
         "Получить роль пользователя (U0, если не найдено)"
         id = str(id)
-        with open(self.roles_path, "r", encoding="utf-8") as f:
+        with open(roles_path, "r", encoding="utf-8") as f:
             return json.load(f).get(str(id), self.USER)
     def set(self, id: str, role: int) -> bool:
         "Установить роль пользователя"
