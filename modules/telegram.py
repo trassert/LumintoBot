@@ -1084,7 +1084,7 @@ async def word_request(event: Message):
 
 
 @client.on(events.NewMessage(pattern=r"(?i)^/слова\s(.+)", func=checks))
-async def word_request(event: Message):
+async def word_requests(event: Message):
     words = event.pattern_match.group(1).strip().lower().split()
     text = ""
     message = await event.reply(phrase.word.checker)
@@ -1145,8 +1145,13 @@ async def word_request(event: Message):
             await message.edit(text)
 
 
+@client.on(events.NewMessage(pattern=r"(?i)^/слова$", func=checks))
+async def word_requests_empty(event: Message):
+    return await event.reply(phrase.word.)
+
+
 @client.on(events.NewMessage(pattern=r"(?i)^/слово$", func=checks))
-async def word_request(event: Message):
+async def word_request_empty(event: Message):
     return await event.reply(phrase.word.empty)
 
 
