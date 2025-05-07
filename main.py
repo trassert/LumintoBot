@@ -34,6 +34,7 @@ async def main():
                 vk.client.run_polling(),
                 time_to.update_shop(),
                 time_to.rewards(),
+                time_to.remove_states(),
                 ip.observe(),
             )
         except ConnectionError:

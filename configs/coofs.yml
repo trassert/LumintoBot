@@ -27,3 +27,6 @@ MineMaxGems: 15
 
 # Ограничение описания
 DescriptionsMaxLen: 300
+
+# Дней, после которых гос-ва удаляются
+DaysToStatesRemove: 7

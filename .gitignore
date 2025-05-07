@@ -13,6 +13,8 @@ db/crocodile/*
 db/timings/*
 db/users/*
 
+backup/states/*
+
 images/*
 
 update/mods/*

@@ -3,7 +3,7 @@ import aiomysql
 
 from loguru import logger
 from datetime import datetime, timedelta
-from os import path, listdir
+from os import path, listdir, replace
 from time import time
 from random import choice, randint
 from collections import defaultdict
@@ -19,6 +19,7 @@ nick_path = path.join("db", "users", "nicks.json")
 tickets_path = path.join("db", "tickets.json")
 stats_path = path.join("db", "chat_stats")
 
+old_states_path = path.join("backup", "states")
 states_path = path.join("db", "states")
 times_path = path.join("db", "time")
 
@@ -486,6 +487,12 @@ class states:
             return True
         return False
 
+    def remove(name: str) -> bool:
+        state = path.join(states_path, f"{name}.json")
+        if path.exists(state):
+            replace(state, path.join(old_states_path, f"{name}.json"))
+            return True
+        return False
 
 class AsyncSQLDatabase:
     def __init__(self, host, user, password, database, table):

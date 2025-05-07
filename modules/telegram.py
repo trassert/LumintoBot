@@ -824,8 +824,8 @@ async def whitelist(event: Message):
         return await event.reply(phrase.server.stopped)
 
 
-@client.on(events.NewMessage(pattern=r"\+стафф(.*)", func=checks))
-@client.on(events.NewMessage(pattern=r"\+staff(.*)", func=checks))
+@client.on(events.NewMessage(pattern=r"(?i)^\+стафф(.*)", func=checks))
+@client.on(events.NewMessage(pattern=r"(?i)^\+staff(.*)", func=checks))
 async def add_staff(event: Message):
     roles = db.roles()
     if roles.get(event.sender_id) < roles.OWNER:
@@ -853,8 +853,8 @@ async def add_staff(event: Message):
     return await event.reply(phrase.perms.upgrade.format(nick=tag, staff=new_role))
 
 
-@client.on(events.NewMessage(pattern=r"\-staff(.*)", func=checks))
-@client.on(events.NewMessage(pattern=r"\-стафф(.*)", func=checks))
+@client.on(events.NewMessage(pattern=r"(?i)^\-staff(.*)", func=checks))
+@client.on(events.NewMessage(pattern=r"(?i)^\-стафф(.*)", func=checks))
 async def add_staff(event: Message):
     roles = db.roles()
     if roles.get(event.sender_id) < roles.OWNER:
@@ -1147,7 +1147,7 @@ async def word_requests(event: Message):
 
 @client.on(events.NewMessage(pattern=r"(?i)^/слова$", func=checks))
 async def word_requests_empty(event: Message):
-    return await event.reply(phrase.word.)
+    return await event.reply(phrase.word.empty_long)
 
 
 @client.on(events.NewMessage(pattern=r"(?i)^/слово$", func=checks))
