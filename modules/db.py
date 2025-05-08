@@ -494,6 +494,7 @@ class states:
             return True
         return False
 
+
 class AsyncSQLDatabase:
     def __init__(self, host, user, password, database, table):
         self.host = host

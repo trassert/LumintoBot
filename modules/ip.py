@@ -12,6 +12,10 @@ from . import config
 ident_v4 = "https://v4.ident.me"
 ident_v6 = "https://v6.ident.me"
 ipinfo = "https://ipinfo.io/{}/json"
+dns_servers = [
+    "ns1.reg.ru",
+    "ns2.reg.ru"
+]
 
 
 async def setup(forced=False):

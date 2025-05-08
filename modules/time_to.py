@@ -57,7 +57,7 @@ async def rewards():
         last = get_last_update("stat_update_time")
         seconds = (timedelta(hours=24) - (today - last)).total_seconds()
         "Если время прошло"
-        if today - last > timedelta(hours=24):
+        if today - last > timedelta(hours=24):  
             day_stat = db.statistic().get_all()
             for top in day_stat:
                 tg_id = db.nicks(nick=top[0]).get()

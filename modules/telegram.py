@@ -1305,7 +1305,7 @@ async def state_get(event: Message):
     return await event.reply(
         phrase.state.get.format(
             type=phrase.state_types[state.type],
-            name=state.name,
+            name=state.name.capitalize(),
             money=decline_number(int(state.money), "изумруд"),
             author=db.nicks(id=state.author).get(),
             enter=enter,

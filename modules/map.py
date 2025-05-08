@@ -1,10 +1,11 @@
 import folium
 import aiohttp
 
-from .ip import get_loc, ident_v4
+from .ip import get_loc, ident_v4, dns_servers
 from .ai import ai_servers
 from .db import AsyncSQLDatabase
 from .config import tokens
+
 
 "Модуль, созданный для отображения карты подключений"
 "Необходима база Authy"
@@ -19,6 +20,8 @@ me = []
 
 async def get_full_map():
     for server in ai_servers:
+        servers[server] = await get_loc(server)
+    for server in dns_servers:
         servers[server] = await get_loc(server)
     authy = AsyncSQLDatabase(
         host=tokens.mysql.host,
