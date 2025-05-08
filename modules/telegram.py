@@ -1155,6 +1155,42 @@ async def word_request_empty(event: Message):
     return await event.reply(phrase.word.empty)
 
 
+@client.on(events.NewMessage(pattern=r"(?i)^\-слово$", func=checks))
+async def word_remove_empty(event: Message):
+    roles = db.roles()
+    if roles.get(event.sender_id) < roles.ADMIN:
+        return await event.reply(
+            phrase.roles.no_perms.format(
+                level=roles.ADMIN,
+                name=phrase.roles.admin
+            )
+        )
+    return await event.reply(phrase.word.rem_empty)
+
+
+@client.on(events.NewMessage(pattern=r"(?i)^\-слово\s(.+)", func=checks))
+async def word_remove(event: Message):
+    roles = db.roles()
+    if roles.get(event.sender_id) < roles.ADMIN:
+        return await event.reply(
+            phrase.roles.no_perms.format(
+                level=roles.ADMIN,
+                name=phrase.roles.admin
+            )
+        )
+    word = event.pattern_match.group(1).strip().lower()
+    with open(crocodile_path, "r", encoding="utf-8") as f:
+        text = f.read().split("\n")
+    if word not in text:
+        return await event.reply(phrase.word.not_exists)
+    text.remove(word)
+    with open(crocodile_path, "w", encoding="utf-8") as f:
+        f.write("\n".join(text))
+    return await event.reply(
+        phrase.word.deleted.format(word)
+    )
+
+
 @client.on(events.NewMessage(pattern=r"(?i)^/nick(.*)", func=checks))
 @client.on(events.NewMessage(pattern=r"(?i)^/ник(.*)", func=checks))
 async def check_nick(event: Message):
