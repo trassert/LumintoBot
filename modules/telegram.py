@@ -58,7 +58,7 @@ async def get_name(id, push=True, minecraft=False):
                 return f"[{nick}]" f"(tg://user?id={id})"
         user_name = await client.get_entity(int(id))
         if push and user_name.username is not None:
-            return "@" + user_name.username
+            return f"@{user_name.username}"
         elif user_name.username is None:
             if user_name.last_name is None:
                 return f"[{user_name.first_name}]" f"(tg://user?id={id})"
@@ -68,7 +68,7 @@ async def get_name(id, push=True, minecraft=False):
                     f"(tg://user?id={id})"
                 )
         else:
-            return "@" + user_name.username
+            return f"@{user_name.username}"
     except Exception:
         return "Неопознанный персонаж"
 

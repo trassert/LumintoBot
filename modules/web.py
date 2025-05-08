@@ -84,7 +84,9 @@ async def server():
         await telegram.client.send_message(
             config.chats.chat,
             phrase.github.format(
-                author=head["author"]["name"], message=head["message"], url=head["url"]
+                author=f'[{head["author"]["name"]}](https://github.com/{head["author"]["name"]})',
+                message=head["message"],
+                url=head["url"]
             ),
             link_preview=False,
             reply_to=config.chats.topics.updates,
