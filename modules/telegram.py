@@ -590,7 +590,12 @@ async def shop(event: Message):
 @client.on(events.NewMessage(pattern=r"(?i)^/айпи$", func=checks))
 @client.on(events.NewMessage(pattern=r"(?i)^/ip$", func=checks))
 async def host(event: Message):
-    await event.reply(phrase.server.host.format(db.database("host")))
+    return await event.reply(
+        phrase.server.host.format(
+            v4=db.database("host"),
+            v6=f'{db.database("ipv6_subdomain")}.{db.database("host")}'
+        )
+    )
 
 
 @client.on(events.NewMessage(pattern=r"(?i)^/серв$", func=checks))

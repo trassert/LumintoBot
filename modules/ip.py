@@ -98,7 +98,7 @@ async def setup(forced=False):
                 input_data = {
                     "username": config.tokens.reg.email,
                     "password": config.tokens.reg.password,
-                    "subdomain": "v6",
+                    "subdomain": database("ipv6_subdomain"),
                     "ipaddr": v6,
                     "output_content_type": "plain",
                     "domain_name": database("host"),
