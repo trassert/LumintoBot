@@ -588,7 +588,7 @@ async def shop(event: Message):
 @client.on(events.NewMessage(pattern=r"(?i)^/хост$", func=checks))
 @client.on(events.NewMessage(pattern=r"(?i)^/host$", func=checks))
 @client.on(events.NewMessage(pattern=r"(?i)^/айпи$", func=checks))
-@client.on(events.NewMessage(pattern=r"(?i)^/ip$", func=checks))
+@client.on(events.NewMessage(pattern=r"(?i)^/ip", func=checks))
 async def host(event: Message):
     return await event.reply(
         phrase.server.host.format(
