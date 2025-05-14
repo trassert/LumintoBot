@@ -57,9 +57,9 @@ async def get_name(id, push=True, minecraft=False):
             if nick is not None:
                 return f"[{nick}]" f"(tg://user?id={id})"
         user_name = await client.get_entity(int(id))
-        if push and user_name.username is not None:
+        if user_name.username is not None and push:
             return f"@{user_name.username}"
-        elif user_name.username is None:
+        elif user_name.username is None or not push:
             if user_name.last_name is None:
                 return f"[{user_name.first_name}]" f"(tg://user?id={id})"
             else:
@@ -316,6 +316,19 @@ async def callback_action(event: events.CallbackQuery.Event):
                 )
                 state.change("type", 2)
             return await event.answer(phrase.state.admit.format(state.name), alert=True)
+        elif data[1] == "remove":
+            state = db.state(data[2])
+            db.add_money(state.author, state.money)
+            if db.states.remove(data[2]) != True:
+                return await event.answer(phrase.error, alert=True)
+            await client.send_message(
+                entity=config.chats.chat,
+                message=phrase.state.rem_public.format(name=data[2]),
+                reply_to=config.chats.topics.rp
+            )
+            return await event.reply(
+                phrase.state.removed.format(author=await get_name(state.author, push=False))
+            )
     else:
         pass
 
@@ -1422,7 +1435,10 @@ async def state_rem(event: Message):
             )
         ]
     )
-    return await event.reply(phrase.state.rem_message, buttons=keyboard)
+    return await event.reply(
+        phrase.state.rem_message.format(name=state_name),
+        buttons=keyboard
+    )
 
 
 @client.on(events.NewMessage(pattern=r"(?i)^/г описание$", func=checks))
