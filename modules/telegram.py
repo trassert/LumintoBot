@@ -1399,6 +1399,32 @@ async def state_leave(event: Message):
     return await event.reply(phrase.state.leave)
 
 
+@client.on(events.NewMessage(pattern=r"(?i)^/уничтожить госво", func=checks))
+@client.on(events.NewMessage(pattern=r"(?i)^/удалить госво", func=checks))
+@client.on(events.NewMessage(pattern=r"(?i)^/уничтожить государство", func=checks))
+@client.on(events.NewMessage(pattern=r"(?i)^/удалить государство", func=checks))
+@client.on(events.NewMessage(pattern=r"(?i)^уничтожить государство", func=checks))
+@client.on(events.NewMessage(pattern=r"(?i)^удалить государство", func=checks))
+@client.on(events.NewMessage(pattern=r"(?i)^/г уничтожить", func=checks))
+@client.on(events.NewMessage(pattern=r"(?i)^/г удалить", func=checks))
+async def state_rem(event: Message):
+    state_name = db.states.if_author(event.sender_id)
+    if state_name is False:
+        return await event.reply(phrase.state.not_a_author)
+    keyboard = ReplyInlineMarkup(
+        [
+            KeyboardButtonRow(
+                [
+                    KeyboardButtonCallback(
+                        text=phrase.state.rem_button, data=f"state.remove.{state_name}".encode()
+                    )
+                ]
+            )
+        ]
+    )
+    return await event.reply(phrase.state.rem_message, buttons=keyboard)
+
+
 @client.on(events.NewMessage(pattern=r"(?i)^/г описание$", func=checks))
 @client.on(events.NewMessage(pattern=r"(?i)^/о госве$", func=checks))
 @client.on(events.NewMessage(pattern=r"(?i)^/г о госве$", func=checks))
