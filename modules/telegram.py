@@ -338,13 +338,13 @@ async def callback_action(event: events.CallbackQuery.Event):
 
 @client.on(events.ChatAction(chats=config.chats.chat))
 async def chat_action(event: events.ChatAction.Event):
-    user_name = await get_name(event.user_id)
+    user_name = await get_name(event.user_id, push=False)
     if event.user_left:
         return await client.send_message(
             config.chats.chat,
             phrase.chataction.leave.format(user_name)
         )
-    elif event.user_joined or event.user_added:
+    elif event.user_joined:
         return await client.send_message(
             config.chats.chat,
             phrase.chataction.hello.format(user_name)
