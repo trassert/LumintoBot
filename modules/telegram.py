@@ -337,12 +337,17 @@ async def callback_action(event: events.CallbackQuery.Event):
 
 
 @client.on(events.ChatAction(chats=config.chats.chat))
-async def chat_action(event):
-    # Если пользователь ушёл из чата
+async def chat_action(event: events.ChatAction.Event):
+    user_name = await get_name(event.user_id)
     if event.user_left:
-        user_name = await get_name(event.user_id)
         return await client.send_message(
-            config.chats.chat, phrase.leave_message.format(user_name)
+            config.chats.chat,
+            phrase.chataction.leave.format(user_name)
+        )
+    elif event.user_joined or event.user_added:
+        return await client.send_message(
+            config.chats.chat,
+            phrase.chataction.hello.format(user_name)
         )
 
 
