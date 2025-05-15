@@ -28,4 +28,5 @@ test.*
 .venv
 .env
 
+map.html
 tokens.yml

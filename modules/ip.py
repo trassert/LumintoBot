@@ -12,6 +12,7 @@ from . import config
 ident_v4 = "https://v4.ident.me"
 ident_v6 = "https://v6.ident.me"
 ipinfo = "https://ipinfo.io/{}/json"
+ip_api = "http://ip-api.com/json/{}"
 dns_servers = [
     "ns1.reg.ru",
     "ns2.reg.ru"
@@ -138,12 +139,31 @@ async def get_loc(ip_address: str):
     async with aiohttp.ClientSession() as session:
 
         async def get(ip):
-            async with session.get(ipinfo.format(ip)) as response:
-                info = await response.json()
-                if "status" in info:
-                    if info["status"] == 404:
+            if "%" in ip:
+                ip = ip.split("%")[0]
+            try:
+                await asyncio.sleep(1)
+                async with session.get(ip_api.format(ip)) as response:
+                    if response.status == 429:
+                        await asyncio.sleep(2)
+                        return await get(ip)
+                    info = await response.json()
+                    logger.info(info)
+                    if info["status"] == "success":
+                        return [float(info["lat"]), float(info["lon"])]
+                    else:
                         raise ValueError
-                return info
+            except Exception:
+                await asyncio.sleep(1)
+                async with session.get(ipinfo.format(ip)) as response:
+                    info = await response.json()
+                    logger.info(info)
+                    if "status" in info:
+                        if info["status"] == 404:
+                            raise ValueError
+                    location = info.get("loc")
+                    latitude, longitude = location.split(",")
+                    return [float(latitude), float(longitude)]
 
         try:
             data = await get(ip_address)
@@ -152,22 +172,8 @@ async def get_loc(ip_address: str):
             ValueError,
             aiohttp.client_exceptions.ContentTypeError,
         ):
-            try:
-                data = await get(socket.gethostbyname(ip_address))
-            except (
-                json.decoder.JSONDecodeError,
-                ValueError,
-                aiohttp.client_exceptions.ContentTypeError,
-            ):
-                logger.error("Получен невалидный IP")
-                return None
-    try:
-        location = data.get("loc")
-        latitude, longitude = location.split(",")
-        logger.info("{} > Ш-{}, Д-{}".format(ip_address, latitude, longitude))
-        return [float(latitude), float(longitude)]
-    except AttributeError:
-        return None
+            data = await get(socket.gethostbyname(ip_address))
+    return data
 
 
 async def observe():
