@@ -228,14 +228,14 @@ class nicks:
         self.nick = nick
         self.id = id
 
-    def get(self):
+    def get(self, if_nothing=None) -> str:
         if self.nick:
             "Получить id игрока по нику"
             with open(nick_path, "r", encoding="utf8") as f:
                 load = json.load(f)
                 if self.nick in load:
                     return load[self.nick]
-                return None
+                return if_nothing
         elif self.id:
             "Получить ник по id"
             with open(nick_path, "r", encoding="utf8") as f:
@@ -243,7 +243,7 @@ class nicks:
                 for key, value in load.items():
                     if value == self.id:
                         return key
-                return None
+                return if_nothing
         else:
             raise TypeError("Нужен ник или id!")
 
@@ -269,7 +269,7 @@ class statistic:
     def __init__(self, days=1):
         self.days = days
 
-    def get(self, nick, all_days=False):
+    def get(self, nick, all_days=False, data=False):
         "Выдаст статистику по заданным аргументам"
         now = datetime.now().strftime("%Y.%m.%d")
 
@@ -294,6 +294,8 @@ class statistic:
                 for date, value in stats.items()
                 if datetime.strptime(date, "%Y.%m.%d") >= start_date
             }
+            if data:
+                return filtered_data
             return sum(filtered_data.values()) or 0
 
     def get_all(self, all_days=False):

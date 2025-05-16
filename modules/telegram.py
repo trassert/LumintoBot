@@ -2,6 +2,7 @@ import asyncio
 import re
 
 from os import path
+from xml.dom.expatbuilder import parseString
 from loguru import logger
 from random import choice, random, randint
 from datetime import datetime
@@ -1651,6 +1652,49 @@ async def mine(event: Message):
 @client.on(events.NewMessage(pattern=r"(?i)^/msk$", func=checks))
 async def msktime(event: Message):
     return await event.reply(phrase.time.format(datetime.now().strftime("%H:%M:%S")))
+
+
+@client.on(events.NewMessage(pattern=r"(?i)^/обо мне$", func=checks))
+@client.on(events.NewMessage(pattern=r"(?i)^/я$", func=checks))
+@client.on(events.NewMessage(pattern=r"(?i)^/i$", func=checks))
+@client.on(events.NewMessage(pattern=r"(?i)^/profile", func=checks))
+@client.on(events.NewMessage(pattern=r"(?i)^/myprofile", func=checks))
+async def profile(event: Message):
+    role = db.roles().get(event.sender_id)
+    state = db.states.if_author(event.sender_id)
+    if state is False:
+        state = db.states.if_player(event.sender_id)
+        if state is False:
+            state = "Не состоит в государстве"
+        else:
+            state = f"{state}, Житель"
+    else:
+        state = f"**{state}, Глава**"
+    nick = db.nicks(id=event.sender_id).get()
+    if nick is not None:
+        m_day = db.statistic(1).get(nick)
+        m_week = db.statistic(7).get(nick)
+        m_month = db.statistic(30).get(nick)
+        m_all = db.statistic().get(nick, all_days=True)
+    else:
+        m_day = 0
+        m_week = 0
+        m_month = 0
+        m_all = 0
+        nick = "Не привязан"
+    return await event.reply(
+        phrase.profile.full.format(
+            name=await get_name(event.sender_id, push=False),
+            minecraft=nick,
+            role_name=phrase.roles.types[role],
+            role_number=role,
+            state=state,
+            m_day=m_day,
+            m_week=m_week,
+            m_month=m_month,
+            m_all=m_all
+        )
+    )
 
 
 @client.on(events.NewMessage(pattern=r"(?i)^/тест\s(.+)", func=checks))
