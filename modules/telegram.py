@@ -1702,7 +1702,8 @@ async def profile(event: Message):
             m_day=m_day,
             m_week=m_week,
             m_month=m_month,
-            m_all=m_all
+            m_all=m_all,
+            balance=decline_number(db.get_money(event.sender_id), "изумруд")
         )
     )
 

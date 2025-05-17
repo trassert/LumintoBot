@@ -340,6 +340,7 @@ class profile:
     full = (
         "👤 : Пользователь **{name}**\n"
         "✍🏻 : Ник - **{minecraft}**\n"
+        "💎 : На балансе: {balance}\n"
         "\n"
         "⭐️ : Роль: {role_name} ({role_number})\n"
         "🏰 : {state}\n"
