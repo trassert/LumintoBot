@@ -1010,6 +1010,16 @@ async def swap_money(event: Message):
                 phrase.money.no_people + phrase.money.swap_balance_use
             )
 
+    entity = await client.get_entity(user)
+    if entity.bot:
+        return await event.reply(
+            phrase.money.bot
+        )
+
+    if event.sender_id == user:
+        return await event.reply(
+            phrase.money.selfbyself
+        )
     sender_balance = db.get_money(event.sender_id)
     if sender_balance < count:
         return await event.reply(
