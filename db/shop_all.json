@@ -665,42 +665,42 @@
     "sculk": {
         "Скалк": {
             "name": "minecraft:sculk",
-            "price": 6,
-            "value": 1
+            "price": 4,
+            "value": 3
         },
         "Скалк-сенсор": {
             "name": "minecraft:sculk_sensor",
-            "price": 6,
-            "value": 1
+            "price": 12,
+            "value": 2
         },
         "Скалковая жила": {
             "name": "minecraft:sculk_vein",
-            "price": 6,
-            "value": 1
+            "price": 3,
+            "value": 2
         },
         "Скалковый катализатор": {
             "name": "minecraft:sculk_catalyst",
-            "price": 6,
+            "price": 18,
             "value": 1
         },
         "Скалковый крикун": {
             "name": "minecraft:sculk_shrieker",
-            "price": 6,
+            "price": 12,
             "value": 1
         },
         "Возвратный компас": {
             "name": "minecraft:recovery_compass",
-            "price": 17,
+            "price": 16,
             "value": 1
         },
         "Осколок пластинки": {
             "name": "minecraft:disc_fragment_5",
-            "price": 6,
+            "price": 10,
             "value": 1
         },
         "Осколок эха": {
             "name": "minecraft:echo_shard",
-            "price": 6,
+            "price": 11,
             "value": 1
         }
     },

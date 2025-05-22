@@ -128,7 +128,7 @@ async def setup(forced=False):
                 logger.info(f"Получен IPv6 {v6}")
         except Exception:
             v6 = database("ipv6")
-            logger.error("Не могу получить IPv4")
+            logger.error("Не могу получить IPv6")
         if database("ipv4") != v4 or database("ipv6") != v6 or forced:
             database("ipv4", v4)
             database("ipv6", v6)
