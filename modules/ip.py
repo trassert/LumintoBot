@@ -9,23 +9,52 @@ from .db import database
 from . import config
 
 
-ident_v4 = "https://v4.ident.me"
-ident_v6 = "https://v6.ident.me"
 ipinfo = "https://ipinfo.io/{}/json"
 ip_api = "http://ip-api.com/json/{}"
+
 dns_servers = [
     "ns1.reg.ru",
     "ns2.reg.ru"
 ]
+ident_v4 = [
+    "https://v4.ident.me",
+    "https://api.ipify.org"
+]
+ident_v6 = [
+    "https://v6.ident.me",
+    "https://api6.ipify.org"
+]
+
+
+async def get_ip(v6=False):
+    async with aiohttp.ClientSession() as session:
+        if v6:
+            for ident in ident_v6:
+                try:
+                    async with session.get(ident, timeout=3) as response:
+                        response = await response.text()
+                        return response
+                except Exception:
+                    logger.error("Не получается найти IPv6")
+        for ident in ident_v4:
+            try:
+                async with session.get(ident, timeout=3) as response:
+                    response = await response.text()
+                    return response
+            except Exception:
+                logger.error("Не получается найти IPv4")
+    
+    # Если ни один не сработал..
+    if v6:
+        return database("ipv6")
+    return database("ipv4")
 
 
 async def setup(forced=False):
-    async with aiohttp.ClientSession() as session:
-
-        async def change_ip(ipv4, ipv6):
-
-            message = ""
-            "NOIP синхронизация"
+    async def change_ip(ipv4, ipv6):
+        message = ""
+        "NOIP синхронизация"
+        async with aiohttp.ClientSession() as session:
             try:
                 async with session.get(
                     f"http://{config.tokens.noip.name}:{config.tokens.noip.password}"
@@ -115,24 +144,16 @@ async def setup(forced=False):
             message += f"IP: {ipv4}, V6: {ipv6}"
             return message
 
-        try:
-            async with session.get(ident_v4, timeout=5) as response:
-                v4 = await response.text()
-                logger.info(f"Получен IPv4 {v4}")
-        except Exception:
-            v4 = database("ipv4")
-            logger.error("Не могу получить IPv4")
-        try:
-            async with session.get(ident_v6, timeout=5) as response:
-                v6 = await response.text()
-                logger.info(f"Получен IPv6 {v6}")
-        except Exception:
-            v6 = database("ipv6")
-            logger.error("Не могу получить IPv6")
-        if database("ipv4") != v4 or database("ipv6") != v6 or forced:
-            database("ipv4", v4)
-            database("ipv6", v6)
-            return await change_ip(v4, v6)
+    v4 = await get_ip()
+    v6 = await get_ip(v6=True)
+    if (
+        database("ipv4") != v4
+    ) or (
+        database("ipv6") != v6
+    ) or forced:
+        database("ipv4", v4)
+        database("ipv6", v6)
+        return await change_ip(v4, v6)
 
 
 async def get_loc(ip_address: str):
