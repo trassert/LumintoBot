@@ -2,7 +2,6 @@ import asyncio
 import re
 
 from os import path
-from xml.dom.expatbuilder import parseString
 from loguru import logger
 from random import choice, random, randint
 from datetime import datetime

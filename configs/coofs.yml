@@ -15,8 +15,10 @@ CrocodileBetCoo: 2
 CrocodileDefaultMaxBet: 5
 CrocodileDefaultMinBet: 1
 
+# Статистика
 MaxStatPlayers: 10
 
+# Типы государств
 Type0Players: 1
 Type1Players: 3
 Type2Players: 5
