@@ -1064,7 +1064,7 @@ async def crocodile_wins(event: Message):
     for id in all.keys():
         if n > 10:
             break
-        text += f"{n}. {await get_name(id, minecraft=True)}: {all[id]}\n"
+        text += f"{n}. {await get_name(id, minecraft=True)}: {all[id]} побед\n"
         n += 1
     return await event.reply(phrase.crocodile.stat.format(text), silent=True)
 
@@ -1644,15 +1644,30 @@ async def state_rem_money_empty(event: Message):
 @client.on(events.NewMessage(pattern=r"(?i)^копать$", func=checks))
 @client.on(events.NewMessage(pattern=r"(?i)^/mine", func=checks))
 async def mine(event: Message):
-    if (db.states.if_player(event.sender_id) is False) and (
+    if (
+        db.states.if_player(event.sender_id) is False
+    ) and (
         db.states.if_author(event.sender_id) is False
     ):
         return await event.reply(phrase.mine.not_in_state)
     if db.ready_to_mine(event.sender_id) is False:
         return await event.reply(choice(phrase.mine.not_ready))
-    added = randint(1, config.coofs.MineMaxGems)
-    db.add_money(event.sender_id, added)
-    return await event.reply(phrase.mine.done.format(decline_number(added, "изумруд")))
+
+    if random() < config.coofs.ChanceToDie:
+        added = randint(1, config.coofs.MineMaxGems)
+        balance = db.get_money(event.sender_id)
+        if balance < added:
+            added = balance
+        text = choice(phrase.mine.die).format(
+            killer=choice(phrase.mine.killers),
+            value=decline_number(added, "изумруд")
+        )
+        db.add_money(event.sender_id, -added)
+    else:
+        added = randint(1, config.coofs.MineMaxGems)
+        text = phrase.mine.done.format(decline_number(added, "изумруд"))
+        db.add_money(event.sender_id, added)
+    return await event.reply(text)
 
 
 @client.on(events.NewMessage(pattern=r"(?i)^/time", func=checks))
