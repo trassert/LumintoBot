@@ -1663,6 +1663,12 @@ async def mine(event: Message):
             value=decline_number(added, "изумруд")
         )
         db.add_money(event.sender_id, -added)
+    if random() < config.coofs.ChanceToBoost:
+        added = randint(config.coofs.MineMaxGems, config.coofs.MineMaxBoost)
+        text = choice(phrase.mine.boost).format(
+            decline_number(added, "изумруд")
+        )
+        db.add_money(event.sender_id, added)
     else:
         added = randint(1, config.coofs.MineMaxGems)
         text = phrase.mine.done.format(decline_number(added, "изумруд"))
