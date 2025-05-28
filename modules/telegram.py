@@ -359,7 +359,7 @@ async def casino(event: Message):
     if (
         event.reply_to_msg_id != config.chats.topics.games
     ) and (
-        getattr(event.reply_to, "reply_to_top_id") != config.chats.topics.games
+        getattr(event.reply_to, "reply_to_top_id", None) != config.chats.topics.games
     ):
         return await event.reply(phrase.game_topic_warning)
     keyboard = ReplyInlineMarkup(
@@ -643,7 +643,7 @@ async def crocodile(event: Message):
     if (
         event.reply_to_msg_id != config.chats.topics.games
     ) and (
-        getattr(event.reply_to, "reply_to_top_id") != config.chats.topics.games
+        getattr(event.reply_to, "reply_to_top_id", None) != config.chats.topics.games
     ):
         return await event.reply(phrase.game_topic_warning)
     else:
@@ -685,7 +685,7 @@ async def crocodile_bet(event: Message):
     if (
         event.reply_to_msg_id != config.chats.topics.games
     ) and (
-        getattr(event.reply_to, "reply_to_top_id") != config.chats.topics.games
+        getattr(event.reply_to, "reply_to_top_id", None) != config.chats.topics.games
     ):
         return await event.reply(phrase.game_topic_warning)
     try:
@@ -1739,7 +1739,7 @@ async def crocodile_hint(event: Message):
     if (
         event.reply_to_msg_id != config.chats.topics.games
     ) and (
-        getattr(event.reply_to, "reply_to_top_id") != config.chats.topics.games
+        getattr(event.reply_to, "reply_to_top_id", None) != config.chats.topics.games
     ):
         return await event.reply(phrase.game_topic_warning)
     game = db.database("current_game")
@@ -1784,8 +1784,8 @@ async def crocodile_hint(event: Message):
 async def crocodile_handler(event: Message):
     if (
         event.reply_to_msg_id != config.chats.topics.games
-    ) or (
-        getattr(event.reply_to, "reply_to_top_id") != config.chats.topics.games
+    ) and (
+        getattr(event.reply_to, "reply_to_top_id", None) != config.chats.topics.games
     ):
         return
     text = event.text.strip().lower()
