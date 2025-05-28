@@ -1,4 +1,5 @@
 import aiohttp
+import ping3
 
 from time import time
 
@@ -24,6 +25,9 @@ async def ping(arg, timestamp, vk=False) -> str:
         "фулл",
         "full",
     ]:
+        all_servers_ping.append(
+            f"🌐 : Пинг сервера - {int(round(ping3.ping('yandex.ru'), 3)*1000)} мс"
+        )
         async with aiohttp.ClientSession() as session:
             n = 1
             for server in ai_servers:
@@ -37,16 +41,16 @@ async def ping(arg, timestamp, vk=False) -> str:
                             else:
                                 server_ping = phrase.ping.min
                             all_servers_ping.append(
-                                f"\n🌐 : Сервер {n} ответил {server_ping}"
+                                f"🌐 : ИИ сервер №{n} ответил {server_ping}"
                             )
                         else:
-                            all_servers_ping.append(f"\n❌ : Сервер {n} - Ошибка!")
+                            all_servers_ping.append(f"❌ : ИИ сервер №{n} - Ошибка!")
                     except TimeoutError:
-                        all_servers_ping.append(f"❌ : Сервер {n} - Нет подключения!")
+                        all_servers_ping.append(f"❌ : ИИ сервер №{n} - Выключен!")
                 n += 1
     elif arg != "":
         return
-    text = phrase.ping.set.format(ping) + "".join(all_servers_ping)
+    text = f"{phrase.ping.set.format(ping)}\n{'\n'.join(all_servers_ping)}"
     if vk:
         text = text.replace("**", "")
     return text

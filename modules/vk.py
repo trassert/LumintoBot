@@ -39,18 +39,3 @@ async def ping(message: Message, match: tuple):
     )
     if text is None: return
     return await message.reply(text)
-
-
-@client.on.chat_message()
-async def tg_chat(message: Message):
-    try:
-        user_info = await client.api.users.get(user_ids=message.from_id)
-        name = "{} {}".format(user_info[0].first_name, user_info[0].last_name)
-    except IndexError:
-        return logger.info("Юзер не найден, пропускаем")
-    logger.info(f"ВК>ТГ: {name} > {message.text}")
-    return await telegram.client.send_message(
-        config.chats.chat,
-        reply_to=config.chats.topics.vk,
-        message=f"**{name}**\n{message.text}",
-    )

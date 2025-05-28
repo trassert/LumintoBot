@@ -351,39 +351,17 @@ async def chat_action(event: events.ChatAction.Event):
         )
 
 
-"Обработчик вк-топика"
-
-
-@client.on(events.NewMessage(config.chats.chat))
-async def vk_chat(event):
-
-    async def send():
-        if event.text == "":
-            return logger.info("Пустое сообщение")
-        user_name = await client.get_entity(event.sender_id)
-        if user_name.last_name is None:
-            user_name = user_name.first_name
-        else:
-            user_name = user_name.first_name + " " + user_name.last_name
-        logger.info(f"ТГ>ВК: {user_name} > {event.text}")
-        await vk.client.api.messages.send(
-            chat_id=config.tokens.vk.chat_id,
-            message=f"{user_name}: {event.text}",
-            random_id=0,
-        )
-
-    if event.reply_to_msg_id == config.chats.topics.vk:
-        return await send()
-    if event.reply_to is not None:
-        if event.reply_to.reply_to_top_id == config.chats.topics.vk:
-            return await send()
-
-
 "Обработчики команд"
 
 
 @client.on(events.NewMessage(config.chats.chat, pattern=r"(?i)^/казино$", func=checks))
 async def casino(event: Message):
+    if (
+        event.reply_to_msg_id != config.chats.topics.games
+    ) or (
+        getattr(event.reply_to, "reply_to_top_id") != config.chats.topics.games
+    ):
+        return await event.reply(phrase.game_topic_warning)
     keyboard = ReplyInlineMarkup(
         [
             KeyboardButtonRow(
@@ -662,6 +640,12 @@ async def ping(event: Message):
 async def crocodile(event: Message):
     if not event.chat_id == config.chats.chat:
         return await event.reply(phrase.crocodile.chat)
+    if (
+        event.reply_to_msg_id != config.chats.topics.games
+    ) or (
+        getattr(event.reply_to, "reply_to_top_id") != config.chats.topics.games
+    ):
+        return await event.reply(phrase.game_topic_warning)
     else:
         pass
     if db.database("current_game") == 0:
@@ -698,6 +682,12 @@ async def crocodile(event: Message):
 @client.on(events.NewMessage(pattern=r"(?i)^/ставка(.*)", func=checks))
 @client.on(events.NewMessage(pattern=r"(?i)^/крокоставка(.*)", func=checks))
 async def crocodile_bet(event: Message):
+    if (
+        event.reply_to_msg_id != config.chats.topics.games
+    ) or (
+        getattr(event.reply_to, "reply_to_top_id") != config.chats.topics.games
+    ):
+        return await event.reply(phrase.game_topic_warning)
     try:
         bet = int(event.pattern_match.group(1).strip())
         if bet < db.database("min_bet"):
@@ -1746,6 +1736,12 @@ async def test(event: Message):
 
 
 async def crocodile_hint(event: Message):
+    if (
+        event.reply_to_msg_id != config.chats.topics.games
+    ) or (
+        getattr(event.reply_to, "reply_to_top_id") != config.chats.topics.games
+    ):
+        return await event.reply(phrase.game_topic_warning)
     game = db.database("current_game")
     hint = game["hints"]
     if event.sender_id in hint:
@@ -1786,81 +1782,88 @@ async def crocodile_hint(event: Message):
 
 
 async def crocodile_handler(event: Message):
+    if (
+        event.reply_to_msg_id != config.chats.topics.games
+    ) or (
+        getattr(event.reply_to, "reply_to_top_id") != config.chats.topics.games
+    ):
+        return
     text = event.text.strip().lower()
-    if len(text) > 0:
-        current_word = db.database("current_game")["word"]
-        current_mask = list(db.database("current_game")["unsec"])
-        if text == current_word:
-            bets = db.database("crocodile_bets")
-            all = 0
-            bets_str = ""
-            topers = []
-            n = 1
-            for toper in db.crocodile_stat.get_all().keys():
-                if n > config.coofs.TopLowerBets:
-                    break
-                topers.append(toper)
-                n += 1
-            if bets != {}:
-                for key in list(bets.keys()):
-                    if str(event.sender_id) == key:
-                        if str(event.sender_id) in topers:
-                            all += round(bets[key] * config.coofs.TopBets)
-                        else:
-                            all += round(bets[key] * config.coofs.CrocodileBetCoo)
+    if not len(text) > 0:
+        return
+    current_word = db.database("current_game")["word"]
+    current_mask = list(db.database("current_game")["unsec"])
+    if text == current_word:
+        bets = db.database("crocodile_bets")
+        all = 0
+        bets_str = ""
+        topers = []
+        n = 1
+        for toper in db.crocodile_stat.get_all().keys():
+            if n > config.coofs.TopLowerBets:
+                break
+            topers.append(toper)
+            n += 1
+        if bets != {}:
+            for key in list(bets.keys()):
+                if str(event.sender_id) == key:
+                    if str(event.sender_id) in topers:
+                        all += round(bets[key] * config.coofs.TopBets)
                     else:
-                        all += bets[key]
-                db.add_money(event.sender_id, all)
-                bets_str = phrase.crocodile.bet_win.format(
-                    decline_number(all, "изумруд"),
-                )
-            db.database("current_game", 0)
-            db.database("crocodile_bets", {})
-            db.database("crocodile_last_hint", 0)
-            if db.database("crocodile_super_game") == 1:
-                db.database("crocodile_super_game", 0)
-                db.database("max_bet", config.coofs.CrocodileDefaultMaxBet)
-                db.database("min_bet", config.coofs.CrocodileDefaultMinBet)
-            client.remove_event_handler(crocodile_hint)
-            client.remove_event_handler(crocodile_handler)
-            db.crocodile_stat(event.sender_id).add()
-            return await event.reply(
-                phrase.crocodile.win.format(current_word) + bets_str
+                        all += round(bets[key] * config.coofs.CrocodileBetCoo)
+                else:
+                    all += bets[key]
+            db.add_money(event.sender_id, all)
+            bets_str = phrase.crocodile.bet_win.format(
+                decline_number(all, "изумруд"),
             )
+        db.database("current_game", 0)
+        db.database("crocodile_bets", {})
+        db.database("crocodile_last_hint", 0)
+        if db.database("crocodile_super_game") == 1:
+            db.database("crocodile_super_game", 0)
+            db.database("max_bet", config.coofs.CrocodileDefaultMaxBet)
+            db.database("min_bet", config.coofs.CrocodileDefaultMinBet)
+        client.remove_event_handler(crocodile_hint)
+        client.remove_event_handler(crocodile_handler)
+        db.crocodile_stat(event.sender_id).add()
+        return await event.reply(
+            phrase.crocodile.win.format(current_word) + bets_str
+        )
+    else:
+        pass
+    if text[0] != "/":
+        if len(text) > len(current_word):
+            n = 0
+            for x in current_word:
+                if x == text[n] and current_mask[n] == "_":
+                    current_mask[n] = x
+                n = n + 1
         else:
-            pass
-        if text[0] != "/":
-            if len(text) > len(current_word):
-                n = 0
-                for x in current_word:
-                    if x == text[n] and current_mask[n] == "_":
-                        current_mask[n] = x
-                    n = n + 1
-            else:
-                n = 0
-                for x in text:
-                    if x == current_word[n] and current_mask[n] == "_":
-                        current_mask[n] = x
-                    n = n + 1
-            if "".join(current_mask) == current_word:
-                current_mask[randint(0, len(current_mask) - 1)] = "_"
-                cgame = db.database("current_game")
-                cgame["unsec"] = "".join(current_mask)
-                db.database("current_game", cgame)
-                return await event.reply(
-                    phrase.crocodile.new.format(
-                        "".join(current_mask).replace("_", "..")
-                    )
+            n = 0
+            for x in text:
+                if x == current_word[n] and current_mask[n] == "_":
+                    current_mask[n] = x
+                n = n + 1
+        if "".join(current_mask) == current_word:
+            current_mask[randint(0, len(current_mask) - 1)] = "_"
+            cgame = db.database("current_game")
+            cgame["unsec"] = "".join(current_mask)
+            db.database("current_game", cgame)
+            return await event.reply(
+                phrase.crocodile.new.format(
+                    "".join(current_mask).replace("_", "..")
                 )
-            if list(db.database("current_game")["unsec"]) != current_mask:
-                cgame = db.database("current_game")
-                cgame["unsec"] = "".join(current_mask)
-                db.database("current_game", cgame)
-                return await event.reply(
-                    phrase.crocodile.new.format(
-                        "".join(current_mask).replace("_", "..")
-                    )
+            )
+        if list(db.database("current_game")["unsec"]) != current_mask:
+            cgame = db.database("current_game")
+            cgame["unsec"] = "".join(current_mask)
+            db.database("current_game", cgame)
+            return await event.reply(
+                phrase.crocodile.new.format(
+                    "".join(current_mask).replace("_", "..")
                 )
+            )
 
 
 if db.database("current_game", log=False) != 0:
