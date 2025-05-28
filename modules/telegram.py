@@ -358,7 +358,7 @@ async def chat_action(event: events.ChatAction.Event):
 async def casino(event: Message):
     if (
         event.reply_to_msg_id != config.chats.topics.games
-    ) or (
+    ) and (
         getattr(event.reply_to, "reply_to_top_id") != config.chats.topics.games
     ):
         return await event.reply(phrase.game_topic_warning)
@@ -642,7 +642,7 @@ async def crocodile(event: Message):
         return await event.reply(phrase.crocodile.chat)
     if (
         event.reply_to_msg_id != config.chats.topics.games
-    ) or (
+    ) and (
         getattr(event.reply_to, "reply_to_top_id") != config.chats.topics.games
     ):
         return await event.reply(phrase.game_topic_warning)
@@ -684,7 +684,7 @@ async def crocodile(event: Message):
 async def crocodile_bet(event: Message):
     if (
         event.reply_to_msg_id != config.chats.topics.games
-    ) or (
+    ) and (
         getattr(event.reply_to, "reply_to_top_id") != config.chats.topics.games
     ):
         return await event.reply(phrase.game_topic_warning)
@@ -1738,7 +1738,7 @@ async def test(event: Message):
 async def crocodile_hint(event: Message):
     if (
         event.reply_to_msg_id != config.chats.topics.games
-    ) or (
+    ) and (
         getattr(event.reply_to, "reply_to_top_id") != config.chats.topics.games
     ):
         return await event.reply(phrase.game_topic_warning)

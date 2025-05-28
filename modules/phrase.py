@@ -1,4 +1,4 @@
-from config import chats
+from .config import chats
 
 
 class crocodile:
