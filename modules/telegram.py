@@ -1,6 +1,9 @@
 import asyncio
 import re
+import aiohttp
+import ping3
 
+from time import time
 from os import path
 from loguru import logger
 from random import choice, random, randint
@@ -22,9 +25,7 @@ from . import db
 from . import phrase
 from . import dice
 from . import ip
-from . import vk
 from . import chart
-from . import crosssocial
 from . import ai
 
 from .system_info import get_system_info
@@ -624,13 +625,50 @@ async def start(event: Message):
 @client.on(events.NewMessage(pattern=r"(?i)^/ping(.*)", func=checks))
 @client.on(events.NewMessage(pattern=r"(?i)^пинг(.*)", func=checks))
 async def ping(event: Message):
-    try:
-        arg = event.pattern_match.group(1).strip()
-    except IndexError:
-        arg = ""
-    text = await crosssocial.ping(arg, event.date.timestamp())
-    if text is None:
+    arg = event.pattern_match.group(1).strip()
+    ping = round(time() - float(timestamp), 2)
+    if ping < 0:
+        ping = phrase.ping.min
+    else:
+        ping = f"за {str(ping)} сек."
+    all_servers_ping = []
+    if arg in [
+        "all",
+        "подробно",
+        "подробный",
+        "полн",
+        "полный",
+        "весь",
+        "ии",
+        "фулл",
+        "full",
+    ]:
+        all_servers_ping.append(
+            f"🌐 : Пинг сервера - {int(round(ping3.ping('yandex.ru'), 3)*1000)} мс"
+        )
+        async with aiohttp.ClientSession() as session:
+            n = 1
+            for server in ai.ai_servers:
+                timestamp = time()
+                async with session.get("https://" + server + "/") as request:
+                    try:
+                        if await request.text() == "ok":
+                            server_ping = round(time() - timestamp, 2)
+                            if server_ping > 0:
+                                server_ping = f"за {server_ping} сек."
+                            else:
+                                server_ping = phrase.ping.min
+                            all_servers_ping.append(
+                                f"🌐 : ИИ сервер №{n} ответил {server_ping}"
+                            )
+                        else:
+                            all_servers_ping.append(f"❌ : ИИ сервер №{n} - Ошибка!")
+                    except TimeoutError:
+                        all_servers_ping.append(f"❌ : ИИ сервер №{n} - Выключен!")
+                n += 1
+    elif arg != "":
         return
+    text = f"{phrase.ping.set.format(ping)}\n{'\n'.join(all_servers_ping)}"
     return await event.reply(text)
 
 

@@ -4,7 +4,6 @@ import asyncio
 from loguru import logger
 from sys import stderr
 
-from modules import vk
 from modules import telegram
 from modules import db
 from modules import ip
@@ -31,7 +30,6 @@ async def main():
             await web.server()
             await asyncio.gather(
                 telegram.client.start(bot_token=config.tokens.bot.token),
-                vk.client.run_polling(),
                 time_to.update_shop(),
                 time_to.rewards(),
                 time_to.remove_states(),
