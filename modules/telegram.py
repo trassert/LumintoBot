@@ -1226,7 +1226,11 @@ async def check_nick(event: Message):
             reply_message = await event.get_reply_message()
             user = reply_message.sender_id
         else:
-            return await event.reply(phrase.nick.who)
+            return await event.reply(
+                phrase.nick.urnick.format(
+                    db.nicks(id=event.sender_id).get()
+                )
+            )
     nick = db.nicks(id=user).get()
     if nick is None:
         return await event.reply(phrase.nick.no_nick)
