@@ -1,5 +1,4 @@
 nest_asyncio
-orjson
 loguru
 aiohttp
 telethon
@@ -11,4 +10,3 @@ aiomysql
 pymorphy3
 folium
 psutil
-vkbottle
