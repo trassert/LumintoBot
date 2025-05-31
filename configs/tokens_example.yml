@@ -7,11 +7,6 @@ bot:
   creator: id создателя (для стафф)
   token: токен бота
 
-topics:
-  vk: для трансляции из тг в вк
-  updates: для публикования обновлений
-  rp: для рп
-
 # Для NOIP, если DDNS
 noip:
   email: ------@yandex.ru
@@ -22,11 +17,6 @@ noip:
 reg:
   email: -------@yandex.ru
   password: --------
-
-vk:
-  token: vk1.a.token
-  group: основной вк чат
-  chat_id: вк айди чата
 
 rcon: 
   password: пароль для RCON из тг

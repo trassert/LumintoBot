@@ -626,7 +626,7 @@ async def start(event: Message):
 @client.on(events.NewMessage(pattern=r"(?i)^пинг(.*)", func=checks))
 async def ping(event: Message):
     arg = event.pattern_match.group(1).strip()
-    ping = round(time() - float(timestamp), 2)
+    ping = round(time() - event.date.timestamp(), 2)
     if ping < 0:
         ping = phrase.ping.min
     else:
