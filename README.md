@@ -8,7 +8,7 @@
 
 **[Телеграм - чат, где используется бот](https://t.me/lumintomc)**
 
-При использовании кода отсюда укажи автора!
+Распространяется под лицензией MIT - @trassert, 2025
 
 # EN
 
@@ -18,4 +18,4 @@ It is actively maintained and updated - you can use its modules or copy the code
 
 **[Telegram chat where the bot is used](https://t.me/lumintomc)**
 
-When using the code from here, specify the author!
+Distributed under the MIT license - @trassert, 2025
