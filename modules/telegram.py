@@ -14,7 +14,7 @@ from telethon.tl.types import (
     KeyboardButtonRow,
     KeyboardButtonCallback,
 )
-from telethon import events
+from telethon import events, types
 from telethon.sync import TelegramClient
 from telethon import errors as TGErrors
 from telethon.tl.functions.users import GetFullUserRequest
@@ -50,7 +50,7 @@ crocodile_blacklist_path = path.join("db", "crocodile", "blacklist.txt")
 "Вспомогательные функции"
 
 
-async def get_name(id, push=True, minecraft=False):
+async def get_name(id, push=False, minecraft=False):
     "Выдает @пуш, если нет - имя + фамилия"
     try:
         if minecraft is True:
@@ -280,6 +280,46 @@ async def callback_action(event: events.CallbackQuery.Event):
                 return await event.answer(
                     phrase.casino.timeout.format(await get_name(event.sender_id))
                 )
+        elif data[1] == "auto":
+            balance = db.get_money(event.sender_id)
+            if balance < config.coofs.PriceForCasino:
+                return await event.answer(
+                    phrase.money.not_enough.format(decline_number(balance, "изумруд")),
+                    alert=True,
+                )
+            db.add_money(event.sender_id, -config.coofs.PriceForCasino)
+            media_dice = await client.send_file(
+                event.chat_id,
+                types.InputMediaDice('🎰'),
+                reply_to=config.chats.topics.games
+            )
+            pos = dice.get(media_dice.media.value)
+            if (pos[0] == pos[1]) and (pos[1] == pos[2]):
+                logger.info(f"{event.sender_id} - победил в казино")
+                db.add_money(
+                    event.sender_id,
+                    config.coofs.PriceForCasino * config.coofs.CasinoWinRatio,
+                )
+                await asyncio.sleep(2)
+                return await event.reply(
+                    phrase.casino.win_auto.format(
+                        value=config.coofs.PriceForCasino * config.coofs.CasinoWinRatio,
+                        name=await get_name(event.sender_id)
+                    )
+                )
+            elif (pos[0] == pos[1]) or (pos[1] == pos[2]):
+                db.add_money(event.sender_id, config.coofs.PriceForCasino)
+                await asyncio.sleep(2)
+                return await event.reply(phrase.casino.partially_auto.format(await get_name(event.sender_id)))
+            else:
+                logger.info(f"{event.sender_id} проиграл в казино")
+                await asyncio.sleep(2)
+                return await event.reply(
+                    phrase.casino.lose_auto.format(
+                        name=await get_name(event.sender_id),
+                        value=config.coofs.PriceForCasino
+                    )
+                )
     elif data[0] == "state":
         if data[1] == "pay":
             nick = db.nicks(id=event.sender_id).get()
@@ -363,17 +403,14 @@ async def casino(event: Message):
         getattr(event.reply_to, "reply_to_top_id", None) != config.chats.topics.games
     ):
         return await event.reply(phrase.game_topic_warning)
-    keyboard = ReplyInlineMarkup(
+    keyboard = [
+        [  
+            KeyboardButtonCallback(text="💎 Внести изумруды", data=b"casino.start")
+        ],
         [
-            KeyboardButtonRow(
-                [
-                    KeyboardButtonCallback(
-                        text="💎 Внести изумруды", data=b"casino.start"
-                    )
-                ]
-            )
+            KeyboardButtonCallback(text="🎰 Автоматическая прокрутка", data=b"casino.auto")
         ]
-    )
+    ]
     return await event.reply(
         phrase.casino.start.format(config.coofs.PriceForCasino), buttons=keyboard
     )
@@ -1092,7 +1129,7 @@ async def crocodile_wins(event: Message):
     for id in all.keys():
         if n > 10:
             break
-        text += f"{n}. {await get_name(id, minecraft=True)}: {all[id]} побед\n"
+        text += f"{n}. {await get_name(id)}: {all[id]} побед\n"
         n += 1
     return await event.reply(phrase.crocodile.stat.format(text), silent=True)
 
@@ -1771,7 +1808,12 @@ async def test(event: Message):
                 name=phrase.roles.admin
             )
         )
-    return event.reply(event.stringify())
+    media_dice = await client.send_file(
+        event.chat_id,
+        types.InputMediaDice('🎰'),
+        reply_to=config.chats.topics.games
+    )
+    return await event.reply(str(dice.get(media_dice.media.value)))
 
 
 "Эвенты для крокодила"
