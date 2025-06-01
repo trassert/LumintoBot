@@ -223,32 +223,32 @@
     "heads": {
         "Голова дракона": {
             "name": "minecraft:dragon_head",
-            "price": 32,
+            "price": 71,
             "value": 1
         },
         "Голова зомби": {
             "name": "minecraft:zombie_head",
-            "price": 32,
+            "price": 23,
             "value": 1
         },
         "Голова крипера": {
             "name": "minecraft:creeper_head",
-            "price": 32,
+            "price": 24,
             "value": 1
         },
         "Голова пиглина": {
             "name": "minecraft:piglin_head",
-            "price": 32,
+            "price": 22,
             "value": 1
         },
         "Череп": {
             "name": "minecraft:skeleton_skull",
-            "price": 32,
+            "price": 25,
             "value": 1
         },
         "Череп визер-скелета": {
             "name": "minecraft:wither_skeleton_skull",
-            "price": 32,
+            "price": 52,
             "value": 1
         }
     },
