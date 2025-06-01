@@ -1129,7 +1129,7 @@ async def crocodile_wins(event: Message):
     for id in all.keys():
         if n > 10:
             break
-        text += f"{n}. {await get_name(id)}: {all[id]} побед\n"
+        text += f"{n}. **{await get_name(id)}**: {all[id]} побед\n"
         n += 1
     return await event.reply(phrase.crocodile.stat.format(text), silent=True)
 
