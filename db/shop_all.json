@@ -548,27 +548,27 @@
     "remains": {
         "Глиняный черепок «Вихрь»": {
             "name": "minecraft:guster_pottery_sherd",
-            "price": 20,
+            "price": 16,
             "value": 1
         },
         "Глиняный черепок «Друг»": {
             "name": "minecraft:friend_pottery_sherd",
-            "price": 20,
+            "price": 14,
             "value": 1
         },
         "Глиняный черепок «Зельевар»": {
             "name": "minecraft:brewer_pottery_sherd",
-            "price": 20,
+            "price": 18,
             "value": 1
         },
         "Глиняный черепок «Зов»": {
             "name": "minecraft:howl_pottery_sherd",
-            "price": 20,
+            "price": 12,
             "value": 1
         },
         "Глиняный черепок «Изобилие»": {
             "name": "minecraft:plenty_pottery_sherd",
-            "price": 20,
+            "price": 22,
             "value": 1
         },
         "Глиняный черепок «Исследователь»": {
@@ -578,37 +578,37 @@
         },
         "Глиняный черепок «Клинок»": {
             "name": "minecraft:blade_pottery_sherd",
-            "price": 20,
+            "price": 15,
             "value": 1
         },
         "Глиняный черепок «Лучник»": {
             "name": "minecraft:archer_pottery_sherd",
-            "price": 20,
+            "price": 16,
             "value": 1
         },
         "Глиняный черепок «Награда»": {
             "name": "minecraft:prize_pottery_sherd",
-            "price": 20,
+            "price": 24,
             "value": 1
         },
         "Глиняный черепок «Нюхач»": {
             "name": "minecraft:snort_pottery_sherd",
-            "price": 20,
+            "price": 10,
             "value": 1
         },
         "Глиняный черепок «Обтёсывание»": {
             "name": "minecraft:scrape_pottery_sherd",
-            "price": 20,
+            "price": 12,
             "value": 1
         },
         "Глиняный черепок «Пламя»": {
             "name": "minecraft:burn_pottery_sherd",
-            "price": 20,
+            "price": 18,
             "value": 1
         },
         "Глиняный черепок «Поток»": {
             "name": "minecraft:flow_pottery_sherd",
-            "price": 20,
+            "price": 14,
             "value": 1
         },
         "Глиняный черепок «Разбитое сердце»": {
@@ -618,37 +618,37 @@
         },
         "Глиняный черепок «Руки вверх»": {
             "name": "minecraft:arms_up_pottery_sherd",
-            "price": 20,
+            "price": 16,
             "value": 1
         },
         "Глиняный черепок «Рыбак»": {
             "name": "minecraft:angler_pottery_sherd",
-            "price": 20,
+            "price": 15,
             "value": 1
         },
         "Глиняный черепок «Сердце»": {
             "name": "minecraft:heart_pottery_sherd",
-            "price": 20,
+            "price": 22,
             "value": 1
         },
         "Глиняный черепок «Скорбь»": {
             "name": "minecraft:mourner_pottery_sherd",
-            "price": 20,
+            "price": 18,
             "value": 1
         },
         "Глиняный черепок «Сноп»": {
             "name": "minecraft:sheaf_pottery_sherd",
-            "price": 20,
+            "price": 14,
             "value": 1
         },
         "Глиняный черепок «Убежище»": {
             "name": "minecraft:shelter_pottery_sherd",
-            "price": 20,
+            "price": 16,
             "value": 1
         },
         "Глиняный черепок «Угроза»": {
             "name": "minecraft:danger_pottery_sherd",
-            "price": 20,
+            "price": 12,
             "value": 1
         },
         "Глиняный черепок «Череп»": {
@@ -658,8 +658,38 @@
         },
         "Глиняный черепок «Шахтёр»": {
             "name": "minecraft:miner_pottery_sherd",
-            "price": 20,
+            "price": 18,
             "value": 1
+        },
+        "Кость": {
+            "name": "minecraft:bone",
+            "price": 3,
+            "value": 8
+        },
+        "Костяной блок": {
+            "name": "minecraft:bone_block",
+            "price": 5,
+            "value": 1
+        },
+        "Глиняный кирпич": {
+            "name": "minecraft:brick",
+            "price": 5,
+            "value": 4
+        },
+        "Декоративный горшок": {
+            "name": "minecraft:decorated_pot",
+            "price": 40,
+            "value": 1
+        },
+        "Кисть": {
+            "name": "minecraft:brush",
+            "price": 5,
+            "value": 1
+        },
+        "Уголь": {
+            "name": "minecraft:coal",
+            "price": 4,
+            "value": 16
         }
     },
     "sculk": {
