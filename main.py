@@ -8,7 +8,7 @@ from modules import telegram
 from modules import db
 from modules import ip
 from modules import config
-from modules import web
+from modules import webhooks
 from modules import time_to
 
 nest_asyncio.apply()
@@ -27,7 +27,7 @@ logger.add(
 async def main():
     while True:
         try:
-            await web.server()
+            await webhooks.server()
             await asyncio.gather(
                 telegram.client.start(bot_token=config.tokens.bot.token),
                 time_to.update_shop(),

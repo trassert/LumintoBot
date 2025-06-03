@@ -85,8 +85,7 @@ async def server():
             config.chats.chat,
             phrase.github.format(
                 author=f'[{head["author"]["name"]}](https://github.com/{head["author"]["name"]})',
-                message=head["message"],
-                url=head["url"]
+                message=head["message"]
             ),
             link_preview=False,
             reply_to=config.chats.topics.updates,
@@ -110,4 +109,4 @@ async def server():
         await ipv4.start()
         await ipv6.start()
     except asyncio.CancelledError:
-        return logger.warning("Веб сервер остановлен")
+        return logger.warning("Вебхуки остановлены")
