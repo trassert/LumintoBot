@@ -687,20 +687,15 @@ async def ping(event: Message):
             n = 1
             for server in ai.ai_servers:
                 timestamp = time()
-                async with session.get("https://" + server + "/") as request:
+                async with session.get(f"https://{server}/") as request:
                     try:
                         if await request.text() == "ok":
-                            server_ping = round(time() - timestamp, 2)
-                            if server_ping > 0:
-                                server_ping = f"за {server_ping} сек."
-                            else:
-                                server_ping = phrase.ping.min
-                            all_servers_ping.append(
-                                f"🌐 : ИИ сервер №{n} ответил {server_ping}"
-                            )
+                            server_ping = int((time() - timestamp)*1000)
+                            textping = f"{server_ping} мс" if server_ping > 0 else phrase.ping.min_ai
+                            all_servers_ping.append(f"🌐 : ИИ сервер №{n} - {textping}")
                         else:
                             all_servers_ping.append(f"❌ : ИИ сервер №{n} - Ошибка!")
-                    except TimeoutError:
+                    except Exception:
                         all_servers_ping.append(f"❌ : ИИ сервер №{n} - Выключен!")
                 n += 1
     elif arg != "":
@@ -1797,9 +1792,9 @@ async def profile(event: Message):
     )
 
 
-@client.on(events.NewMessage(pattern=r"(?i)^/тест\s(.+)", func=checks))
-async def test(event: Message):
-    arg = event.pattern_match.group(1).strip()
+@client.on(events.NewMessage(pattern=r"(?i)^/лаи\s(.+)", func=checks))
+async def local_ai(event: Message):
+    text = event.pattern_match.group(1).strip()
     roles = db.roles()
     if roles.get(event.sender_id) < roles.ADMIN:
         return await event.reply(
@@ -1808,12 +1803,12 @@ async def test(event: Message):
                 name=phrase.roles.admin
             )
         )
-    media_dice = await client.send_file(
-        event.chat_id,
-        types.InputMediaDice('🎰'),
-        reply_to=config.chats.topics.games
-    )
-    return await event.reply(str(dice.get(media_dice.media.value)))
+    message_for_edit = await event.reply(phrase.ai.response)
+    response = ""
+    async for chunk in ai.asyncio_local_generator(text):
+        response += chunk
+    await event.reply(f":{response}:")
+    await event.reply(f"id of response {message_for_edit.id}")
 
 
 "Эвенты для крокодила"
