@@ -680,9 +680,6 @@ async def ping(event: Message):
         "фулл",
         "full",
     ]:
-        all_servers_ping.append(
-            f"🌐 : Пинг сервера - {int(round(ping3.ping('yandex.ru'), 3)*1000)} мс"
-        )
         async with aiohttp.ClientSession() as session:
             n = 1
             for server in ai.ai_servers:
@@ -690,14 +687,17 @@ async def ping(event: Message):
                 async with session.get(f"https://{server}/") as request:
                     try:
                         if await request.text() == "ok":
-                            server_ping = int((time() - timestamp)*1000)
-                            textping = f"{server_ping} мс" if server_ping > 0 else phrase.ping.min_ai
+                            server_ping = round(time() - timestamp, 1)
+                            textping = f"{server_ping} сек." if server_ping > 0 else phrase.ping.min_ai
                             all_servers_ping.append(f"🌐 : ИИ сервер №{n} - {textping}")
                         else:
                             all_servers_ping.append(f"❌ : ИИ сервер №{n} - Ошибка!")
                     except Exception:
                         all_servers_ping.append(f"❌ : ИИ сервер №{n} - Выключен!")
                 n += 1
+        all_servers_ping.append(
+            f"🌐 : Пинг сервера - {int(round(ping3.ping('yandex.ru'), 3)*1000)} мс"
+        )
     elif arg != "":
         return
     text = f"{phrase.ping.set.format(ping)}\n{'\n'.join(all_servers_ping)}"
@@ -1417,19 +1417,15 @@ async def state_enter(event: Message):
 @client.on(events.NewMessage(pattern=r"(?i)^/госво(.*)", func=checks))
 @client.on(events.NewMessage(pattern=r"(?i)^/государство(.*)", func=checks))
 async def state_get(event: Message):
-    arg = event.pattern_match.group(1).strip()
-    if arg == "":
-        player_in = db.states.if_player(event.sender_id)
-        if player_in is not False:
-            arg = player_in
-        author_in = db.states.if_author(event.sender_id)
-        if author_in is not False:
-            arg = author_in
-        else:
+    state_name = event.pattern_match.group(1).strip()
+    if state_name == "":
+        check = db.states.if_player(743475650) or db.states.if_author(743472650)
+        if check is False:
             return await event.reply(phrase.state.no_name)
-    if db.states.find(arg) is False:
+        state_name = check
+    if db.states.find(state_name) is False:
         return await event.reply(phrase.state.not_find)
-    state = db.state(arg)
+    state = db.state(state_name)
     enter = "Свободный" if state.enter else "Закрыт"
     if state.price > 0:
         enter = decline_number(state.price, "изумруд")
