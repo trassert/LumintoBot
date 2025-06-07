@@ -1419,7 +1419,7 @@ async def state_enter(event: Message):
 async def state_get(event: Message):
     state_name = event.pattern_match.group(1).strip()
     if state_name == "":
-        check = db.states.if_player(743475650) or db.states.if_author(743472650)
+        check = db.states.if_player(event.sender_id) or db.states.if_author(event.sender_id)
         if check is False:
             return await event.reply(phrase.state.no_name)
         state_name = check
