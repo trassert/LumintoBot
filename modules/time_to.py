@@ -4,7 +4,7 @@ from datetime import timedelta, datetime
 from loguru import logger
 
 from . import db
-from .telegram_old import client
+from .telegram.client import client
 from . import config
 from . import phrase
 

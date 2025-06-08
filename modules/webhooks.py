@@ -8,7 +8,7 @@ from hashlib import sha1, md5
 from . import config
 from . import db
 from . import phrase
-from .telegram_old import client
+from .telegram.client import client
 from .formatter import decline_number
 
 
