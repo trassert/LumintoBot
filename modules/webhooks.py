@@ -33,7 +33,7 @@ async def server():
             give = phrase.vote_money.format(decline_number(10, "изумруд"))
         else:
             give = ""
-        await client.client.send_message(
+        await client.send_message(
             config.chats.chat,
             phrase.hotmc.format(nick=nick, money=give),
             link_preview=False,
@@ -60,7 +60,7 @@ async def server():
             give = phrase.vote_money.format(decline_number(10, "изумруд"))
         else:
             give = ""
-        await client.client.send_message(
+        await client.send_message(
             config.chats.chat,
             phrase.servers.format(nick=username, money=give),
             link_preview=False,
@@ -81,7 +81,7 @@ async def server():
         "Вебхук для гитхаба"
         load = await request.json()
         head = load["head_commit"]
-        await client.client.send_message(
+        await client.send_message(
             config.chats.chat,
             phrase.github.format(
                 author=f'[{head["author"]["name"]}](https://github.com/{head["author"]["name"]})',

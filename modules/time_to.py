@@ -40,7 +40,7 @@ async def update_shop():
         if today - last > timedelta(hours=2):
             theme = db.update_shop()
             logger.info("Изменена тема магазина")
-            await client.client.send_message(
+            await client.send_message(
                 config.chats.chat,
                 phrase.shop.update.format(theme=phrase.shop_quotes[theme]["translate"]),
             )
@@ -63,7 +63,7 @@ async def rewards():
                 tg_id = db.nicks(nick=top[0]).get()
                 if tg_id is not None:
                     db.add_money(tg_id, config.coofs.ActiveGift)
-                    await client.client.send_message(
+                    await client.send_message(
                         config.chats.chat,
                         phrase.stat.gift.format(
                             user=top[0],
@@ -98,7 +98,7 @@ async def remove_states():
                     db.add_money(state_info["author"], state_info["money"])
                     db.states.remove(state)
                     logger.warning(f"Государство {state} распалось")
-                    await client.client.send_message(
+                    await client.send_message(
                         entity=config.chats.chat,
                         message=phrase.state.end.format(state),
                         reply_to=config.chats.topics.rp,
