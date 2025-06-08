@@ -4,13 +4,6 @@ import asyncio
 from loguru import logger
 from sys import stderr
 
-from modules import telegram
-from modules import db
-from modules import ip
-from modules import config
-from modules import webhooks
-from modules import time_to
-
 nest_asyncio.apply()
 logger.remove()
 logger.add(
@@ -23,13 +16,19 @@ logger.add(
     colorize=True,
 )
 
+from modules.telegram.client import client
+from modules import db
+from modules import ip
+from modules import config
+from modules import webhooks
+from modules import time_to
 
 async def main():
     while True:
         try:
             await webhooks.server()
             await asyncio.gather(
-                telegram.client.start(bot_token=config.tokens.bot.token),
+                client.start(bot_token=config.tokens.bot.token),
                 time_to.update_shop(),
                 time_to.rewards(),
                 time_to.remove_states(),

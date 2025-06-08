@@ -8,7 +8,7 @@ from hashlib import sha1, md5
 from . import config
 from . import db
 from . import phrase
-from . import telegram
+from .telegram_old import client
 from .formatter import decline_number
 
 
@@ -33,7 +33,7 @@ async def server():
             give = phrase.vote_money.format(decline_number(10, "изумруд"))
         else:
             give = ""
-        await telegram.client.send_message(
+        await client.client.send_message(
             config.chats.chat,
             phrase.hotmc.format(nick=nick, money=give),
             link_preview=False,
@@ -60,7 +60,7 @@ async def server():
             give = phrase.vote_money.format(decline_number(10, "изумруд"))
         else:
             give = ""
-        await telegram.client.send_message(
+        await client.client.send_message(
             config.chats.chat,
             phrase.servers.format(nick=username, money=give),
             link_preview=False,
@@ -81,7 +81,7 @@ async def server():
         "Вебхук для гитхаба"
         load = await request.json()
         head = load["head_commit"]
-        await telegram.client.send_message(
+        await client.client.send_message(
             config.chats.chat,
             phrase.github.format(
                 author=f'[{head["author"]["name"]}](https://github.com/{head["author"]["name"]})',

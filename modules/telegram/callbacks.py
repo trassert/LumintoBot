@@ -1,0 +1,306 @@
+import asyncio
+
+from telethon import events, types
+
+from loguru import logger
+from random import choice
+
+from .client import client
+from .global_checks import *
+from .func import get_name
+from .games import (
+    crocodile_handler,
+    crocodile_hint
+)
+
+from .. import (
+    config,
+    phrase,
+    db,
+    patches,
+    dice
+)
+from ..formatter import decline_number
+from ..mcrcon import MinecraftClient
+
+
+@client.on(events.CallbackQuery(func=checks))
+async def callback_action(event: events.CallbackQuery.Event):
+    data = event.data.decode("utf-8").split(".")
+    logger.info(f"{event.sender_id} отправил КБ - {data}")
+    if data[0] == "crocodile":
+        if data[1] == "start":
+            if db.database("crocodile_super_game") == 1:
+                return await event.answer(phrase.crocodile.super_game_here, alert=True)
+            if db.database("current_game") != 0:
+                return await event.answer(phrase.crocodile.no, alert=True)
+            with open(patches.crocodile_path, "r", encoding="utf8") as f:
+                word = choice(f.read().split("\n"))
+            unsec = ""
+            for x in list(word):
+                if x.isalpha():
+                    unsec += "_"
+                elif x == " ":
+                    unsec += x
+            db.database("current_game", {"hints": [], "word": word, "unsec": unsec})
+            client.add_event_handler(
+                crocodile_hint, events.NewMessage(pattern=r"(?i)^/подсказка")
+            )
+            client.add_event_handler(
+                crocodile_handler, events.NewMessage(chats=event.chat_id)
+            )
+            return await event.reply(phrase.crocodile.up)
+        elif data[1] == "stop":
+            entity = await client.get_entity(event.sender_id)
+            user = (
+                f"@{entity.username}"
+                if entity.username
+                else entity.first_name + " " + entity.last_name
+            )
+            if db.database("current_game") == 0:
+                return await event.answer(phrase.crocodile.already_down, alert=True)
+            if db.database("crocodile_super_game") == 1:
+                return await event.answer(phrase.crocodile.super_game_here, alert=True)
+            bets_json = db.database("crocodile_bets")
+            if bets_json != {}:
+                bets = round(sum(list(bets_json.values())) / 2)
+                bets = 1 if bets < 1 else bets
+                sender_balance = db.get_money(event.sender_id)
+                if sender_balance < bets:
+                    return await event.answer(
+                        phrase.crocodile.not_enough.format(
+                            decline_number(sender_balance, "изумруд")
+                        ),
+                        alert=True,
+                    )
+                db.add_money(event.sender_id, -bets)
+            word = db.database("current_game")["word"]
+            db.database("current_game", 0)
+            db.database("crocodile_last_hint", 0)
+            client.remove_event_handler(crocodile_hint)
+            client.remove_event_handler(crocodile_handler)
+            if bets_json != {}:
+                return await event.reply(
+                    phrase.crocodile.down_payed.format(
+                        user=user, money=decline_number(bets, "изумруд"), word=word
+                    )
+                )
+            return await event.reply(phrase.crocodile.down.format(word))
+    elif data[0] == "shop":
+        if int(data[-1]) != db.database("shop_version"):
+            return await event.answer(phrase.shop.old, alert=True)
+        nick = db.nicks(id=event.sender_id).get()
+        if nick is None:
+            return await event.answer(phrase.nick.not_append, alert=True)
+        shop = db.get_shop()
+        del shop["theme"]
+        balance = db.get_money(event.sender_id)
+        items = list(shop.keys())
+        item = shop[items[int(data[1])]]
+        if balance < item["price"]:
+            return await event.answer(
+                phrase.money.not_enough.format(decline_number(balance, "изумруд")),
+                alert=True,
+            )
+        try:
+            async with MinecraftClient(
+                host=db.database("ipv4"),
+                port=config.tokens.rcon.port,
+                password=config.tokens.rcon.password,
+            ) as rcon:
+                command = f'invgive {nick} {item["name"]} {item["value"]}'
+                logger.info(f"Выполняется команда: {command}")
+                await rcon.send(command)
+        except TimeoutError:
+            return await event.answer(phrase.shop.timeout, alert=True)
+        db.add_money(event.sender_id, -item["price"])
+        return await event.answer(
+            phrase.shop.buy.format(items[int(data[1])]), alert=True
+        )
+    elif data[0] == "word":
+        user_name = await get_name(data[3])
+        if data[1] == "yes":
+            with open(patches.crocodile_path, "a", encoding="utf-8") as f:
+                f.write(f"\n{data[2]}")
+            db.add_money(data[3], config.coofs.WordRequest)
+            await client.send_message(
+                config.chats.chat,
+                phrase.word.success.format(
+                    word=data[2],
+                    user=user_name,
+                    money=decline_number(config.coofs.WordRequest, "изумруд"),
+                ),
+            )
+            return await client.edit_message(
+                event.sender_id, event.message_id, phrase.word.add
+            )
+        if data[1] == "no":
+            with open(patches.crocodile_blacklist_path, "a", encoding="utf-8") as f:
+                f.write(f"\n{data[2]}")
+            await client.send_message(
+                config.chats.chat, phrase.word.no.format(word=data[2], user=user_name)
+            )
+            return await client.edit_message(
+                event.sender_id, event.message_id, phrase.word.noadd
+            )
+    elif data[0] == "nick":
+        if event.sender_id != int(data[2]):
+            return await event.answer(phrase.not_for_you)
+        if db.nicks(id=event.sender_id).get() == data[1]:
+            return await event.answer(phrase.nick.already_you, alert=True)
+        balance = db.get_money(event.sender_id)
+        if balance - config.coofs.PriceForChangeNick < 0:
+            return await event.answer(
+                phrase.money.not_enough.format(decline_number(balance, "изумруд"))
+            )
+        db.add_money(event.sender_id, -config.coofs.PriceForChangeNick)
+        db.nicks(data[1], event.sender_id).link()
+        user_name = await get_name(data[2])
+        return await event.reply(
+            phrase.nick.buy_nick.format(
+                user=user_name,
+                price=decline_number(config.coofs.PriceForChangeNick, "изумруд"),
+            )
+        )
+    elif data[0] == "casino":
+        if data[1] == "start":
+            balance = db.get_money(event.sender_id)
+            if balance < config.coofs.PriceForCasino:
+                return await event.answer(
+                    phrase.money.not_enough.format(decline_number(balance, "изумруд")),
+                    alert=True,
+                )
+            db.add_money(event.sender_id, -config.coofs.PriceForCasino)
+            await event.answer(phrase.casino.do)
+            response = []
+
+            async def check(message):
+                if event.sender_id != message.sender_id:
+                    return
+                if getattr(message, "media", None) is None:
+                    return
+                if getattr(message.media, "emoticon", None) is None:
+                    return
+                if message.media.emoticon != "🎰":
+                    return
+                pos = dice.get(message.media.value)
+                if (pos[0] == pos[1]) and (pos[1] == pos[2]):
+                    logger.info(f"{message.sender_id} - победил в казино")
+                    db.add_money(
+                        message.sender_id,
+                        config.coofs.PriceForCasino * config.coofs.CasinoWinRatio,
+                    )
+                    await asyncio.sleep(2)
+                    await message.reply(
+                        phrase.casino.win.format(
+                            config.coofs.PriceForCasino * config.coofs.CasinoWinRatio
+                        )
+                    )
+                elif (pos[0] == pos[1]) or (pos[1] == pos[2]):
+                    db.add_money(message.sender_id, config.coofs.PriceForCasino)
+                    await asyncio.sleep(2)
+                    await message.reply(phrase.casino.partially)
+                else:
+                    logger.info(f"{message.sender_id} проиграл в казино")
+                    await asyncio.sleep(2)
+                    await message.reply(phrase.casino.lose)
+                client.remove_event_handler(check)
+                logger.info("Снят обработчик казино")
+                response.append(1)
+
+            client.add_event_handler(check, events.NewMessage(config.chats.chat))
+            await asyncio.sleep(config.coofs.CasinoSleepTime)
+            if 1 not in response:
+                return await event.answer(
+                    phrase.casino.timeout.format(await get_name(event.sender_id))
+                )
+        elif data[1] == "auto":
+            balance = db.get_money(event.sender_id)
+            if balance < config.coofs.PriceForCasino:
+                return await event.answer(
+                    phrase.money.not_enough.format(decline_number(balance, "изумруд")),
+                    alert=True,
+                )
+            db.add_money(event.sender_id, -config.coofs.PriceForCasino)
+            media_dice = await client.send_file(
+                event.chat_id,
+                types.InputMediaDice('🎰'),
+                reply_to=config.chats.topics.games
+            )
+            pos = dice.get(media_dice.media.value)
+            if (pos[0] == pos[1]) and (pos[1] == pos[2]):
+                logger.info(f"{event.sender_id} - победил в казино")
+                db.add_money(
+                    event.sender_id,
+                    config.coofs.PriceForCasino * config.coofs.CasinoWinRatio,
+                )
+                await asyncio.sleep(2)
+                return await event.reply(
+                    phrase.casino.win_auto.format(
+                        value=config.coofs.PriceForCasino * config.coofs.CasinoWinRatio,
+                        name=await get_name(event.sender_id)
+                    )
+                )
+            elif (pos[0] == pos[1]) or (pos[1] == pos[2]):
+                db.add_money(event.sender_id, config.coofs.PriceForCasino)
+                await asyncio.sleep(2)
+                return await event.reply(phrase.casino.partially_auto.format(await get_name(event.sender_id)))
+            else:
+                logger.info(f"{event.sender_id} проиграл в казино")
+                await asyncio.sleep(2)
+                return await event.reply(
+                    phrase.casino.lose_auto.format(
+                        name=await get_name(event.sender_id),
+                        value=config.coofs.PriceForCasino
+                    )
+                )
+    elif data[0] == "state":
+        if data[1] == "pay":
+            nick = db.nicks(id=event.sender_id).get()
+            if nick is None:
+                return await event.answer(phrase.state.not_connected, alert=True)
+            balance = db.get_money(event.sender_id)
+            state = db.state(data[2])
+            if state.price > balance:
+                return await event.answer(
+                    phrase.money.not_enough.format(decline_number(balance, "изумруд")),
+                    alert=True,
+                )
+            db.add_money(event.sender_id, -state.price)
+            state.change("money", state.money + state.price)
+            players = state.players
+            players.append(event.sender_id)
+            state.change("players", players)
+            await client.send_message(
+                entity=config.chats.chat,
+                message=phrase.state.new_player.format(state=state.name, player=nick),
+                reply_to=config.chats.topics.rp,
+            )
+            if (state.type == 0) and (len(players) >= config.coofs.Type1Players):
+                await client.send_message(
+                    entity=config.chats.chat,
+                    message=phrase.state.up.format(name=state.name, type="Государство"),
+                    reply_to=config.chats.topics.rp,
+                )
+                state.change("type", 1)
+            if (state.type == 1) and (len(players) >= config.coofs.Type2Players):
+                await client.send_message(
+                    entity=config.chats.chat,
+                    message=phrase.state.up.format(name=state.name, type="Империя"),
+                    reply_to=config.chats.topics.rp,
+                )
+                state.change("type", 2)
+            return await event.answer(phrase.state.admit.format(state.name), alert=True)
+        elif data[1] == "remove":
+            state = db.state(data[2])
+            db.add_money(state.author, state.money)
+            if db.states.remove(data[2]) != True:
+                return await event.answer(phrase.error, alert=True)
+            await client.send_message(
+                entity=config.chats.chat,
+                message=phrase.state.rem_public.format(name=data[2]),
+                reply_to=config.chats.topics.rp
+            )
+            return await event.reply(
+                phrase.state.removed.format(author=await get_name(state.author, push=False))
+            )
