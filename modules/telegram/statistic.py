@@ -1,3 +1,7 @@
+from loguru import logger
+
+logger.info(f"Загружен модуль {__name__}!")
+
 from telethon.tl.custom import Message
 from telethon import events
 
@@ -5,12 +9,7 @@ from .client import client
 from .global_checks import *
 from .func import get_name
 
-from .. import (
-    config,
-    phrase,
-    db,
-    chart
-)
+from .. import config, phrase, db, chart
 from ..formatter import decline_number, remove_section_marks
 from ..mcrcon import MinecraftClient
 
@@ -60,6 +59,7 @@ async def active_check(event: Message):
         n += 1
     return await event.reply(text)
 
+
 @client.on(events.NewMessage(pattern=r"(?i)^/топ крокодил$", func=checks))
 @client.on(events.NewMessage(pattern=r"(?i)^/топ слова$", func=checks))
 @client.on(events.NewMessage(pattern=r"(?i)^/стат крокодил$", func=checks))
@@ -76,11 +76,13 @@ async def crocodile_wins(event: Message):
         n += 1
     return await event.reply(phrase.crocodile.stat.format(text), silent=True)
 
+
 @client.on(events.NewMessage(pattern=r"(?i)^/банк$", func=checks))
 async def all_money(event: Message):
     return await event.reply(
         phrase.money.all_money.format(decline_number(db.get_all_money(), "изумруд"))
     )
+
 
 @client.on(events.NewMessage(pattern=r"(?i)^/топ игроков$", func=checks))
 @client.on(events.NewMessage(pattern=r"(?i)^/topplayers$", func=checks))

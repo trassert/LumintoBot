@@ -1,9 +1,11 @@
+from loguru import logger
+
+logger.info(f"Загружен модуль {__name__}!")
+
 from telethon import events
 
-from .. import (
-    db,
-    phrase
-)
+from .. import db, phrase
+
 
 async def checks(event):
     roles = db.roles()

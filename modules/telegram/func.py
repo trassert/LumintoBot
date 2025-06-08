@@ -1,5 +1,10 @@
+from loguru import logger
+
+logger.info(f"Загружен модуль {__name__}!")
+
 from .. import db
 from .client import client
+
 
 async def get_name(id, push=False, minecraft=False):
     "Выдает @пуш, если нет - имя + фамилия"

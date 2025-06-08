@@ -1,5 +1,7 @@
 from loguru import logger
 
+logger.info(f"Загружен модуль {__name__}!")
+
 from telethon.tl.custom import Message
 from telethon import events
 from telethon.tl.functions.users import GetFullUserRequest
@@ -8,11 +10,7 @@ from .client import client
 from .global_checks import *
 from .func import get_name
 
-from .. import (
-    ip,
-    phrase,
-    config
-)
+from .. import ip, phrase, config
 from ..formatter import remove_section_marks
 from ..mcrcon import MinecraftClient
 
@@ -23,12 +21,10 @@ async def tg_dns(event: Message):
     roles = db.roles()
     if roles.get(event.sender_id) < roles.ADMIN:
         return await event.reply(
-            phrase.roles.no_perms.format(
-                level=roles.ADMIN,
-                name=phrase.roles.admin
-            )
+            phrase.roles.no_perms.format(level=roles.ADMIN, name=phrase.roles.admin)
         )
     return await event.reply(phrase.dns.format(await ip.setup(True)), parse_mode="html")
+
 
 @client.on(events.NewMessage(pattern=r"(?i)^/изменить баланс(.*)", func=checks))
 @client.on(events.NewMessage(pattern=r"(?i)^/change balance(.*)", func=checks))
@@ -36,10 +32,7 @@ async def add_balance(event: Message):
     roles = db.roles()
     if roles.get(event.sender_id) < roles.ADMIN:
         return await event.reply(
-            phrase.roles.no_perms.format(
-                level=roles.ADMIN,
-                name=phrase.roles.admin
-            )
+            phrase.roles.no_perms.format(level=roles.ADMIN, name=phrase.roles.admin)
         )
     args = event.pattern_match.group(1).strip().split()
     try:
@@ -67,16 +60,14 @@ async def add_balance(event: Message):
     db.add_money(user.full_user.id, new)
     await event.reply(phrase.money.add_money.format(name=tag, old=old, new=old + new))
 
+
 @client.on(events.NewMessage(pattern=r"(?i)^\+стафф(.*)", func=checks))
 @client.on(events.NewMessage(pattern=r"(?i)^\+staff(.*)", func=checks))
 async def add_staff(event: Message):
     roles = db.roles()
     if roles.get(event.sender_id) < roles.OWNER:
         return await event.reply(
-            phrase.roles.no_perms.format(
-                level=roles.OWNER,
-                name=phrase.roles.owner
-            )
+            phrase.roles.no_perms.format(level=roles.OWNER, name=phrase.roles.owner)
         )
     arg = event.pattern_match.group(1).strip()
     try:
@@ -91,7 +82,7 @@ async def add_staff(event: Message):
             tag = await get_name(user)
         else:
             return await event.reply(phrase.money.no_people)
-    new_role = roles.get(user)+1
+    new_role = roles.get(user) + 1
     roles.set(user, new_role)
     return await event.reply(phrase.perms.upgrade.format(nick=tag, staff=new_role))
 
@@ -102,10 +93,7 @@ async def del_staff(event: Message):
     roles = db.roles()
     if roles.get(event.sender_id) < roles.OWNER:
         return await event.reply(
-            phrase.roles.no_perms.format(
-                level=roles.OWNER,
-                name=phrase.roles.owner
-            )
+            phrase.roles.no_perms.format(level=roles.OWNER, name=phrase.roles.owner)
         )
     arg = event.pattern_match.group(1).strip()
     try:
@@ -120,19 +108,17 @@ async def del_staff(event: Message):
             tag = await get_name(user)
         else:
             return await event.reply(phrase.money.no_people)
-    new_role = roles.get(user)-1
+    new_role = roles.get(user) - 1
     roles.set(user, new_role)
     return await event.reply(phrase.perms.downgrade.format(nick=tag, staff=new_role))
+
 
 @client.on(events.NewMessage(pattern=r"//(.+)", func=checks))
 async def mcrcon(event: Message):
     roles = db.roles()
     if roles.get(event.sender_id) < roles.ADMIN:
         return await event.reply(
-            phrase.roles.no_perms.format(
-                level=roles.ADMIN,
-                name=phrase.roles.admin
-            )
+            phrase.roles.no_perms.format(level=roles.ADMIN, name=phrase.roles.admin)
         )
     command = event.pattern_match.group(1).strip()
     logger.info(f"Выполняется команда: {command}")
@@ -152,6 +138,7 @@ async def mcrcon(event: Message):
     except TimeoutError:
         return await event.reply(phrase.server.stopped)
 
+
 @client.on(events.NewMessage(pattern=r"(?i)^\+вт\s(.+)", func=checks))
 @client.on(events.NewMessage(pattern=r"(?i)^\-вт\s(.+)", func=checks))
 @client.on(events.NewMessage(pattern=r"(?i)^\+wl\s(.+)", func=checks))
@@ -160,10 +147,7 @@ async def whitelist(event: Message):
     roles = db.roles()
     if roles.get(event.sender_id) < roles.VIP:
         return await event.reply(
-            phrase.roles.no_perms.format(
-                level=roles.VIP,
-                name=phrase.roles.vip
-            )
+            phrase.roles.no_perms.format(level=roles.VIP, name=phrase.roles.vip)
         )
     if event.text[0] == "-":
         command = f"swl remove {event.pattern_match.group(1).strip()}"

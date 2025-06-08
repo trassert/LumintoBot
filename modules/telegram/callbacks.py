@@ -1,25 +1,19 @@
+from loguru import logger
+
+logger.info(f"Загружен модуль {__name__}!")
+
 import asyncio
 
 from telethon import events, types
 
-from loguru import logger
 from random import choice
 
 from .client import client
 from .global_checks import *
 from .func import get_name
-from .games import (
-    crocodile_handler,
-    crocodile_hint
-)
+from .games import crocodile_handler, crocodile_hint
 
-from .. import (
-    config,
-    phrase,
-    db,
-    patches,
-    dice
-)
+from .. import config, phrase, db, patches, dice
 from ..formatter import decline_number
 from ..mcrcon import MinecraftClient
 
@@ -224,8 +218,8 @@ async def callback_action(event: events.CallbackQuery.Event):
             db.add_money(event.sender_id, -config.coofs.PriceForCasino)
             media_dice = await client.send_file(
                 event.chat_id,
-                types.InputMediaDice('🎰'),
-                reply_to=config.chats.topics.games
+                types.InputMediaDice("🎰"),
+                reply_to=config.chats.topics.games,
             )
             pos = dice.get(media_dice.media.value)
             if (pos[0] == pos[1]) and (pos[1] == pos[2]):
@@ -238,20 +232,22 @@ async def callback_action(event: events.CallbackQuery.Event):
                 return await event.reply(
                     phrase.casino.win_auto.format(
                         value=config.coofs.PriceForCasino * config.coofs.CasinoWinRatio,
-                        name=await get_name(event.sender_id)
+                        name=await get_name(event.sender_id),
                     )
                 )
             elif (pos[0] == pos[1]) or (pos[1] == pos[2]):
                 db.add_money(event.sender_id, config.coofs.PriceForCasino)
                 await asyncio.sleep(2)
-                return await event.reply(phrase.casino.partially_auto.format(await get_name(event.sender_id)))
+                return await event.reply(
+                    phrase.casino.partially_auto.format(await get_name(event.sender_id))
+                )
             else:
                 logger.info(f"{event.sender_id} проиграл в казино")
                 await asyncio.sleep(2)
                 return await event.reply(
                     phrase.casino.lose_auto.format(
                         name=await get_name(event.sender_id),
-                        value=config.coofs.PriceForCasino
+                        value=config.coofs.PriceForCasino,
                     )
                 )
     elif data[0] == "state":
@@ -299,8 +295,10 @@ async def callback_action(event: events.CallbackQuery.Event):
             await client.send_message(
                 entity=config.chats.chat,
                 message=phrase.state.rem_public.format(name=data[2]),
-                reply_to=config.chats.topics.rp
+                reply_to=config.chats.topics.rp,
             )
             return await event.reply(
-                phrase.state.removed.format(author=await get_name(state.author, push=False))
+                phrase.state.removed.format(
+                    author=await get_name(state.author, push=False)
+                )
             )

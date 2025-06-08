@@ -1,3 +1,7 @@
+from loguru import logger
+
+logger.info(f"Загружен модуль {__name__}!")
+
 from telethon import events
 from telethon.tl.custom import Message
 from telethon.tl.types import (
@@ -15,6 +19,7 @@ from ..formatter import decline_number
 from .. import (
     phrase,
 )
+
 
 @client.on(events.NewMessage(pattern=r"(?i)^/shop", func=checks))
 @client.on(events.NewMessage(pattern=r"(?i)^/шоп$", func=checks))

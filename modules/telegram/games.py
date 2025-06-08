@@ -1,3 +1,7 @@
+from loguru import logger
+
+logger.info(f"Загружен модуль {__name__}!")
+
 import asyncio
 
 from random import randint, random
@@ -14,38 +18,31 @@ from telethon.tl.types import (
 from .client import client
 from .global_checks import *
 
-from .. import (
-    config,
-    phrase,
-    ai
-)
+from .. import config, phrase, ai
 from ..formatter import decline_number
 
 
 @client.on(events.NewMessage(config.chats.chat, pattern=r"(?i)^/казино$", func=checks))
 async def casino(event: Message):
-    if (
-        event.reply_to_msg_id != config.chats.topics.games
-    ) and (
+    if (event.reply_to_msg_id != config.chats.topics.games) and (
         getattr(event.reply_to, "reply_to_top_id", None) != config.chats.topics.games
     ):
         return await event.reply(phrase.game_topic_warning)
     keyboard = [
-        [  
-            KeyboardButtonCallback(text="💎 Внести изумруды", data=b"casino.start")
-        ],
+        [KeyboardButtonCallback(text="💎 Внести изумруды", data=b"casino.start")],
         [
-            KeyboardButtonCallback(text="🎰 Автоматическая прокрутка", data=b"casino.auto")
-        ]
+            KeyboardButtonCallback(
+                text="🎰 Автоматическая прокрутка", data=b"casino.auto"
+            )
+        ],
     ]
     return await event.reply(
         phrase.casino.start.format(config.coofs.PriceForCasino), buttons=keyboard
     )
 
+
 async def crocodile_hint(event: Message):
-    if (
-        event.reply_to_msg_id != config.chats.topics.games
-    ) and (
+    if (event.reply_to_msg_id != config.chats.topics.games) and (
         getattr(event.reply_to, "reply_to_top_id", None) != config.chats.topics.games
     ):
         return await event.reply(phrase.game_topic_warning)
@@ -87,15 +84,14 @@ async def crocodile_hint(event: Message):
         db.database("crocodile_last_hint", response)
     return await event.reply(response)
 
+
 @client.on(events.NewMessage(pattern=r"(?i)^/крокодил$", func=checks))
 @client.on(events.NewMessage(pattern=r"(?i)^/crocodile$", func=checks))
 @client.on(events.NewMessage(pattern=r"(?i)^старт крокодил$", func=checks))
 async def crocodile(event: Message):
     if not event.chat_id == config.chats.chat:
         return await event.reply(phrase.crocodile.chat)
-    if (
-        event.reply_to_msg_id != config.chats.topics.games
-    ) and (
+    if (event.reply_to_msg_id != config.chats.topics.games) and (
         getattr(event.reply_to, "reply_to_top_id", None) != config.chats.topics.games
     ):
         return await event.reply(phrase.game_topic_warning)
@@ -131,12 +127,11 @@ async def crocodile(event: Message):
         )
         return await event.reply(phrase.crocodile.no, buttons=keyboard)
 
+
 @client.on(events.NewMessage(pattern=r"(?i)^/ставка(.*)", func=checks))
 @client.on(events.NewMessage(pattern=r"(?i)^/крокоставка(.*)", func=checks))
 async def crocodile_bet(event: Message):
-    if (
-        event.reply_to_msg_id != config.chats.topics.games
-    ) and (
+    if (event.reply_to_msg_id != config.chats.topics.games) and (
         getattr(event.reply_to, "reply_to_top_id", None) != config.chats.topics.games
     ):
         return await event.reply(phrase.game_topic_warning)
@@ -175,15 +170,13 @@ async def crocodile_bet(event: Message):
         phrase.crocodile.bet.format(decline_number(bet, "изумруд"))
     )
 
+
 @client.on(events.NewMessage(pattern=r"(?i)^/суперигра(.*)", func=checks))
 async def super_game(event: Message):
     roles = db.roles()
     if roles.get(event.sender_id) < roles.ADMIN:
         return await event.reply(
-            phrase.roles.no_perms.format(
-                level=roles.ADMIN,
-                name=phrase.roles.admin
-            )
+            phrase.roles.no_perms.format(level=roles.ADMIN, name=phrase.roles.admin)
         )
     arg = event.pattern_match.group(1).strip()
     bets = db.database("crocodile_bets")
@@ -203,10 +196,9 @@ async def super_game(event: Message):
     )
     return await client.send_message(config.chats.chat, phrase.crocodile.super_game)
 
+
 async def crocodile_handler(event: Message):
-    if (
-        event.reply_to_msg_id != config.chats.topics.games
-    ) and (
+    if (event.reply_to_msg_id != config.chats.topics.games) and (
         getattr(event.reply_to, "reply_to_top_id", None) != config.chats.topics.games
     ):
         return
@@ -249,9 +241,7 @@ async def crocodile_handler(event: Message):
         client.remove_event_handler(crocodile_hint)
         client.remove_event_handler(crocodile_handler)
         db.crocodile_stat(event.sender_id).add()
-        return await event.reply(
-            phrase.crocodile.win.format(current_word) + bets_str
-        )
+        return await event.reply(phrase.crocodile.win.format(current_word) + bets_str)
     else:
         pass
     if text[0] != "/":
@@ -273,19 +263,16 @@ async def crocodile_handler(event: Message):
             cgame["unsec"] = "".join(current_mask)
             db.database("current_game", cgame)
             return await event.reply(
-                phrase.crocodile.new.format(
-                    "".join(current_mask).replace("_", "..")
-                )
+                phrase.crocodile.new.format("".join(current_mask).replace("_", ".."))
             )
         if list(db.database("current_game")["unsec"]) != current_mask:
             cgame = db.database("current_game")
             cgame["unsec"] = "".join(current_mask)
             db.database("current_game", cgame)
             return await event.reply(
-                phrase.crocodile.new.format(
-                    "".join(current_mask).replace("_", "..")
-                )
+                phrase.crocodile.new.format("".join(current_mask).replace("_", ".."))
             )
+
 
 if db.database("current_game") != 0:
     client.add_event_handler(

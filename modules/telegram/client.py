@@ -1,3 +1,7 @@
+from loguru import logger
+
+logger.info(f"Загружен модуль {__name__}!")
+
 from telethon.sync import TelegramClient
 
 from os import path
@@ -27,5 +31,5 @@ from . import (
     shop,
     states,
     statistic,
-    tickets
+    tickets,
 )

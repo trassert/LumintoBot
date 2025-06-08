@@ -1,7 +1,9 @@
+from loguru import logger
+
+logger.info(f"Загружен модуль {__name__}!")
+
 import re
 import asyncio
-
-from loguru import logger
 
 from telethon.tl.custom import Message
 from telethon import events
@@ -15,11 +17,9 @@ from .client import client
 from .global_checks import *
 from .func import get_name
 
-from .. import (
-    config,
-    phrase
-)
+from .. import config, phrase
 from ..formatter import decline_number
+
 
 @client.on(events.NewMessage(pattern=r"(?i)^/госва$", func=checks))
 @client.on(events.NewMessage(pattern=r"(?i)^/государства$", func=checks))
@@ -133,7 +133,9 @@ async def state_enter(event: Message):
 async def state_get(event: Message):
     state_name = event.pattern_match.group(1).strip()
     if state_name == "":
-        check = db.states.if_player(event.sender_id) or db.states.if_author(event.sender_id)
+        check = db.states.if_player(event.sender_id) or db.states.if_author(
+            event.sender_id
+        )
         if check is False:
             return await event.reply(phrase.state.no_name)
         state_name = check
@@ -218,15 +220,15 @@ async def state_rem(event: Message):
             KeyboardButtonRow(
                 [
                     KeyboardButtonCallback(
-                        text=phrase.state.rem_button, data=f"state.remove.{state_name}".encode()
+                        text=phrase.state.rem_button,
+                        data=f"state.remove.{state_name}".encode(),
                     )
                 ]
             )
         ]
     )
     return await event.reply(
-        phrase.state.rem_message.format(name=state_name),
-        buttons=keyboard
+        phrase.state.rem_message.format(name=state_name), buttons=keyboard
     )
 
 

@@ -1,9 +1,12 @@
+from loguru import logger
+
+logger.info(f"Загружен модуль {__name__}!")
+
 import ping3
 import aiohttp
 import re
 
 from time import time
-from loguru import logger
 from random import choice, randint, random
 from datetime import datetime
 
@@ -38,9 +41,10 @@ async def host(event: Message):
     return await event.reply(
         phrase.server.host.format(
             v4=db.database("host"),
-            v6=f'{db.database("ipv6_subdomain")}.{db.database("host")}'
+            v6=f'{db.database("ipv6_subdomain")}.{db.database("host")}',
         )
     )
+
 
 @client.on(events.NewMessage(pattern=r"(?i)^/помощь$", func=checks))
 @client.on(events.NewMessage(pattern=r"(?i)^/help", func=checks))
@@ -50,6 +54,7 @@ async def host(event: Message):
 @client.on(events.NewMessage(pattern=r"(?i)^бот помощь$", func=checks))
 async def help(event: Message):
     return await event.reply(phrase.help.comm, link_preview=True)
+
 
 @client.on(events.NewMessage(pattern=r"(?i)^/пинг(.*)", func=checks))
 @client.on(events.NewMessage(pattern=r"(?i)^/ping", func=checks))
@@ -82,7 +87,11 @@ async def ping(event: Message):
                     try:
                         if await request.text() == "ok":
                             server_ping = round(time() - timestamp, 1)
-                            textping = f"{server_ping} сек." if server_ping > 0 else phrase.ping.min_ai
+                            textping = (
+                                f"{server_ping} сек."
+                                if server_ping > 0
+                                else phrase.ping.min_ai
+                            )
                             all_servers_ping.append(f"🌐 : ИИ сервер №{n} - {textping}")
                         else:
                             all_servers_ping.append(f"❌ : ИИ сервер №{n} - Ошибка!")
@@ -97,12 +106,14 @@ async def ping(event: Message):
     text = f"{phrase.ping.set.format(ping)}\n{'\n'.join(all_servers_ping)}"
     return await event.reply(text)
 
+
 @client.on(events.NewMessage(pattern=r"(?i)^/start$", func=checks))
 @client.on(events.NewMessage(pattern=r"(?i)^/старт$", func=checks))
 async def start(event: Message):
     return await event.reply(
         phrase.start.format(await get_name(event.sender_id, push=False)), silent=True
     )
+
 
 @client.on(events.NewMessage(pattern=r"(?i)^/обо мне$", func=checks))
 @client.on(events.NewMessage(pattern=r"(?i)^/я$", func=checks))
@@ -143,9 +154,10 @@ async def profile(event: Message):
             m_week=m_week,
             m_month=m_month,
             m_all=m_all,
-            balance=decline_number(db.get_money(event.sender_id), "изумруд")
+            balance=decline_number(db.get_money(event.sender_id), "изумруд"),
         )
     )
+
 
 @client.on(events.NewMessage(pattern=r"(?i)^/time", func=checks))
 @client.on(events.NewMessage(pattern=r"(?i)^/время$", func=checks))
@@ -153,6 +165,7 @@ async def profile(event: Message):
 @client.on(events.NewMessage(pattern=r"(?i)^/msk$", func=checks))
 async def msktime(event: Message):
     return await event.reply(phrase.time.format(datetime.now().strftime("%H:%M:%S")))
+
 
 @client.on(events.NewMessage(pattern=r"(?i)^/г шахта$", func=checks))
 @client.on(events.NewMessage(pattern=r"(?i)^/г майнить$", func=checks))
@@ -165,9 +178,7 @@ async def msktime(event: Message):
 @client.on(events.NewMessage(pattern=r"(?i)^копать$", func=checks))
 @client.on(events.NewMessage(pattern=r"(?i)^/mine", func=checks))
 async def mine(event: Message):
-    if (
-        db.states.if_player(event.sender_id) is False
-    ) and (
+    if (db.states.if_player(event.sender_id) is False) and (
         db.states.if_author(event.sender_id) is False
     ):
         return await event.reply(phrase.mine.not_in_state)
@@ -180,15 +191,12 @@ async def mine(event: Message):
         if balance < added:
             added = balance
         text = choice(phrase.mine.die).format(
-            killer=choice(phrase.mine.killers),
-            value=decline_number(added, "изумруд")
+            killer=choice(phrase.mine.killers), value=decline_number(added, "изумруд")
         )
         db.add_money(event.sender_id, -added)
     if random() < config.coofs.ChanceToBoost:
         added = randint(config.coofs.MineMaxGems, config.coofs.MineMaxBoost)
-        text = choice(phrase.mine.boost).format(
-            decline_number(added, "изумруд")
-        )
+        text = choice(phrase.mine.boost).format(decline_number(added, "изумруд"))
         db.add_money(event.sender_id, added)
     else:
         added = randint(1, config.coofs.MineMaxGems)
@@ -321,10 +329,7 @@ async def word_remove_empty(event: Message):
     roles = db.roles()
     if roles.get(event.sender_id) < roles.ADMIN:
         return await event.reply(
-            phrase.roles.no_perms.format(
-                level=roles.ADMIN,
-                name=phrase.roles.admin
-            )
+            phrase.roles.no_perms.format(level=roles.ADMIN, name=phrase.roles.admin)
         )
     return await event.reply(phrase.word.rem_empty)
 
@@ -334,10 +339,7 @@ async def word_remove(event: Message):
     roles = db.roles()
     if roles.get(event.sender_id) < roles.ADMIN:
         return await event.reply(
-            phrase.roles.no_perms.format(
-                level=roles.ADMIN,
-                name=phrase.roles.admin
-            )
+            phrase.roles.no_perms.format(level=roles.ADMIN, name=phrase.roles.admin)
         )
     word = event.pattern_match.group(1).strip().lower()
     with open(patches.crocodile_path, "r", encoding="utf-8") as f:
@@ -347,9 +349,7 @@ async def word_remove(event: Message):
     text.remove(word)
     with open(patches.crocodile_path, "w", encoding="utf-8") as f:
         f.write("\n".join(text))
-    return await event.reply(
-        phrase.word.deleted.format(word)
-    )
+    return await event.reply(phrase.word.deleted.format(word))
 
 
 @client.on(events.NewMessage(pattern=r"(?i)^/nick(.*)", func=checks))
@@ -365,14 +365,13 @@ async def check_nick(event: Message):
             user = reply_message.sender_id
         else:
             return await event.reply(
-                phrase.nick.urnick.format(
-                    db.nicks(id=event.sender_id).get()
-                )
+                phrase.nick.urnick.format(db.nicks(id=event.sender_id).get())
             )
     nick = db.nicks(id=user).get()
     if nick is None:
         return await event.reply(phrase.nick.no_nick)
     return await event.reply(phrase.nick.usernick.format(nick))
+
 
 @client.on(events.NewMessage(pattern=r"(?i)^/скинуть(.*)", func=checks))
 @client.on(events.NewMessage(pattern=r"(?i)^/кинуть(.*)", func=checks))
@@ -408,14 +407,10 @@ async def swap_money(event: Message):
 
     entity = await client.get_entity(user)
     if entity.bot:
-        return await event.reply(
-            phrase.money.bot
-        )
+        return await event.reply(phrase.money.bot)
 
     if event.sender_id == user:
-        return await event.reply(
-            phrase.money.selfbyself
-        )
+        return await event.reply(phrase.money.selfbyself)
     sender_balance = db.get_money(event.sender_id)
     if sender_balance < count:
         return await event.reply(
@@ -426,6 +421,7 @@ async def swap_money(event: Message):
     return await event.reply(
         phrase.money.swap_money.format(decline_number(count, "изумруд"))
     )
+
 
 @client.on(events.NewMessage(pattern=r"(?i)^/баланс$", func=checks))
 @client.on(events.NewMessage(pattern=r"(?i)^баланс$", func=checks))
@@ -439,6 +435,7 @@ async def get_balance(event: Message):
             decline_number(db.get_money(event.sender_id), "изумруд")
         )
     )
+
 
 @client.on(events.NewMessage(pattern=r"(?i)^/linknick(.*)", func=checks))
 @client.on(events.NewMessage(pattern=r"(?i)^/привязать(.*)", func=checks))

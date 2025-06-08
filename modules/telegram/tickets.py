@@ -1,3 +1,7 @@
+from loguru import logger
+
+logger.info(f"Загружен модуль {__name__}!")
+
 from telethon import events
 from telethon.tl.custom import Message
 

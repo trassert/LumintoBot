@@ -1,14 +1,15 @@
+from loguru import logger
+
+logger.info(f"Загружен модуль {__name__}!")
+
 from telethon.tl.custom import Message
 from telethon import events
 
 from .client import client
 from .global_checks import *
 
-from .. import (
-    phrase,
-    db,
-    ai
-)
+from .. import phrase, db, ai
+
 
 @client.on(events.NewMessage(pattern=r"(?i)^/ии\s(.+)", func=checks))
 @client.on(events.NewMessage(pattern=r"(?i)^/ai\s(.+)", func=checks))
@@ -25,6 +26,7 @@ async def gemini(event: Message):
     else:
         return await event.reply(response)
 
+
 @client.on(events.NewMessage(pattern=r"(?i)^/ии$", func=checks))
 @client.on(events.NewMessage(pattern=r"(?i)^/ai$", func=checks))
 @client.on(events.NewMessage(pattern=r"(?i)^ии$", func=checks))
@@ -32,16 +34,14 @@ async def gemini(event: Message):
 async def gemini_empty(event: Message):
     return await event.reply(phrase.no.response)
 
+
 @client.on(events.NewMessage(pattern=r"(?i)^/лаи\s(.+)", func=checks))
 async def local_ai(event: Message):
     text = event.pattern_match.group(1).strip()
     roles = db.roles()
     if roles.get(event.sender_id) < roles.ADMIN:
         return await event.reply(
-            phrase.roles.no_perms.format(
-                level=roles.ADMIN,
-                name=phrase.roles.admin
-            )
+            phrase.roles.no_perms.format(level=roles.ADMIN, name=phrase.roles.admin)
         )
     message_for_edit = await event.reply(phrase.ai.response)
     response = ""
