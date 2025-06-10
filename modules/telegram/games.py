@@ -29,12 +29,11 @@ async def casino(event: Message):
     ):
         return await event.reply(phrase.game_topic_warning)
     keyboard = [
-        [KeyboardButtonCallback(text="💎 Внести изумруды", data=b"casino.start")],
         [
             KeyboardButtonCallback(
                 text="🎰 Автоматическая прокрутка", data=b"casino.auto"
             )
-        ],
+        ]
     ]
     return await event.reply(
         phrase.casino.start.format(config.coofs.PriceForCasino), buttons=keyboard
