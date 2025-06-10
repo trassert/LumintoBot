@@ -57,7 +57,6 @@ async def help(event: Message):
 
 
 @client.on(events.NewMessage(pattern=r"(?i)^/пинг(.*)", func=checks))
-@client.on(events.NewMessage(pattern=r"(?i)^/ping", func=checks))
 @client.on(events.NewMessage(pattern=r"(?i)^/ping(.*)", func=checks))
 @client.on(events.NewMessage(pattern=r"(?i)^пинг(.*)", func=checks))
 async def ping(event: Message):
@@ -101,8 +100,6 @@ async def ping(event: Message):
         all_servers_ping.append(
             f"🌐 : Пинг сервера - {int(round(ping3.ping('yandex.ru'), 3)*1000)} мс"
         )
-    elif arg != "":
-        return
     text = f"{phrase.ping.set.format(ping)}\n{'\n'.join(all_servers_ping)}"
     return await event.reply(text)
 

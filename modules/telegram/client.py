@@ -16,6 +16,8 @@ client = TelegramClient(
     api_hash=config.tokens.bot.hash,
     device_model="Bot",
     system_version="4.16.30-vxCUSTOM",
+    lang_code="ru",
+    system_lang_code="ru",
     use_ipv6=True,
 )
 

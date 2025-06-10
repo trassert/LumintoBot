@@ -16,9 +16,7 @@ from .client import client
 from .global_checks import *
 
 from ..formatter import decline_number
-from .. import (
-    phrase,
-)
+from .. import phrase
 
 
 @client.on(events.NewMessage(pattern=r"(?i)^/shop", func=checks))
