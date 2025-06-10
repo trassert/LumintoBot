@@ -9,9 +9,9 @@ from .client import client
 from .global_checks import *
 from .func import get_name
 
-from ..formatter import decline_number
 from .. import (
     phrase,
+    formatter
 )
 
 @client.on(events.NewMessage(pattern=r"(?i)^\+чек(.*)", func=checks))
@@ -31,7 +31,7 @@ async def do_ticket(event: Message):
     balance = db.get_money(event.sender_id)
     if balance < arg:
         return await event.reply(
-            phrase.money.not_enough.format(decline_number(balance, "изумруд"))
+            phrase.money.not_enough.format(formatter.value_to_str(balance, "изумруд"))
         )
     db.add_money(event.sender_id, -arg)
     ticket_id = db.ticket.add(event.sender_id, arg)
@@ -59,6 +59,6 @@ async def get_ticket(event: Message):
     return await event.reply(
         phrase.ticket.got.format(
             author=await get_name(ticket_info["author"]),
-            value=decline_number(ticket_info["value"], "изумруд"),
+            value=formatter.value_to_str(ticket_info["value"], "изумруд"),
         )
     )

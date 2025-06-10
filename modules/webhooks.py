@@ -5,11 +5,8 @@ import aiohttp.web
 from loguru import logger
 from hashlib import sha1, md5
 
-from . import config
-from . import db
-from . import phrase
+from . import config, db, phrase, formatter
 from .telegram.client import client
-from .formatter import decline_number
 
 
 async def server():
@@ -30,7 +27,7 @@ async def server():
         tg_id = db.nicks(nick=nick).get()
         if tg_id is not None:
             db.add_money(tg_id, 10)
-            give = phrase.vote_money.format(decline_number(10, "изумруд"))
+            give = phrase.vote_money.format(formatter.value_to_str(10, "изумруд"))
         else:
             give = ""
         await client.send_message(
@@ -57,7 +54,7 @@ async def server():
         tg_id = db.nicks(nick=username).get()
         if tg_id is not None:
             db.add_money(tg_id, 10)
-            give = phrase.vote_money.format(decline_number(10, "изумруд"))
+            give = phrase.vote_money.format(formatter.value_to_str(10, "изумруд"))
         else:
             give = ""
         await client.send_message(

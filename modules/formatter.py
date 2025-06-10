@@ -4,7 +4,7 @@ import re
 morph = MorphAnalyzer()
 
 
-def decline_number(number, noun):
+def value_to_str(number, noun):
     """Склоняет существительное в соответствии с числом.
 
     Аргументы:
@@ -17,21 +17,22 @@ def decline_number(number, noun):
 
     p = morph.parse(noun)[0]
 
-    if number == 1:
-        word = p.inflect({"nomn", "sing"}).word
-    elif 2 <= number <= 4:
-        word = p.inflect({"gent", "sing"}).word
-    else:
-        word = p.inflect({"gent", "plur"}).word
+    match abs(number) % 10:
+        case 1:
+            word = p.inflect({"nomn", "sing"}).word
+        case 2 | 3 | 4:
+            word = p.inflect({"gent", "sing"}).word
+        case _:
+            word = p.inflect({"gent", "plur"}).word
     return f"{number} {word}"
 
 
-def formatter(text):
+def rm_badtext(text):
     text = re.sub(r"\\boxed\{.*?\}", "", text)
     return text.replace("$", "**").replace("\\cdot", "×")  # ! Экранизация необходима
 
 
-def remove_section_marks(text):
+def rm_colors(text):
     'Удаляет из текста все вхождения "§n", где n - цифра или буква.'
     pattern = r"§[a-zA-Z0-9]"
     return re.sub(pattern, "", text)

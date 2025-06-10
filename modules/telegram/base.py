@@ -28,8 +28,8 @@ from .. import (
     ai,
     config,
     patches,
+    formatter
 )
-from ..formatter import decline_number
 from ..system_info import get_system_info
 
 
@@ -151,7 +151,7 @@ async def profile(event: Message):
             m_week=m_week,
             m_month=m_month,
             m_all=m_all,
-            balance=decline_number(db.get_money(event.sender_id), "изумруд"),
+            balance=formatter.value_to_str(db.get_money(event.sender_id), "изумруд"),
         )
     )
 
@@ -188,16 +188,16 @@ async def mine(event: Message):
         if balance < added:
             added = balance
         text = choice(phrase.mine.die).format(
-            killer=choice(phrase.mine.killers), value=decline_number(added, "изумруд")
+            killer=choice(phrase.mine.killers), value=formatter.value_to_str(added, "изумруд")
         )
         db.add_money(event.sender_id, -added)
     if random() < config.coofs.ChanceToBoost:
         added = randint(config.coofs.MineMaxGems, config.coofs.MineMaxBoost)
-        text = choice(phrase.mine.boost).format(decline_number(added, "изумруд"))
+        text = choice(phrase.mine.boost).format(formatter.value_to_str(added, "изумруд"))
         db.add_money(event.sender_id, added)
     else:
         added = randint(1, config.coofs.MineMaxGems)
-        text = phrase.mine.done.format(decline_number(added, "изумруд"))
+        text = phrase.mine.done.format(formatter.value_to_str(added, "изумруд"))
         db.add_money(event.sender_id, added)
     return await event.reply(text)
 
@@ -411,12 +411,12 @@ async def swap_money(event: Message):
     sender_balance = db.get_money(event.sender_id)
     if sender_balance < count:
         return await event.reply(
-            phrase.money.not_enough.format(decline_number(sender_balance, "изумруд"))
+            phrase.money.not_enough.format(formatter.value_to_str(sender_balance, "изумруд"))
         )
     db.add_money(event.sender_id, -count)
     db.add_money(user, count)
     return await event.reply(
-        phrase.money.swap_money.format(decline_number(count, "изумруд"))
+        phrase.money.swap_money.format(formatter.value_to_str(count, "изумруд"))
     )
 
 
@@ -429,7 +429,7 @@ async def swap_money(event: Message):
 async def get_balance(event: Message):
     return await event.reply(
         phrase.money.wallet.format(
-            decline_number(db.get_money(event.sender_id), "изумруд")
+            formatter.value_to_str(db.get_money(event.sender_id), "изумруд")
         )
     )
 
@@ -469,7 +469,7 @@ async def link_nick(event: Message):
         )
         return await event.reply(
             phrase.nick.already_have.format(
-                price=decline_number(config.coofs.PriceForChangeNick, "изумруд")
+                price=formatter.value_to_str(config.coofs.PriceForChangeNick, "изумруд")
             ),
             buttons=keyboard,
         )
@@ -477,7 +477,7 @@ async def link_nick(event: Message):
     db.add_money(event.sender_id, config.coofs.LinkGift)
     db.nicks(nick, event.sender_id).link()
     return await event.reply(
-        phrase.nick.success.format(decline_number(config.coofs.LinkGift, "изумруд"))
+        phrase.nick.success.format(formatter.value_to_str(config.coofs.LinkGift, "изумруд"))
     )
 
 

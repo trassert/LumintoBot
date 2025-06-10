@@ -17,8 +17,7 @@ from .client import client
 from .global_checks import *
 from .func import get_name
 
-from .. import config, phrase
-from ..formatter import decline_number
+from .. import config, phrase, formatter
 
 
 @client.on(events.NewMessage(pattern=r"(?i)^/госва$", func=checks))
@@ -144,14 +143,14 @@ async def state_get(event: Message):
     state = db.state(state_name)
     enter = "Свободный" if state.enter else "Закрыт"
     if state.price > 0:
-        enter = decline_number(state.price, "изумруд")
+        enter = formatter.value_to_str(state.price, "изумруд")
     tasks = [get_name(player, minecraft=True) for player in state.players]
     idented_players = await asyncio.gather(*tasks)
     return await event.reply(
         phrase.state.get.format(
             type=phrase.state_types[state.type],
             name=state.name.capitalize(),
-            money=decline_number(int(state.money), "изумруд"),
+            money=formatter.value_to_str(int(state.money), "изумруд"),
             author=db.nicks(id=state.author).get(),
             enter=enter,
             desc=state.desc,
@@ -310,7 +309,7 @@ async def state_enter(event: Message):
         state.change("price", arg)
         state.change("enter", True)
         return await event.reply(
-            phrase.state.enter_price.format(decline_number(arg, "изумруд"))
+            phrase.state.enter_price.format(formatter.value_to_str(arg, "изумруд"))
         )
     else:
         return await event.reply(phrase.state.howto_enter)
@@ -355,14 +354,14 @@ async def state_add_money(event: Message):
     balance = db.get_money(event.sender_id)
     if arg > balance:
         return await event.reply(
-            phrase.money.not_enough.format(decline_number(balance, "изумруд"))
+            phrase.money.not_enough.format(formatter.value_to_str(balance, "изумруд"))
         )
     db.add_money(event.sender_id, -arg)
     state = db.state(state_name)
     state.change("money", state.money + arg)
     logger.info(f"Казна {state_name} пополнена на {arg}")
     return await event.reply(
-        phrase.state.add_treasury.format(decline_number(arg, "изумруд"))
+        phrase.state.add_treasury.format(formatter.value_to_str(arg, "изумруд"))
     )
 
 
@@ -397,7 +396,7 @@ async def state_rem_money(event: Message):
     state.change("money", state.money - arg)
     db.add_money(event.sender_id, arg)
     return await event.reply(
-        phrase.state.rem_treasury.format(decline_number(arg, "изумруд"))
+        phrase.state.rem_treasury.format(formatter.value_to_str(arg, "изумруд"))
     )
 
 

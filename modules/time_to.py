@@ -5,10 +5,7 @@ from loguru import logger
 
 from . import db
 from .telegram.client import client
-from . import config
-from . import phrase
-
-from .formatter import decline_number
+from . import config, phrase, formatter
 
 
 def get_last_update(name):
@@ -67,7 +64,7 @@ async def rewards():
                         config.chats.chat,
                         phrase.stat.gift.format(
                             user=top[0],
-                            gift=decline_number(config.coofs.ActiveGift, "изумруд"),
+                            gift=formatter.value_to_str(config.coofs.ActiveGift, "изумруд"),
                         ),
                     )
                     logger.info("Начислен подарок за активность!")

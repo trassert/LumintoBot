@@ -6,9 +6,7 @@ from telethon.sync import TelegramClient
 
 from os import path
 
-from .. import (
-    config,
-)
+from .. import config
 
 client = TelegramClient(
     session=path.join("db", "bot"),

@@ -4,8 +4,7 @@ import aiohttp
 from requests import codes
 from loguru import logger
 
-from .formatter import formatter
-from . import config
+from . import config, formatter
 
 
 # local_client = genai.Client(api_key="AIzaSyD3eUj98s6DvR7iusI8ncDTATRWNNXwoFE", proxy_string="proxy")
@@ -27,7 +26,7 @@ async def response(message):
                     url=f"https://{server}/gemini?q={message}&token={config.tokens.google}"
                 ) as request:
                     if request.status == codes.ok:
-                        return formatter(await request.text())
+                        return formatter.rm_badtext(await request.text())
             except Exception:
                 pass
     return None

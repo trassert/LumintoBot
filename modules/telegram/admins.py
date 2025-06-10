@@ -10,8 +10,7 @@ from .client import client
 from .global_checks import *
 from .func import get_name
 
-from .. import ip, phrase, config
-from ..formatter import remove_section_marks
+from .. import ip, phrase, config, formatter
 from ..mcrcon import MinecraftClient
 
 
@@ -128,7 +127,7 @@ async def mcrcon(event: Message):
             port=config.tokens.rcon.port,
             password=config.tokens.rcon.password,
         ) as rcon:
-            resp = remove_section_marks(await rcon.send(command))
+            resp = formatter.rm_colors(await rcon.send(command))
             logger.info(f"Ответ команды:\n{resp}")
             if len(resp) > 4096:
                 for x in range(0, len(resp), 4096):
@@ -160,7 +159,7 @@ async def whitelist(event: Message):
             port=config.tokens.rcon.port,
             password=config.tokens.rcon.password,
         ) as rcon:
-            resp = remove_section_marks(await rcon.send(command))
+            resp = formatter.rm_colors(await rcon.send(command))
             logger.info(f"Ответ команды:\n{resp}")
             return await event.reply(f"✍🏻 : {resp}")
     except TimeoutError:

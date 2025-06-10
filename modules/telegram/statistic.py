@@ -9,8 +9,7 @@ from .client import client
 from .global_checks import *
 from .func import get_name
 
-from .. import config, phrase, db, chart
-from ..formatter import decline_number, remove_section_marks
+from .. import config, phrase, db, chart, formatter
 from ..mcrcon import MinecraftClient
 
 
@@ -35,7 +34,7 @@ async def active_check(event: Message):
         return await client.send_file(event.chat_id, chart.chart_path, caption=text)
     try:
         days = int(arg)
-        text = phrase.stat.chat.format(decline_number(days, "день"))
+        text = phrase.stat.chat.format(formatter.value_to_str(days, "день"))
         all_data = db.statistic(days=days).get_all()
         if days >= 7:
             chart.create_plot(db.statistic(days=days).get_raw())
@@ -80,7 +79,7 @@ async def crocodile_wins(event: Message):
 @client.on(events.NewMessage(pattern=r"(?i)^/банк$", func=checks))
 async def all_money(event: Message):
     return await event.reply(
-        phrase.money.all_money.format(decline_number(db.get_all_money(), "изумруд"))
+        phrase.money.all_money.format(formatter.value_to_str(db.get_all_money(), "изумруд"))
     )
 
 
@@ -96,7 +95,7 @@ async def server_top_list(event: Message):
             password=config.tokens.rcon.password,
         ) as rcon:
             await event.reply(
-                remove_section_marks(await rcon.send("playtime top"))
+                formatter.rm_colors(await rcon.send("playtime top"))
                 .replace("[i] Лидеры по времени на сервере", phrase.stat.server)
                 .replace("***", "")
             )

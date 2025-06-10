@@ -13,8 +13,7 @@ from .global_checks import *
 from .func import get_name
 from .games import crocodile_handler, crocodile_hint
 
-from .. import config, phrase, db, patches, dice
-from ..formatter import decline_number
+from .. import config, phrase, db, patches, dice, formatter
 from ..mcrcon import MinecraftClient
 
 
@@ -63,7 +62,7 @@ async def callback_action(event: events.CallbackQuery.Event):
                 if sender_balance < bets:
                     return await event.answer(
                         phrase.crocodile.not_enough.format(
-                            decline_number(sender_balance, "изумруд")
+                            formatter.value_to_str(sender_balance, "изумруд")
                         ),
                         alert=True,
                     )
@@ -76,7 +75,7 @@ async def callback_action(event: events.CallbackQuery.Event):
             if bets_json != {}:
                 return await event.reply(
                     phrase.crocodile.down_payed.format(
-                        user=user, money=decline_number(bets, "изумруд"), word=word
+                        user=user, money=formatter.value_to_str(bets, "изумруд"), word=word
                     )
                 )
             return await event.reply(phrase.crocodile.down.format(word))
@@ -93,7 +92,7 @@ async def callback_action(event: events.CallbackQuery.Event):
         item = shop[items[int(data[1])]]
         if balance < item["price"]:
             return await event.answer(
-                phrase.money.not_enough.format(decline_number(balance, "изумруд")),
+                phrase.money.not_enough.format(formatter.value_to_str(balance, "изумруд")),
                 alert=True,
             )
         try:
@@ -122,7 +121,7 @@ async def callback_action(event: events.CallbackQuery.Event):
                 phrase.word.success.format(
                     word=data[2],
                     user=user_name,
-                    money=decline_number(config.coofs.WordRequest, "изумруд"),
+                    money=formatter.value_to_str(config.coofs.WordRequest, "изумруд"),
                 ),
             )
             return await client.edit_message(
@@ -145,7 +144,7 @@ async def callback_action(event: events.CallbackQuery.Event):
         balance = db.get_money(event.sender_id)
         if balance - config.coofs.PriceForChangeNick < 0:
             return await event.answer(
-                phrase.money.not_enough.format(decline_number(balance, "изумруд"))
+                phrase.money.not_enough.format(formatter.value_to_str(balance, "изумруд"))
             )
         db.add_money(event.sender_id, -config.coofs.PriceForChangeNick)
         db.nicks(data[1], event.sender_id).link()
@@ -153,7 +152,7 @@ async def callback_action(event: events.CallbackQuery.Event):
         return await event.reply(
             phrase.nick.buy_nick.format(
                 user=user_name,
-                price=decline_number(config.coofs.PriceForChangeNick, "изумруд"),
+                price=formatter.value_to_str(config.coofs.PriceForChangeNick, "изумруд"),
             )
         )
     elif data[0] == "casino":
@@ -161,7 +160,7 @@ async def callback_action(event: events.CallbackQuery.Event):
             balance = db.get_money(event.sender_id)
             if balance < config.coofs.PriceForCasino:
                 return await event.answer(
-                    phrase.money.not_enough.format(decline_number(balance, "изумруд")),
+                    phrase.money.not_enough.format(formatter.value_to_str(balance, "изумруд")),
                     alert=True,
                 )
             db.add_money(event.sender_id, -config.coofs.PriceForCasino)
@@ -208,7 +207,7 @@ async def callback_action(event: events.CallbackQuery.Event):
             state = db.state(data[2])
             if state.price > balance:
                 return await event.answer(
-                    phrase.money.not_enough.format(decline_number(balance, "изумруд")),
+                    phrase.money.not_enough.format(formatter.value_to_str(balance, "изумруд")),
                     alert=True,
                 )
             db.add_money(event.sender_id, -state.price)

@@ -15,8 +15,7 @@ from random import choice
 from .client import client
 from .global_checks import *
 
-from ..formatter import decline_number
-from .. import phrase
+from .. import phrase, formatter
 
 
 @client.on(events.NewMessage(pattern=r"(?i)^/shop", func=checks))
@@ -50,27 +49,27 @@ async def shop(event: Message):
             value_1=(
                 f" ({shop[items[0]]['value']})" if shop[items[0]]["value"] != 1 else ""
             ),
-            price_1=decline_number(shop[items[0]]["price"], "изумруд"),
+            price_1=formatter.value_to_str(shop[items[0]]["price"], "изумруд"),
             trade_2=items[1],
             value_2=(
                 f" ({shop[items[1]]['value']})" if shop[items[1]]["value"] != 1 else ""
             ),
-            price_2=decline_number(shop[items[1]]["price"], "изумруд"),
+            price_2=formatter.value_to_str(shop[items[1]]["price"], "изумруд"),
             trade_3=items[2],
             value_3=(
                 f" ({shop[items[2]]['value']})" if shop[items[2]]["value"] != 1 else ""
             ),
-            price_3=decline_number(shop[items[2]]["price"], "изумруд"),
+            price_3=formatter.value_to_str(shop[items[2]]["price"], "изумруд"),
             trade_4=items[3],
             value_4=(
                 f" ({shop[items[3]]['value']})" if shop[items[3]]["value"] != 1 else ""
             ),
-            price_4=decline_number(shop[items[3]]["price"], "изумруд"),
+            price_4=formatter.value_to_str(shop[items[3]]["price"], "изумруд"),
             trade_5=items[4],
             value_5=(
                 f" ({shop[items[4]]['value']})" if shop[items[4]]["value"] != 1 else ""
             ),
-            price_5=decline_number(shop[items[4]]["price"], "изумруд"),
+            price_5=formatter.value_to_str(shop[items[4]]["price"], "изумруд"),
             quote=choice(phrase.shop_quotes[theme]["quotes"]),
             emo=phrase.shop_quotes[theme]["emo"],
         ),

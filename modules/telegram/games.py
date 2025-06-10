@@ -18,8 +18,7 @@ from telethon.tl.types import (
 from .client import client
 from .global_checks import *
 
-from .. import config, phrase, ai
-from ..formatter import decline_number
+from .. import config, phrase, ai, formatter
 
 
 @client.on(events.NewMessage(config.chats.chat, pattern=r"(?i)^/казино$", func=checks))
@@ -139,13 +138,13 @@ async def crocodile_bet(event: Message):
         if bet < db.database("min_bet"):
             return await event.reply(
                 phrase.money.min_count.format(
-                    decline_number(db.database("min_bet"), "изумруд")
+                    formatter.value_to_str(db.database("min_bet"), "изумруд")
                 )
             )
         elif bet > db.database("max_bet"):
             return await event.reply(
                 phrase.money.max_count.format(
-                    decline_number(db.database("max_bet"), "изумруд")
+                    formatter.value_to_str(db.database("max_bet"), "изумруд")
                 )
             )
     except IndexError:
@@ -155,7 +154,7 @@ async def crocodile_bet(event: Message):
     sender_balance = db.get_money(event.sender_id)
     if sender_balance < bet:
         return await event.reply(
-            phrase.money.not_enough.format(decline_number(sender_balance, "изумруд"))
+            phrase.money.not_enough.format(formatter.value_to_str(sender_balance, "изумруд"))
         )
     if db.database("current_game") != 0:
         return await event.reply(phrase.crocodile.no)
@@ -166,7 +165,7 @@ async def crocodile_bet(event: Message):
     all_bets[str(event.sender_id)] = bet
     db.database("crocodile_bets", all_bets)
     return await event.reply(
-        phrase.crocodile.bet.format(decline_number(bet, "изумруд"))
+        phrase.crocodile.bet.format(formatter.value_to_str(bet, "изумруд"))
     )
 
 
@@ -228,7 +227,7 @@ async def crocodile_handler(event: Message):
                     all += bets[key]
             db.add_money(event.sender_id, all)
             bets_str = phrase.crocodile.bet_win.format(
-                decline_number(all, "изумруд"),
+                formatter.value_to_str(all, "изумруд"),
             )
         db.database("current_game", 0)
         db.database("crocodile_bets", {})
