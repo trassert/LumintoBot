@@ -1,6 +1,8 @@
 import json
 import aiomysql
+import aiomysql
 
+from typing import Dict
 from loguru import logger
 from datetime import datetime, timedelta
 from os import path, listdir, replace
@@ -168,11 +170,13 @@ class roles:
     MODER = 3
     ADMIN = 4
     OWNER = 5
+
     def get(self, id: str) -> int:
         "Получить роль пользователя (U0, если не найдено)"
         id = str(id)
         with open(roles_path, "r", encoding="utf-8") as f:
             return json.load(f).get(str(id), self.USER)
+
     def set(self, id: str, role: int) -> bool:
         "Установить роль пользователя"
         id = str(id)
@@ -180,12 +184,12 @@ class roles:
         with open(roles_path) as f:
             data = json.load(f)
         data[id] = role
-        with open(roles_path, "w", encoding='utf-8') as f:
+        with open(roles_path, "w", encoding="utf-8") as f:
             json.dump(
                 dict(sorted(data.items(), key=lambda x: (-x[1], x[0]))),
                 f,
                 indent=4,
-                ensure_ascii=False
+                ensure_ascii=False,
             )
 
 
@@ -497,28 +501,101 @@ class states:
         return False
 
 
-class AsyncSQLDatabase:
-    def __init__(self, host, user, password, database, table):
+class Mysql:
+    def __init__(
+        self,
+        host: str,
+        user: str,
+        password: str,
+        db: str,
+        table_name: str,
+        port: int = 3306,
+        minsize: int = 1,
+        maxsize: int = 10,
+    ):
         self.host = host
         self.user = user
         self.password = password
-        self.database = database
-        self.table = table
+        self.db = db
+        self.port = port
+        self.minsize = minsize
+        self.maxsize = maxsize
         self.pool = None
+        self.table_name = table_name
 
-    async def connect(self):
+    async def initialize(self):
         self.pool = await aiomysql.create_pool(
             host=self.host,
+            port=self.port,
             user=self.user,
             password=self.password,
-            db=self.database,
-            autocommit=True,
+            db=self.db,
+            minsize=self.minsize,
+            maxsize=self.maxsize,
         )
 
-    async def get(self):
-        query = f"SELECT * FROM {self.table}"
+    async def get_by_id(self, id: int) -> Dict[str, int]:
         async with self.pool.acquire() as conn:
-            async with conn.cursor() as cursor:
-                await cursor.execute(query)
-                result = await cursor.fetchall()
-                return result
+            async with conn.cursor() as cur:
+                await cur.execute(
+                    f"""
+                SELECT wins_casino, lose_moneys_in_casino 
+                FROM {self.table_name} 
+                WHERE id = %s
+                """,
+                    (id,),
+                )
+                result = await cur.fetchone()
+                if result:
+                    return {"wins_casino": result[0], "lose_moneys_in_casino": result[1]}
+                return {"wins_casino": 0, "lose_moneys_in_casino": 0}
+
+    async def get_all(self) -> Dict[int, Dict[str, int]]:
+        async with self.pool.acquire() as conn:
+            async with conn.cursor() as cur:
+                await cur.execute(
+                    f"""
+                SELECT id, wins_casino, lose_moneys_in_casino 
+                FROM {self.table_name}
+                """
+                )
+                results = await cur.fetchall()
+                return {
+                    row[0]: {"wins_casino": row[1], "lose_moneys_in_casino": row[2]}
+                    for row in results
+                }
+
+    async def add_win(self, id: int):
+        async with self.pool.acquire() as conn:
+            async with conn.cursor() as cur:
+                await cur.execute(
+                    f"""
+                INSERT INTO {self.table_name} (id, wins_casino, lose_moneys_in_casino)
+                VALUES (%s, 1, 0)
+                ON DUPLICATE KEY UPDATE wins_casino = wins_casino + 1
+                """,
+                    (id,),
+                )
+                await conn.commit()
+
+    async def add_lose_money(self, id: int, amount: int = 1):
+        async with self.pool.acquire() as conn:
+            async with conn.cursor() as cur:
+                await cur.execute(
+                    f"""
+                INSERT INTO {self.table_name} (id, wins_casino, lose_moneys_in_casino)
+                VALUES (%s, 0, %s)
+                ON DUPLICATE KEY UPDATE lose_moneys_in_casino = lose_moneys_in_casino + %s
+                """,
+                    (id, amount, amount),
+                )
+                await conn.commit()
+
+
+Users = Mysql(
+    host=config.tokens.mysql_users.host,
+    user=config.tokens.mysql_users.user,
+    password=config.tokens.mysql_users.password,
+    db=config.tokens.mysql_users.database,
+    table_name=config.tokens.mysql_users.table
+)

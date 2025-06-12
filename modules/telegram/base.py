@@ -486,3 +486,15 @@ async def link_nick(event: Message):
 @client.on(events.NewMessage(pattern=r"(?i)^/server", func=checks))
 async def sysinfo(event: Message):
     await event.reply(get_system_info())
+
+
+@client.on(events.NewMessage(pattern=r"(?i)^/тест$", func=checks))
+async def test(event: Message):
+    t1 = time()
+    await event.reply(
+        f"urid {await db.Users.get_by_id(event.sender_id)}"
+    )
+    await event.reply(
+        f"allid {await db.Users.get_all()}"
+    )
+    await event.reply(f"ping is {round(time() - t1, 2)} s.")

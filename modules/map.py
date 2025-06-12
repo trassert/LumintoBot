@@ -1,10 +1,11 @@
 import folium
 import aiohttp
 import random
+import aiomysql
 
 from .ip import get_loc, ident_v4, ident_v6, dns_servers
 from .ai import ai_servers
-from .db import AsyncSQLDatabase
+from .db import MapSQL
 from .config import tokens
 
 
@@ -17,6 +18,33 @@ players = {}
 servers = {}
 
 me = []
+
+
+class MapSQL:
+    def __init__(self, host, user, password, database, table):
+        self.host = host
+        self.user = user
+        self.password = password
+        self.database = database
+        self.table = table
+        self.pool = None
+
+    async def connect(self):
+        self.pool = await aiomysql.create_pool(
+            host=self.host,
+            user=self.user,
+            password=self.password,
+            db=self.database,
+            autocommit=True,
+        )
+
+    async def get(self):
+        query = f"SELECT * FROM {self.table}"
+        async with self.pool.acquire() as conn:
+            async with conn.cursor() as cursor:
+                await cursor.execute(query)
+                result = await cursor.fetchall()
+                return result
 
 
 def randomize_coordinates(data, max_offset=0.02):
@@ -38,12 +66,12 @@ async def get_full_map():
         servers[server] = await get_loc(server)
     for server in dns_servers:
         servers[server] = await get_loc(server)
-    authy = AsyncSQLDatabase(
-        host=tokens.mysql.host,
-        user=tokens.mysql.user,
-        password=tokens.mysql.password,
-        database=tokens.mysql.database,
-        table=tokens.mysql.table,
+    authy = MapSQL(
+        host=tokens.mysql_map.host,
+        user=tokens.mysql_map.user,
+        password=tokens.mysql_map.password,
+        database=tokens.mysql_map.database,
+        table=tokens.mysql_map.table,
     )
     await authy.connect()
     for player in await authy.get():

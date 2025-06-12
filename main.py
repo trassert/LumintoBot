@@ -26,6 +26,7 @@ from modules import time_to
 async def main():
     while True:
         try:
+            await db.Users.initialize()
             await webhooks.server()
             await asyncio.gather(
                 client.start(bot_token=config.tokens.bot.token),

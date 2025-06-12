@@ -23,12 +23,19 @@ rcon:
   port: 25575
   port_fabric: порт для еще одного сервера
 
-mysql:
+mysql_map:
   host: localhost
   user: trassert
   password: пароль для карты
   database: authy
   table: players
+
+mysql_users:
+  host: localhost
+  user: trassert
+  password: пароль для юзертаблицы
+  database: trassert
+  table: users
 
 hotmc: токен для хотмс
 mcservers: токен для мсерверс

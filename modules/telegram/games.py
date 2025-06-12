@@ -39,50 +39,6 @@ async def casino(event: Message):
     )
 
 
-async def crocodile_hint(event: Message):
-    if (event.reply_to_msg_id != config.chats.topics.games) and (
-        getattr(event.reply_to, "reply_to_top_id", None) != config.chats.topics.games
-    ):
-        return await event.reply(phrase.game_topic_warning)
-    game = db.database("current_game")
-    hint = game["hints"]
-    if event.sender_id in hint:
-        return await event.reply(phrase.crocodile.hints_all)
-    hint.append(event.sender_id)
-    game["hints"] = hint
-    db.database("current_game", game)
-    word = game["word"]
-    last_hint = db.database("crocodile_last_hint")
-    if random() < config.coofs.PercentForRandomLetter and last_hint != 0:
-        n = 1
-        for letter in list(db["unsec"]):
-            if letter == "_":
-                response = f'{n} буква в слове - **{db["word"][n-1]}**'
-                break
-            n += 1
-    else:
-        if last_hint != 0:
-            check_last = "Так же учитывай, " f"что подсказка {last_hint} уже была."
-        else:
-            check_last = ""
-        response = await ai.response(
-            f'Сделай подсказку для слова "{word}". '
-            'Ни в коем случае не добавляй никаких "подсказка для слова.." '
-            "и т.п, ответ должен содержать только подсказку. "
-            "Не забудь, что подсказка не должна "
-            "содержать слово в любом случае. " + check_last
-        )
-        if response is None:
-            game = db.database("current_game")
-            hint = game["hints"]
-            hint.remove(event.sender_id)
-            game["hints"] = hint
-            db.database("current_game", game)
-            return await event.reply(phrase.crocodile.error)
-        db.database("crocodile_last_hint", response)
-    return await event.reply(response)
-
-
 @client.on(events.NewMessage(pattern=r"(?i)^/крокодил$", func=checks))
 @client.on(events.NewMessage(pattern=r"(?i)^/crocodile$", func=checks))
 @client.on(events.NewMessage(pattern=r"(?i)^старт крокодил$", func=checks))
@@ -270,6 +226,50 @@ async def crocodile_handler(event: Message):
             return await event.reply(
                 phrase.crocodile.new.format("".join(current_mask).replace("_", ".."))
             )
+
+
+async def crocodile_hint(event: Message):
+    if (event.reply_to_msg_id != config.chats.topics.games) and (
+        getattr(event.reply_to, "reply_to_top_id", None) != config.chats.topics.games
+    ):
+        return await event.reply(phrase.game_topic_warning)
+    game = db.database("current_game")
+    hint = game["hints"]
+    if event.sender_id in hint:
+        return await event.reply(phrase.crocodile.hints_all)
+    hint.append(event.sender_id)
+    game["hints"] = hint
+    db.database("current_game", game)
+    word = game["word"]
+    last_hint = db.database("crocodile_last_hint")
+    if random() < config.coofs.PercentForRandomLetter and last_hint != 0:
+        n = 1
+        for letter in list(db["unsec"]):
+            if letter == "_":
+                response = f'{n} буква в слове - **{db["word"][n-1]}**'
+                break
+            n += 1
+    else:
+        if last_hint != 0:
+            check_last = "Так же учитывай, " f"что подсказка {last_hint} уже была."
+        else:
+            check_last = ""
+        response = await ai.response(
+            f'Сделай подсказку для слова "{word}". '
+            'Ни в коем случае не добавляй никаких "подсказка для слова.." '
+            "и т.п, ответ должен содержать только подсказку. "
+            "Не забудь, что подсказка не должна "
+            "содержать слово в любом случае. " + check_last
+        )
+        if response is None:
+            game = db.database("current_game")
+            hint = game["hints"]
+            hint.remove(event.sender_id)
+            game["hints"] = hint
+            db.database("current_game", game)
+            return await event.reply(phrase.crocodile.error)
+        db.database("crocodile_last_hint", response)
+    return await event.reply(response)
 
 
 if db.database("current_game") != 0:
