@@ -4,7 +4,7 @@ WordRequest: 2
 IPSleepTime: 3600
 LinkGift: 5
 ActiveGift: 15
-PriceForChangeNick: 32
+PriceForChangeNick: 50
 PercentForRandomLetter: 0.2
 
 PriceForCasino: 5
@@ -33,11 +33,11 @@ DescriptionsMaxLen: 300
 DaysToStatesRemove: 7
 
 # Шанс быть убитым в шахте
-ChanceToDie: 0.01
+ChanceToDie: 0.04
 
 # Шанс найти залежи
 ChanceToBoost: 0.01
 
 # Количество изумрудов
 MineMaxGems: 15
-MineMaxBoost: 100
+MineMaxBoost: 80
