@@ -169,15 +169,17 @@ async def callback_action(event: events.CallbackQuery.Event):
                 types.InputMediaDice("🎰"),
                 reply_to=config.chats.topics.games,
             )
+            fm = await event.reply(phrase.casino.wait)
             pos = dice.get(media_dice.media.value)
             if (pos[0] == pos[1]) and (pos[1] == pos[2]):
+                await db.Users.add_win(event.sender_id)
                 logger.info(f"{event.sender_id} - победил в казино")
                 db.add_money(
                     event.sender_id,
                     config.coofs.PriceForCasino * config.coofs.CasinoWinRatio,
                 )
                 await asyncio.sleep(2)
-                return await event.reply(
+                return await fm.edit(
                     phrase.casino.win_auto.format(
                         value=config.coofs.PriceForCasino * config.coofs.CasinoWinRatio,
                         name=await get_name(event.sender_id),
@@ -186,13 +188,14 @@ async def callback_action(event: events.CallbackQuery.Event):
             elif (pos[0] == pos[1]) or (pos[1] == pos[2]):
                 db.add_money(event.sender_id, config.coofs.PriceForCasino)
                 await asyncio.sleep(2)
-                return await event.reply(
+                return await fm.edit(
                     phrase.casino.partially_auto.format(await get_name(event.sender_id))
                 )
             else:
+                await db.Users.add_lose_money(event.sender_id, config.coofs.PriceForCasino)
                 logger.info(f"{event.sender_id} проиграл в казино")
                 await asyncio.sleep(2)
-                return await event.reply(
+                return await fm.edit(
                     phrase.casino.lose_auto.format(
                         name=await get_name(event.sender_id),
                         value=config.coofs.PriceForCasino,
