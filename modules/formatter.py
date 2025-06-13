@@ -17,13 +17,16 @@ def value_to_str(number, noun):
 
     p = morph.parse(noun)[0]
 
-    match abs(number) % 10:
-        case 1:
-            word = p.inflect({"nomn", "sing"}).word
-        case 2 | 3 | 4:
-            word = p.inflect({"gent", "sing"}).word
-        case _:
-            word = p.inflect({"gent", "plur"}).word
+    if str(number)[0] == "1" and len(str(number)) == 2:
+        word = p.inflect({"gent", "plur"}).word
+    else:
+        match abs(number) % 10:
+            case 1:
+                word = p.inflect({"nomn", "sing"}).word
+            case 2 | 3 | 4:
+                word = p.inflect({"gent", "sing"}).word
+            case _:
+                word = p.inflect({"gent", "plur"}).word
     return f"{number} {word}"
 
 
