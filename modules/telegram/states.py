@@ -31,7 +31,7 @@ async def states_all(event: Message):
     text = phrase.state.all
     n = 1
     for state in data:
-        text += f'{n}. **{state}** - {len(data[state]["players"])} чел.\n'
+        text += f'{n}. **{state}** - {len(data[state]["players"])+1} чел.\n'
         n += 1
     return await event.reply(text)
 
