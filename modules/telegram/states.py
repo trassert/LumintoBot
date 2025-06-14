@@ -20,7 +20,8 @@ from .func import get_name
 from .. import config, phrase, formatter
 
 
-@client.on(events.NewMessage(pattern=r"(?i)^/states", func=checks))
+@client.on(events.NewMessage(pattern=r"(?i)^/states$", func=checks))
+@client.on(events.NewMessage(pattern=r"(?i)^/states@", func=checks))
 @client.on(events.NewMessage(pattern=r"(?i)^/госва$", func=checks))
 @client.on(events.NewMessage(pattern=r"(?i)^/государства$", func=checks))
 @client.on(events.NewMessage(pattern=r"(?i)^государства$", func=checks))
@@ -128,7 +129,8 @@ async def state_enter(event: Message):
     return await event.reply(phrase.state.admit.format(state_name))
 
 
-@client.on(events.NewMessage(pattern=r"(?i)^/state", func=checks))
+@client.on(events.NewMessage(pattern=r"(?i)^/state$", func=checks))
+@client.on(events.NewMessage(pattern=r"(?i)^/state@", func=checks))
 @client.on(events.NewMessage(pattern=r"(?i)^/госво(.*)", func=checks))
 @client.on(events.NewMessage(pattern=r"(?i)^/государство(.*)", func=checks))
 async def state_get(event: Message):
