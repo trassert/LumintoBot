@@ -20,6 +20,7 @@ from .func import get_name
 from .. import config, phrase, formatter
 
 
+@client.on(events.NewMessage(pattern=r"(?i)^/states$", func=checks))
 @client.on(events.NewMessage(pattern=r"(?i)^/госва$", func=checks))
 @client.on(events.NewMessage(pattern=r"(?i)^/государства$", func=checks))
 @client.on(events.NewMessage(pattern=r"(?i)^государства$", func=checks))
