@@ -40,7 +40,7 @@ async def states_all(event: Message):
 @client.on(events.NewMessage(pattern=r"(?i)^\+госво(.*)", func=checks))
 @client.on(events.NewMessage(pattern=r"(?i)^\+государство(.*)", func=checks))
 async def state_make(event: Message):
-    arg = event.pattern_match.group(1).strip()
+    arg: str = event.pattern_match.group(1).strip()
     if arg == "":
         return await event.reply(phrase.state.no_name)
     if len(arg) > 28:
@@ -71,7 +71,7 @@ async def state_make(event: Message):
 @client.on(events.NewMessage(pattern=r"(?i)^/г вступить(.*)", func=checks))
 @client.on(events.NewMessage(pattern=r"(?i)^/г войти(.*)", func=checks))
 async def state_enter(event: Message):
-    arg = event.pattern_match.group(1).strip()
+    arg: str = event.pattern_match.group(1).strip()
     if arg == "":
         return await event.reply(phrase.state.no_name)
     if db.states.find(arg) is False:
@@ -271,7 +271,7 @@ async def state_coords(event: Message):
     state_name = db.states.if_author(event.sender_id)
     if state_name is False:
         return await event.reply(phrase.state.not_a_author)
-    arg = event.pattern_match.group(1).strip()
+    arg: str = event.pattern_match.group(1).strip()
     try:
         arg = list(map(int, arg.split()))
     except ValueError:
@@ -288,7 +288,7 @@ async def state_enter(event: Message):
     state_name = db.states.if_author(event.sender_id)
     if state_name is False:
         return await event.reply(phrase.state.not_a_author)
-    arg = event.pattern_match.group(1).strip()
+    arg: str = event.pattern_match.group(1).strip()
     state = db.state(state_name)
     if arg in ["да", "+", "разрешить", "открыть", "true", "ok", "ок", "можно"]:
         if state.enter is True:
@@ -347,7 +347,7 @@ async def state_add_money(event: Message):
         state_name = db.states.if_author(event.sender_id)
         if state_name is False:
             return await event.reply(phrase.state.not_a_member)
-    arg = event.pattern_match.group(1).strip()
+    arg: str = event.pattern_match.group(1).strip()
     if not arg.isdigit():
         return await event.reply(phrase.state.howto_add_balance)
     try:
@@ -386,7 +386,7 @@ async def state_rem_money(event: Message):
     state_name = db.states.if_author(event.sender_id)
     if state_name is False:
         return await event.reply(phrase.state.not_a_author)
-    arg = event.pattern_match.group(1).strip()
+    arg: str = event.pattern_match.group(1).strip()
     if not arg.isdigit():
         return await event.reply(phrase.state.howto_rem_balance)
     try:
