@@ -293,7 +293,9 @@ async def state_enter(event: Message):
     arg: str = event.pattern_match.group(1).strip()
     state = db.state(state_name)
     if arg in ["да", "+", "разрешить", "открыть", "true", "ok", "ок", "можно"]:
-        if state.enter is True:
+        if state.price != 0:
+            state.change("price", 0)
+        elif state.enter is True:
             return await event.reply(phrase.state.already_open)
         state.change("enter", True)
         return await event.reply(phrase.state.enter_open)
