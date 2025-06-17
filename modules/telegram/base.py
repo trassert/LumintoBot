@@ -504,8 +504,8 @@ async def randompic(event: Message):
 
 
 @client.on(events.NewMessage(pattern=r"(?i)^/map", func=checks))
-@client.on(events.NewMessage(pattern=r"(?i)^/мап", func=checks))
-@client.on(events.NewMessage(pattern=r"(?i)^/карта", func=checks))
+@client.on(events.NewMessage(pattern=r"(?i)^/мап$", func=checks))
+@client.on(events.NewMessage(pattern=r"(?i)^/карта$", func=checks))
 async def getmap(event: Message):
     return await event.reply(phrase.get_map)
 
