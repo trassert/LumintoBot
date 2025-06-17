@@ -494,12 +494,20 @@ async def sysinfo(event: Message):
 @client.on(events.NewMessage(pattern=r"(?i)^/рандомпик$", func=checks))
 @client.on(events.NewMessage(pattern=r"(?i)^/картинка$", func=checks))
 async def randompic(event: Message):
+    logger.info(f"Запрошена случайная картинка (id {event.sender_id})")
     return await client.send_file(
         entity=event.chat_id,
         file=pic.get_random(),
         reply_to=event.id,
         caption=phrase.pic.get
     )
+
+
+@client.on(events.NewMessage(pattern=r"(?i)^/map", func=checks))
+@client.on(events.NewMessage(pattern=r"(?i)^/мап", func=checks))
+@client.on(events.NewMessage(pattern=r"(?i)^/карта", func=checks))
+async def getmap(event: Message):
+    return await event.reply(phrase.get_map)
 
 
 @client.on(events.NewMessage(pattern=r"(?i)^/тест$", func=checks))
