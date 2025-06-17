@@ -29,7 +29,8 @@ from .. import (
     ai,
     config,
     patches,
-    formatter
+    formatter,
+    pic
 )
 from ..system_info import get_system_info
 
@@ -487,6 +488,18 @@ async def link_nick(event: Message):
 @client.on(events.NewMessage(pattern=r"(?i)^/server", func=checks))
 async def sysinfo(event: Message):
     await event.reply(get_system_info())
+
+
+@client.on(events.NewMessage(pattern=r"(?i)^/randompic", func=checks))
+@client.on(events.NewMessage(pattern=r"(?i)^/рандомпик$", func=checks))
+@client.on(events.NewMessage(pattern=r"(?i)^/картинка$", func=checks))
+async def randompic(event: Message):
+    return await client.send_file(
+        entity=event.chat_id,
+        file=pic.get_random(),
+        reply_to=event.id,
+        caption=phrase.pic.get
+    )
 
 
 @client.on(events.NewMessage(pattern=r"(?i)^/тест$", func=checks))
