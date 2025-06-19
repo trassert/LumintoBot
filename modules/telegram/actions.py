@@ -1,3 +1,5 @@
+from asyncio import sleep
+
 from loguru import logger
 
 logger.info(f"Загружен модуль {__name__}!")
@@ -18,6 +20,10 @@ async def chat_action(event: events.ChatAction.Event):
             config.chats.chat, phrase.chataction.leave.format(user_name)
         )
     elif event.user_joined:
-        return await client.send_message(
+        await client.send_message(
             config.chats.chat, phrase.chataction.hello.format(user_name)
+        )
+        await sleep(1)
+        return await client.send_message(
+            config.chats.chat, phrase.chataction.botscheck.format(user_name)
         )
