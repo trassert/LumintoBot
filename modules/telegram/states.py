@@ -132,8 +132,6 @@ async def state_enter(event: Message):
 @client.on(events.NewMessage(pattern=r"(?i)^/state$", func=checks))
 @client.on(events.NewMessage(pattern=r"(?i)^/state@", func=checks))
 @client.on(events.NewMessage(pattern=r"(?i)^/госво(.*)", func=checks))
-@client.on(events.NewMessage(pattern=r"(?i)^/г", func=checks))
-@client.on(events.NewMessage(pattern=r"(?i)^/гос", func=checks))
 @client.on(events.NewMessage(pattern=r"(?i)^/государство(.*)", func=checks))
 async def state_get(event: Message):
     try:
@@ -417,3 +415,19 @@ async def state_rem_money(event: Message):
 @client.on(events.NewMessage(pattern=r"(?i)^г снять$", func=checks))
 async def state_rem_money_empty(event: Message):
     return await event.reply(phrase.state.howto_rem_balance)
+
+
+@client.on(events.NewMessage(pattern=r"(?i)^/г кик\s(.+)", func=checks))
+@client.on(events.NewMessage(pattern=r"(?i)^/г кикнуть\s(.+)", func=checks))
+@client.on(events.NewMessage(pattern=r"(?i)^/г выгнать\s(.+)", func=checks))
+@client.on(events.NewMessage(pattern=r"(?i)^/выгнать\s(.+)", func=checks))
+async def state_kick_user(event: Message):
+    return await event.reply('test.kick.user.args')
+
+
+@client.on(events.NewMessage(pattern=r"(?i)^/г кик$", func=checks))
+@client.on(events.NewMessage(pattern=r"(?i)^/г кикнуть$", func=checks))
+@client.on(events.NewMessage(pattern=r"(?i)^/г выгнать$", func=checks))
+@client.on(events.NewMessage(pattern=r"(?i)^/выгнать$", func=checks))
+async def state_kick_user_empty(event: Message):
+    return await event.reply('test.kick.user')
