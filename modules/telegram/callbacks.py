@@ -239,12 +239,12 @@ async def callback_action(event: events.CallbackQuery.Event):
                 state.change("type", 2)
             return await event.answer(phrase.state.admit.format(state.name), alert=True)
         elif data[1] == "remove":
-            if event.sender_id != state.author:
-                return await event.answer(phrase.not_for_you, alert=True)
             try:
                 state = db.state(data[2])
             except FileNotFoundError:
                 return await event.answer(phrase.state.already_deleted, alert=True)
+            if event.sender_id != state.author:
+                return await event.answer(phrase.not_for_you, alert=True)
             db.add_money(state.author, state.money)
             if db.states.remove(data[2]) != True:
                 return await event.answer(phrase.error, alert=True)
