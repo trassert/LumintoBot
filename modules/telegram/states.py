@@ -132,6 +132,8 @@ async def state_enter(event: Message):
 @client.on(events.NewMessage(pattern=r"(?i)^/state$", func=checks))
 @client.on(events.NewMessage(pattern=r"(?i)^/state@", func=checks))
 @client.on(events.NewMessage(pattern=r"(?i)^/госво(.*)", func=checks))
+@client.on(events.NewMessage(pattern=r"(?i)^/г", func=checks))
+@client.on(events.NewMessage(pattern=r"(?i)^/гос", func=checks))
 @client.on(events.NewMessage(pattern=r"(?i)^/государство(.*)", func=checks))
 async def state_get(event: Message):
     try:
@@ -245,9 +247,9 @@ async def state_desc_empty(event: Message):
     return await event.reply(phrase.state.no_desc)
 
 
-@client.on(events.NewMessage(pattern=r"(?i)^/г описание\s(.+)", func=checks))
-@client.on(events.NewMessage(pattern=r"(?i)^/о госве\s(.+)", func=checks))
-@client.on(events.NewMessage(pattern=r"(?i)^/г о госве\s(.+)", func=checks))
+@client.on(events.NewMessage(pattern=r"(?i)^/г описание\s([\s\S]+)", func=checks))
+@client.on(events.NewMessage(pattern=r"(?i)^/о госве\s([\s\S]+)", func=checks))
+@client.on(events.NewMessage(pattern=r"(?i)^/г о госве\s([\s\S]+)", func=checks))
 async def state_desc(event: Message):
     state_name = db.states.if_author(event.sender_id)
     if state_name is False:
