@@ -461,6 +461,11 @@ class states:
             )
             return True
 
+    def check(name):
+        if path.exists(path.join(states_path, f"{name}.json")):
+            return True
+        return False
+
     def get_all():
         all = {}
         for file in listdir(states_path):

@@ -258,3 +258,30 @@ async def callback_action(event: events.CallbackQuery.Event):
                     author=await get_name(state.author, push=False)
                 )
             )
+        elif data[1] == "m":
+            if event.sender_id != int(data[2]):
+                return await event.answer(phrase.not_for_you, alert=True)
+            state_name: str = data[3].capitalize()
+            balance = db.get_money(event.sender_id)
+            if balance < config.coofs.PriceForNewState:
+                return await event.answer(
+                    phrase.money.not_enough.format(
+                        formatter.value_to_str(balance, "изумруд")
+                    ),
+                    alert=True
+                )
+            if db.states.check(state_name) is True:
+                return await event.answer(phrase.state.already_here, alert=True)
+            db.add_money(event.sender_id, -config.coofs.PriceForNewState)
+            db.states.add(state_name, event.sender_id)
+            await event.reply(
+                phrase.state.make_by_callback.format(
+                    author=await get_name(event.sender_id),
+                    state_name=state_name
+                )
+            )
+            return await client.send_message(
+                entity=config.chats.chat,
+                message=phrase.state.make.format(state_name),
+                reply_to=config.chats.topics.rp,
+            )

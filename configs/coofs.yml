@@ -4,10 +4,8 @@ WordRequest: 2
 IPSleepTime: 3600
 LinkGift: 5
 ActiveGift: 15
-PriceForChangeNick: 50
 PercentForRandomLetter: 0.2
 
-PriceForCasino: 5
 CasinoSleepTime: 150
 CasinoWinRatio: 10
 
@@ -41,3 +39,8 @@ ChanceToBoost: 0.01
 # Количество изумрудов
 MineMaxGems: 15
 MineMaxBoost: 80
+
+# Цены
+PriceForChangeNick: 50
+PriceForCasino: 5
+PriceForNewState: 25

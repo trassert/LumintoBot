@@ -12,6 +12,7 @@ from telethon.tl.types import (
     KeyboardButtonRow,
     KeyboardButtonCallback,
 )
+from telethon import errors as TGErrors
 
 from .client import client
 from .global_checks import *
@@ -38,16 +39,16 @@ async def states_all(event: Message):
     return await event.reply(text)
 
 
-@client.on(events.NewMessage(pattern=r"(?i)^/создать госво(.*)", func=checks))
-@client.on(events.NewMessage(pattern=r"(?i)^\+госво(.*)", func=checks))
-@client.on(events.NewMessage(pattern=r"(?i)^\+государство(.*)", func=checks))
+@client.on(events.NewMessage(pattern=r"(?i)^/создать госво\s(.+)", func=checks))
+@client.on(events.NewMessage(pattern=r"(?i)^\+госво\s(.+)", func=checks))
+@client.on(events.NewMessage(pattern=r"(?i)^\+государство\s(.+)", func=checks))
 async def state_make(event: Message):
-    arg: str = event.pattern_match.group(1).strip()
-    if arg == "":
-        return await event.reply(phrase.state.no_name)
+    arg: str = event.pattern_match.group(1).strip().lower()
     if len(arg) > 28:
         return await event.reply(phrase.state.too_long)
-    if (not re.fullmatch(r"^[а-яА-ЯёЁa-zA-Z\- ]+$", arg)) or (
+    if (
+        not re.fullmatch(r"^[а-яА-ЯёЁa-zA-Z\- ]+$", arg)
+    ) or (
         re.fullmatch(r"^[\- ]+$", arg)
     ):
         return await event.reply(phrase.state.not_valid)
@@ -57,15 +58,31 @@ async def state_make(event: Message):
         return await event.reply(phrase.state.already_author)
     if db.states.if_player(event.sender_id) is not False:
         return await event.reply(phrase.state.already_player)
-    arg = arg.capitalize()
-    if db.states.add(arg, event.sender_id) is not True:
+    if db.states.check(arg.capitalize()) is True:
         return await event.reply(phrase.state.already_here)
-    await client.send_message(
-        entity=config.chats.chat,
-        message=phrase.state.make.format(arg),
-        reply_to=config.chats.topics.rp,
-    )
-    return await event.reply(phrase.state.make.format(arg))
+    if db.get_money(event.sender_id) < config.coofs.PriceForNewState:
+        return await event.reply(phrase.state.require_emerald)
+    try:
+        return await event.reply(
+            phrase.state.warn_make.format(arg),
+            buttons=[
+                [
+                    KeyboardButtonCallback(
+                        text=f"🏰 Создать государство",
+                        data=f"state.m.{event.sender_id}.{arg.capitalize()}".encode()
+                    )
+                ]
+            ]
+        )
+    except TGErrors.ButtonDataInvalidError:
+        return await event.reply(phrase.state.too_long)
+
+
+@client.on(events.NewMessage(pattern=r"(?i)^/создать госво$", func=checks))
+@client.on(events.NewMessage(pattern=r"(?i)^\+госво$", func=checks))
+@client.on(events.NewMessage(pattern=r"(?i)^\+государство$", func=checks))
+async def state_make(event: Message):
+    return await event.reply(phrase.state.no_name)
 
 
 @client.on(events.NewMessage(pattern=r"(?i)^/вступить(.*)", func=checks))
@@ -127,7 +144,9 @@ async def state_enter(event: Message):
             reply_to=config.chats.topics.rp,
         )
         state.change("type", 2)
-    return await event.reply(phrase.state.admit.format(state_name))
+    return await event.reply(
+        phrase.state.admit.format(state_name)
+    )
 
 
 @client.on(events.NewMessage(pattern=r"(?i)^/state$", func=checks))
