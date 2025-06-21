@@ -38,6 +38,7 @@ async def states_all(event: Message):
     return await event.reply(text)
 
 
+@client.on(events.NewMessage(pattern=r"(?i)^/создать госво(.*)", func=checks))
 @client.on(events.NewMessage(pattern=r"(?i)^\+госво(.*)", func=checks))
 @client.on(events.NewMessage(pattern=r"(?i)^\+государство(.*)", func=checks))
 async def state_make(event: Message):
