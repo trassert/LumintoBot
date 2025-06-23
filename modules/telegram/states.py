@@ -467,7 +467,8 @@ async def state_kick_user(event: Message):
     await client.send_message(
         entity=config.chats.chat,
         message=choice(phrase.state.kicked_rp).format(
-            state=state_name, player=db.nicks(id=event.sender_id).get()
+            state=state_name,
+            player=await get_name(user, minecraft=True)
         ),
         reply_to=config.chats.topics.rp,
     )
