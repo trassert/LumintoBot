@@ -12,6 +12,11 @@
 #         message=f"**{name}**\n{message.text}",
 #     )
 
+# class enchant:
+#     no_arg = "🤔 : Укажи название зачарования"
+#     no_diff = "😓 : Не знаю такого зачарования"
+#     main = "**🤔 : Я думаю, ты о нём:**\n\n{}"
+
 # from loguru import logger
 
 # from vkbottle.dispatch.rules import ABCRule

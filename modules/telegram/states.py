@@ -13,10 +13,11 @@ from telethon.tl.types import (
     KeyboardButtonCallback,
 )
 from telethon import errors as TGErrors
+from random import choice
 
 from .client import client
 from .global_checks import *
-from .func import get_name
+from .func import get_name, get_id
 
 from .. import config, phrase, formatter
 
@@ -46,9 +47,7 @@ async def state_make(event: Message):
     arg: str = event.pattern_match.group(1).strip().lower()
     if len(arg) > 28:
         return await event.reply(phrase.state.too_long)
-    if (
-        not re.fullmatch(r"^[а-яА-ЯёЁa-zA-Z\- ]+$", arg)
-    ) or (
+    if (not re.fullmatch(r"^[а-яА-ЯёЁa-zA-Z\- ]+$", arg)) or (
         re.fullmatch(r"^[\- ]+$", arg)
     ):
         return await event.reply(phrase.state.not_valid)
@@ -69,10 +68,10 @@ async def state_make(event: Message):
                 [
                     KeyboardButtonCallback(
                         text=f"🏰 Создать государство",
-                        data=f"state.m.{event.sender_id}.{arg.capitalize()}".encode()
+                        data=f"state.m.{event.sender_id}.{arg.capitalize()}".encode(),
                     )
                 ]
-            ]
+            ],
         )
     except TGErrors.ButtonDataInvalidError:
         return await event.reply(phrase.state.too_long)
@@ -144,9 +143,7 @@ async def state_enter(event: Message):
             reply_to=config.chats.topics.rp,
         )
         state.change("type", 2)
-    return await event.reply(
-        phrase.state.admit.format(state_name)
-    )
+    return await event.reply(phrase.state.admit.format(state_name))
 
 
 @client.on(events.NewMessage(pattern=r"(?i)^/state$", func=checks))
@@ -204,7 +201,7 @@ async def state_leave(event: Message):
     state = db.state(state_name)
     state.players.remove(event.sender_id)
     state.change("players", state.players)
-    state_name = state.name.capitalize()
+    state_name: str = state.name.capitalize()
     await client.send_message(
         entity=config.chats.chat,
         message=phrase.state.leave_player.format(
@@ -442,7 +439,42 @@ async def state_rem_money_empty(event: Message):
 @client.on(events.NewMessage(pattern=r"(?i)^/г выгнать\s(.+)", func=checks))
 @client.on(events.NewMessage(pattern=r"(?i)^/выгнать\s(.+)", func=checks))
 async def state_kick_user(event: Message):
-    return await event.reply('test.kick.user.args')
+    state_name = db.states.if_author(event.sender_id)
+    if state_name is False:
+        return await event.reply(phrase.state.not_a_author)
+    user = await get_id(event.pattern_match.group(1).strip())
+    if user is None:
+        return await event.reply(phrase.player_not_in)
+    state = db.state(state_name)
+    if user not in state.players:
+        return await event.reply(phrase.state.player_not_in)
+    state.players.remove(user)
+    state.change("players", state.players)
+    if (state.type == 2) and (len(state.players) < config.coofs.Type2Players):
+        await client.send_message(
+            entity=config.chats.chat,
+            message=phrase.state.down.format(name=state.name, type="Государство"),
+            reply_to=config.chats.topics.rp,
+        )
+        state.change("type", 1)
+    if (state.type == 1) and (len(state.players) < config.coofs.Type1Players):
+        await client.send_message(
+            entity=config.chats.chat,
+            message=phrase.state.down.format(name=state_name, type="Княжество"),
+            reply_to=config.chats.topics.rp,
+        )
+        state.change("type", 0)
+    await client.send_message(
+        entity=config.chats.chat,
+        message=choice(phrase.state.kicked_rp).format(
+            state=state_name, player=db.nicks(id=event.sender_id).get()
+        ),
+        reply_to=config.chats.topics.rp,
+    )
+    return await event.reply(
+        phrase.state.kicked.format(await get_name(user, minecraft=True))
+    )
+
 
 
 @client.on(events.NewMessage(pattern=r"(?i)^/г кик$", func=checks))
@@ -450,4 +482,39 @@ async def state_kick_user(event: Message):
 @client.on(events.NewMessage(pattern=r"(?i)^/г выгнать$", func=checks))
 @client.on(events.NewMessage(pattern=r"(?i)^/выгнать$", func=checks))
 async def state_kick_user_empty(event: Message):
-    return await event.reply('test.kick.user')
+    state_name = db.states.if_author(event.sender_id)
+    if state_name is False:
+        return await event.reply(phrase.state.not_a_author)
+    if not event.reply_to_msg_id:
+        return await event.reply(phrase.state.no_player)
+    reply_message = await event.get_reply_message()
+    user = reply_message.sender_id
+    state = db.state(state_name)
+    if user not in state.players:
+        return await event.reply(phrase.state.player_not_in)
+    state.players.remove(user)
+    state.change("players", state.players)
+    if (state.type == 2) and (len(state.players) < config.coofs.Type2Players):
+        await client.send_message(
+            entity=config.chats.chat,
+            message=phrase.state.down.format(name=state.name, type="Государство"),
+            reply_to=config.chats.topics.rp,
+        )
+        state.change("type", 1)
+    if (state.type == 1) and (len(state.players) < config.coofs.Type1Players):
+        await client.send_message(
+            entity=config.chats.chat,
+            message=phrase.state.down.format(name=state_name, type="Княжество"),
+            reply_to=config.chats.topics.rp,
+        )
+        state.change("type", 0)
+    await client.send_message(
+        entity=config.chats.chat,
+        message=choice(phrase.state.kicked_rp).format(
+            state=state_name, player=db.nicks(id=event.sender_id).get()
+        ),
+        reply_to=config.chats.topics.rp,
+    )
+    return await event.reply(
+        phrase.state.kicked.format(await get_name(user, minecraft=True))
+    )

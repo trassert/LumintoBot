@@ -2,6 +2,10 @@ from loguru import logger
 
 logger.info(f"Загружен модуль {__name__}!")
 
+import re
+
+from telethon.tl.functions.users import GetFullUserRequest
+
 from .. import db
 from .client import client
 
@@ -28,3 +32,17 @@ async def get_name(id, push=False, minecraft=False):
             return f"@{user_name.username}"
     except Exception:
         return "Неопознанный персонаж"
+
+
+async def get_id(str: str) -> int:
+    if str[-1] == ",":
+        str = str[:-1]
+    if str.isdigit():
+        if bool(re.fullmatch(r'^@\d+$', str)):
+            str = str[1:]
+        check = await get_name(int(str))
+        if check == "Неопознанный персонаж":
+            return None
+        return int(str)
+    user = await client(GetFullUserRequest(str))
+    return user.full_user.id

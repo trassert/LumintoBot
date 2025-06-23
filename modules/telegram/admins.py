@@ -8,7 +8,7 @@ from telethon.tl.functions.users import GetFullUserRequest
 
 from .client import client
 from .global_checks import *
-from .func import get_name
+from .func import get_name, get_id
 
 from .. import ip, phrase, config, formatter
 from ..mcrcon import MinecraftClient
@@ -164,3 +164,16 @@ async def whitelist(event: Message):
             return await event.reply(f"✍🏻 : {resp}")
     except TimeoutError:
         return await event.reply(phrase.server.stopped)
+
+
+@client.on(events.NewMessage(pattern=r"(?i)^/парс\s(.+)", func=checks))
+async def parse(event: Message):
+    roles = db.roles()
+    if roles.get(event.sender_id) < roles.ADMIN:
+        return await event.reply(
+            phrase.roles.no_perms.format(level=roles.VIP, name=phrase.roles.vip)
+        )
+    arg = event.pattern_match.group(1).strip()
+    await event.reply(f"arg %{arg}%")
+    await event.reply(f"get-id %{await get_id(arg)}%")
+    await event.reply(f"get-name %{await get_name(arg)}%")
