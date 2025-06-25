@@ -8,7 +8,7 @@ from telethon import events
 from .client import client
 from .global_checks import *
 
-from .. import phrase, db, ai
+from .. import phrase, db, ai, config
 
 
 @client.on(events.NewMessage(pattern=r"(?i)^/ии\s(.+)", func=checks))
@@ -37,15 +37,7 @@ async def gemini_empty(event: Message):
 
 @client.on(events.NewMessage(pattern=r"(?i)^/лаи\s(.+)", func=checks))
 async def local_ai(event: Message):
+    if not event.chat_id == config.chats.chat:
+        return await event.reply(phrase.ai.chat)
     text = event.pattern_match.group(1).strip()
-    roles = db.roles()
-    if roles.get(event.sender_id) < roles.ADMIN:
-        return await event.reply(
-            phrase.roles.no_perms.format(level=roles.ADMIN, name=phrase.roles.admin)
-        )
-    message_for_edit = await event.reply(phrase.ai.response)
-    response = ""
-    async for chunk in ai.asyncio_local_generator(text):
-        response += chunk
-    await event.reply(f":{response}:")
-    await event.reply(f"id of response {message_for_edit.id}")
+    

@@ -10,3 +10,4 @@ aiomysql
 pymorphy3
 folium
 psutil
+google-genai[aiohttp]==1.20
