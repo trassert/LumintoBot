@@ -30,7 +30,7 @@ async def main():
     while True:
         try:
             logger.info(
-                f"Ответ ИИ - {(await ai.chat.send_message(phrase.main_prompt)).text.replace('\n', '')}"
+                f"Ответ ИИ - {(await ai.chat.send_message(phrase.ai.main_prompt)).text.replace('\n', '')}"
             )
             await db.Users.initialize()
             await webhooks.server()

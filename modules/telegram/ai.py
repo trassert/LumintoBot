@@ -2,6 +2,7 @@ from loguru import logger
 
 logger.info(f"Загружен модуль {__name__}!")
 
+from asyncio import sleep
 from telethon.tl.custom import Message
 from telethon import events
 from telethon.errors.rpcerrorlist import MessageNotModifiedError
@@ -42,11 +43,8 @@ async def local_ai(event: Message):
         return await event.reply(phrase.ai.chat)
     text = event.pattern_match.group(1).strip()
     logger.info(f"Запрос {text}")
-    response = ""
     message: Message = await event.reply(phrase.ai.response)
-    async for chunk in ai.get_stream(event.sender_id, text):
-        response += chunk
-        try:
-            await message.edit(response)
-        except MessageNotModifiedError:
-            pass
+    # try:
+    await message.edit((await ai.chat.send_message(text)).text)
+    # except Exception:
+    #     await message.edit(phrase.ai.error)
