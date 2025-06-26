@@ -1,5 +1,7 @@
 import aiohttp
-# import genai_proxy as genai
+
+from google import genai
+from google.genai import types
 
 from requests import codes
 from loguru import logger
@@ -7,9 +9,16 @@ from loguru import logger
 from . import config, formatter
 
 
-# local_client = genai.Client(api_key="AIzaSyD3eUj98s6DvR7iusI8ncDTATRWNNXwoFE", proxy_string="proxy")
 ai_servers = ["trassert0reserve.pythonanywhere.com", "trassert.pythonanywhere.com"]
-local_model = "gemini-2.0-flash-001"
+model = "gemini-2.0-flash-001"
+client = genai.Client(
+    api_key=config.tokens.gemini,
+    http_options=types.HttpOptions(
+        async_client_args={"proxy": config.tokens.proxy},
+    ),
+)
+chat = client.aio.chats.create(model=model)
+logger.info("ИИ инициализирован")
 
 
 async def response(message):
@@ -32,8 +41,6 @@ async def response(message):
     return None
 
 
-# async def asyncio_local_generator(message):
-#     async for chunk in await local_client.aio.models.generate_content_stream(
-#         model=local_model, contents=message
-#     ):
-#         yield chunk.text
+async def get_stream(id: int, message: str):
+    async for chunk in await chat.send_message_stream(f"{id} | {message}"):
+        yield chunk.text

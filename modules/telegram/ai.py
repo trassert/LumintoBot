@@ -4,11 +4,12 @@ logger.info(f"Загружен модуль {__name__}!")
 
 from telethon.tl.custom import Message
 from telethon import events
+from telethon.errors.rpcerrorlist import MessageNotModifiedError
 
 from .client import client
 from .global_checks import *
 
-from .. import phrase, db, ai, config
+from .. import phrase, ai, config
 
 
 @client.on(events.NewMessage(pattern=r"(?i)^/ии\s(.+)", func=checks))
@@ -40,4 +41,12 @@ async def local_ai(event: Message):
     if not event.chat_id == config.chats.chat:
         return await event.reply(phrase.ai.chat)
     text = event.pattern_match.group(1).strip()
-    
+    logger.info(f"Запрос {text}")
+    response = ""
+    message: Message = await event.reply(phrase.ai.response)
+    async for chunk in ai.get_stream(event.sender_id, text):
+        response += chunk
+        try:
+            await message.edit(response)
+        except MessageNotModifiedError:
+            pass
