@@ -19,7 +19,6 @@ client = genai.Client(
 )
 chat = client.aio.chats.create(model=model)
 crocodile = client.aio.chats.create(model=model)
-logger.info("ИИ инициализирован")
 
 
 async def response(message):
