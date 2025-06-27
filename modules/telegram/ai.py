@@ -44,7 +44,7 @@ async def local_ai(event: Message):
     text = event.pattern_match.group(1).strip()
     logger.info(f"Запрос {text}")
     message: Message = await event.reply(phrase.ai.response)
-    # try:
-    await message.edit((await ai.chat.send_message(text)).text)
-    # except Exception:
-    #     await message.edit(phrase.ai.error)
+    try:
+        await message.edit((await ai.chat.send_message(text)).text)
+    except Exception:
+        await message.edit(phrase.ai.error)
