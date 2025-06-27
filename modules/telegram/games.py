@@ -243,7 +243,11 @@ async def crocodile_hint(event: Message):
     word = game["word"]
     # last_hint = db.database("crocodile_last_hint")
     # and last_hint != 0
-    if random() < config.coofs.PercentForRandomLetter:
+    if (
+        random() < config.coofs.PercentForRandomLetter
+    ) and (
+        len(hint) > 0
+    ):
         n = 1
         for letter in list(game["unsec"]):
             if letter == "_":
