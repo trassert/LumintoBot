@@ -4,7 +4,7 @@ WordRequest: 2
 IPSleepTime: 3600
 LinkGift: 5
 ActiveGift: 15
-PercentForRandomLetter: 0.2
+PercentForRandomLetter: 0.3
 
 CasinoSleepTime: 150
 CasinoWinRatio: 10
