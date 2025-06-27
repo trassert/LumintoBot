@@ -245,9 +245,9 @@ async def crocodile_hint(event: Message):
     # and last_hint != 0
     if random() < config.coofs.PercentForRandomLetter:
         n = 1
-        for letter in list(db["unsec"]):
+        for letter in list(game["unsec"]):
             if letter == "_":
-                return await event.reply(f'{n} буква в слове - **{db["word"][n-1]}**')
+                return await event.reply(f'{n} буква в слове - **{game["word"][n-1]}**')
             n += 1
     return await event.reply(
         (
