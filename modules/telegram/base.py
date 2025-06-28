@@ -510,6 +510,15 @@ async def getmap(event: Message):
     return await event.reply(phrase.get_map)
 
 
+@client.on(events.NewMessage(pattern=r"(?i)^/vote@", func=checks))
+@client.on(events.NewMessage(pattern=r"(?i)^/vote$", func=checks))
+@client.on(events.NewMessage(pattern=r"(?i)^/голос$", func=checks))
+@client.on(events.NewMessage(pattern=r"(?i)^/голосование$", func=checks))
+@client.on(events.NewMessage(pattern=r"(?i)^/проголосовать$", func=checks))
+async def vote(event: Message):
+    return await event.reply(phrase.vote)
+
+
 @client.on(events.NewMessage(pattern=r"(?i)^/тест$", func=checks))
 async def test(event: Message):
     t1 = time()
