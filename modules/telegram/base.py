@@ -516,7 +516,12 @@ async def getmap(event: Message):
 @client.on(events.NewMessage(pattern=r"(?i)^/голосование$", func=checks))
 @client.on(events.NewMessage(pattern=r"(?i)^/проголосовать$", func=checks))
 async def vote(event: Message):
-    return await event.reply(phrase.vote)
+    return await client.send_message(
+        event.chat_id,
+        reply_to=event.id,
+        message=phrase.vote,
+        link_preview=False
+    )
 
 
 @client.on(events.NewMessage(pattern=r"(?i)^/тест$", func=checks))

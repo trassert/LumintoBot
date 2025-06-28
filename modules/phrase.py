@@ -441,8 +441,8 @@ vote = (
     "🗳 : Актуальные ссылки для голосов:\n"
     "1. **[Буст чата](https://t.me/boost/lumintomc)**\n"
     "2. **[Minecraft-servers](https://minecraft-servers.ru/server/trassert)**\n"
-    "3. **[HotMC](https://hotmc.ru/vote-274472)**"
-    "1. **[Буст канала](https://t.me/boost/lumintoch)**\n"
+    "3. **[HotMC](https://hotmc.ru/vote-274472)**\n"
+    "4. **[Буст канала](https://t.me/boost/lumintoch)**\n"
 )
 start = (
     "**Привет, {}!**\n"
