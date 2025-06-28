@@ -214,7 +214,7 @@ async def word_request(event: Message):
         if word in f.read().split("\n"):
             return await event.reply(phrase.word.in_blacklist)
     entity = await get_name(event.sender_id)
-    logger.info(f'Пользователь {entity} хочет добавить слово "{word}"')
+    logger.info(f'Пользователь {event.sender_id} хочет добавить слово "{word}"')
     keyboard = ReplyInlineMarkup(
         [
             KeyboardButtonRow(
@@ -274,7 +274,7 @@ async def word_requests(event: Message):
         return
     entity = await get_name(event.sender_id)
     for word in words:
-        logger.info(f'Пользователь {entity} хочет добавить слово "{word}"')
+        logger.info(f'Пользователь {event.sender_id} хочет добавить слово "{word}"')
         keyboard = ReplyInlineMarkup(
             [
                 KeyboardButtonRow(
