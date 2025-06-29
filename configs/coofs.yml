@@ -31,11 +31,9 @@ DescriptionsMaxLen: 300
 # Дней, после которых гос-ва удаляются
 DaysToStatesRemove: 7
 
-# Шанс быть убитым в шахте
-ChanceToDie: 0.04
-
-# Шанс найти залежи
-ChanceToBoost: 0.01
+# Шанс быть убитым в шахте | найти залежи
+ChanceToDie: 0.05
+ChanceToBoost: 0.99
 
 # Количество изумрудов
 MineMaxGems: 15

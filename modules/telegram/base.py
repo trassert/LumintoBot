@@ -1,3 +1,4 @@
+from xml.etree import ElementInclude
 from loguru import logger
 
 logger.info(f"Загружен модуль {__name__}!")
@@ -25,13 +26,7 @@ from .client import client
 from .global_checks import *
 from .func import get_name
 
-from .. import (
-    ai,
-    config,
-    patches,
-    formatter,
-    pic
-)
+from .. import ai, config, patches, formatter, pic
 from ..system_info import get_system_info
 
 
@@ -184,18 +179,22 @@ async def mine(event: Message):
     if db.ready_to_mine(event.sender_id) is False:
         return await event.reply(choice(phrase.mine.not_ready))
 
-    if random() < config.coofs.ChanceToDie:
+    rand = random()
+    if rand < config.coofs.ChanceToDie:
         added = randint(1, config.coofs.MineMaxGems)
         balance = db.get_money(event.sender_id)
         if balance < added:
             added = balance
         text = choice(phrase.mine.die).format(
-            killer=choice(phrase.mine.killers), value=formatter.value_to_str(added, "изумруд")
+            killer=choice(phrase.mine.killers),
+            value=formatter.value_to_str(added, "изумруд"),
         )
         db.add_money(event.sender_id, -added)
-    if random() < config.coofs.ChanceToBoost:
+    elif rand > config.coofs.ChanceToBoost:
         added = randint(config.coofs.MineMaxGems, config.coofs.MineMaxBoost)
-        text = choice(phrase.mine.boost).format(formatter.value_to_str(added, "изумруд"))
+        text = choice(phrase.mine.boost).format(
+            formatter.value_to_str(added, "изумруд")
+        )
         db.add_money(event.sender_id, added)
     else:
         added = randint(1, config.coofs.MineMaxGems)
@@ -413,7 +412,9 @@ async def swap_money(event: Message):
     sender_balance = db.get_money(event.sender_id)
     if sender_balance < count:
         return await event.reply(
-            phrase.money.not_enough.format(formatter.value_to_str(sender_balance, "изумруд"))
+            phrase.money.not_enough.format(
+                formatter.value_to_str(sender_balance, "изумруд")
+            )
         )
     db.add_money(event.sender_id, -count)
     db.add_money(user, count)
@@ -479,7 +480,9 @@ async def link_nick(event: Message):
     db.add_money(event.sender_id, config.coofs.LinkGift)
     db.nicks(nick, event.sender_id).link()
     return await event.reply(
-        phrase.nick.success.format(formatter.value_to_str(config.coofs.LinkGift, "изумруд"))
+        phrase.nick.success.format(
+            formatter.value_to_str(config.coofs.LinkGift, "изумруд")
+        )
     )
 
 
@@ -499,7 +502,7 @@ async def randompic(event: Message):
         entity=event.chat_id,
         file=pic.get_random(),
         reply_to=event.id,
-        caption=phrase.pic.get
+        caption=phrase.pic.get,
     )
 
 
@@ -517,10 +520,7 @@ async def getmap(event: Message):
 @client.on(events.NewMessage(pattern=r"(?i)^/проголосовать$", func=checks))
 async def vote(event: Message):
     return await client.send_message(
-        event.chat_id,
-        reply_to=event.id,
-        message=phrase.vote,
-        link_preview=False
+        event.chat_id, reply_to=event.id, message=phrase.vote, link_preview=False
     )
 
 
@@ -536,4 +536,4 @@ async def test(event: Message):
 
     message = await event.reply(f"ping is {round(time() - t1, 2)} s.")
     await asyncio.sleep(3)
-    await message.edit('edited.')
+    await message.edit("edited.")
