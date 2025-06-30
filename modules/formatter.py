@@ -39,3 +39,7 @@ def rm_colors(text):
     'Удаляет из текста все вхождения "§n", где n - цифра или буква.'
     pattern = r"§[a-zA-Z0-9]"
     return re.sub(pattern, "", text)
+
+
+def splitter(text, chunk_size=4096):
+    return [text[i:i + chunk_size] for i in range(0, len(text), chunk_size)]

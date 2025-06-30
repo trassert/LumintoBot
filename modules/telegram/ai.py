@@ -14,32 +14,25 @@ from .. import phrase, ai, config, floodwait, formatter
 
 WaitAI = floodwait.FloodWaitBase("WaitAI")
 
-@client.on(events.NewMessage(pattern=r"(?i)^/ии\s(.+)", func=checks))
-@client.on(events.NewMessage(pattern=r"(?i)^/ai\s(.+)", func=checks))
-@client.on(events.NewMessage(pattern=r"(?i)^ии\s(.+)", func=checks))
-@client.on(events.NewMessage(pattern=r"(?i)^/бот\s(.+)", func=checks))
+
+# async def gemini(event: Message):
+#     arg = event.pattern_match.group(1).strip()
+#     response = await ai.response(arg)
+#     if response is None:
+#         return await event.reply(phrase.server.overload)
+#     if len(response) > 4096:
+#         for x in range(0, len(response), 4096):
+#             await event.reply(response[x : x + 4096])
+#     else:
+#         return await event.reply(response)
+
+
+@client.on(events.NewMessage(pattern=r"(?i)^/ии\s([\s\S]+)", func=checks))
+@client.on(events.NewMessage(pattern=r"(?i)^/ai\s([\s\S]+)", func=checks))
+@client.on(events.NewMessage(pattern=r"(?i)^ии\s([\s\S]+)", func=checks))
+@client.on(events.NewMessage(pattern=r"(?i)^/бот\s([\s\S]+)", func=checks))
+@client.on(events.NewMessage(pattern=r"(?i)^/лаи\s([\s\S]+)", func=checks))
 async def gemini(event: Message):
-    arg = event.pattern_match.group(1).strip()
-    response = await ai.response(arg)
-    if response is None:
-        return await event.reply(phrase.server.overload)
-    if len(response) > 4096:
-        for x in range(0, len(response), 4096):
-            await event.reply(response[x : x + 4096])
-    else:
-        return await event.reply(response)
-
-
-@client.on(events.NewMessage(pattern=r"(?i)^/ии$", func=checks))
-@client.on(events.NewMessage(pattern=r"(?i)^/ai$", func=checks))
-@client.on(events.NewMessage(pattern=r"(?i)^ии$", func=checks))
-@client.on(events.NewMessage(pattern=r"(?i)^/бот$", func=checks))
-async def gemini_empty(event: Message):
-    return await event.reply(phrase.no.response)
-
-
-@client.on(events.NewMessage(pattern=r"(?i)^/лаи\s(.+)", func=checks))
-async def local_ai(event: Message):
     if not event.chat_id == config.chats.chat:
         return await event.reply(phrase.ai.chat)
     request = WaitAI.request()
@@ -49,8 +42,25 @@ async def local_ai(event: Message):
         )
     text = event.pattern_match.group(1).strip()
     logger.info(f"Запрос {text}")
-    message: Message = await event.reply(phrase.ai.response)
     try:
-        await message.edit((await ai.chat.send_message(f"{event.sender_id} | {text}")).text)
+        response = (await ai.chat.send_message(f"{event.sender_id} | {text}")).text
     except Exception:
-        await message.edit(phrase.ai.error)
+        return logger.error("Не удалось получить ответ ИИ")
+    try:
+        if len(response) > 4096:
+            response = formatter.splitter(response)
+            for chunk in response:
+                await event.reply(chunk)
+        else:
+            await event.reply(response)
+    except Exception:
+        await event.reply(phrase.ai.error)
+
+
+@client.on(events.NewMessage(pattern=r"(?i)^/ии$", func=checks))
+@client.on(events.NewMessage(pattern=r"(?i)^/ai$", func=checks))
+@client.on(events.NewMessage(pattern=r"(?i)^ии$", func=checks))
+@client.on(events.NewMessage(pattern=r"(?i)^/бот$", func=checks))
+@client.on(events.NewMessage(pattern=r"(?i)^/лаи$", func=checks))
+async def gemini_empty(event: Message):
+    return await event.reply(phrase.ai.no_resp)
