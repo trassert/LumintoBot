@@ -13,8 +13,11 @@ from .global_checks import *
 from .func import get_name
 from .games import crocodile_handler, crocodile_hint
 
-from .. import config, phrase, db, patches, dice, formatter
+from .. import config, phrase, db, patches, dice, formatter, floodwait
 from ..mcrcon import MinecraftClient
+
+
+WaitCasino = floodwait.FloodWaitBase("WaitCasino", config.flood.casino)
 
 
 @client.on(events.CallbackQuery(func=checks))
@@ -156,6 +159,12 @@ async def callback_action(event: events.CallbackQuery.Event):
             )
         )
     elif data[0] == "casino":
+        request = WaitCasino.request()
+        if request is not True:
+            return await event.answer(
+                phrase.casino.floodwait.format(request),
+                alert=True
+            )
         if data[1] == "auto":
             balance = db.get_money(event.sender_id)
             if balance < config.coofs.PriceForCasino:

@@ -18,7 +18,7 @@ from telethon.tl.types import (
 from .client import client
 from .global_checks import *
 
-from .. import config, phrase, ai, formatter
+from .. import phrase, ai, config, formatter
 
 
 @client.on(events.NewMessage(config.chats.chat, pattern=r"(?i)^/казино$", func=checks))

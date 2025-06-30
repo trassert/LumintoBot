@@ -2,17 +2,15 @@ from loguru import logger
 
 logger.info(f"Загружен модуль {__name__}!")
 
-from asyncio import sleep
 from telethon.tl.custom import Message
 from telethon import events
-from telethon.errors.rpcerrorlist import MessageNotModifiedError
 
 from .client import client
 from .global_checks import *
 
 from .. import phrase, ai, config, floodwait, formatter
 
-WaitAI = floodwait.FloodWaitBase("WaitAI")
+WaitAI = floodwait.FloodWaitBase("WaitAI", config.flood.ai)
 
 
 @client.on(events.NewMessage(pattern=r"(?i)^/ии\s([\s\S]+)", func=checks))

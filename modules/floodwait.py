@@ -4,13 +4,14 @@ from time import time
 from . import config
 
 class FloodWaitBase:
-    def __init__(self, name="FloodWaitSys", lasttime=time()):
+    def __init__(self, name="FloodWaitSys", timer=5, lasttime=time()):
         logger.info(f"ФлудВайт: {name} инициализирован")
         self.time = lasttime
+        self.timer = 5
     def request(self):
         now = time()
         wait = round(now-self.time)
-        if wait > config.coofs.WaitAI:
+        if wait > self.timer:
             self.time = now
             return True
         return wait
