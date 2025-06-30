@@ -1,2 +1,2 @@
-@python -OO main.py
+@python main.py
 @pause
