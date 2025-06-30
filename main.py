@@ -60,7 +60,7 @@ async def main():
 if __name__ == "__main__":
     if sum(db.database("shop_weight").values()) != 100:
         logger.error("Сумма процентов в магазине не равна 100!")
-    try:
-        asyncio.run(main())
-    except (KeyboardInterrupt, RuntimeError, asyncio.CancelledError):
-        logger.warning("Закрываю бота!")
+    # try:
+    asyncio.run(main())
+    # except (KeyboardInterrupt, RuntimeError, asyncio.CancelledError):
+    #     logger.warning("Закрываю бота!")
