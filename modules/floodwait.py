@@ -1,7 +1,6 @@
 from loguru import logger
 from time import time
 
-from . import config
 
 class FloodWaitBase:
     def __init__(self, name="FloodWaitSys", timer=5, lasttime=time()):

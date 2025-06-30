@@ -12,18 +12,9 @@ from . import config
 ipinfo = "https://ipinfo.io/{}/json"
 ip_api = "http://ip-api.com/json/{}"
 
-dns_servers = [
-    "ns1.reg.ru",
-    "ns2.reg.ru"
-]
-ident_v4 = [
-    "https://v4.ident.me",
-    "https://api.ipify.org"
-]
-ident_v6 = [
-    "https://v6.ident.me",
-    "https://api6.ipify.org"
-]
+dns_servers = ["ns1.reg.ru", "ns2.reg.ru"]
+ident_v4 = ["https://v4.ident.me", "https://api.ipify.org"]
+ident_v6 = ["https://v6.ident.me", "https://api6.ipify.org"]
 
 
 async def get_ip(v6=False):
@@ -31,126 +22,135 @@ async def get_ip(v6=False):
         if v6:
             for ident in ident_v6:
                 try:
-                    async with session.get(ident, timeout=3) as response:
+                    logger.info("Получаю IPv6...")
+                    async with session.get(ident, timeout=5) as response:
                         response = await response.text()
+                        logger.info(f"Получено - {response}")
                         return response
                 except Exception:
                     logger.error("Не получается найти IPv6")
+                    return database("ipv6")
         for ident in ident_v4:
             try:
-                async with session.get(ident, timeout=3) as response:
+                logger.info("Получаю IPv4...")
+                async with session.get(ident, timeout=5) as response:
                     response = await response.text()
+                    logger.info(f"Получено - {response}")
                     return response
             except Exception:
                 logger.error("Не получается найти IPv4")
-    
-    # Если ни один не сработал..
-    if v6:
-        return database("ipv6")
-    return database("ipv4")
+                return database("ipv4")
+
+
+async def change_ip(ipv4, ipv6):
+    message = ""
+    async with aiohttp.ClientSession() as session:
+        "REGru синхронизация"
+        try:
+            input_data = {
+                "username": config.tokens.reg.email,
+                "password": config.tokens.reg.password,
+                "output_content_type": "plain",
+                "domain_name": database("host"),
+            }
+            post = await session.post(
+                "https://api.reg.ru/api/regru2/zone/clear", data=input_data
+            )
+            logger.info(
+                json.dumps(
+                    await post.json(content_type="text/plain"),
+                    indent=2,
+                    sort_keys=True,
+                    ensure_ascii=False,
+                )
+            )
+            message += "Связь с REGru выполнена. (1)\n"
+        except Exception:
+            logger.error("Не удалось связаться с REGru (1)")
+            message += "Не удалось связаться с REGru (1)\n"
+
+        try:
+            input_data = {
+                "username": config.tokens.reg.email,
+                "password": config.tokens.reg.password,
+                "subdomain": "@",
+                "ipaddr": ipv4,
+                "output_content_type": "plain",
+                "domain_name": database("host"),
+            }
+            post = await session.post(
+                "https://api.reg.ru/api/regru2/zone/add_alias", data=input_data
+            )
+            logger.info(
+                json.dumps(
+                    await post.json(content_type="text/plain"),
+                    indent=2,
+                    sort_keys=True,
+                    ensure_ascii=False,
+                )
+            )
+            message += "Связь с REGru выполнена. (2)\n"
+        except Exception:
+            logger.error("Не удалось связаться с REGru (2)")
+            message += "Не удалось связаться с REGru (2)\n"
+
+        try:
+            input_data = {
+                "username": config.tokens.reg.email,
+                "password": config.tokens.reg.password,
+                "subdomain": "@",
+                "ipaddr": ipv6,
+                "output_content_type": "plain",
+                "domain_name": database("host"),
+            }
+            post = await session.post(
+                "https://api.reg.ru/api/regru2/zone/add_aaaa", data=input_data
+            )
+            logger.info(
+                json.dumps(
+                    await post.json(content_type="text/plain"),
+                    indent=2,
+                    sort_keys=True,
+                    ensure_ascii=False,
+                )
+            )
+            message += "Связь с REGru выполнена. (3)\n"
+        except Exception:
+            logger.error("Не удалось связаться с REGru (3)")
+            message += "Не удалось связаться с REGru (3)\n"
+
+        try:
+            input_data = {
+                "username": config.tokens.reg.email,
+                "password": config.tokens.reg.password,
+                "subdomain": database("ipv6_subdomain"),
+                "ipaddr": ipv6,
+                "output_content_type": "plain",
+                "domain_name": database("host"),
+            }
+            post = await session.post(
+                "https://api.reg.ru/api/regru2/zone/add_aaaa", data=input_data
+            )
+            logger.info(
+                json.dumps(
+                    await post.json(content_type="text/plain"),
+                    indent=2,
+                    sort_keys=True,
+                    ensure_ascii=False,
+                )
+            )
+            message += "Связь с REGru выполнена. (4)\n"
+        except Exception:
+            logger.error("Не удалось связаться с REGru (4)")
+            message += "Не удалось связаться с REGru (4)\n"
+        message += f"IP: {ipv4}, V6: {ipv6}"
+        return message
 
 
 async def setup(forced=False):
-    async def change_ip(ipv4, ipv6):
-        message = ""
-        "NOIP синхронизация"
-        async with aiohttp.ClientSession() as session:
-            try:
-                async with session.get(
-                    f"http://{config.tokens.noip.name}:{config.tokens.noip.password}"
-                    "@dynupdate.no-ip.com/"
-                    f'nic/update?hostname={database("noip_host")}&myip={ipv4},{ipv6}',
-                    headers={
-                        "User-Agent": "Trassert MinecraftServer' \
-                            '/Windows 11-22000 s3pple@yandex.ru"
-                    },
-                ) as response:
-                    logger.info(await response.text())
-                    message += "Связь с NOIP выполнена.\n"
-            except Exception:
-                logger.error("Не удалось связаться с NOIP")
-                message += "Не удалось связаться с NOIP\n"
-
-            "REGru синхронизация"
-            try:
-                input_data = {
-                    "username": config.tokens.reg.email,
-                    "password": config.tokens.reg.password,
-                    "output_content_type": "plain",
-                    "domain_name": database("host"),
-                }
-                post = await session.post(
-                    "https://api.reg.ru/api/regru2/zone/clear", data=input_data
-                )
-                logger.info(await post.json(content_type="text/plain"))
-                message += "Связь с REGru выполнена. (1)\n"
-            except Exception:
-                logger.error("Не удалось связаться с REGru (1)")
-                message += "Не удалось связаться с REGru (1)\n"
-
-            try:
-                input_data = {
-                    "username": config.tokens.reg.email,
-                    "password": config.tokens.reg.password,
-                    "subdomain": "@",
-                    "ipaddr": v4,
-                    "output_content_type": "plain",
-                    "domain_name": database("host"),
-                }
-                post = await session.post(
-                    "https://api.reg.ru/api/regru2/zone/add_alias", data=input_data
-                )
-                logger.info(await post.json(content_type="text/plain"))
-                message += "Связь с REGru выполнена. (2)\n"
-            except Exception:
-                logger.error("Не удалось связаться с REGru (2)")
-                message += "Не удалось связаться с REGru (2)\n"
-
-            try:
-                input_data = {
-                    "username": config.tokens.reg.email,
-                    "password": config.tokens.reg.password,
-                    "subdomain": "@",
-                    "ipaddr": v6,
-                    "output_content_type": "plain",
-                    "domain_name": database("host"),
-                }
-                post = await session.post(
-                    "https://api.reg.ru/api/regru2/zone/add_aaaa", data=input_data
-                )
-                logger.info(await post.json(content_type="text/plain"))
-                message += "Связь с REGru выполнена. (3)\n"
-            except Exception:
-                logger.error("Не удалось связаться с REGru (3)")
-                message += "Не удалось связаться с REGru (3)\n"
-
-            try:
-                input_data = {
-                    "username": config.tokens.reg.email,
-                    "password": config.tokens.reg.password,
-                    "subdomain": database("ipv6_subdomain"),
-                    "ipaddr": v6,
-                    "output_content_type": "plain",
-                    "domain_name": database("host"),
-                }
-                post = await session.post(
-                    "https://api.reg.ru/api/regru2/zone/add_aaaa", data=input_data
-                )
-                logger.info(await post.json(content_type="text/plain"))
-                message += "Связь с REGru выполнена. (4)\n"
-            except Exception:
-                logger.error("Не удалось связаться с REGru (4)")
-                message += "Не удалось связаться с REGru (4)\n"
-            message += f"IP: {ipv4}, V6: {ipv6}"
-            return message
-
     v4 = await get_ip()
     v6 = await get_ip(v6=True)
-    if (
-        database("ipv4") != v4
-    ) or (
-        database("ipv6") != v6
-    ) or forced:
+    if (database("ipv4") != v4) or (database("ipv6") != v6) or forced:
         database("ipv4", v4)
         database("ipv6", v6)
         return await change_ip(v4, v6)
@@ -198,6 +198,9 @@ async def get_loc(ip_address: str):
 
 
 async def observe():
+    logger.info("Жду стабильного подключения..")
+    await asyncio.sleep(10)
     while True:
+        logger.info("Запуск синхронизации..")
         await setup()
         await asyncio.sleep(config.coofs.IPSleepTime)
