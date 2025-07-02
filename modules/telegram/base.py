@@ -59,7 +59,7 @@ async def help(event: Message):
 async def ping(event: Message):
     arg = event.pattern_match.group(1).strip()
     ping = round(time() - event.date.timestamp(), 2)
-    if ping < 0:
+    if ping <= 0:
         ping = phrase.ping.min
     else:
         ping = f"за {str(ping)} сек."
@@ -75,25 +75,9 @@ async def ping(event: Message):
         "фулл",
         "full",
     ]:
-        async with aiohttp.ClientSession() as session:
-            n = 1
-            for server in ai.ai_servers:
-                timestamp = time()
-                async with session.get(f"https://{server}/") as request:
-                    try:
-                        if await request.text() == "ok":
-                            server_ping = round(time() - timestamp, 1)
-                            textping = (
-                                f"{server_ping} сек."
-                                if server_ping > 0
-                                else phrase.ping.min_ai
-                            )
-                            all_servers_ping.append(f"🌐 : ИИ сервер №{n} - {textping}")
-                        else:
-                            all_servers_ping.append(f"❌ : ИИ сервер №{n} - Ошибка!")
-                    except Exception:
-                        all_servers_ping.append(f"❌ : ИИ сервер №{n} - Выключен!")
-                n += 1
+        all_servers_ping.append(
+            f"🤖 : Пинг ИИ - {int(round(ping3.ping(config.tokens.proxy.split("@")[-1]), 3)*1000)} мс"
+        )
         all_servers_ping.append(
             f"🌐 : Пинг сервера - {int(round(ping3.ping('yandex.ru'), 3)*1000)} мс"
         )
