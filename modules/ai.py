@@ -10,7 +10,7 @@ from . import config, formatter
 
 
 ai_servers = ["trassert0reserve.pythonanywhere.com", "trassert.pythonanywhere.com"]
-model = "gemini-2.0-flash-001"
+model = "gemini-2.5-flash-lite-preview-06-17"
 client = genai.Client(
     api_key=config.tokens.gemini,
     http_options=types.HttpOptions(
