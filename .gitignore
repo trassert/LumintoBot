@@ -17,9 +17,7 @@ backup/states/*
 
 images/*
 
-update/mods/*
-update/prog/*
-
+notes/*
 charts/*
 
 test.*
