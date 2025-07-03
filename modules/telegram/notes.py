@@ -10,6 +10,7 @@ from telethon.tl.custom import Message
 
 from .. import db, phrase
 
+
 @client.on(events.NewMessage(pattern=r"(?i)^\+нот (.+)\n([\s\S]+)", func=checks))
 @client.on(events.NewMessage(pattern=r"(?i)^\+note (.+)\n([\s\S]+)", func=checks))
 async def add_note(event: Message):
@@ -28,10 +29,27 @@ async def add_note(event: Message):
 @client.on(events.NewMessage(pattern=r"(?i)^\+нот (.+)$", func=checks))
 @client.on(events.NewMessage(pattern=r"(?i)^\+note (.+)$", func=checks))
 async def add_note_notext(event: Message):
+    roles = db.roles()
+    if roles.get(event.sender_id) < roles.VIP:
+        return await event.reply(
+            phrase.roles.no_perms.format(level=roles.VIP, name=phrase.roles.vip)
+        )
     return await event.reply(phrase.notes.notext)
 
 
 @client.on(events.NewMessage(pattern=r"(?i)^\+нот\n([\s\S]+)", func=checks))
 @client.on(events.NewMessage(pattern=r"(?i)^\+note\n([\s\S]+)", func=checks))
 async def add_note_notext(event: Message):
+    roles = db.roles()
+    if roles.get(event.sender_id) < roles.VIP:
+        return await event.reply(
+            phrase.roles.no_perms.format(level=roles.VIP, name=phrase.roles.vip)
+        )
     return await event.reply(phrase.notes.noname)
+
+
+@client.on(events.NewMessage(pattern=r"(?i)^\.(.+)", func=checks))
+async def get_note(event: Message):
+    note_text = db.Note().get(event.pattern_match.group(1).strip().lower())
+    if note_text is not None:
+        return await event.reply(note_text)

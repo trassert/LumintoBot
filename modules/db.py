@@ -603,26 +603,26 @@ class Notes:
         """Возвращает путь к файлу заметки."""
         return path.join(self.storage_dir, f"{name}.txt")
 
-    def get(self, name):
+    def get(self, name: str):
         """Получить заметку по имени. Возвращает текст или None."""
-        file_path = self._get_file_path(name)
+        file_path = self._get_file_path(name.lower())
         if not path.exists(file_path):
             return None
         with open(file_path, "r", encoding="utf-8") as f:
             return f.read()
 
-    def create(self, name, text):
+    def create(self, name: str, text: str):
         """Создать новую заметку. Возвращает True при успехе, False если уже существует."""
-        file_path = self._get_file_path(name)
+        file_path = self._get_file_path(name.lower())
         if path.exists(file_path):
             return False
         with open(file_path, "w", encoding="utf-8") as f:
             f.write(text)
         return True
 
-    def remove(self, name):
+    def remove(self, name: str):
         """Удалить заметку. Возвращает True при успехе, False если не существует."""
-        file_path = self._get_file_path(name)
+        file_path = self._get_file_path(name.lower())
         if not path.exists(file_path):
             return False
         remove(file_path)
