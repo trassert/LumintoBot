@@ -4,7 +4,6 @@ from loguru import logger
 logger.info(f"Загружен модуль {__name__}!")
 
 import ping3
-import aiohttp
 import re
 import asyncio
 
@@ -75,9 +74,6 @@ async def ping(event: Message):
         "фулл",
         "full",
     ]:
-        all_servers_ping.append(
-            f"🤖 : Пинг ИИ - {int(round(ping3.ping(config.tokens.proxy.split("@")[-1]), 3)*1000)} мс"
-        )
         all_servers_ping.append(
             f"🌐 : Пинг сервера - {int(round(ping3.ping('yandex.ru'), 3)*1000)} мс"
         )

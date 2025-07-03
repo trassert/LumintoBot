@@ -32,4 +32,5 @@ from . import (
     states,
     statistic,
     tickets,
+    notes
 )
