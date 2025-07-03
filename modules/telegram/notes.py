@@ -50,6 +50,6 @@ async def add_note_notext(event: Message):
 
 @client.on(events.NewMessage(pattern=r"(?i)^\.(.+)", func=checks))
 async def get_note(event: Message):
-    note_text = db.Note().get(event.pattern_match.group(1).strip().lower())
+    note_text = db.Notes().get(event.pattern_match.group(1).strip().lower())
     if note_text is not None:
         return await event.reply(note_text)
