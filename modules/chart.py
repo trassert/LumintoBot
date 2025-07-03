@@ -4,18 +4,16 @@ import matplotlib.dates as mdates
 
 from datetime import datetime, timedelta
 from matplotlib import font_manager
-from os import path
 from loguru import logger
 
+from . import pathes
 
-font_path = path.join("fonts", "minecraft.ttf")
-chart_path = path.join("charts", "chart.png")
 
-font_properties = font_manager.FontEntry(fname=font_path, name="minecraft")
+font_properties = font_manager.FontEntry(fname=pathes.font_path, name="minecraft")
 font_manager.fontManager.ttflist.append(font_properties)
 
 
-def create_plot(data_dict, output_file=chart_path, time_range_days=None):
+def create_plot(data_dict, output_file=pathes.chart_path, time_range_days=None):
     "Фукнция для создания линейного графика"
 
     "Данные"
@@ -25,7 +23,7 @@ def create_plot(data_dict, output_file=chart_path, time_range_days=None):
     "Шрифт"
     plt.rcParams["font.family"] = "sans-serif"
     plt.rcParams["font.sans-serif"] = font_properties.name
-    prop = font_manager.FontProperties(fname=font_path)
+    prop = font_manager.FontProperties(fname=pathes.font_path)
     title_font = {
         "fontproperties": prop,
         "fontsize": 16,

@@ -13,7 +13,7 @@ from .global_checks import *
 from .func import get_name
 from .games import crocodile_handler, crocodile_hint
 
-from .. import config, phrase, db, patches, dice, formatter, floodwait
+from .. import config, pathes, phrase, db, dice, formatter, floodwait
 from ..mcrcon import MinecraftClient
 
 
@@ -30,7 +30,7 @@ async def callback_action(event: events.CallbackQuery.Event):
                 return await event.answer(phrase.crocodile.super_game_here, alert=True)
             if db.database("current_game") != 0:
                 return await event.answer(phrase.crocodile.no, alert=True)
-            with open(patches.crocodile_path, "r", encoding="utf8") as f:
+            with open(pathes.crocodile_path, "r", encoding="utf8") as f:
                 word = choice(f.read().split("\n"))
             unsec = ""
             for x in list(word):
@@ -116,7 +116,7 @@ async def callback_action(event: events.CallbackQuery.Event):
     elif data[0] == "word":
         user_name = await get_name(data[3])
         if data[1] == "yes":
-            with open(patches.crocodile_path, "a", encoding="utf-8") as f:
+            with open(pathes.crocodile_path, "a", encoding="utf-8") as f:
                 f.write(f"\n{data[2]}")
             db.add_money(data[3], config.coofs.WordRequest)
             await client.send_message(
@@ -131,7 +131,7 @@ async def callback_action(event: events.CallbackQuery.Event):
                 event.sender_id, event.message_id, phrase.word.add
             )
         if data[1] == "no":
-            with open(patches.crocodile_blacklist_path, "a", encoding="utf-8") as f:
+            with open(pathes.crocodile_blacklist_path, "a", encoding="utf-8") as f:
                 f.write(f"\n{data[2]}")
             await client.send_message(
                 config.chats.chat, phrase.word.no.format(word=data[2], user=user_name)

@@ -4,12 +4,10 @@ logger.info(f"Загружен модуль {__name__}!")
 
 from telethon.sync import TelegramClient
 
-from os import path
-
-from .. import config
+from .. import config, pathes
 
 client = TelegramClient(
-    session=path.join("db", "bot"),
+    session=pathes.bot_path,
     api_id=config.tokens.bot.id,
     api_hash=config.tokens.bot.hash,
     device_model="Bot",

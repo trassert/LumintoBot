@@ -5,8 +5,7 @@ import socket
 
 from loguru import logger
 
-from .db import database
-from . import config
+from . import config, db
 
 
 ipinfo = "https://ipinfo.io/{}/json"
@@ -29,7 +28,7 @@ async def get_ip(v6=False):
                         return response
                 except Exception:
                     logger.error("Не получается найти IPv6")
-                    return database("ipv6")
+                    return db.database("ipv6")
         for ident in ident_v4:
             try:
                 logger.info("Получаю IPv4...")
@@ -39,7 +38,7 @@ async def get_ip(v6=False):
                     return response
             except Exception:
                 logger.error("Не получается найти IPv4")
-                return database("ipv4")
+                return db.database("ipv4")
 
 
 async def change_ip(ipv4, ipv6):
@@ -51,7 +50,7 @@ async def change_ip(ipv4, ipv6):
                 "username": config.tokens.reg.email,
                 "password": config.tokens.reg.password,
                 "output_content_type": "plain",
-                "domain_name": database("host"),
+                "domain_name": db.database("host"),
             }
             post = await session.post(
                 "https://api.reg.ru/api/regru2/zone/clear", data=input_data
@@ -76,7 +75,7 @@ async def change_ip(ipv4, ipv6):
                 "subdomain": "@",
                 "ipaddr": ipv4,
                 "output_content_type": "plain",
-                "domain_name": database("host"),
+                "domain_name": db.database("host"),
             }
             post = await session.post(
                 "https://api.reg.ru/api/regru2/zone/add_alias", data=input_data
@@ -101,7 +100,7 @@ async def change_ip(ipv4, ipv6):
                 "subdomain": "@",
                 "ipaddr": ipv6,
                 "output_content_type": "plain",
-                "domain_name": database("host"),
+                "domain_name": db.database("host"),
             }
             post = await session.post(
                 "https://api.reg.ru/api/regru2/zone/add_aaaa", data=input_data
@@ -123,10 +122,10 @@ async def change_ip(ipv4, ipv6):
             input_data = {
                 "username": config.tokens.reg.email,
                 "password": config.tokens.reg.password,
-                "subdomain": database("ipv6_subdomain"),
+                "subdomain": db.database("ipv6_subdomain"),
                 "ipaddr": ipv6,
                 "output_content_type": "plain",
-                "domain_name": database("host"),
+                "domain_name": db.database("host"),
             }
             post = await session.post(
                 "https://api.reg.ru/api/regru2/zone/add_aaaa", data=input_data
@@ -150,9 +149,9 @@ async def change_ip(ipv4, ipv6):
 async def setup(forced=False):
     v4 = await get_ip()
     v6 = await get_ip(v6=True)
-    if (database("ipv4") != v4) or (database("ipv6") != v6) or forced:
-        database("ipv4", v4)
-        database("ipv6", v6)
+    if (db.database("ipv4") != v4) or (db.database("ipv6") != v6) or forced:
+        db.database("ipv4", v4)
+        db.database("ipv6", v6)
         return await change_ip(v4, v6)
 
 

@@ -9,7 +9,7 @@ from .client import client
 from .global_checks import *
 from .func import get_name
 
-from .. import config, phrase, db, chart, formatter
+from .. import config, phrase, db, pathes, formatter, chart
 from ..mcrcon import MinecraftClient
 
 
@@ -31,7 +31,7 @@ async def active_check(event: Message):
                 break
             text += f"{n}. {data[0]} - {data[1]}\n"
             n += 1
-        return await client.send_file(event.chat_id, chart.chart_path, caption=text)
+        return await client.send_file(event.chat_id, pathes.chart_path, caption=text)
     try:
         days = int(arg)
         text = phrase.stat.chat.format(formatter.value_to_str(days, "день"))
@@ -44,7 +44,7 @@ async def active_check(event: Message):
                     break
                 text += f"{n}. {data[0]} - {data[1]}\n"
                 n += 1
-            return await client.send_file(event.chat_id, chart.chart_path, caption=text)
+            return await client.send_file(event.chat_id, pathes.chart_path, caption=text)
     except ValueError:
         text = phrase.stat.chat.format("день")
         all_data = db.statistic().get_all()

@@ -1,10 +1,10 @@
 from random import choice
 from os import listdir, path
 
-from . import patches
+from . import pathes
 
 def get_random():
     return path.join(
-        patches.pic_path,
-        choice(listdir(patches.pic_path))
+        pathes.pic_path,
+        choice(listdir(pathes.pic_path))
     )

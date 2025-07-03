@@ -25,7 +25,7 @@ from .client import client
 from .global_checks import *
 from .func import get_name
 
-from .. import ai, config, patches, formatter, pic
+from .. import ai, config, formatter, pathes, pic
 from ..system_info import get_system_info
 
 
@@ -186,10 +186,10 @@ async def mine(event: Message):
 @client.on(events.NewMessage(pattern=r"(?i)^/слово\s(.+)", func=checks))
 async def word_request(event: Message):
     word = event.pattern_match.group(1).strip().lower()
-    with open(patches.crocodile_path, "r", encoding="utf-8") as f:
+    with open(pathes.crocodile_path, "r", encoding="utf-8") as f:
         if word in f.read().split("\n"):
             return await event.reply(phrase.word.exists)
-    with open(patches.crocodile_blacklist_path, "r", encoding="utf-8") as f:
+    with open(pathes.crocodile_blacklist_path, "r", encoding="utf-8") as f:
         if word in f.read().split("\n"):
             return await event.reply(phrase.word.in_blacklist)
     entity = await get_name(event.sender_id)
@@ -235,14 +235,14 @@ async def word_requests(event: Message):
     words = event.pattern_match.group(1).strip().lower().split()
     text = ""
     message = await event.reply(phrase.word.checker)
-    with open(patches.crocodile_path, "r", encoding="utf-8") as f:
+    with open(pathes.crocodile_path, "r", encoding="utf-8") as f:
         all_words = f.read().split("\n")
         for word in words:
             if word in all_words:
                 text += f"Слово **{word}** - есть\n"
                 await message.edit(text)
                 words.remove(word)
-    with open(patches.crocodile_blacklist_path, "r", encoding="utf-8") as f:
+    with open(pathes.crocodile_blacklist_path, "r", encoding="utf-8") as f:
         all_blacklist = f.read().split("\n")
         for word in words:
             if word in all_blacklist:
@@ -320,12 +320,12 @@ async def word_remove(event: Message):
             phrase.roles.no_perms.format(level=roles.ADMIN, name=phrase.roles.admin)
         )
     word = event.pattern_match.group(1).strip().lower()
-    with open(patches.crocodile_path, "r", encoding="utf-8") as f:
+    with open(pathes.crocodile_path, "r", encoding="utf-8") as f:
         text = f.read().split("\n")
     if word not in text:
         return await event.reply(phrase.word.not_exists)
     text.remove(word)
-    with open(patches.crocodile_path, "w", encoding="utf-8") as f:
+    with open(pathes.crocodile_path, "w", encoding="utf-8") as f:
         f.write("\n".join(text))
     return await event.reply(phrase.word.deleted.format(word))
 

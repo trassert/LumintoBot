@@ -1,29 +1,17 @@
 import json
 import aiomysql
-import aiomysql
 
 from typing import Dict
 from loguru import logger
 from datetime import datetime, timedelta
-from os import path, listdir, replace
+from os import path, listdir, replace, makedirs, remove
 from time import time
 from random import choice, randint
 from collections import defaultdict
 
 from . import config
 from .get_theme import weighted_choice
-
-crocodile_stats_path = path.join("db", "users", "crocodile_stat.json")
-mine_path = path.join("db", "timings", "mine.json")
-roles_path = path.join("db", "users", "roles.json")
-money_path = path.join("db", "users", "money.json")
-nick_path = path.join("db", "users", "nicks.json")
-tickets_path = path.join("db", "tickets.json")
-stats_path = path.join("db", "chat_stats")
-
-old_states_path = path.join("backup", "states")
-states_path = path.join("db", "states")
-times_path = path.join("db", "time")
+from .pathes import *
 
 
 def database(key, value=None, delete=None, log=True):
@@ -604,3 +592,38 @@ Users = Mysql(
     db=config.tokens.mysql_users.database,
     table_name=config.tokens.mysql_users.table
 )
+
+
+class Notes:
+    def __init__(self, storage_dir=notes_path):
+        self.storage_dir = storage_dir
+        makedirs(storage_dir, exist_ok=True)
+
+    def _get_file_path(self, name):
+        """Возвращает путь к файлу заметки."""
+        return path.join(self.storage_dir, f"{name}.json")
+
+    def get(self, name):
+        """Получить заметку по имени. Возвращает текст или None."""
+        file_path = self._get_file_path(name)
+        if not path.exists(file_path):
+            return None
+        with open(file_path, "r", encoding="utf-8") as f:
+            return json.load(f).get("text")
+
+    def create(self, name, text):
+        """Создать новую заметку. Возвращает True при успехе, False если уже существует."""
+        file_path = self._get_file_path(name)
+        if path.exists(file_path):
+            return False
+        with open(file_path, "w", encoding="utf-8") as f:
+            f.write(text)
+        return True
+
+    def remove(self, name):
+        """Удалить заметку. Возвращает True при успехе, False если не существует."""
+        file_path = self._get_file_path(name)
+        if not path.exists(file_path):
+            return False
+        remove(file_path)
+        return True
