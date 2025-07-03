@@ -601,7 +601,7 @@ class Notes:
 
     def _get_file_path(self, name):
         """Возвращает путь к файлу заметки."""
-        return path.join(self.storage_dir, f"{name}.json")
+        return path.join(self.storage_dir, f"{name}.txt")
 
     def get(self, name):
         """Получить заметку по имени. Возвращает текст или None."""
