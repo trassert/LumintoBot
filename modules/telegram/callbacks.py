@@ -215,6 +215,10 @@ async def callback_action(event: events.CallbackQuery.Event):
             nick = db.nicks(id=event.sender_id).get()
             if nick is None:
                 return await event.answer(phrase.state.not_connected, alert=True)
+            if db.states.if_player(event.sender_id) is not False:
+                return await event.answer(phrase.state.already_player, alert=True)
+            if db.states.if_author(event.sender_id) is not False:
+                return await event.answer(phrase.state.already_author, alert=True)
             balance = db.get_money(event.sender_id)
             state = db.state(data[2])
             if state.price > balance:
