@@ -609,7 +609,7 @@ class Notes:
         if not path.exists(file_path):
             return None
         with open(file_path, "r", encoding="utf-8") as f:
-            return json.load(f).get("text")
+            return f.read()
 
     def create(self, name, text):
         """Создать новую заметку. Возвращает True при успехе, False если уже существует."""
