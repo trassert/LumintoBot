@@ -90,7 +90,7 @@ async def all_money(event: Message):
 async def server_top_list(event: Message):
     try:
         async with MinecraftClient(
-            host=db.database("ipv4"),
+            host=config.tokens.rcon.host,
             port=config.tokens.rcon.port,
             password=config.tokens.rcon.password,
         ) as rcon:
