@@ -123,17 +123,20 @@ async def mcrcon(event: Message):
     logger.info(f"Выполняется команда: {command}")
     try:
         async with MinecraftClient(
-            host=db.database("ipv4"),
+            host=config.tokens.rcon.host,
             port=config.tokens.rcon.port,
             password=config.tokens.rcon.password,
         ) as rcon:
             resp = formatter.rm_colors(await rcon.send(command))
+            if len(resp) == 0:
+                logger.info("Пустой ответ.")
+                return await event.reply(phrase.rcon.empty)
             logger.info(f"Ответ команды:\n{resp}")
             if len(resp) > 4096:
                 for x in range(0, len(resp), 4096):
                     await event.reply(f"```{resp[x:x+4096]}```")
-            else:
-                return await event.reply(f"```{resp}```")
+                return
+            return await event.reply(f"```{resp}```")
     except TimeoutError:
         return await event.reply(phrase.server.stopped)
 
