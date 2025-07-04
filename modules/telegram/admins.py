@@ -162,7 +162,7 @@ async def whitelist(event: Message):
             port=config.tokens.rcon.port,
             password=config.tokens.rcon.password,
         ) as rcon:
-            resp = formatter.rm_colors(await rcon.send(command))
+            resp = formatter.rm_colors(await rcon.send(command)).strip()
             logger.info(f"Ответ команды:\n{resp}")
             return await event.reply(f"✍🏻 : {resp}")
     except TimeoutError:
