@@ -21,9 +21,10 @@ async def add_note(event: Message):
         )
     if db.Notes().create(
         event.pattern_match.group(1).strip(),
-        event.pattern_match.group(2).strip()
+        event.text.split('\n', maxsplit=1)[1]
     ) is True:
         return await event.reply(phrase.notes.new.format(event.pattern_match.group(1).strip()))
+    return await event.reply(phrase.notes.already_added)
 
 
 @client.on(events.NewMessage(pattern=r"(?i)^\+нот (.+)$", func=checks))
