@@ -1,3 +1,4 @@
+from aiohttp import ClientConnectionError
 from loguru import logger
 
 logger.info(f"Загружен модуль {__name__}!")
@@ -53,4 +54,19 @@ async def add_note_notext(event: Message):
 async def get_note(event: Message):
     note_text = db.Notes().get(event.pattern_match.group(1).strip().lower())
     if note_text is not None:
-        return await event.reply(note_text)
+        if event.reply_to_msg_id:
+            reply_message: Message = (await event.get_reply_message())
+            return await client.send_message(
+                event.chat_id,
+                note_text,
+                reply_to=reply_message.id,
+                silent=True,
+                link_preview=False
+            )
+        return await client.send_message(
+            event.chat_id,
+            note_text,
+            reply_to=event.id,
+            silent=True,
+            link_preview=False
+        )
