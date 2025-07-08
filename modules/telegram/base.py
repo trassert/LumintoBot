@@ -169,7 +169,7 @@ async def mine(event: Message):
             value=formatter.value_to_str(added, "изумруд"),
         )
         db.add_money(event.sender_id, -added)
-    elif rand > config.coofs.ChanceToBoost:
+    elif rand > 1 - config.coofs.ChanceToBoost:
         added = randint(config.coofs.MineMaxGems, config.coofs.MineMaxBoost)
         text = choice(phrase.mine.boost).format(
             formatter.value_to_str(added, "изумруд")
