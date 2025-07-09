@@ -543,6 +543,11 @@
             "name": "enchanted_book[stored_enchantments={levels:{mending:1}}]",
             "price": 56,
             "value": 1
+        },
+        "Зловещая бутылка": {
+            "name": "ominous_bottle",
+            "price": 28,
+            "value": 1
         }
     },
     "remains": {
