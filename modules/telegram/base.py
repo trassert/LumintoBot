@@ -26,6 +26,7 @@ from .func import get_name
 
 from .. import ai, config, formatter, pathes, pic
 from ..system_info import get_system_info
+from ..mcrcon import MinecraftClient
 
 
 @client.on(events.NewMessage(pattern=r"(?i)^/хост$", func=checks))
@@ -431,14 +432,11 @@ async def link_nick(event: Message):
         return await event.reply(phrase.nick.too_big)
     if not re.match("^[A-Za-z0-9_]*$", nick):
         return await event.reply(phrase.nick.invalid)
-
+    if db.nicks(id=event.sender_id).get() == nick:
+        return await event.reply(phrase.nick.already_you)
     if db.nicks(nick=nick).get() is not None:
-        if db.nicks(id=event.sender_id).get() == nick:
-            return await event.reply(phrase.nick.already_you)
         return await event.reply(phrase.nick.taken)
-    elif db.nicks(id=event.sender_id).get() is not None:
-        if db.nicks(id=event.sender_id).get() == nick:
-            return await event.reply(phrase.nick.already_you)
+    if db.nicks(id=event.sender_id).get() is not None:
         keyboard = ReplyInlineMarkup(
             [
                 KeyboardButtonRow(
@@ -457,7 +455,16 @@ async def link_nick(event: Message):
             ),
             buttons=keyboard,
         )
-
+    try:
+        async with MinecraftClient(
+            host=config.tokens.rcon.host,
+            port=config.tokens.rcon.port,
+            password=config.tokens.rcon.password,
+        ) as rcon:
+            await rcon.send(f"swl add {nick}")
+    except Exception:
+        logger.error("Внутренняя ошибка при добавлении в белый список")
+        return await event.reply(phrase.nick.error)
     db.add_money(event.sender_id, config.coofs.LinkGift)
     db.nicks(nick, event.sender_id).link()
     return await event.reply(

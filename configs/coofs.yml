@@ -39,6 +39,6 @@ MineMaxGems: 15
 MineMaxBoost: 80
 
 # Цены
-PriceForChangeNick: 50
+PriceForChangeNick: 5
 PriceForCasino: 5
 PriceForNewState: 25
