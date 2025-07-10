@@ -422,6 +422,8 @@ async def get_balance(event: Message):
 @client.on(events.NewMessage(pattern=r"(?i)^/новый ник\s(.+)", func=checks))
 @client.on(events.NewMessage(pattern=r"(?i)^/линкник\s(.+)", func=checks))
 async def link_nick(event: Message):
+    if not event.chat_id == config.chats.chat:
+        return await event.reply(phrase.nick.chat)
     nick = event.pattern_match.group(1).strip()
     if len(nick) < 4:
         return await event.reply(phrase.nick.too_short)
@@ -471,6 +473,8 @@ async def link_nick(event: Message):
 @client.on(events.NewMessage(pattern=r"(?i)^/новый ник$", func=checks))
 @client.on(events.NewMessage(pattern=r"(?i)^/линкник$", func=checks))
 async def link_nick(event: Message):
+    if not event.chat_id == config.chats.chat:
+        return await event.reply(phrase.nick.chat)
     return await event.reply(phrase.nick.not_select)
 
 
