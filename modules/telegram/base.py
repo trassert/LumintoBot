@@ -416,11 +416,11 @@ async def get_balance(event: Message):
     )
 
 
-@client.on(events.NewMessage(pattern=r"(?i)^/linknick(.*)", func=checks))
-@client.on(events.NewMessage(pattern=r"(?i)^/привязать(.*)", func=checks))
-@client.on(events.NewMessage(pattern=r"(?i)^привязать(.*)", func=checks))
-@client.on(events.NewMessage(pattern=r"(?i)^/новый ник(.*)", func=checks))
-@client.on(events.NewMessage(pattern=r"(?i)^/линкник(.*)", func=checks))
+@client.on(events.NewMessage(pattern=r"(?i)^/linknick\s(.+)", func=checks))
+@client.on(events.NewMessage(pattern=r"(?i)^/привязать\s(.+)", func=checks))
+@client.on(events.NewMessage(pattern=r"(?i)^привязать\s(.+)", func=checks))
+@client.on(events.NewMessage(pattern=r"(?i)^/новый ник\s(.+)", func=checks))
+@client.on(events.NewMessage(pattern=r"(?i)^/линкник\s(.+)", func=checks))
 async def link_nick(event: Message):
     nick = event.pattern_match.group(1).strip()
     if len(nick) < 4:
@@ -463,6 +463,15 @@ async def link_nick(event: Message):
             formatter.value_to_str(config.coofs.LinkGift, "изумруд")
         )
     )
+
+
+@client.on(events.NewMessage(pattern=r"(?i)^/linknick$", func=checks))
+@client.on(events.NewMessage(pattern=r"(?i)^/привязать$", func=checks))
+@client.on(events.NewMessage(pattern=r"(?i)^привязать$", func=checks))
+@client.on(events.NewMessage(pattern=r"(?i)^/новый ник$", func=checks))
+@client.on(events.NewMessage(pattern=r"(?i)^/линкник$", func=checks))
+async def link_nick(event: Message):
+    return await event.reply(phrase.nick.not_select)
 
 
 @client.on(events.NewMessage(pattern=r"(?i)^/серв$", func=checks))
