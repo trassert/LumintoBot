@@ -78,7 +78,9 @@ async def callback_action(event: events.CallbackQuery.Event):
             if bets_json != {}:
                 return await event.reply(
                     phrase.crocodile.down_payed.format(
-                        user=user, money=formatter.value_to_str(bets, "изумруд"), word=word
+                        user=user,
+                        money=formatter.value_to_str(bets, "изумруд"),
+                        word=word,
                     )
                 )
             return await event.reply(phrase.crocodile.down.format(word))
@@ -95,7 +97,9 @@ async def callback_action(event: events.CallbackQuery.Event):
         item = shop[items[int(data[1])]]
         if balance < item["price"]:
             return await event.answer(
-                phrase.money.not_enough.format(formatter.value_to_str(balance, "изумруд")),
+                phrase.money.not_enough.format(
+                    formatter.value_to_str(balance, "изумруд")
+                ),
                 alert=True,
             )
         try:
@@ -142,34 +146,52 @@ async def callback_action(event: events.CallbackQuery.Event):
     elif data[0] == "nick":
         if event.sender_id != int(data[2]):
             return await event.answer(phrase.not_for_you)
-        if db.nicks(id=event.sender_id).get() == data[1]:
+        old_nick = db.nicks(id=event.sender_id).get()
+        if old_nick == data[1]:
             return await event.answer(phrase.nick.already_you, alert=True)
         balance = db.get_money(event.sender_id)
         if balance - config.coofs.PriceForChangeNick < 0:
             return await event.answer(
-                phrase.money.not_enough.format(formatter.value_to_str(balance, "изумруд"))
+                phrase.money.not_enough.format(
+                    formatter.value_to_str(balance, "изумруд")
+                ),
+                alert=True,
             )
+        try:
+            async with MinecraftClient(
+                host=config.tokens.rcon.host,
+                port=config.tokens.rcon.port,
+                password=config.tokens.rcon.password,
+            ) as rcon:
+                await rcon.send(f"swl remove {old_nick}")
+                await rcon.send(f"swl add {data[1]}")
+        except Exception:
+            logger.error("Внутренняя ошибка при управлении белым списком")
+            return await event.answer(phrase.nick.error, alert=True)
         db.add_money(event.sender_id, -config.coofs.PriceForChangeNick)
         db.nicks(data[1], event.sender_id).link()
         user_name = await get_name(data[2])
         return await event.reply(
             phrase.nick.buy_nick.format(
                 user=user_name,
-                price=formatter.value_to_str(config.coofs.PriceForChangeNick, "изумруд"),
+                price=formatter.value_to_str(
+                    config.coofs.PriceForChangeNick, "изумруд"
+                ),
             )
         )
     elif data[0] == "casino":
         request = WaitCasino.request()
         if request is not True:
             return await event.answer(
-                phrase.casino.floodwait.format(request),
-                alert=True
+                phrase.casino.floodwait.format(request), alert=True
             )
         if data[1] == "auto":
             balance = db.get_money(event.sender_id)
             if balance < config.coofs.PriceForCasino:
                 return await event.answer(
-                    phrase.money.not_enough.format(formatter.value_to_str(balance, "изумруд")),
+                    phrase.money.not_enough.format(
+                        formatter.value_to_str(balance, "изумруд")
+                    ),
                     alert=True,
                 )
             db.add_money(event.sender_id, -config.coofs.PriceForCasino)
@@ -201,7 +223,9 @@ async def callback_action(event: events.CallbackQuery.Event):
                     phrase.casino.partially_auto.format(await get_name(event.sender_id))
                 )
             else:
-                await db.Users.add_lose_money(event.sender_id, config.coofs.PriceForCasino)
+                await db.Users.add_lose_money(
+                    event.sender_id, config.coofs.PriceForCasino
+                )
                 logger.info(f"{event.sender_id} проиграл в казино")
                 await asyncio.sleep(2)
                 return await fm.edit(
@@ -223,7 +247,9 @@ async def callback_action(event: events.CallbackQuery.Event):
             state = db.state(data[2])
             if state.price > balance:
                 return await event.answer(
-                    phrase.money.not_enough.format(formatter.value_to_str(balance, "изумруд")),
+                    phrase.money.not_enough.format(
+                        formatter.value_to_str(balance, "изумруд")
+                    ),
                     alert=True,
                 )
             db.add_money(event.sender_id, -state.price)
@@ -281,7 +307,7 @@ async def callback_action(event: events.CallbackQuery.Event):
                     phrase.money.not_enough.format(
                         formatter.value_to_str(balance, "изумруд")
                     ),
-                    alert=True
+                    alert=True,
                 )
             if db.states.check(state_name) is True:
                 return await event.answer(phrase.state.already_here, alert=True)
@@ -289,8 +315,7 @@ async def callback_action(event: events.CallbackQuery.Event):
             db.states.add(state_name, event.sender_id)
             await event.reply(
                 phrase.state.make_by_callback.format(
-                    author=await get_name(event.sender_id),
-                    state_name=state_name
+                    author=await get_name(event.sender_id), state_name=state_name
                 )
             )
             return await client.send_message(
