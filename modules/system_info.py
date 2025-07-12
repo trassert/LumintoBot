@@ -1,5 +1,6 @@
 import psutil
 import platform
+import WinTmp
 from time import time
 
 
@@ -24,13 +25,15 @@ def get_system_info():
     disk_total = disk_usage.total / (1024 * 1024 * 1024)
     disk_used = disk_usage.used / (1024 * 1024 * 1024)
     disk_free = disk_usage.free / (1024 * 1024 * 1024)
+    temp = WinTmp.CPU_Temps()
     return f"""⚙️ : Информация о хостинге:
     Время работы: {result}
     ОС: {platform.system()} {platform.release()}
     Процессор:
         Частота: {int(psutil.cpu_freq().current)} МГц
         Ядра/Потоки: {psutil.cpu_count(logical=False)}/{psutil.cpu_count(logical=True)}
-        Загрузка: {psutil.cpu_percent()} %
+        Загрузка: {psutil.cpu_percent(0.5)} %
+        °С (↑|≈|↓): {round(max(temp))}|{round(max(temp)/len(temp))}|{round(min(temp))} 
     Память:
         Общий объем: {mem_total:.1f} ГБ
         Доступно: {mem_avail:.1f} ГБ
