@@ -221,7 +221,7 @@ async def word_request(event: Message):
     return await event.reply(phrase.word.set.format(word=word))
 
 
-@client.on(events.NewMessage(pattern=r"(?i)^/слова\s(.+)", func=checks))
+@client.on(events.NewMessage(pattern=r"(?i)^/слова\s([\s\S]+)", func=checks))
 async def word_requests(event: Message):
     words = event.pattern_match.group(1).strip().lower().split()
     text = ""
@@ -261,19 +261,10 @@ async def word_requests(event: Message):
                 )
             ]
         )
-        hint = None
-        while hint is None:
-            hint = await ai.response(
-                f'Сделай подсказку для слова "{word}". '
-                'Ни в коем случае не добавляй никаких "подсказка для слова.." '
-                "и т.п, ответ должен содержать только подсказку. "
-                "Не забудь, что подсказка не должна "
-                "содержать слово в любом случае. "
-            )
         try:
             await client.send_message(
                 config.tokens.bot.creator,
-                phrase.word.request.format(user=entity, word=word, hint=hint),
+                phrase.word.request.format(user=entity, word=word, hint=(await ai.crocodile.send_message(word)).text),
                 buttons=keyboard,
             )
             text += f"Слово **{word}** - проверяется\n"
