@@ -33,7 +33,7 @@ def get_system_info():
         Частота: {int(psutil.cpu_freq().current)} МГц
         Ядра/Потоки: {psutil.cpu_count(logical=False)}/{psutil.cpu_count(logical=True)}
         Загрузка: {psutil.cpu_percent(0.5)} %
-        °С (↑|≈|↓): {round(max(temp))}|{round(max(temp)/len(temp))}|{round(min(temp))} 
+        Температура ↑|≈|↓: {round(max(temp))} | {round(sum(temp)/len(temp))} | {round(min(temp))} 
     Память:
         Общий объем: {mem_total:.1f} ГБ
         Доступно: {mem_avail:.1f} ГБ
