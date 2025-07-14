@@ -210,19 +210,10 @@ async def word_request(event: Message):
             )
         ]
     )
-    hint = None
-    while hint is None:
-        hint = await ai.response(
-            f'Сделай подсказку для слова "{word}". '
-            'Ни в коем случае не добавляй никаких "подсказка для слова.." '
-            "и т.п, ответ должен содержать только подсказку. "
-            "Не забудь, что подсказка не должна "
-            "содержать слово в любом случае. "
-        )
     try:
         await client.send_message(
             config.tokens.bot.creator,
-            phrase.word.request.format(user=entity, word=word, hint=hint),
+            phrase.word.request.format(user=entity, word=word, hint=(await ai.crocodile.send_message(word)).text),
             buttons=keyboard,
         )
     except TGErrors.ButtonDataInvalidError:
