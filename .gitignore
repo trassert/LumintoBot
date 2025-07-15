@@ -25,6 +25,7 @@ test.*
 **/__pycache__/
 .venv
 .env
+.vscode
 
 map.html
 tokens.yml

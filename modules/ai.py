@@ -1,41 +1,18 @@
-import aiohttp
+from loguru import logger
+
+logger.info(f"Загружен модуль {__name__}!")
 
 from google import genai
 from google.genai import types
 
-from requests import codes
-from loguru import logger
+from . import config
 
-from . import config, formatter
-
-
-ai_servers = ["trassert0reserve.pythonanywhere.com", "trassert.pythonanywhere.com"]
 model = "gemini-2.5-flash-lite-preview-06-17"
 client = genai.Client(
     api_key=config.tokens.gemini,
     http_options=types.HttpOptions(
         async_client_args={"proxy": config.tokens.proxy},
-    ),
+    )
 )
 chat = client.aio.chats.create(model=model)
 crocodile = client.aio.chats.create(model=model)
-
-
-async def response(message):
-    "Запрос к Google Gemini"
-    async with aiohttp.ClientSession() as session:
-        for server in ai_servers:
-            (
-                logger.info(f"Выполняю запрос к AI: {message}")
-                if len(message) < 100
-                else logger.info(f"Выполняю запрос к AI: {message[:100]}...")
-            )
-            try:
-                async with session.get(
-                    url=f"https://{server}/gemini?q={message}&token={config.tokens.google}"
-                ) as request:
-                    if request.status == codes.ok:
-                        return formatter.rm_badtext(await request.text())
-            except Exception:
-                pass
-    return None
