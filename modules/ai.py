@@ -12,7 +12,7 @@ client = genai.Client(
     api_key=config.tokens.gemini,
     http_options=types.HttpOptions(
         async_client_args={"proxy": config.tokens.proxy},
-    )
+    ),
 )
 chat = client.aio.chats.create(model=model)
 crocodile = client.aio.chats.create(model=model)

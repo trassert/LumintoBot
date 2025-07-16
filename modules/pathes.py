@@ -16,7 +16,6 @@ bot_path = path.join("db", "bot")
 old_states_path = path.join("backup", "states")
 states_path = path.join("db", "states")
 times_path = path.join("db", "time")
+notes_path = path.join("db", "notes")
 
 pic_path = "images"
-notes_path = "notes"
-

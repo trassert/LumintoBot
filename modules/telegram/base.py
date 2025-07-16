@@ -213,7 +213,11 @@ async def word_request(event: Message):
     try:
         await client.send_message(
             config.tokens.bot.creator,
-            phrase.word.request.format(user=entity, word=word, hint=(await ai.crocodile.send_message(word)).text),
+            phrase.word.request.format(
+                user=entity,
+                word=word,
+                hint=(await ai.crocodile.send_message(word)).text,
+            ),
             buttons=keyboard,
         )
     except TGErrors.ButtonDataInvalidError:
@@ -264,7 +268,11 @@ async def word_requests(event: Message):
         try:
             await client.send_message(
                 config.tokens.bot.creator,
-                phrase.word.request.format(user=entity, word=word, hint=(await ai.crocodile.send_message(word)).text),
+                phrase.word.request.format(
+                    user=entity,
+                    word=word,
+                    hint=(await ai.crocodile.send_message(word)).text,
+                ),
                 buttons=keyboard,
             )
             text += f"Слово **{word}** - проверяется\n"

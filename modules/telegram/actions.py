@@ -2,13 +2,12 @@ from loguru import logger
 
 logger.info(f"Загружен модуль {__name__}!")
 
-from asyncio import sleep
 from telethon import events
 
 from .client import client
+from .func import get_name
 
 from .. import config, phrase
-from .func import get_name
 
 
 @client.on(events.ChatAction(chats=config.chats.chat))
