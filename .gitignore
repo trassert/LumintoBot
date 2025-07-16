@@ -12,12 +12,11 @@ db/tickets.json
 db/crocodile/*
 db/timings/*
 db/users/*
+db/notes/*
 
 backup/states/*
 
 images/*
-
-notes/*
 charts/*
 
 test.*
