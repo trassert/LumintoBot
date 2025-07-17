@@ -393,6 +393,7 @@ async def swap_money(event: Message):
     )
 
 
+@client.on(events.NewMessage(pattern=r"(?i)^/изумруды$", func=checks))
 @client.on(events.NewMessage(pattern=r"(?i)^/баланс$", func=checks))
 @client.on(events.NewMessage(pattern=r"(?i)^баланс$", func=checks))
 @client.on(events.NewMessage(pattern=r"(?i)^/wallet", func=checks))
