@@ -627,3 +627,12 @@ class Notes:
             return False
         remove(file_path)
         return True
+
+    def get_all(self) -> list[str]:
+        if path.exists(self.storage_dir):
+            return [
+                path.splitext(f)[0]
+                for f in listdir(self.storage_dir)
+                if path.isfile(path.join(self.storage_dir, f))
+            ]
+        return []

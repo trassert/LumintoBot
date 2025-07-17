@@ -69,3 +69,14 @@ async def get_note(event: Message):
             silent=True,
             link_preview=False
         )
+
+
+@client.on(events.NewMessage(pattern=r"(?i)^/notes$", func=checks))
+@client.on(events.NewMessage(pattern=r"(?i)^/ноты$", func=checks))
+async def get_all_notes(event: Message):
+    text = ""
+    n = 1
+    for name in db.Notes().get_all():
+        text+=f"{n}. {name}\n"
+        n += 1
+    return await event.reply(phrase.notes.alltext.format(text))
