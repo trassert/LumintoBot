@@ -911,7 +911,7 @@
         },
         "Древние обломки": {
             "name": "minecraft:ancient_debris",
-            "price": 20,
+            "price": 64,
             "value": 3
         },
         "Железная конская броня": {
