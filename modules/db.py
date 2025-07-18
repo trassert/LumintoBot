@@ -68,7 +68,7 @@ def database(key, value=None, delete=None, log=True):
 def get_money(id):
     id = str(id)
     with open(money_path, "rb") as f:
-        load = json.load(f.read())
+        load = orjson.loads(f.read())
         if id in load:
             return load[id]
 
