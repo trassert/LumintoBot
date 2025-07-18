@@ -35,7 +35,7 @@ ChanceToDie: 0.011
 ChanceToBoost: 0.009
 
 # Количество изумрудов
-MineMaxGems: 15
+MineMaxGems: 10
 MineMaxBoost: 80
 
 # Цены
