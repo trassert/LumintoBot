@@ -454,6 +454,8 @@ class notes:
     noname = "🧐 : Не хватает названия заметки"
     already_added = "📝 : Заметка уже есть"
     alltext = "📝 : Все заметки:\n{}"
+    not_found = "📝 : Заметка не найдена"
+    deleted = "🗑 : Заметка удалена"
 
 
 class rcon:

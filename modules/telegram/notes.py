@@ -80,3 +80,17 @@ async def get_all_notes(event: Message):
         text+=f"{n}. {name}\n"
         n += 1
     return await event.reply(phrase.notes.alltext.format(text))
+
+
+@client.on(events.NewMessage(pattern=r"(?i)^\-нот (.+)$", func=checks))
+@client.on(events.NewMessage(pattern=r"(?i)^\-note (.+)$", func=checks))
+@client.on(events.NewMessage(pattern=r"(?i)^\-text (.+)$", func=checks))
+async def del_note_notext(event: Message):
+    roles = db.roles()
+    if roles.get(event.sender_id) < roles.VIP:
+        return await event.reply(
+            phrase.roles.no_perms.format(level=roles.VIP, name=phrase.roles.vip)
+        )
+    if not db.Notes().remove(event.pattern_match.group(1).strip()):
+        return await event.reply(phrase.notes.not_found)
+    return await event.reply(phrase.notes.deleted)
