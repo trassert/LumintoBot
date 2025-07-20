@@ -126,24 +126,23 @@ async def state_callback(event: events.CallbackQuery.Event):
                 ),
                 alert=True,
             )
+        if db.state(state_name).rename(data[2].capitalize()) is False:
+            return await event.answer(phrase.state.already_here, alert=True)
         db.add_money(event.sender_id, -config.coofs.PriceForChangeStateNick)
-        if db.state(state_name).rename(data[2].capitalize()):
-            await event.reply(
-                phrase.state.renamed.format(
-                    old=state_name.capitalize(),
-                    new=data[2].capitalize()
-                )
+        await event.reply(
+            phrase.state.renamed.format(
+                old=state_name.capitalize(),
+                new=data[2].capitalize()
             )
-            return await client.send_message(
-                entity=config.chats.chat,
-                message=phrase.state.renamed.format(
-                    old=state_name.capitalize(),
-                    new=data[2].capitalize()
-                ),
-                reply_to=config.chats.topics.rp,
-            )
-        db.add_money(event.sender_id, +config.coofs.PriceForChangeStateNick)
-        return await event.answer(phrase.state.already_here, alert=True)
+        )
+        return await client.send_message(
+            entity=config.chats.chat,
+            message=phrase.state.renamed.format(
+                old=state_name.capitalize(),
+                new=data[2].capitalize()
+            ),
+            reply_to=config.chats.topics.rp,
+        )
 
 
 @client.on(events.CallbackQuery(func=checks, pattern=r"^casino"))

@@ -542,7 +542,7 @@ async def state_rename(event: Message):
         ]
     ]
     return await event.reply(
-        phrase.state.rename.format(config.coofs.PriceForCasino),
+        phrase.state.rename.format(new_name.capitalize()),
         buttons=keyboard,
         parse_mode="html"
     )
