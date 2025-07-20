@@ -403,8 +403,11 @@ class ticket:
 
 class state:
     def __init__(self, name):
-        self.name = name
-        with open(path.join(states_path, f"{name}.json"), "rb") as f:
+        self.name: str = name
+        self._info()
+
+    def _info(self):
+        with open(path.join(states_path, f"{self.name}.json"), "rb") as f:
             all = orjson.loads(f.read())
         self.all = all
         self.price = all["price"]
@@ -423,6 +426,17 @@ class state:
         ) as f:
             self.all[key] = value
             json.dump(self.all, f, indent=4, ensure_ascii=False, sort_keys=True)
+
+    def rename(self, new_name: str):
+        if path.exists(path.join(states_path, f"{new_name}.json")):
+            return False
+        else:
+            replace(
+                path.join(states_path, f"{self.name}.json"),
+                path.join(states_path, f"{new_name}.json"),
+            )
+            self.name = new_name
+            self._info()
 
 
 class states:

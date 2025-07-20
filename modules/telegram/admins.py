@@ -174,9 +174,10 @@ async def parse(event: Message):
     roles = db.roles()
     if roles.get(event.sender_id) < roles.ADMIN:
         return await event.reply(
-            phrase.roles.no_perms.format(level=roles.VIP, name=phrase.roles.vip)
+            phrase.roles.no_perms.format(level=roles.ADMIN, name=phrase.roles.admin)
         )
     arg = event.pattern_match.group(1).strip()
-    await event.reply(f"arg %{arg}%")
+    await event.reply(f"html\n%\n{arg}\n%", parse_mode="html")
+    await event.reply(f"mkd\n%\n{arg}\n%")
     await event.reply(f"get-id %{await get_id(arg)}%")
     await event.reply(f"get-name %{await get_name(arg)}%")

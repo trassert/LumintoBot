@@ -4,7 +4,6 @@ logger.info(f"Загружен модуль {__name__}!")
 
 import ping3
 import re
-import asyncio
 
 from time import time
 from random import choice, randint, random
@@ -512,18 +511,3 @@ async def vote(event: Message):
     return await client.send_message(
         event.chat_id, reply_to=event.id, message=phrase.vote, link_preview=False
     )
-
-
-@client.on(events.NewMessage(pattern=r"(?i)^/тест$", func=checks))
-async def test(event: Message):
-    t1 = time()
-    # await event.reply(
-    #     f"urid {await db.Users.get_by_id(event.sender_id)}"
-    # )
-    # await event.reply(
-    #     f"allid {await db.Users.get_all()}"
-    # )
-
-    message = await event.reply(f"ping is {round(time() - t1, 2)} s.")
-    await asyncio.sleep(3)
-    await message.edit("edited.")

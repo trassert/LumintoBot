@@ -519,3 +519,30 @@ async def state_kick_user_empty(event: Message):
     return await event.reply(
         phrase.state.kicked.format(await get_name(user, minecraft=True))
     )
+
+
+@client.on(events.NewMessage(pattern=r"(?i)^/г название (.+)", func=checks))
+@client.on(events.NewMessage(pattern=r"(?i)^/г нейм (.+)", func=checks))
+@client.on(events.NewMessage(pattern=r"(?i)^/г name (.+)", func=checks))
+@client.on(events.NewMessage(pattern=r"(?i)^/г переназвать (.+)", func=checks))
+@client.on(events.NewMessage(pattern=r"(?i)^/название госва (.+)", func=checks))
+async def state_rename(event: Message):
+    state_name = db.states.if_author(event.sender_id)
+    if state_name is False:
+        return await event.reply(phrase.state.not_a_author)
+    new_name: str = event.pattern_match.group(1).strip()
+    if db.states.check(new_name.capitalize()):
+        return await event.reply(phrase.state.already_here)
+    keyboard = [
+        [
+            KeyboardButtonCallback(
+                text=phrase.state.button_rename,
+                data=f"state.rn.{new_name}.{event.sender_id}".encode()
+            )
+        ]
+    ]
+    return await event.reply(
+        phrase.state.rename.format(config.coofs.PriceForCasino),
+        buttons=keyboard,
+        parse_mode="html"
+    )
