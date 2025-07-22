@@ -34,22 +34,3 @@ async def chat_action(event: events.ChatAction.Event):
         return await client.send_message(
             config.chats.chat, phrase.chataction.hello.format(user_name)
         )
-
-
-@client.on(events.NewMessage(chats=config.chats.chat))
-async def zalgomainfilter(event: Message):
-    if formatter.check_zalgo(event.text) > 70:
-        try:
-            await client.edit_permissions(
-                config.chats.chat,
-                event.user_id,
-                until_date=timedelta(hours=1),
-                send_messages=False
-            )
-            return await client.send_message(
-                config.chats.chat,
-                phrase.chataction.zalgo.format(await get_name(event.user_id, push=False)),
-                silent=False
-            )
-        except Exception:
-            pass
