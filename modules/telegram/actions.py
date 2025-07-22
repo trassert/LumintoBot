@@ -17,7 +17,7 @@ async def chat_action(event: events.ChatAction.Event):
         return await client.send_message(
             config.chats.chat, phrase.chataction.leave.format(user_name)
         )
-    elif event.user_joined:
+    elif event.user_joined or event.user_added:
         if formatter.check_zalgo(user_name) > 50: 
             await client.edit_permissions(
                 config.chats.chat,
