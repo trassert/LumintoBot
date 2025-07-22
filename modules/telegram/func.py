@@ -11,7 +11,7 @@ from .client import client
 
 
 async def get_name(id, push=False, minecraft=False):
-    "Выдает @пуш, если нет - имя + фамилия"
+    "Выдает имя + фамилия, либо @пуш"
     try:
         if minecraft is True:
             nick = db.nicks(id=int(id)).get()
