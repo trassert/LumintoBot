@@ -468,7 +468,15 @@ class states:
             return True
         return False
 
-    def get_all():
+    def get_all(sortedby="players"):
+        """Выдаёт все государства, сортированные по sortedby
+
+        Args:
+            sortedby (str, optional): Автоматическая сортировка. По умолчанию "players".
+
+        Returns:
+            dict: Все государства сортированные в реверсе
+        """
         all = {}
         for file in listdir(states_path):
             with open(path.join(states_path, file), "rb") as f:
@@ -477,7 +485,7 @@ class states:
                 except json.decoder.JSONDecodeError:
                     logger.error(f"Не удалось просмотреть гос-во {file}")
         return dict(
-            sorted(all.items(), key=lambda item: len(item[1]["players"]), reverse=True)
+            sorted(all.items(), key=lambda item: len(item[1][sortedby]), reverse=True)
         )
 
     def if_author(id: int):
