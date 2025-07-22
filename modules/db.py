@@ -471,10 +471,10 @@ class states:
     def get_all(sortedby="players"):
         """Выдаёт все государства, сортированные по sortedby
 
-        Args:
-            sortedby (str, optional): Автоматическая сортировка. По умолчанию "players".
-
-        Returns:
+        Аргумент:
+            sortedby (str, optional): Автоматическая сортировка. По умолчанию "players",
+            может быть "money"
+        Возвращает:
             dict: Все государства сортированные в реверсе
         """
         all = {}
@@ -484,9 +484,11 @@ class states:
                     all[file.replace(".json", "")] = orjson.loads(f.read())
                 except json.decoder.JSONDecodeError:
                     logger.error(f"Не удалось просмотреть гос-во {file}")
-        return dict(
-            sorted(all.items(), key=lambda item: len(item[1][sortedby]), reverse=True)
-        )
+        if sortedby == "money":
+            sort_key = lambda item: item[1][sortedby]
+        else:  # По умолчанию сортируем по количеству игроков
+            sort_key = lambda item: len(item[1]["players"])
+        return dict(sorted(all.items(), key=sort_key, reverse=True))
 
     def if_author(id: int):
         for file in listdir(states_path):

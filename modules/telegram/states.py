@@ -40,6 +40,28 @@ async def states_all(event: Message):
     return await event.reply(text)
 
 
+@client.on(events.NewMessage(pattern=r"(?i)^/toptreasury$", func=checks))
+@client.on(events.NewMessage(pattern=r"(?i)^/topstate@", func=checks))
+@client.on(events.NewMessage(pattern=r"(?i)^/топказна$", func=checks))
+@client.on(events.NewMessage(pattern=r"(?i)^/топ казна$", func=checks))
+@client.on(events.NewMessage(pattern=r"(?i)^/казна топ$", func=checks))
+@client.on(events.NewMessage(pattern=r"(?i)^/казтоп$", func=checks))
+@client.on(events.NewMessage(pattern=r"(?i)^/ктоп$", func=checks))
+@client.on(events.NewMessage(pattern=r"(?i)^казна топ$", func=checks))
+@client.on(events.NewMessage(pattern=r"(?i)^казтоп$", func=checks))
+async def states_all(event: Message):
+    data = db.states.get_all(sortedby="money")
+    if data == {}:
+        return await event.reply(phrase.state.empty_list)
+    text = phrase.state.toptreasury
+    n = 1
+    for state in data:
+        if data[state]["money"] > 0:
+            text += f'{n}. **{state}** - {data[state]["money"]} изм.\n'
+            n += 1
+    return await event.reply(text)
+
+
 @client.on(events.NewMessage(pattern=r"(?i)^/создать госво\s(.+)", func=checks))
 @client.on(events.NewMessage(pattern=r"(?i)^\+госво\s(.+)", func=checks))
 @client.on(events.NewMessage(pattern=r"(?i)^\+государство\s(.+)", func=checks))
