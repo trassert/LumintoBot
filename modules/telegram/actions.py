@@ -25,7 +25,9 @@ async def chat_action(event: events.ChatAction.Event):
                 send_messages=False
             )
             return await client.send_message(
-                config.chats.chat, phrase.chataction.zalgo.format(user_name)
+                config.chats.chat,
+                phrase.chataction.zalgo.format(user_name),
+                silent=False
             )
         return await client.send_message(
             config.chats.chat, phrase.chataction.hello.format(user_name)
