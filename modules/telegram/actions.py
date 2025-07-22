@@ -17,7 +17,7 @@ async def chat_action(event: events.ChatAction.Event):
         return await client.send_message(
             config.chats.chat, phrase.chataction.leave.format(user_name)
         )
-    elif event.user_joined or event.user_added:
-        await client.send_message(
+    elif event.user_joined:
+        return await client.send_message(
             config.chats.chat, phrase.chataction.hello.format(user_name)
         )
