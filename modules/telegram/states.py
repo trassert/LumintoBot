@@ -192,7 +192,8 @@ async def state_get(event: Message):
         enter = formatter.value_to_str(state.price, "изумруд")
     tasks = [get_name(player, minecraft=True) for player in state.players]
     idented_players = await asyncio.gather(*tasks)
-    return await event.reply(
+    return await client.send_message(
+        event.chat_id,
         phrase.state.get.format(
             type=phrase.state_types[state.type],
             name=state.name.capitalize(),
@@ -205,6 +206,8 @@ async def state_get(event: Message):
             list_players=", ".join(idented_players),
             xyz=state.coordinates,
         ),
+        reply_to=event.id,
+        link_preview=False,
         silent=True,
     )
 
@@ -489,15 +492,13 @@ async def state_kick_user(event: Message):
     await client.send_message(
         entity=config.chats.chat,
         message=choice(phrase.state.kicked_rp).format(
-            state=state_name,
-            player=await get_name(user, minecraft=True)
+            state=state_name, player=await get_name(user, minecraft=True)
         ),
         reply_to=config.chats.topics.rp,
     )
     return await event.reply(
         phrase.state.kicked.format(await get_name(user, minecraft=True))
     )
-
 
 
 @client.on(events.NewMessage(pattern=r"(?i)^/г кик$", func=checks))
@@ -559,14 +560,12 @@ async def state_rename(event: Message):
         [
             KeyboardButtonCallback(
                 text=phrase.state.button_rename,
-                data=f"state.rn.{new_name}.{event.sender_id}".encode()
+                data=f"state.rn.{new_name}.{event.sender_id}".encode(),
             )
         ]
     ]
     return await event.reply(
         phrase.state.rename.format(new_name.capitalize()),
         buttons=keyboard,
-        parse_mode="html"
+        parse_mode="html",
     )
-
-
