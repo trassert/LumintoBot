@@ -1,10 +1,8 @@
 from loguru import logger
-from datetime import timedelta
 
 logger.info(f"Загружен модуль {__name__}!")
 
 from telethon import events
-from telethon.tl.custom import Message
 
 from .client import client
 from .func import get_name
