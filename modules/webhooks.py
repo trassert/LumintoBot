@@ -89,6 +89,12 @@ async def server():
         )
         return aiohttp.web.Response(text="ok")
 
+    async def bank(request):
+        player = request.query.get("player")
+        amount = request.query.get("amount")
+        key = request.query.get("key")
+        return aiohttp.web.Response(text="ok")
+
     app = aiohttp.web.Application()
     app.add_routes(
         [
@@ -96,6 +102,7 @@ async def server():
             aiohttp.web.post("/servers", mcservers),
             aiohttp.web.post("/github", github),
             aiohttp.web.get("/minecraft", minecraft),
+            aiohttp.web.get("/bank", bank),
         ]
     )
     runner = aiohttp.web.AppRunner(app)

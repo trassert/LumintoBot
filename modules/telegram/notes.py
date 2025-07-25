@@ -59,14 +59,12 @@ async def get_note(event: Message):
                 event.chat_id,
                 note_text,
                 reply_to=reply_message.id,
-                silent=True,
                 link_preview=False
             )
         return await client.send_message(
             event.chat_id,
             note_text,
             reply_to=event.id,
-            silent=True,
             link_preview=False
         )
 
