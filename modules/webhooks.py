@@ -90,9 +90,12 @@ async def server():
         return aiohttp.web.Response(text="ok")
 
     async def bank(request):
+        if request.query.get("key") != config.tokens.bankplugin:
+            logger.warning("Неверный пароль (BankPlugin)")
+            return aiohttp.web.Response(text="Неверный пароль.", status=401)
         player = request.query.get("player")
         amount = request.query.get("amount")
-        key = request.query.get("key")
+        
         return aiohttp.web.Response(text="ok")
 
     app = aiohttp.web.Application()
