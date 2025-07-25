@@ -7,6 +7,7 @@ from hashlib import sha1, md5
 
 from . import config, db, phrase, formatter
 from .telegram.client import client
+from .telegram import func
 
 
 async def server():
@@ -93,9 +94,23 @@ async def server():
         if request.query.get("key") != config.tokens.bankplugin:
             logger.warning("Неверный пароль (BankPlugin)")
             return aiohttp.web.Response(text="Неверный пароль.", status=401)
-        player = request.query.get("player")
+        playerid = db.nicks(nick=request.query.get("player")).get()
+        if playerid is None:
+            logger.warning("Неверный игрок (BankPlugin)")
+            return aiohttp.web.Response(text="Неверный игрок.", status=401)
         amount = request.query.get("amount")
-        
+        if not amount > 0 and not amount < 67:
+            logger.warning("Неверное количество (BankPlugin)")
+            return aiohttp.web.Response(text="Неверное количество.", status=401)
+        await client.send_message(
+            config.chats.chat,
+            phrase.add_money.format(
+                player=await func.get_name(playerid, minecraft=True),
+                amount=amount
+            )
+        )
+        db.add_money(playerid, amount)
+        logger.info(f"[Bank] Переведено {amount} изумрудов на счет {playerid}")
         return aiohttp.web.Response(text="ok")
 
     app = aiohttp.web.Application()
