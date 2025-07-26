@@ -98,15 +98,15 @@ async def server():
         if playerid is None:
             logger.warning("Неверный игрок (BankPlugin)")
             return aiohttp.web.Response(text="Неверный игрок.", status=401)
-        amount = request.query.get("amount")
+        amount = int(request.query.get("amount"))
         if not amount > 0 and not amount < 67:
             logger.warning("Неверное количество (BankPlugin)")
             return aiohttp.web.Response(text="Неверное количество.", status=401)
         await client.send_message(
             config.chats.chat,
-            phrase.add_money.format(
+            phrase.mcadd_money.format(
                 player=await func.get_name(playerid, minecraft=True),
-                amount=amount
+                amount=formatter.value_to_str(amount, "изумруд")
             )
         )
         db.add_money(playerid, amount)
