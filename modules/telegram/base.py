@@ -420,12 +420,15 @@ async def money_to_server(event: Message):
     if balance < arg:
         return await event.reply(phrase.money.not_enough.format(formatter.value_to_str(balance, "изумруд")))
     db.add_money(event.sender_id, -arg)
-    async with MinecraftClient(
-        host=config.tokens.rcon.host,
-        port=config.tokens.rcon.port,
-        password=config.tokens.rcon.password,
-    ) as rcon:
-        await rcon.send(f"invgive {nick} emerald {arg}")
+    try:
+        async with MinecraftClient(
+            host=config.tokens.rcon.host,
+            port=config.tokens.rcon.port,
+            password=config.tokens.rcon.password,
+        ) as rcon:
+            await rcon.send(f"invgive {nick} emerald {arg}")
+    except Exception:
+        db.add_money()
 
 
 @client.on(events.NewMessage(pattern=r"(?i)^/вывести$", func=checks))

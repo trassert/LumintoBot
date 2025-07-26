@@ -666,8 +666,6 @@ class Notes:
 def check_withdraw_limit(id: int, amount: int) -> int | bool:
     if amount > 64:
         return 64
-    if amount <= 0:
-        return False
     today = datetime.now().date()
     if not path.exists(withdraws_path):
         logger.error("Файл вывода не найден!")
