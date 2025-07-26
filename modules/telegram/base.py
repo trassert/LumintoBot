@@ -430,7 +430,10 @@ async def money_to_server(event: Message):
     except Exception:
         db.add_money(event.sender_id, arg)
         db.check_withdraw_limit(event.sender_id, -arg)
-    
+        return await event.reply(phrase.bank.error)
+    return await event.reply(
+        phrase.bank.withdraw.format(formatter.value_to_str(arg, "изумруд"))
+    )
 
 
 @client.on(events.NewMessage(pattern=r"(?i)^/вывести$", func=checks))
