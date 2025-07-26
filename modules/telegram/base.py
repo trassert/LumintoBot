@@ -428,7 +428,9 @@ async def money_to_server(event: Message):
         ) as rcon:
             await rcon.send(f"invgive {nick} emerald {arg}")
     except Exception:
-        db.add_money()
+        db.add_money(event.sender_id, arg)
+        db.check_withdraw_limit(event.sender_id, -arg)
+    
 
 
 @client.on(events.NewMessage(pattern=r"(?i)^/вывести$", func=checks))
