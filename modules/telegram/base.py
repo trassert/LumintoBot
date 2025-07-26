@@ -400,10 +400,32 @@ async def swap_money(event: Message):
 @client.on(events.NewMessage(pattern=r"(?i)^/в маин (.+)", func=checks))
 @client.on(events.NewMessage(pattern=r"(?i)^вывести (.+)", func=checks))
 async def money_to_server(event: Message):
+    nick = db.nicks(id=event.sender_id).get()
+    if nick is None:
+        return await event.reply(phrase.nick.not_append)
     try:
         arg = int(event.pattern_match.group(1).strip())
     except Exception:
         return await event.reply(phrase.money.nan_count)
+    if arg < 1:
+        return await event.reply(phrase.money.negative_count)
+    if arg > config.coofs.WithdrawDailyLimit:
+        return await event.reply(
+            phrase.bank.daily_limit
+        )
+    amount = db.check_withdraw_limit(event.sender_id, arg)
+    if amount is not True:
+        return await event.reply(phrase.bank.limit.format(formatter.value_to_str(amount, "изумруд")))
+    balance = db.get_money(event.sender_id)
+    if balance < arg:
+        return await event.reply(phrase.money.not_enough.format(formatter.value_to_str(balance, "изумруд")))
+    db.add_money(event.sender_id, -arg)
+    async with MinecraftClient(
+        host=config.tokens.rcon.host,
+        port=config.tokens.rcon.port,
+        password=config.tokens.rcon.password,
+    ) as rcon:
+        await rcon.send(f"invgive {nick} emerald {arg}")
 
 
 @client.on(events.NewMessage(pattern=r"(?i)^/вывести$", func=checks))

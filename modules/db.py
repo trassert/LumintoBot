@@ -3,7 +3,7 @@ import aiomysql
 
 from typing import Dict
 from loguru import logger
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, date
 from os import path, listdir, replace, makedirs, remove
 from time import time
 from random import choice, randint
@@ -192,9 +192,7 @@ class crocodile_stat:
         if self.id in load:
             return load[self.id]
         else:
-            with open(
-                path.join("db", "crocodile_stat.json"), "rb"
-            ) as f:
+            with open(path.join("db", "crocodile_stat.json"), "rb") as f:
                 load[self.id] = 0
                 json.dump(load, f, indent=4, ensure_ascii=False, sort_keys=True)
             return 0
@@ -564,7 +562,10 @@ class Mysql:
                 )
                 result = await cur.fetchone()
                 if result:
-                    return {"wins_casino": result[0], "lose_moneys_in_casino": result[1]}
+                    return {
+                        "wins_casino": result[0],
+                        "lose_moneys_in_casino": result[1],
+                    }
                 return {"wins_casino": 0, "lose_moneys_in_casino": 0}
 
     async def get_all(self) -> Dict[int, Dict[str, int]]:
@@ -614,7 +615,7 @@ Users = Mysql(
     user=config.tokens.mysql_users.user,
     password=config.tokens.mysql_users.password,
     db=config.tokens.mysql_users.database,
-    table_name=config.tokens.mysql_users.table
+    table_name=config.tokens.mysql_users.table,
 )
 
 
@@ -660,3 +661,39 @@ class Notes:
                 if path.isfile(path.join(self.storage_dir, f))
             ]
         return []
+
+
+def check_withdraw_limit(id: int, amount: int) -> int | bool:
+    if amount > 64:
+        return 64
+    if amount <= 0:
+        return False
+    today = datetime.now().date()
+    if not path.exists(withdraws_path):
+        logger.error("Файл вывода не найден!")
+        data = {}
+    else:
+        with open(withdraws_path, "rb") as f:
+            try:
+                data = orjson.loads(f.read())
+            except orjson.JSONDecodeError:
+                logger.error("Ошибка при чтении файла вывода!")
+                data = {}
+    if str(id) in data:
+        record_date = datetime.strptime(data[str(id)]["date"], "%Y-%m-%d").date()
+        if record_date == today:
+            already_withdrawn = data[str(id)]["withdrawn"]
+            remaining = 64 - already_withdrawn
+            if amount > remaining:
+                return remaining
+            else:
+                data[str(id)] = {"date": today.isoformat(), "withdrawn": already_withdrawn+amount}
+        else:
+            # Дата устарела, сбрасываем счетчик
+            data[str(id)] = {"date": today.isoformat(), "withdrawn": amount}
+    else:
+        data[str(id)] = {"date": today.isoformat(), "withdrawn": amount}
+    
+    with open(withdraws_path, "wb") as f:
+        f.write(orjson.dumps(data))
+    return True

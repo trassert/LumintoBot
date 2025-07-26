@@ -43,3 +43,6 @@ PriceForChangeNick: 5
 PriceForCasino: 5
 PriceForNewState: 25
 PriceForChangeStateNick: 40
+
+# Максимум вывода в день
+WithdrawDailyLimit: 64
