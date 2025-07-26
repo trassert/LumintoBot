@@ -346,7 +346,7 @@ async def check_nick(event: Message):
 @client.on(events.NewMessage(pattern=r"(?i)^/перевести(.*)", func=checks))
 @client.on(events.NewMessage(pattern=r"(?i)^перевести(.*)", func=checks))
 async def swap_money(event: Message):
-    args = event.pattern_match.group(1).strip()
+    args: str = event.pattern_match.group(1).strip()
     if len(args) < 1:
         return await event.reply(phrase.money.no_count + phrase.money.swap_balance_use)
     args = args.split()
@@ -390,6 +390,31 @@ async def swap_money(event: Message):
     return await event.reply(
         phrase.money.swap_money.format(formatter.value_to_str(count, "изумруд"))
     )
+
+
+@client.on(events.NewMessage(pattern=r"(?i)^/вывести (.+)", func=checks))
+@client.on(events.NewMessage(pattern=r"(?i)^/вывод (.+)", func=checks))
+@client.on(events.NewMessage(pattern=r"(?i)^/вмайн (.+)", func=checks))
+@client.on(events.NewMessage(pattern=r"(?i)^/в майн (.+)", func=checks))
+@client.on(events.NewMessage(pattern=r"(?i)^/вмаин (.+)", func=checks))
+@client.on(events.NewMessage(pattern=r"(?i)^/в маин (.+)", func=checks))
+@client.on(events.NewMessage(pattern=r"(?i)^вывести (.+)", func=checks))
+async def money_to_server(event: Message):
+    try:
+        arg = int(event.pattern_match.group(1).strip())
+    except Exception:
+        return await event.reply(phrase.money.nan_count)
+
+
+@client.on(events.NewMessage(pattern=r"(?i)^/вывести$", func=checks))
+@client.on(events.NewMessage(pattern=r"(?i)^/вывод$", func=checks))
+@client.on(events.NewMessage(pattern=r"(?i)^/вмайн$", func=checks))
+@client.on(events.NewMessage(pattern=r"(?i)^/в майн$", func=checks))
+@client.on(events.NewMessage(pattern=r"(?i)^/вмаин$", func=checks))
+@client.on(events.NewMessage(pattern=r"(?i)^/в маин$", func=checks))
+@client.on(events.NewMessage(pattern=r"(?i)^вывести$", func=checks))
+async def money_to_server_empty(event: Message):
+    return await event.reply(phrase.money.no_count)
 
 
 @client.on(events.NewMessage(pattern=r"(?i)^/изумруды$", func=checks))
