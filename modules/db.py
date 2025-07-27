@@ -710,10 +710,14 @@ class RefCodes:
         return self._read().get(str(id), {}).get("used", default)
     def add_own(self, id: int, name: str):
         load = self._read()
+        if str(id) not in load:
+            load[str(id)] = {}
         load[str(id)]["own"] = name
         self._write(load)
     def add_used(self, id: int, name: str):
         load = self._read()
+        if str(id) not in load:
+            load[str(id)] = {}
         load[str(id)]["used"] = name
         self._write(load)
     def check_ref(self, name) -> str:
