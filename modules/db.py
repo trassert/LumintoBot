@@ -705,9 +705,9 @@ class RefCodes:
         with open(ref_path, "wb") as f:
             f.write(orjson.dumps(data, option=orjson.OPT_INDENT_2))
     def get_own(self, id: int, default=None) -> str:
-        return self._read().get(str(id), default).get("own", default)
+        return self._read().get(str(id), {}).get("own", default)
     def check_used(self, id: int, default=False) -> str:
-        return self._read().get(str(id), default).get("used", default)
+        return self._read().get(str(id), {}).get("used", default)
     def add_own(self, id: int, name: str):
         load = self._read()
         load[str(id)]["own"] = name
