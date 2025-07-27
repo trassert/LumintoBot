@@ -13,6 +13,7 @@ font_path = path.join("fonts", "minecraft.ttf")
 chart_path = path.join("charts", "chart.png")
 data_path = path.join("db", "data.json")
 withdraws_path = path.join("db", "users", "withdraws.json")
+ref_path = path.join("db", "users", "ref.json")
 
 bot_path = path.join("db", "bot")
 old_states_path = path.join("backup", "states")

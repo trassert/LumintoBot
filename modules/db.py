@@ -693,5 +693,34 @@ def check_withdraw_limit(id: int, amount: int) -> int | bool:
         data[str(id)] = {"date": today.isoformat(), "withdrawn": amount}
 
     with open(withdraws_path, "wb") as f:
-        f.write(orjson.dumps(data))
+        f.write(orjson.dumps(data), option=orjson.OPT_INDENT_2)
     return True
+
+
+class RefCodes:
+    def _read(self) -> dict:
+        with open(ref_path, "rb") as f:
+            return orjson.loads(f.read())
+    def _write(self, data):
+        with open(ref_path, "wb") as f:
+            f.write(orjson.dumps(data), option=orjson.OPT_INDENT_2)
+    def get_own(self, id: int, default=None) -> str:
+        return self._read().get(str(id), default).get("own",default)
+    def check_used(self, id: int, default=False) -> str:
+        return self._read().get(str(id), default).get("used", default)
+    def add_own(self, id: int, name: str):
+        load = self._read()
+        load[str(id)]["own"] = name
+        self._write(load)
+    def add_used(self, id: int, name: str):
+        load = self._read()
+        load[str(id)]["used"] = name
+        self._write(load)
+    def check_ref(self, name) -> str:
+        load = self._read()
+        for id, data in load.items():
+            try:
+                if data.get("own").lower() == name.lower():
+                    return id
+            except Exception:
+                pass

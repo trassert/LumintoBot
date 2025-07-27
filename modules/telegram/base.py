@@ -182,7 +182,7 @@ async def mine(event: Message):
     return await event.reply(text)
 
 
-@client.on(events.NewMessage(pattern=r"(?i)^/слово\s(.+)", func=checks))
+@client.on(events.NewMessage(pattern=r"(?i)^/слово (.+)", func=checks))
 async def word_request(event: Message):
     word = event.pattern_match.group(1).strip().lower()
     with open(pathes.crocodile_path, "r", encoding="utf-8") as f:
@@ -462,15 +462,16 @@ async def get_balance(event: Message):
     )
 
 
-@client.on(events.NewMessage(pattern=r"(?i)^/linknick\s(.+)", func=checks))
-@client.on(events.NewMessage(pattern=r"(?i)^/привязать\s(.+)", func=checks))
-@client.on(events.NewMessage(pattern=r"(?i)^привязать\s(.+)", func=checks))
-@client.on(events.NewMessage(pattern=r"(?i)^/новый ник\s(.+)", func=checks))
-@client.on(events.NewMessage(pattern=r"(?i)^/линкник\s(.+)", func=checks))
+@client.on(events.NewMessage(pattern=r"(?i)^/linknick (\S+)\s*(\S*)$", func=checks))
+@client.on(events.NewMessage(pattern=r"(?i)^/привязать (\S+)\s*(\S*)$", func=checks))
+@client.on(events.NewMessage(pattern=r"(?i)^привязать (\S+)\s*(\S*)$", func=checks))
+@client.on(events.NewMessage(pattern=r"(?i)^/новый ник (\S+)\s*(\S*)$", func=checks))
+@client.on(events.NewMessage(pattern=r"(?i)^/линкник (\S+)\s*(\S*)$", func=checks))
 async def link_nick(event: Message):
     if not event.chat_id == config.chats.chat:
         return await event.reply(phrase.nick.chat)
     nick = event.pattern_match.group(1).strip()
+    refcode = event.pattern_match.group(2).strip()
     if len(nick) < 4:
         return await event.reply(phrase.nick.too_short)
     if len(nick) > 16:
@@ -500,6 +501,14 @@ async def link_nick(event: Message):
             ),
             buttons=keyboard,
         )
+    reftext = ""
+    if len(refcode) > 0:
+        author = db.RefCodes().check_ref(refcode) 
+        if author is None:
+            return await event.reply(phrase.ref.invalid)
+        db.add_money(author, config.coofs.RefGift)
+        db.add_money(event.sender_id, config.coofs.RefGift)
+        reftext = phrase.ref.gift.format(config.coofs.RefGift)
     try:
         async with MinecraftClient(
             host=config.tokens.rcon.host,
@@ -512,11 +521,20 @@ async def link_nick(event: Message):
         return await event.reply(phrase.nick.error)
     db.add_money(event.sender_id, config.coofs.LinkGift)
     db.nicks(nick, event.sender_id).link()
-    return await event.reply(
+    await event.reply(
         phrase.nick.success.format(
             formatter.value_to_str(config.coofs.LinkGift, "изумруд")
         )
     )
+    if len(reftext) > 0:
+        await event.reply(reftext)
+        await client.send_message(
+            int(author),
+            phrase.ref.used.format(
+                user=await get_name(event.sender_id, minecraft=True),
+                amount=config.coofs.RefGift
+            )
+        )
 
 
 @client.on(events.NewMessage(pattern=r"(?i)^/linknick$", func=checks))

@@ -46,3 +46,6 @@ PriceForChangeStateNick: 40
 
 # Максимум вывода в день
 WithdrawDailyLimit: 64
+
+# Рефералы
+RefGift: 25
