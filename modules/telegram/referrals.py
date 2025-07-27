@@ -2,6 +2,8 @@ from loguru import logger
 
 logger.info(f"Загружен модуль {__name__}!")
 
+import re
+
 from telethon.tl.types import (
     ReplyInlineMarkup,
     KeyboardButtonRow,
@@ -16,6 +18,8 @@ from .client import client
 from .global_checks import *
 from .func import get_name
 
+from .. import db
+
 
 @client.on(events.NewMessage(pattern=r"(?i)^/addrefcode (.+)", func=checks))
 @client.on(events.NewMessage(pattern=r"(?i)^/новыйреф (.+)", func=checks))
@@ -27,7 +31,15 @@ from .func import get_name
 @client.on(events.NewMessage(pattern=r"(?i)^/добавить рефку (.+)", func=checks))
 @client.on(events.NewMessage(pattern=r"(?i)^добавить рефку (.+)", func=checks))
 async def add_refcode(event: Message):
-    pass
+    arg = event.pattern_match.group(1).strip().lower()
+    if not re.match("^[A-Za-z0-9_]*$", arg):
+        return await event.reply(phrase.ref.not_regex)
+    ref = db.RefCodes()
+    if ref.get_own(event.sender_id) is not None:
+        ref.add_own(event.sender_id, arg)
+        return await event.reply(phrase.ref.edited.format(arg))
+    ref.add_own(event.sender_id, arg)
+    return await event.reply(phrase.ref.added.format(arg))
 
 
 @client.on(events.NewMessage(pattern=r"(?i)^/addrefcode$", func=checks))
