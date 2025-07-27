@@ -709,6 +709,8 @@ class RefCodes:
     def check_used(self, id: int, default=False) -> str:
         return self._read().get(str(id), {}).get("used", default)
     def add_own(self, id: int, name: str):
+        if self.check_ref(name) is not None:
+            return False
         load = self._read()
         if str(id) not in load:
             load[str(id)] = {}
