@@ -30,5 +30,6 @@ from . import (
     states,
     statistic,
     tickets,
-    notes
+    notes,
+    referrals
 )
