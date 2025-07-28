@@ -693,7 +693,7 @@ def check_withdraw_limit(id: int, amount: int) -> int | bool:
         data[str(id)] = {"date": today.isoformat(), "withdrawn": amount}
 
     with open(withdraws_path, "wb") as f:
-        f.write(orjson.dumps(data), option=orjson.OPT_INDENT_2)
+        f.write(orjson.dumps(data, option=orjson.OPT_INDENT_2))
     return True
 
 
