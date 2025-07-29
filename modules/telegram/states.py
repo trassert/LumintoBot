@@ -383,10 +383,10 @@ async def state_enter(event: Message):
         return await event.reply(phrase.state.enter_open)
 
 
-@client.on(events.NewMessage(pattern=r"(?i)^/пополнить казну\s(.+)", func=checks))
-@client.on(events.NewMessage(pattern=r"(?i)^/г пополнить\s(.+)", func=checks))
-@client.on(events.NewMessage(pattern=r"(?i)^\+казна\s(.+)", func=checks))
-@client.on(events.NewMessage(pattern=r"(?i)^г пополнить\s(.+)", func=checks))
+@client.on(events.NewMessage(pattern=r"(?i)^/пополнить казну (.+)", func=checks))
+@client.on(events.NewMessage(pattern=r"(?i)^/г пополнить (.+)", func=checks))
+@client.on(events.NewMessage(pattern=r"(?i)^\+казна (.+)", func=checks))
+@client.on(events.NewMessage(pattern=r"(?i)^г пополнить (.+)", func=checks))
 async def state_add_money(event: Message):
     state_name = db.states.if_player(event.sender_id)
     if state_name is False:
@@ -394,7 +394,16 @@ async def state_add_money(event: Message):
         if state_name is False:
             return await event.reply(phrase.state.not_a_member)
     arg: str = event.pattern_match.group(1).strip()
-    if not arg.isdigit():
+    if arg in [
+        "все",
+        "всё",
+        "все деньги",
+        "на все"
+    ]:
+        arg = db.get_money(event.sender_id)
+        if arg <= 0:
+            return await event.reply(phrase.money.negative_count)
+    elif not arg.isdigit():
         return await event.reply(phrase.state.howto_add_balance)
     try:
         arg = int(arg)
