@@ -401,8 +401,6 @@ async def state_add_money(event: Message):
         "на все"
     ]:
         arg = db.get_money(event.sender_id)
-        if arg <= 0:
-            return await event.reply(phrase.money.negative_count)
     elif not arg.isdigit():
         return await event.reply(phrase.state.howto_add_balance)
     try:
@@ -442,7 +440,15 @@ async def state_rem_money(event: Message):
     if state_name is False:
         return await event.reply(phrase.state.not_a_author)
     arg: str = event.pattern_match.group(1).strip()
-    if not arg.isdigit():
+    state = db.state(state_name)
+    if arg in [
+        "все",
+        "всё",
+        "все деньги",
+        "на все"
+    ]:
+        arg = state.money
+    elif not arg.isdigit():
         return await event.reply(phrase.state.howto_rem_balance)
     try:
         arg = int(arg)
@@ -450,7 +456,6 @@ async def state_rem_money(event: Message):
         return await event.reply(phrase.state.howto_rem_balance)
     if arg < 1:
         return await event.reply(phrase.money.negative_count)
-    state = db.state(state_name)
     if state.money < arg:
         return await event.reply(phrase.state.too_low)
     state.change("money", state.money - arg)
