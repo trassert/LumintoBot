@@ -7,7 +7,7 @@ ActiveGift: 15
 PercentForRandomLetter: 0.3
 
 CasinoSleepTime: 150
-CasinoWinRatio: 10
+CasinoWinRatio: 8
 
 CrocodileBetCoo: 2
 CrocodileDefaultMaxBet: 5
@@ -19,7 +19,7 @@ MaxStatPlayers: 10
 # Типы государств
 Type0Players: 1
 Type1Players: 3
-Type2Players: 5
+Type2Players: 6
 
 # Время ожидания в секундах
 MineWait: 14400
@@ -36,7 +36,7 @@ ChanceToBoost: 0.009
 
 # Количество изумрудов
 MineMaxGems: 10
-MineMaxBoost: 80
+MineMaxBoost: 50
 
 # Цены
 PriceForChangeNick: 5
