@@ -79,6 +79,7 @@ async def server():
         "Вебхук для гитхаба"
         load = await request.json()
         head = load["head_commit"]
+        logger.info("Обновление!")
         await client.send_message(
             config.chats.chat,
             phrase.github.format(

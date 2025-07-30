@@ -25,7 +25,7 @@ def get_system_info():
     disk_total = disk_usage.total / (1024 * 1024 * 1024)
     disk_used = disk_usage.used / (1024 * 1024 * 1024)
     disk_free = disk_usage.free / (1024 * 1024 * 1024)
-    # temp = WinTmp.CPU_Temps()
+    temp = WinTmp.CPU_Temps()
     return f"""⚙️ : Информация о хостинге:
     Время работы: {result}
     ОС: {platform.system()} {platform.release()}
