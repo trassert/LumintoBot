@@ -4,7 +4,8 @@ logger.info(f"Загружен модуль {__name__}!")
 
 from telethon import events
 
-from .. import db, func, phrase
+from .. import db, phrase
+from . import func
 
 
 async def checks(event):
