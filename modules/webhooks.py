@@ -70,7 +70,7 @@ async def server():
             logger.info("Неверный пароль (C2HTTP)")
             return aiohttp.web.Response(text="Неверный пароль.", status=401)
         nick = request.query.get("nick")
-        # ! message = request.query.get('message') Для будущих нужд
+        # message = request.query.get('message') Для будущих нужд
         db.statistic.add(nick=nick)
         logger.info(f"+ соо. от {nick}")
         return aiohttp.web.Response(text="ok")
