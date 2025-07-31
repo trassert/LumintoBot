@@ -38,7 +38,7 @@ async def get_id(str: str) -> int:
     if str[-1] == ",":
         str = str[:-1]
     if str.isdigit():
-        if bool(re.fullmatch(r'^@\d+$', str)):
+        if bool(re.fullmatch(r"^@\d+$", str)):
             str = str[1:]
         check = await get_name(int(str))
         if check == "Неопознанный персонаж":

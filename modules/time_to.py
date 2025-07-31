@@ -54,7 +54,7 @@ async def rewards():
         last = get_last_update("stat_update_time")
         seconds = (timedelta(hours=24) - (today - last)).total_seconds()
         "Если время прошло"
-        if today - last > timedelta(hours=24):  
+        if today - last > timedelta(hours=24):
             day_stat = db.statistic().get_all()
             for top in day_stat:
                 tg_id = db.nicks(nick=top[0]).get()
@@ -64,7 +64,9 @@ async def rewards():
                         config.chats.chat,
                         phrase.stat.gift.format(
                             user=top[0],
-                            gift=formatter.value_to_str(config.coofs.ActiveGift, "изумруд"),
+                            gift=formatter.value_to_str(
+                                config.coofs.ActiveGift, "изумруд"
+                            ),
                         ),
                     )
                     logger.info("Начислен подарок за активность!")
@@ -85,10 +87,8 @@ async def remove_states():
             states = db.states.get_all()
             for state in states:
                 state_info = states[state]
-                state_date = list(map(int, state_info["date"].split('.')))
-                if (
-                    len(state_info["players"]) == 0
-                ) and (
+                state_date = list(map(int, state_info["date"].split(".")))
+                if (len(state_info["players"]) == 0) and (
                     today - datetime(state_date[0], state_date[1], state_date[2])
                     > timedelta(days=config.coofs.DaysToStatesRemove)
                 ):
@@ -100,6 +100,8 @@ async def remove_states():
                         message=phrase.state.end.format(state),
                         reply_to=config.chats.topics.rp,
                     )
-            db.database("states_update_time", str(today).split(":")[0] + ":00:00.000000")
+            db.database(
+                "states_update_time", str(today).split(":")[0] + ":00:00.000000"
+            )
         logger.info("Жду до следующей проверки государств...")
         await asyncio.sleep(abs(seconds))

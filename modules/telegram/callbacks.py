@@ -80,9 +80,7 @@ async def state_callback(event: events.CallbackQuery.Event):
             reply_to=config.chats.topics.rp,
         )
         return await event.reply(
-            phrase.state.removed.format(
-                author=await get_name(state.author, push=False)
-            )
+            phrase.state.removed.format(author=await get_name(state.author, push=False))
         )
     elif data[1] == "m":
         if event.sender_id != int(data[2]):
@@ -131,15 +129,13 @@ async def state_callback(event: events.CallbackQuery.Event):
         db.add_money(event.sender_id, -config.coofs.PriceForChangeStateNick)
         await event.reply(
             phrase.state.renamed.format(
-                old=state_name.capitalize(),
-                new=data[2].capitalize()
+                old=state_name.capitalize(), new=data[2].capitalize()
             )
         )
         return await client.send_message(
             entity=config.chats.chat,
             message=phrase.state.renamed.format(
-                old=state_name.capitalize(),
-                new=data[2].capitalize()
+                old=state_name.capitalize(), new=data[2].capitalize()
             ),
             reply_to=config.chats.topics.rp,
         )
@@ -150,9 +146,7 @@ async def casino_callback(event: events.CallbackQuery.Event):
     data = event.data.decode("utf-8").split(".")
     request = floodwait.WaitCasino.request()
     if request is not True:
-        return await event.answer(
-            phrase.casino.floodwait.format(request), alert=True
-        )
+        return await event.answer(phrase.casino.floodwait.format(request), alert=True)
     logger.info(f"КБ кнопка (Casino), дата: {data}")
     if data[1] == "auto":
         balance = db.get_money(event.sender_id)
@@ -192,9 +186,7 @@ async def casino_callback(event: events.CallbackQuery.Event):
                 phrase.casino.partially_auto.format(await get_name(event.sender_id))
             )
         else:
-            await db.Users.add_lose_money(
-                event.sender_id, config.coofs.PriceForCasino
-            )
+            await db.Users.add_lose_money(event.sender_id, config.coofs.PriceForCasino)
             logger.info(f"{event.sender_id} проиграл в казино")
             await asyncio.sleep(2)
             return await fm.edit(
@@ -217,9 +209,7 @@ async def nick_callback(event: events.CallbackQuery.Event):
     balance = db.get_money(event.sender_id)
     if balance - config.coofs.PriceForChangeNick < 0:
         return await event.answer(
-            phrase.money.not_enough.format(
-                formatter.value_to_str(balance, "изумруд")
-            ),
+            phrase.money.not_enough.format(formatter.value_to_str(balance, "изумруд")),
             alert=True,
         )
     try:
@@ -239,9 +229,7 @@ async def nick_callback(event: events.CallbackQuery.Event):
     return await event.reply(
         phrase.nick.buy_nick.format(
             user=user_name,
-            price=formatter.value_to_str(
-                config.coofs.PriceForChangeNick, "изумруд"
-            ),
+            price=formatter.value_to_str(config.coofs.PriceForChangeNick, "изумруд"),
         )
     )
 
@@ -293,9 +281,7 @@ async def shop_callback(event: events.CallbackQuery.Event):
     item = shop[items[int(data[1])]]
     if balance < item["price"]:
         return await event.answer(
-            phrase.money.not_enough.format(
-                formatter.value_to_str(balance, "изумруд")
-            ),
+            phrase.money.not_enough.format(formatter.value_to_str(balance, "изумруд")),
             alert=True,
         )
     try:
@@ -310,9 +296,7 @@ async def shop_callback(event: events.CallbackQuery.Event):
     except TimeoutError:
         return await event.answer(phrase.shop.timeout, alert=True)
     db.add_money(event.sender_id, -item["price"])
-    return await event.answer(
-        phrase.shop.buy.format(items[int(data[1])]), alert=True
-    )
+    return await event.answer(phrase.shop.buy.format(items[int(data[1])]), alert=True)
 
 
 @client.on(events.CallbackQuery(func=checks, pattern=r"^crocodile"))

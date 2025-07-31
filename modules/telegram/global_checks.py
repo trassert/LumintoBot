@@ -4,9 +4,7 @@ logger.info(f"Загружен модуль {__name__}!")
 
 from telethon import events
 
-from .. import db, phrase
-
-from . import func
+from .. import db, func, phrase
 
 
 async def checks(event):
@@ -19,9 +17,9 @@ async def checks(event):
                 if len(event.text) < 100
                 else logger.info(f"ЛС - {name} > {event.text[:100]}...")
             )
-    if roles.get(event.sender_id) == roles.BLACKLIST:
-        if isinstance(event, events.CallbackQuery.Event):
-            await event.answer(phrase.blacklisted, alert=True)
-        await event.reply(phrase.blacklisted)
-        return False
-    return True
+    if roles.get(event.sender_id) != roles.BLACKLIST:
+        return True
+    if isinstance(event, events.CallbackQuery.Event):
+        await event.answer(phrase.blacklisted, alert=True)
+    await event.reply(phrase.blacklisted)
+    return False

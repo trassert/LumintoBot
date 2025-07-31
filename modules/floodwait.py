@@ -9,9 +9,10 @@ class FloodWaitBase:
         logger.info(f"ФлудВайт: {name} инициализирован")
         self.time = lasttime
         self.timer = timer
+
     def request(self):
         now = time()
-        wait = round(now-self.time)
+        wait = round(now - self.time)
         if wait > self.timer:
             self.time = now
             return True

@@ -19,11 +19,15 @@ async def add_note(event: Message):
         return await event.reply(
             phrase.roles.no_perms.format(level=roles.VIP, name=phrase.roles.vip)
         )
-    if db.Notes().create(
-        event.pattern_match.group(1).strip(),
-        event.text.split('\n', maxsplit=1)[1]
-    ) is True:
-        return await event.reply(phrase.notes.new.format(event.pattern_match.group(1).strip()))
+    if (
+        db.Notes().create(
+            event.pattern_match.group(1).strip(), event.text.split("\n", maxsplit=1)[1]
+        )
+        is True
+    ):
+        return await event.reply(
+            phrase.notes.new.format(event.pattern_match.group(1).strip())
+        )
     return await event.reply(phrase.notes.already_added)
 
 
@@ -54,18 +58,12 @@ async def get_note(event: Message):
     note_text = db.Notes().get(event.pattern_match.group(1).strip().lower())
     if note_text is not None:
         if event.reply_to_msg_id:
-            reply_message: Message = (await event.get_reply_message())
+            reply_message: Message = await event.get_reply_message()
             return await client.send_message(
-                event.chat_id,
-                note_text,
-                reply_to=reply_message.id,
-                link_preview=False
+                event.chat_id, note_text, reply_to=reply_message.id, link_preview=False
             )
         return await client.send_message(
-            event.chat_id,
-            note_text,
-            reply_to=event.id,
-            link_preview=False
+            event.chat_id, note_text, reply_to=event.id, link_preview=False
         )
 
 
@@ -75,7 +73,7 @@ async def get_all_notes(event: Message):
     text = ""
     n = 1
     for name in db.Notes().get_all():
-        text+=f"{n}. {name}\n"
+        text += f"{n}. {name}\n"
         n += 1
     return await event.reply(phrase.notes.alltext.format(text))
 

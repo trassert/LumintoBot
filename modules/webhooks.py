@@ -84,7 +84,7 @@ async def server():
             config.chats.chat,
             phrase.github.format(
                 author=f'[{head["author"]["name"]}](https://github.com/{head["author"]["name"]})',
-                message=head["message"]
+                message=head["message"],
             ),
             link_preview=False,
             reply_to=config.chats.topics.updates,
@@ -107,8 +107,8 @@ async def server():
             config.chats.chat,
             phrase.mcadd_money.format(
                 player=await func.get_name(playerid, minecraft=True),
-                amount=formatter.value_to_str(amount, "изумруд")
-            )
+                amount=formatter.value_to_str(amount, "изумруд"),
+            ),
         )
         db.add_money(playerid, amount)
         logger.info(f"[Bank] Переведено {amount} изумрудов на счет {playerid}")

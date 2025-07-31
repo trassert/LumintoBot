@@ -55,8 +55,8 @@ def randomize_coordinates(data, max_offset=0.02):
     randomized_data = {}
     for key in data:
         lat, lon = data[key]
-        randomized_lat = lat + random.uniform(-max_offset/2, max_offset/2)
-        randomized_lon = lon + random.uniform(-max_offset/2, max_offset/2)
+        randomized_lat = lat + random.uniform(-max_offset / 2, max_offset / 2)
+        randomized_lon = lon + random.uniform(-max_offset / 2, max_offset / 2)
         randomized_data[key] = [randomized_lat, randomized_lon]
     return randomized_data
 
@@ -75,7 +75,7 @@ async def get_full_map():
     )
     await authy.connect()
     for player in await authy.get():
-        if not (player[2].startswith('192') or player[2].startswith('127')):
+        if not (player[2].startswith("192") or player[2].startswith("127")):
             players[player[1]] = await get_loc(player[2])
     async with aiohttp.ClientSession() as session:
         async with session.get(ident_v6, timeout=5) as response:

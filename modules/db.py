@@ -685,7 +685,10 @@ def check_withdraw_limit(id: int, amount: int) -> int | bool:
             if amount > remaining:
                 return remaining
             else:
-                data[str(id)] = {"date": today.isoformat(), "withdrawn": already_withdrawn+amount}
+                data[str(id)] = {
+                    "date": today.isoformat(),
+                    "withdrawn": already_withdrawn + amount,
+                }
         else:
             # Дата устарела, сбрасываем счетчик
             data[str(id)] = {"date": today.isoformat(), "withdrawn": amount}
@@ -701,13 +704,17 @@ class RefCodes:
     def _read(self) -> dict:
         with open(ref_path, "rb") as f:
             return orjson.loads(f.read())
+
     def _write(self, data):
         with open(ref_path, "wb") as f:
             f.write(orjson.dumps(data, option=orjson.OPT_INDENT_2))
+
     def get_own(self, id: int, default=None) -> str:
         return self._read().get(str(id), {}).get("own", default)
+
     def check_used(self, id: int, default=False) -> str:
         return self._read().get(str(id), {}).get("used", default)
+
     def add_own(self, id: int, name: str):
         if self.check_ref(name) is not None:
             return False
@@ -716,12 +723,14 @@ class RefCodes:
             load[str(id)] = {}
         load[str(id)]["own"] = name
         self._write(load)
+
     def add_used(self, id: int, name: str):
         load = self._read()
         if str(id) not in load:
             load[str(id)] = {}
         load[str(id)]["used"] = name
         self._write(load)
+
     def check_ref(self, name) -> str:
         load = self._read()
         for id, data in load.items():

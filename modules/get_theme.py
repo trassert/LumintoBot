@@ -7,12 +7,10 @@ def weighted_choice(strings, weights):
         logger.error("Все элементы должны быть строками!")
         return None
 
-    # Проверка на словарь
     if not isinstance(weights, dict):
         logger.error("Веса должны быть словарем.")
         return None
 
-    # Проверка, что все ключи в weights есть в strings и веса - числа
     valid_weights = {
         k: v for k, v in weights.items() if k in strings and isinstance(v, (int, float))
     }
@@ -23,10 +21,8 @@ def weighted_choice(strings, weights):
         logger.error("Нет валидных весов для строк.")
         return None
 
-    # Создаем список весов, соответствующий порядку строк
     probabilities = [valid_weights.get(s, 0) for s in strings]
 
-    # Нормализация веса
     total_weight = sum(probabilities)
     if total_weight > 0:
         normalized_probabilities = [p / total_weight for p in probabilities]

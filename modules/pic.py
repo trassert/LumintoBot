@@ -5,7 +5,4 @@ from . import pathes
 
 
 def get_random():
-    return path.join(
-        pathes.pic_path,
-        choice(listdir(pathes.pic_path))
-    )
+    return path.join(pathes.pic_path, choice(listdir(pathes.pic_path)))

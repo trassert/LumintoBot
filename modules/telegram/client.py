@@ -31,5 +31,5 @@ from . import (
     statistic,
     tickets,
     notes,
-    referrals
+    referrals,
 )

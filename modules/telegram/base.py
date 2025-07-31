@@ -410,15 +410,17 @@ async def money_to_server(event: Message):
     if arg < 1:
         return await event.reply(phrase.money.negative_count)
     if arg > config.coofs.WithdrawDailyLimit:
-        return await event.reply(
-            phrase.bank.daily_limit
-        )
+        return await event.reply(phrase.bank.daily_limit)
     amount = db.check_withdraw_limit(event.sender_id, arg)
     if amount is not True:
-        return await event.reply(phrase.bank.limit.format(formatter.value_to_str(amount, "изумруд")))
+        return await event.reply(
+            phrase.bank.limit.format(formatter.value_to_str(amount, "изумруд"))
+        )
     balance = db.get_money(event.sender_id)
     if balance < arg:
-        return await event.reply(phrase.money.not_enough.format(formatter.value_to_str(balance, "изумруд")))
+        return await event.reply(
+            phrase.money.not_enough.format(formatter.value_to_str(balance, "изумруд"))
+        )
     db.add_money(event.sender_id, -arg)
     try:
         async with MinecraftClient(
@@ -503,7 +505,7 @@ async def link_nick(event: Message):
         )
     reftext = ""
     if len(refcode) > 0:
-        author = db.RefCodes().check_ref(refcode) 
+        author = db.RefCodes().check_ref(refcode)
         if author is None:
             return await event.reply(phrase.ref.invalid)
         db.add_money(author, config.coofs.RefGift)
@@ -532,8 +534,8 @@ async def link_nick(event: Message):
             int(author),
             phrase.ref.used.format(
                 user=await get_name(event.sender_id, minecraft=True),
-                amount=config.coofs.RefGift
-            )
+                amount=config.coofs.RefGift,
+            ),
         )
 
 
