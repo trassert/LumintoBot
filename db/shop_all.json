@@ -891,11 +891,6 @@
             "name": "minecraft:ghast_tear",
             "price": 10,
             "value": 7
-        },
-        "Зелье возврата": {
-            "name": "minecraft:potion[custom_name='{\"text\":\"Зелье возврата\",\"italic\":false}',custom_data='{recallpotion:1}',hide_additional_tooltip={},enchantment_glint_override=true,potion_contents={custom_color:249343},rarity=\"rare\"]",
-            "price": 32,
-            "value": 1
         }
     },
     "blacksmith": {
@@ -1059,11 +1054,6 @@
         "Голова дракона": {
             "name": "minecraft:dragon_head",
             "price": 36,
-            "value": 1
-        },
-        "Зелье возврата": {
-            "name": "minecraft:potion[custom_name='{\"text\":\"Зелье возврата\",\"italic\":false}',custom_data='{recallpotion:1}',hide_additional_tooltip={},enchantment_glint_override=true,potion_contents={custom_color:249343},rarity=\"rare\"]",
-            "price": 32,
             "value": 1
         },
         "Элитры": {
