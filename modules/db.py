@@ -23,19 +23,19 @@ def database(key, value=None, delete=None, log=True):
         try:
             with open(data_path, "rb") as f:
                 load = orjson.loads(f.read())
-            with open(data_path, "wb", encoding="utf-8") as f:
+            with open(data_path, "wb") as f:
                 load[key] = value
                 load = dict(sorted(load.items()))
                 return f.write(orjson.dumps(load, option=orjson.OPT_INDENT_2))
         except FileNotFoundError:
             logger.error("Файл не найден")
-            with open(data_path, "wb", encoding="utf-8") as f:
+            with open(data_path, "wb") as f:
                 load = {}
                 load[key] = value
                 return f.write(orjson.dumps(load, option=orjson.OPT_INDENT_2))
         except JSONDecodeError:
             logger.error("Ошибка при чтении файла")
-            with open(data_path, "wb", encoding="utf-8") as f:
+            with open(data_path, "wb") as f:
                 f.write(orjson.loads({}, option=orjson.OPT_INDENT_2))
             return None
     elif delete is not None:
@@ -43,7 +43,7 @@ def database(key, value=None, delete=None, log=True):
             logger.info(f"Удаляю ключ: {key}")
         with open(data_path, "rb") as f:
             load = orjson.loads(f.read())
-        with open(data_path, "wb", encoding="utf-8") as f:
+        with open(data_path, "wb") as f:
             if key in load:
                 del load[key]
             return f.write(orjson.dumps(load, option=orjson.OPT_INDENT_2))
@@ -56,12 +56,12 @@ def database(key, value=None, delete=None, log=True):
                 return load.get(key)
         except JSONDecodeError:
             logger.error("Ошибка при чтении файла")
-            with open(data_path, "w", encoding="utf-8") as f:
+            with open(data_path, "wb") as f:
                 f.write(orjson.loads({}, option=orjson.OPT_INDENT_2))
             return None
         except FileNotFoundError:
             logger.error("Файл не найден")
-            with open(data_path, "w", encoding="utf-8") as f:
+            with open(data_path, "wb") as f:
                 f.write(orjson.loads({}, option=orjson.OPT_INDENT_2))
             return None
 
@@ -73,7 +73,7 @@ def get_money(id):
         if id in load:
             return load[id]
 
-    with open(money_path, "wb", encoding="utf8") as f:
+    with open(money_path, "wb") as f:
         load[id] = 0
         f.write(orjson.dumps(load, option=orjson.OPT_INDENT_2))
         return 0
@@ -99,7 +99,7 @@ def add_money(id, count):
 
     if load[id] < 0:
         load[id] = 0
-    with open(money_path, "wb", encoding="utf8") as f:
+    with open(money_path, "wb") as f:
         f.write(orjson.dumps(load, option=orjson.OPT_INDENT_2))
         logger.info(f"Изменён баланс {id} ({old} -> {load[id]})")
         return load[id]
@@ -108,7 +108,7 @@ def add_money(id, count):
 def update_shop():
     "Обновляет магазин"
     "Возвращает тему магазина"
-    with open(path.join("db", "shop_current.json"), "r", encoding="utf8") as f:
+    with open(path.join("db", "shop_current.json"), "r") as f:
         last_theme = orjson.loads(f.read())["theme"]
     current_shop = {}
     with open(path.join("db", "shop_all.json"), "rb") as f:
@@ -126,7 +126,7 @@ def update_shop():
         current_items.append(choice(all_items))
     for item in current_items:
         current_shop[item] = load[current_shop["theme"]][item]
-    with open(path.join("db", "shop_current.json"), "wb", encoding="utf8") as f:
+    with open(path.join("db", "shop_current.json"), "wb") as f:
         f.write(orjson.dumps(current_shop, option=orjson.OPT_INDENT_2))
     return current_shop["theme"]
 
@@ -145,7 +145,7 @@ def ready_to_mine(id: str) -> bool:
         int(time()) - data.get(id, int(time())) > config.coofs.MineWait
     ):
         data[id] = int(time())
-        with open(mine_path, "wb", encoding="utf8") as f:
+        with open(mine_path, "wb") as f:
             f.write(orjson.dumps(data, option=orjson.OPT_INDENT_2))
         return True
     return False
@@ -173,7 +173,7 @@ class roles:
         with open(roles_path, "rb") as f:
             data = orjson.loads(f.read())
         data[id] = role
-        with open(roles_path, "wb", encoding="utf-8") as f:
+        with open(roles_path, "wb") as f:
             f.write(
                 orjson.dumps(
                     dict(sorted(data.items(), key=lambda x: (-x[1], x[0]))),
@@ -205,7 +205,7 @@ class crocodile_stat:
             load[self.id] += 1
         else:
             load[self.id] = 1
-        with open(crocodile_stats_path, "wb", encoding="utf8") as f:
+        with open(crocodile_stats_path, "wb") as f:
             f.write(orjson.dumps(load, option=orjson.OPT_SORT_KEYS))
 
     def get_all(self=False):
@@ -251,7 +251,7 @@ class nicks:
                 del load[key]
                 break
         load[self.nick] = int(self.id)
-        with open(nick_path, "wb", encoding="utf8") as f:
+        with open(nick_path, "wb") as f:
             f.write(orjson.dumps(load, option=orjson.OPT_INDENT_2))
         return True
 
@@ -266,7 +266,7 @@ class statistic:
 
         # Если нет файла
         if not path.exists(path.join(stats_path, f"{nick}.json")):
-            with open(path.join(stats_path, f"{nick}.json"), "wb", encoding="utf8") as f:
+            with open(path.join(stats_path, f"{nick}.json"), "wb") as f:
                 stats = {}
                 stats[now] = 0
                 f.write(orjson.dumps(stats, option=orjson.OPT_SORT_KEYS))
@@ -308,7 +308,7 @@ class statistic:
 
         # Если нет файла
         if not path.exists(path.join(stats_path, f"{nick}.json")):
-            with open(path.join(stats_path, f"{nick}.json"), "wb", encoding="utf8") as f:
+            with open(path.join(stats_path, f"{nick}.json"), "wb") as f:
                 stats = {}
                 stats[now] = 1
                 f.write(orjson.dumps(stats, option=orjson.OPT_SORT_KEYS))
@@ -320,7 +320,7 @@ class statistic:
                 stats[now] = stats[now] + 1
             else:
                 stats[now] = 1
-        with open(path.join(stats_path, f"{nick}.json"), "wb", encoding="utf8") as f:
+        with open(path.join(stats_path, f"{nick}.json"), "wb") as f:
             f.write(orjson.dumps(stats, option=orjson.OPT_SORT_KEYS))
 
     def get_raw(self) -> dict[str, int]:
@@ -357,7 +357,7 @@ class ticket:
                     return data[id]
                 return None
         else:
-            with open(tickets_path, "wb", encoding="utf8") as f:
+            with open(tickets_path, "wb") as f:
                 f.write(orjson.dumps({}))
             return None
 
@@ -365,7 +365,7 @@ class ticket:
         if path.exists(tickets_path):
             with open(tickets_path, "rb") as f:
                 data = orjson.loads(f.read())
-            with open(tickets_path, "wb", encoding="utf8") as f:
+            with open(tickets_path, "wb") as f:
                 random_id = randint(1000, 9999)
                 while random_id in data:
                     random_id = randint(1000, 9999)
@@ -376,7 +376,7 @@ class ticket:
                 f.write(orjson.dumps(data, option=orjson.OPT_INDENT_2))
                 return random_id
         else:
-            with open(tickets_path, "wb", encoding="utf8") as f:
+            with open(tickets_path, "wb") as f:
                 random_id = str(randint(1000, 9999))
                 f.write(
                     orjson.dumps(
@@ -393,7 +393,7 @@ class ticket:
                 return None
             else:
                 del data[id]
-        with open(tickets_path, "wb", encoding="utf8") as f:
+        with open(tickets_path, "wb") as f:
             f.write(orjson.dumps(data, option=orjson.OPT_INDENT_2))
             return True
 
@@ -419,7 +419,7 @@ class state:
 
     def change(self, key, value):
         with open(
-            path.join(states_path, f"{self.name}.json"), "wb", encoding="utf8"
+            path.join(states_path, f"{self.name}.json"), "wb"
         ) as f:
             self.all[key] = value
             f.write(orjson.dumps(self.all, option=orjson.OPT_INDENT_2))
@@ -440,7 +440,7 @@ class states:
     def add(name, author):
         if path.exists(path.join(states_path, f"{name}.json")):
             return
-        with open(path.join(states_path, f"{name}.json"), "wb", encoding="utf8") as f:
+        with open(path.join(states_path, f"{name}.json"), "wb") as f:
             f.write(
                 orjson.dumps(
                     {
@@ -631,7 +631,7 @@ class Notes:
         file_path = self._get_file_path(name.lower())
         if not path.exists(file_path):
             return None
-        with open(file_path, "r", encoding="utf-8") as f:
+        with open(file_path, "r") as f:
             return f.read()
 
     def create(self, name: str, text: str):
@@ -639,7 +639,7 @@ class Notes:
         file_path = self._get_file_path(name.lower())
         if path.exists(file_path):
             return False
-        with open(file_path, "w", encoding="utf-8") as f:
+        with open(file_path, "w") as f:
             f.write(text)
         return True
 
