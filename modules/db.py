@@ -1,4 +1,4 @@
-import json, orjson
+import orjson
 import aiomysql
 
 from typing import Dict
@@ -8,6 +8,7 @@ from os import path, listdir, replace, makedirs, remove
 from time import time
 from random import choice, randint
 from collections import defaultdict
+from json import JSONDecodeError
 
 from . import config
 from .get_theme import weighted_choice
@@ -22,30 +23,30 @@ def database(key, value=None, delete=None, log=True):
         try:
             with open(data_path, "rb") as f:
                 load = orjson.loads(f.read())
-            with open(data_path, "w", encoding="utf-8") as f:
+            with open(data_path, "wb", encoding="utf-8") as f:
                 load[key] = value
                 load = dict(sorted(load.items()))
-                return json.dump(load, f, indent=4, ensure_ascii=False, sort_keys=True)
+                return f.write(orjson.dumps(load, option=orjson.OPT_INDENT_2))
         except FileNotFoundError:
             logger.error("Файл не найден")
-            with open(data_path, "w", encoding="utf-8") as f:
+            with open(data_path, "wb", encoding="utf-8") as f:
                 load = {}
                 load[key] = value
-                return json.dump(load, f, indent=4, sort_keys=True)
-        except json.decoder.JSONDecodeError:
+                return f.write(orjson.dumps(load, option=orjson.OPT_INDENT_2))
+        except JSONDecodeError:
             logger.error("Ошибка при чтении файла")
-            with open(data_path, "w", encoding="utf-8") as f:
-                json.dump({}, f, indent=4)
+            with open(data_path, "wb", encoding="utf-8") as f:
+                f.write(orjson.loads({}, option=orjson.OPT_INDENT_2))
             return None
     elif delete is not None:
         if log:
             logger.info(f"Удаляю ключ: {key}")
         with open(data_path, "rb") as f:
             load = orjson.loads(f.read())
-        with open(data_path, "w", encoding="utf-8") as f:
+        with open(data_path, "wb", encoding="utf-8") as f:
             if key in load:
                 del load[key]
-            return json.dump(load, f, indent=4, ensure_ascii=False, sort_keys=True)
+            return f.write(orjson.dumps(load, option=orjson.OPT_INDENT_2))
     else:
         if log:
             logger.info(f"Получаю ключ: {key}")
@@ -53,15 +54,15 @@ def database(key, value=None, delete=None, log=True):
             with open(data_path, "rb") as f:
                 load = orjson.loads(f.read())
                 return load.get(key)
-        except json.decoder.JSONDecodeError:
+        except JSONDecodeError:
             logger.error("Ошибка при чтении файла")
             with open(data_path, "w", encoding="utf-8") as f:
-                json.dump({}, f, indent=4)
+                f.write(orjson.loads({}, option=orjson.OPT_INDENT_2))
             return None
         except FileNotFoundError:
             logger.error("Файл не найден")
             with open(data_path, "w", encoding="utf-8") as f:
-                json.dump({}, f, indent=4)
+                f.write(orjson.loads({}, option=orjson.OPT_INDENT_2))
             return None
 
 
@@ -72,9 +73,9 @@ def get_money(id):
         if id in load:
             return load[id]
 
-    with open(money_path, "w", encoding="utf8") as f:
+    with open(money_path, "wb", encoding="utf8") as f:
         load[id] = 0
-        json.dump(load, f, indent=4, ensure_ascii=False, sort_keys=True)
+        f.write(orjson.dumps(load, option=orjson.OPT_INDENT_2))
         return 0
 
 
@@ -98,8 +99,8 @@ def add_money(id, count):
 
     if load[id] < 0:
         load[id] = 0
-    with open(money_path, "w", encoding="utf8") as f:
-        json.dump(load, f, indent=4, ensure_ascii=False, sort_keys=True)
+    with open(money_path, "wb", encoding="utf8") as f:
+        f.write(orjson.dumps(load, option=orjson.OPT_INDENT_2))
         logger.info(f"Изменён баланс {id} ({old} -> {load[id]})")
         return load[id]
 
@@ -125,8 +126,8 @@ def update_shop():
         current_items.append(choice(all_items))
     for item in current_items:
         current_shop[item] = load[current_shop["theme"]][item]
-    with open(path.join("db", "shop_current.json"), "w", encoding="utf8") as f:
-        json.dump(current_shop, f, indent=4, ensure_ascii=False, sort_keys=True)
+    with open(path.join("db", "shop_current.json"), "wb", encoding="utf8") as f:
+        f.write(orjson.dumps(current_shop, option=orjson.OPT_INDENT_2))
     return current_shop["theme"]
 
 
@@ -144,8 +145,8 @@ def ready_to_mine(id: str) -> bool:
         int(time()) - data.get(id, int(time())) > config.coofs.MineWait
     ):
         data[id] = int(time())
-        with open(mine_path, "w", encoding="utf8") as f:
-            json.dump(data, f, indent=4, ensure_ascii=False, sort_keys=True)
+        with open(mine_path, "wb", encoding="utf8") as f:
+            f.write(orjson.dumps(data, option=orjson.OPT_INDENT_2))
         return True
     return False
 
@@ -172,12 +173,12 @@ class roles:
         with open(roles_path, "rb") as f:
             data = orjson.loads(f.read())
         data[id] = role
-        with open(roles_path, "w", encoding="utf-8") as f:
-            json.dump(
-                dict(sorted(data.items(), key=lambda x: (-x[1], x[0]))),
-                f,
-                indent=4,
-                ensure_ascii=False,
+        with open(roles_path, "wb", encoding="utf-8") as f:
+            f.write(
+                orjson.dumps(
+                    dict(sorted(data.items(), key=lambda x: (-x[1], x[0]))),
+                    option=orjson.OPT_INDENT_2
+                )
             )
 
 
@@ -192,9 +193,9 @@ class crocodile_stat:
         if self.id in load:
             return load[self.id]
         else:
-            with open(path.join("db", "crocodile_stat.json"), "rb") as f:
+            with open(crocodile_stats_path, "wb") as f:
                 load[self.id] = 0
-                json.dump(load, f, indent=4, ensure_ascii=False, sort_keys=True)
+                f.write(orjson.dumps(load, option=orjson.OPT_SORT_KEYS))
             return 0
 
     def add(self):
@@ -204,8 +205,8 @@ class crocodile_stat:
             load[self.id] += 1
         else:
             load[self.id] = 1
-        with open(crocodile_stats_path, "w", encoding="utf8") as f:
-            json.dump(load, f, indent=4, ensure_ascii=False, sort_keys=True)
+        with open(crocodile_stats_path, "wb", encoding="utf8") as f:
+            f.write(orjson.dumps(load, option=orjson.OPT_SORT_KEYS))
 
     def get_all(self=False):
         with open(crocodile_stats_path, "rb") as f:
@@ -250,8 +251,8 @@ class nicks:
                 del load[key]
                 break
         load[self.nick] = int(self.id)
-        with open(nick_path, "w", encoding="utf8") as f:
-            json.dump(load, f, indent=4, ensure_ascii=False, sort_keys=True)
+        with open(nick_path, "wb", encoding="utf8") as f:
+            f.write(orjson.dumps(load, option=orjson.OPT_INDENT_2))
         return True
 
 
@@ -265,10 +266,10 @@ class statistic:
 
         # Если нет файла
         if not path.exists(path.join(stats_path, f"{nick}.json")):
-            with open(path.join(stats_path, f"{nick}.json"), "w", encoding="utf8") as f:
+            with open(path.join(stats_path, f"{nick}.json"), "wb", encoding="utf8") as f:
                 stats = {}
                 stats[now] = 0
-                json.dump(stats, f, indent=4, ensure_ascii=False, sort_keys=True)
+                f.write(orjson.dumps(stats, option=orjson.OPT_SORT_KEYS))
                 return 0
 
         # Если есть файл
@@ -307,10 +308,10 @@ class statistic:
 
         # Если нет файла
         if not path.exists(path.join(stats_path, f"{nick}.json")):
-            with open(path.join(stats_path, f"{nick}.json"), "w", encoding="utf8") as f:
+            with open(path.join(stats_path, f"{nick}.json"), "wb", encoding="utf8") as f:
                 stats = {}
                 stats[now] = 1
-                json.dump(stats, f, indent=4, ensure_ascii=False, sort_keys=True)
+                f.write(orjson.dumps(stats, option=orjson.OPT_SORT_KEYS))
 
         # Если есть файл
         with open(path.join(stats_path, f"{nick}.json"), "rb") as f:
@@ -319,8 +320,8 @@ class statistic:
                 stats[now] = stats[now] + 1
             else:
                 stats[now] = 1
-        with open(path.join(stats_path, f"{nick}.json"), "w", encoding="utf8") as f:
-            json.dump(stats, f, indent=4, ensure_ascii=False, sort_keys=True)
+        with open(path.join(stats_path, f"{nick}.json"), "wb", encoding="utf8") as f:
+            f.write(orjson.dumps(stats, option=orjson.OPT_SORT_KEYS))
 
     def get_raw(self) -> dict[str, int]:
         "Выдаёт {дата: сообщения} от всех"
@@ -332,7 +333,7 @@ class statistic:
                     data = orjson.loads(f.read())
                     for date, count in data.items():
                         totals[date] += count
-            except (json.JSONDecodeError, UnicodeDecodeError) as e:
+            except (JSONDecodeError, UnicodeDecodeError) as e:
                 logger.error(f"Ошибка при чтении файла - {json_file}")
                 continue
         if self.days != 1:
@@ -356,15 +357,15 @@ class ticket:
                     return data[id]
                 return None
         else:
-            with open(tickets_path, "w", encoding="utf8") as f:
-                json.dump({}, f, indent=4, ensure_ascii=False, sort_keys=True)
+            with open(tickets_path, "wb", encoding="utf8") as f:
+                f.write(orjson.dumps({}))
             return None
 
     def add(author, value):
         if path.exists(tickets_path):
             with open(tickets_path, "rb") as f:
                 data = orjson.loads(f.read())
-            with open(tickets_path, "w", encoding="utf8") as f:
+            with open(tickets_path, "wb", encoding="utf8") as f:
                 random_id = randint(1000, 9999)
                 while random_id in data:
                     random_id = randint(1000, 9999)
@@ -372,18 +373,16 @@ class ticket:
                     "author": int(author),
                     "value": int(value),
                 }
-                json.dump(data, f, indent=4, ensure_ascii=False, sort_keys=True)
-                logger
+                f.write(orjson.dumps(data, option=orjson.OPT_INDENT_2))
                 return random_id
         else:
-            with open(tickets_path, "w", encoding="utf8") as f:
+            with open(tickets_path, "wb", encoding="utf8") as f:
                 random_id = str(randint(1000, 9999))
-                json.dump(
-                    {random_id: {"author": int(author), "value": int(value)}},
-                    f,
-                    indent=4,
-                    ensure_ascii=False,
-                    sort_keys=True,
+                f.write(
+                    orjson.dumps(
+                        {random_id: {"author": int(author), "value": int(value)}},
+                        option=orjson.OPT_SORT_KEYS
+                    )
                 )
             return random_id
 
@@ -394,8 +393,8 @@ class ticket:
                 return None
             else:
                 del data[id]
-        with open(tickets_path, "w", encoding="utf8") as f:
-            json.dump(data, f, indent=4, ensure_ascii=False, sort_keys=True)
+        with open(tickets_path, "wb", encoding="utf8") as f:
+            f.write(orjson.dumps(data, option=orjson.OPT_INDENT_2))
             return True
 
 
@@ -420,10 +419,10 @@ class state:
 
     def change(self, key, value):
         with open(
-            path.join(states_path, f"{self.name}.json"), "w", encoding="utf8"
+            path.join(states_path, f"{self.name}.json"), "wb", encoding="utf8"
         ) as f:
             self.all[key] = value
-            json.dump(self.all, f, indent=4, ensure_ascii=False, sort_keys=True)
+            f.write(orjson.dumps(self.all, option=orjson.OPT_INDENT_2))
 
     def rename(self, new_name: str):
         if path.exists(path.join(states_path, f"{new_name}.json")):
@@ -441,23 +440,22 @@ class states:
     def add(name, author):
         if path.exists(path.join(states_path, f"{name}.json")):
             return
-        with open(path.join(states_path, f"{name}.json"), "w", encoding="utf8") as f:
-            json.dump(
-                {
-                    "price": 0,
-                    "enter": True,
-                    "desc": "Пусто",
-                    "players": [],
-                    "type": 0,
-                    "date": datetime.now().strftime("%Y.%m.%d"),
-                    "money": 0,
-                    "author": author,
-                    "coordinates": "Не найдено",
-                },
-                f,
-                indent=4,
-                ensure_ascii=False,
-                sort_keys=True,
+        with open(path.join(states_path, f"{name}.json"), "wb", encoding="utf8") as f:
+            f.write(
+                orjson.dumps(
+                    {
+                        "price": 0,
+                        "enter": True,
+                        "desc": "Пусто",
+                        "players": [],
+                        "type": 0,
+                        "date": datetime.now().strftime("%Y.%m.%d"),
+                        "money": 0,
+                        "author": author,
+                        "coordinates": "Не найдено",
+                    },
+                    option=orjson.OPT_INDENT_2
+                )
             )
             return True
 
@@ -480,7 +478,7 @@ class states:
             with open(path.join(states_path, file), "rb") as f:
                 try:
                     all[file.replace(".json", "")] = orjson.loads(f.read())
-                except json.decoder.JSONDecodeError:
+                except JSONDecodeError:
                     logger.error(f"Не удалось просмотреть гос-во {file}")
         if sortedby == "money":
             sort_key = lambda item: item[1][sortedby]
