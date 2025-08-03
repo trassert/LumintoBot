@@ -631,7 +631,7 @@ class Notes:
         file_path = self._get_file_path(name.lower())
         if not path.exists(file_path):
             return None
-        with open(file_path, "r") as f:
+        with open(file_path, "r", encoding="utf8") as f:
             return f.read()
 
     def create(self, name: str, text: str):
@@ -639,7 +639,7 @@ class Notes:
         file_path = self._get_file_path(name.lower())
         if path.exists(file_path):
             return False
-        with open(file_path, "w") as f:
+        with open(file_path, "w", encoding="utf8") as f:
             f.write(text)
         return True
 
