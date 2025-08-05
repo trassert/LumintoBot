@@ -1,107 +1,107 @@
 {
     "armorer": {
         "Алмазный меч": {
-            "name": "minecraft:diamond_sword",
+            "name": "diamond_sword",
             "price": 8,
             "value": 1
         },
         "Деревянный меч": {
-            "name": "minecraft:wooden_sword",
+            "name": "wooden_sword",
             "price": 1,
             "value": 1
         },
         "Железные ботинки": {
-            "name": "minecraft:iron_boots",
+            "name": "iron_boots",
             "price": 3,
             "value": 1
         },
         "Железные поножи": {
-            "name": "minecraft:iron_leggings",
+            "name": "iron_leggings",
             "price": 5,
             "value": 1
         },
         "Железный меч": {
-            "name": "minecraft:iron_sword",
+            "name": "iron_sword",
             "price": 4,
             "value": 1
         },
         "Железный нагрудник": {
-            "name": "minecraft:iron_chestplate",
+            "name": "iron_chestplate",
             "price": 6,
             "value": 1
         },
         "Железный шлем": {
-            "name": "minecraft:iron_helmet",
+            "name": "iron_helmet",
             "price": 4,
             "value": 1
         },
         "Золотой меч": {
-            "name": "minecraft:golden_sword",
+            "name": "golden_sword",
             "price": 2,
             "value": 1
         },
         "Каменный меч": {
-            "name": "minecraft:stone_sword",
+            "name": "stone_sword",
             "price": 1,
             "value": 1
         },
         "Кожаная куртка": {
-            "name": "minecraft:leather_chestplate",
+            "name": "leather_chestplate",
             "price": 2,
             "value": 1
         },
         "Кожаные ботинки": {
-            "name": "minecraft:leather_boots",
+            "name": "leather_boots",
             "price": 1,
             "value": 1
         },
         "Кожаные штаны": {
-            "name": "minecraft:leather_leggings",
+            "name": "leather_leggings",
             "price": 2,
             "value": 1
         },
         "Кожаный шлем": {
-            "name": "minecraft:leather_helmet",
+            "name": "leather_helmet",
             "price": 1,
             "value": 1
         },
         "Койф": {
-            "name": "minecraft:chainmail_helmet",
+            "name": "chainmail_helmet",
             "price": 4,
             "value": 1
         },
         "Кольчуга": {
-            "name": "minecraft:chainmail_chestplate",
+            "name": "chainmail_chestplate",
             "price": 7,
             "value": 1
         },
         "Кольчужные ботинки": {
-            "name": "minecraft:chainmail_boots",
+            "name": "chainmail_boots",
             "price": 4,
             "value": 1
         },
         "Кольчужные поножи": {
-            "name": "minecraft:chainmail_leggings",
+            "name": "chainmail_leggings",
             "price": 5,
             "value": 1
         },
         "Алмазный шлем": {
-            "name": "minecraft:diamond_helmet",
+            "name": "diamond_helmet",
             "price": 15,
             "value": 1
         },
         "Алмазный нагрудник": {
-            "name": "minecraft:diamond_chestplate",
+            "name": "diamond_chestplate",
             "price": 20,
             "value": 1
         },
         "Алмазные поножи": {
-            "name": "minecraft:diamond_leggings",
+            "name": "diamond_leggings",
             "price": 18,
             "value": 1
         },
         "Алмазные ботинки": {
-            "name": "minecraft:diamond_boots",
+            "name": "diamond_boots",
             "price": 10,
             "value": 1
         },
@@ -118,188 +118,188 @@
     },
     "desert": {
         "Бамбуковый плот": {
-            "name": "minecraft:bamboo_raft",
+            "name": "bamboo_raft",
             "price": 2,
             "value": 1
         },
         "Гладкий красный песчаник": {
-            "name": "minecraft:smooth_red_sandstone",
+            "name": "smooth_red_sandstone",
             "price": 10,
             "value": 70
         },
         "Гладкий песчаник": {
-            "name": "minecraft:smooth_sandstone",
+            "name": "smooth_sandstone",
             "price": 10,
             "value": 70
         },
         "Грузовой бамбуковый плот": {
-            "name": "minecraft:bamboo_chest_raft",
+            "name": "bamboo_chest_raft",
             "price": 2,
             "value": 1
         },
         "Резной красный песчаник": {
-            "name": "minecraft:chiseled_red_sandstone",
+            "name": "chiseled_red_sandstone",
             "price": 10,
             "value": 20
         },
         "Подзорная труба": {
-            "name": "minecraft:red_sandstone_stairs",
+            "name": "red_sandstone_stairs",
             "price": 5,
             "value": 1
         },
         "Чистая карта": {
-            "name": "minecraft:red_sandstone_stairs",
+            "name": "red_sandstone_stairs",
             "price": 5,
             "value": 1
         },
         "Кисть": {
-            "name": "minecraft:brush",
+            "name": "brush",
             "price": 5,
             "value": 1
         }
     },
     "flower": {
         "Бирюзовый краситель": {
-            "name": "minecraft:cyan_dye",
+            "name": "cyan_dye",
             "price": 1,
             "value": 3
         },
         "Голубой краситель": {
-            "name": "minecraft:light_blue_dye",
+            "name": "light_blue_dye",
             "price": 1,
             "value": 3
         },
         "Жёлтый краситель": {
-            "name": "minecraft:yellow_dye",
+            "name": "yellow_dye",
             "price": 1,
             "value": 3
         },
         "Зелёный краситель": {
-            "name": "minecraft:green_dye",
+            "name": "green_dye",
             "price": 1,
             "value": 3
         },
         "Коричневый краситель": {
-            "name": "minecraft:brown_dye",
+            "name": "brown_dye",
             "price": 1,
             "value": 3
         },
         "Красный краситель": {
-            "name": "minecraft:red_dye",
+            "name": "red_dye",
             "price": 1,
             "value": 3
         },
         "Лаймовый краситель": {
-            "name": "minecraft:lime_dye",
+            "name": "lime_dye",
             "price": 1,
             "value": 3
         },
         "Оранжевый краситель": {
-            "name": "minecraft:orange_dye",
+            "name": "orange_dye",
             "price": 1,
             "value": 3
         },
         "Пурпурный краситель": {
-            "name": "minecraft:magenta_dye",
+            "name": "magenta_dye",
             "price": 1,
             "value": 3
         },
         "Розовый краситель": {
-            "name": "minecraft:pink_dye",
+            "name": "pink_dye",
             "price": 1,
             "value": 3
         },
         "Синий краситель": {
-            "name": "minecraft:blue_dye",
+            "name": "blue_dye",
             "price": 1,
             "value": 3
         },
         "Фиолетовый краситель": {
-            "name": "minecraft:purple_dye",
+            "name": "purple_dye",
             "price": 1,
             "value": 3
         }
     },
     "heads": {
         "Голова дракона": {
-            "name": "minecraft:dragon_head",
+            "name": "dragon_head",
             "price": 71,
             "value": 1
         },
         "Голова зомби": {
-            "name": "minecraft:zombie_head",
+            "name": "zombie_head",
             "price": 23,
             "value": 1
         },
         "Голова крипера": {
-            "name": "minecraft:creeper_head",
+            "name": "creeper_head",
             "price": 24,
             "value": 1
         },
         "Голова пиглина": {
-            "name": "minecraft:piglin_head",
+            "name": "piglin_head",
             "price": 22,
             "value": 1
         },
         "Череп": {
-            "name": "minecraft:skeleton_skull",
+            "name": "skeleton_skull",
             "price": 25,
             "value": 1
         },
         "Череп визер-скелета": {
-            "name": "minecraft:wither_skeleton_skull",
+            "name": "wither_skeleton_skull",
             "price": 52,
             "value": 1
         },
         "Сундук с изумрудной рудой" : {
-            "name": "minecraft:player_head[profile={properties:[{name:\"textures\",value:\"eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvMTdkYTdiYzJlN2Q0YjNkYjhiMzg4MTg3YWY2ODNmNTZhMTIxYzk2MWQ3ODdjNmY4NTFiYmI5Njc0YzkzNzQ2YiJ9fX0=\"}]}]",
+            "name": "player_head[profile={properties:[{name:\"textures\",value:\"eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvMTdkYTdiYzJlN2Q0YjNkYjhiMzg4MTg3YWY2ODNmNTZhMTIxYzk2MWQ3ODdjNmY4NTFiYmI5Njc0YzkzNzQ2YiJ9fX0=\"}]}]",
             "price": 43,
             "value": 1
         },
         "Пляжный мяч" : {
-            "name": "minecraft:player_head[profile={properties:[{name:\"textures\",value:\"eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvODkzNmJjNzIxNDNlNjcyOTAxZjY5ZTJhNmI1ZWMzOTMyOGU1MWYxMGIzY2MyNTJjMTJmM2Y4ZjUzZTQ3NmZhYiJ9fX0=\"}]}]",
+            "name": "player_head[profile={properties:[{name:\"textures\",value:\"eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvODkzNmJjNzIxNDNlNjcyOTAxZjY5ZTJhNmI1ZWMzOTMyOGU1MWYxMGIzY2MyNTJjMTJmM2Y4ZjUzZTQ3NmZhYiJ9fX0=\"}]}]",
             "price": 25,
             "value": 1
         }
     },
     "mine": {
         "Алмаз": {
-            "name": "minecraft:diamond",
+            "name": "diamond",
             "price": 21,
             "value": 8
         },
         "Древесный уголь": {
-            "name": "minecraft:charcoal",
+            "name": "charcoal",
             "price": 3,
             "value": 16
         },
         "Лазурит": {
-            "name": "minecraft:lapis_lazuli",
+            "name": "lapis_lazuli",
             "price": 4,
             "value": 2
         },
         "Осколок аметиста": {
-            "name": "minecraft:amethyst_shard",
+            "name": "amethyst_shard",
             "price": 3,
             "value": 1
         },
         "Рудная медь": {
-            "name": "minecraft:raw_copper",
+            "name": "raw_copper",
             "price": 3,
             "value": 1
         },
         "Рудное железо": {
-            "name": "minecraft:raw_iron",
+            "name": "raw_iron",
             "price": 2,
             "value": 2
         },
         "Рудное золото": {
-            "name": "minecraft:raw_gold",
+            "name": "raw_gold",
             "price": 5,
             "value": 1
         },
         "Уголь": {
-            "name": "minecraft:coal",
+            "name": "coal",
             "price": 1,
             "value": 1
         },
@@ -321,164 +321,164 @@
     },
     "music": {
         "11-я пластинка": {
-            "name": "minecraft:music_disc_11",
+            "name": "music_disc_11",
             "price": 22,
             "value": 1
         },
         "13-я пластинка": {
-            "name": "minecraft:music_disc_13",
+            "name": "music_disc_13",
             "price": 21,
             "value": 1
         },
         "5-я пластинка": {
-            "name": "minecraft:music_disc_5",
+            "name": "music_disc_5",
             "price": 15,
             "value": 1
         },
         "Пластинка «Blocks»": {
-            "name": "minecraft:music_disc_blocks",
+            "name": "music_disc_blocks",
             "price": 32,
             "value": 1
         },
         "Пластинка «Cat»": {
-            "name": "minecraft:music_disc_cat",
+            "name": "music_disc_cat",
             "price": 15,
             "value": 1
         },
         "Пластинка «Chirp»": {
-            "name": "minecraft:music_disc_chirp",
+            "name": "music_disc_chirp",
             "price": 17,
             "value": 1
         },
         "Пластинка «Far»": {
-            "name": "minecraft:music_disc_far",
+            "name": "music_disc_far",
             "price": 20,
             "value": 1
         },
         "Пластинка «Mall»": {
-            "name": "minecraft:music_disc_mall",
+            "name": "music_disc_mall",
             "price": 21,
             "value": 1
         },
         "Пластинка «Mellohi»": {
-            "name": "minecraft:music_disc_mellohi",
+            "name": "music_disc_mellohi",
             "price": 12,
             "value": 1
         },
         "Пластинка «Otherside»": {
-            "name": "minecraft:music_disc_otherside",
+            "name": "music_disc_otherside",
             "price": 40,
             "value": 1
         },
         "Пластинка «Pigstep»": {
-            "name": "minecraft:music_disc_pigstep",
+            "name": "music_disc_pigstep",
             "price": 28,
             "value": 1
         },
         "Пластинка «Precipice»": {
-            "name": "minecraft:music_disc_precipice",
+            "name": "music_disc_precipice",
             "price": 19,
             "value": 1
         },
         "Пластинка «Relic»": {
-            "name": "minecraft:music_disc_relic",
+            "name": "music_disc_relic",
             "price": 14,
             "value": 1
         },
         "Пластинка «Stal»": {
-            "name": "minecraft:music_disc_stal",
+            "name": "music_disc_stal",
             "price": 20,
             "value": 1
         },
         "Пластинка «Strad»": {
-            "name": "minecraft:music_disc_strad",
+            "name": "music_disc_strad",
             "price": 20,
             "value": 1
         },
         "Пластинка «Wait»": {
-            "name": "minecraft:music_disc_wait",
+            "name": "music_disc_wait",
             "price": 19,
             "value": 1
         },
         "Пластинка «Ward»": {
-            "name": "minecraft:music_disc_ward",
+            "name": "music_disc_ward",
             "price": 18,
             "value": 1
         }
     },
     "nether": {
         "Багровый нилий": {
-            "name": "minecraft:crimson_nylium",
+            "name": "crimson_nylium",
             "price": 10,
             "value": 32
         },
         "Базальт": {
-            "name": "minecraft:basalt",
+            "name": "basalt",
             "price": 3,
             "value": 36
         },
         "Гладкий базальт": {
-            "name": "minecraft:smooth_basalt",
+            "name": "smooth_basalt",
             "price": 3,
             "value": 10
         },
         "Искажённый нилий": {
-            "name": "minecraft:warped_nylium",
+            "name": "warped_nylium",
             "price": 4,
             "value": 16
         },
         "Костный блок": {
-            "name": "minecraft:bone_block",
+            "name": "bone_block",
             "price": 3,
             "value": 5
         },
         "Магма": {
-            "name": "minecraft:magma_block",
+            "name": "magma_block",
             "price": 10,
             "value": 10
         },
         "Незерак": {
-            "name": "minecraft:netherrack",
+            "name": "netherrack",
             "price": 1,
             "value": 24
         },
         "Обсидиан": {
-            "name": "minecraft:obsidian",
+            "name": "obsidian",
             "price": 9,
             "value": 1
         },
         "Песок душ": {
-            "name": "minecraft:soul_sand",
+            "name": "soul_sand",
             "price": 8,
             "value": 32
         },
         "Плачущий обсидиан": {
-            "name": "minecraft:crying_obsidian",
+            "name": "crying_obsidian",
             "price": 10,
             "value": 1
         },
         "Почва душ": {
-            "name": "minecraft:soul_soil",
+            "name": "soul_soil",
             "price": 14,
             "value": 32
         },
         "Чернит": {
-            "name": "minecraft:blackstone",
+            "name": "blackstone",
             "price": 6,
             "value": 64
         },
         "Огненный заряд": {
-            "name": "minecraft:fire_charge",
+            "name": "fire_charge",
             "price": 6,
             "value": 3
         },
         "Огниво": {
-            "name": "minecraft:flint_and_steel",
+            "name": "flint_and_steel",
             "price": 2,
             "value": 1
         },
         "Удочка с искажённым грибом": {
-            "name": "minecraft:warped_fungus_on_a_stick",
+            "name": "warped_fungus_on_a_stick",
             "price": 6,
             "value": 1
         },
@@ -490,57 +490,57 @@
     },
     "raiders": {
         "Белая шерсть": {
-            "name": "minecraft:white_wool",
+            "name": "white_wool",
             "price": 8,
             "value": 48
         },
         "Булава": {
-            "name": "minecraft:mace",
+            "name": "mace",
             "price": 100,
             "value": 1
         },
         "Волчья броня": {
-            "name": "minecraft:wolf_armor",
+            "name": "wolf_armor",
             "price": 10,
             "value": 1
         },
         "Динамит": {
-            "name": "minecraft:tnt",
+            "name": "tnt",
             "price": 24,
             "value": 16
         },
         "Железный меч": {
-            "name": "minecraft:iron_sword",
+            "name": "iron_sword",
             "price": 4,
             "value": 1
         },
         "Железный топор": {
-            "name": "minecraft:iron_axe",
+            "name": "iron_axe",
             "price": 4,
             "value": 1
         },
         "Красная шерсть": {
-            "name": "minecraft:red_wool",
+            "name": "red_wool",
             "price": 8,
             "value": 32
         },
         "Кузнечный шаблон «Молния»": {
-            "name": "minecraft:bolt_armor_trim_smithing_template",
+            "name": "bolt_armor_trim_smithing_template",
             "price": 26,
             "value": 1
         },
         "Пузырёк опыта": {
-            "name": "minecraft:experience_bottle",
+            "name": "experience_bottle",
             "price": 13,
             "value": 32
         },
         "Тотем бессмертия": {
-            "name": "minecraft:totem_of_undying",
+            "name": "totem_of_undying",
             "price": 30,
             "value": 1
         },
         "Бирка": {
-            "name": "minecraft:name_tag",
+            "name": "name_tag",
             "price": 20,
             "value": 1
         },
@@ -562,475 +562,475 @@
     },
     "remains": {
         "Глиняный черепок «Вихрь»": {
-            "name": "minecraft:guster_pottery_sherd",
+            "name": "guster_pottery_sherd",
             "price": 16,
             "value": 1
         },
         "Глиняный черепок «Друг»": {
-            "name": "minecraft:friend_pottery_sherd",
+            "name": "friend_pottery_sherd",
             "price": 14,
             "value": 1
         },
         "Глиняный черепок «Зельевар»": {
-            "name": "minecraft:brewer_pottery_sherd",
+            "name": "brewer_pottery_sherd",
             "price": 18,
             "value": 1
         },
         "Глиняный черепок «Зов»": {
-            "name": "minecraft:howl_pottery_sherd",
+            "name": "howl_pottery_sherd",
             "price": 12,
             "value": 1
         },
         "Глиняный черепок «Изобилие»": {
-            "name": "minecraft:plenty_pottery_sherd",
+            "name": "plenty_pottery_sherd",
             "price": 22,
             "value": 1
         },
         "Глиняный черепок «Исследователь»": {
-            "name": "minecraft:explorer_pottery_sherd",
+            "name": "explorer_pottery_sherd",
             "price": 20,
             "value": 1
         },
         "Глиняный черепок «Клинок»": {
-            "name": "minecraft:blade_pottery_sherd",
+            "name": "blade_pottery_sherd",
             "price": 15,
             "value": 1
         },
         "Глиняный черепок «Лучник»": {
-            "name": "minecraft:archer_pottery_sherd",
+            "name": "archer_pottery_sherd",
             "price": 16,
             "value": 1
         },
         "Глиняный черепок «Награда»": {
-            "name": "minecraft:prize_pottery_sherd",
+            "name": "prize_pottery_sherd",
             "price": 24,
             "value": 1
         },
         "Глиняный черепок «Нюхач»": {
-            "name": "minecraft:snort_pottery_sherd",
+            "name": "snort_pottery_sherd",
             "price": 10,
             "value": 1
         },
         "Глиняный черепок «Обтёсывание»": {
-            "name": "minecraft:scrape_pottery_sherd",
+            "name": "scrape_pottery_sherd",
             "price": 12,
             "value": 1
         },
         "Глиняный черепок «Пламя»": {
-            "name": "minecraft:burn_pottery_sherd",
+            "name": "burn_pottery_sherd",
             "price": 18,
             "value": 1
         },
         "Глиняный черепок «Поток»": {
-            "name": "minecraft:flow_pottery_sherd",
+            "name": "flow_pottery_sherd",
             "price": 14,
             "value": 1
         },
         "Глиняный черепок «Разбитое сердце»": {
-            "name": "minecraft:heartbreak_pottery_sherd",
+            "name": "heartbreak_pottery_sherd",
             "price": 20,
             "value": 1
         },
         "Глиняный черепок «Руки вверх»": {
-            "name": "minecraft:arms_up_pottery_sherd",
+            "name": "arms_up_pottery_sherd",
             "price": 16,
             "value": 1
         },
         "Глиняный черепок «Рыбак»": {
-            "name": "minecraft:angler_pottery_sherd",
+            "name": "angler_pottery_sherd",
             "price": 15,
             "value": 1
         },
         "Глиняный черепок «Сердце»": {
-            "name": "minecraft:heart_pottery_sherd",
+            "name": "heart_pottery_sherd",
             "price": 22,
             "value": 1
         },
         "Глиняный черепок «Скорбь»": {
-            "name": "minecraft:mourner_pottery_sherd",
+            "name": "mourner_pottery_sherd",
             "price": 18,
             "value": 1
         },
         "Глиняный черепок «Сноп»": {
-            "name": "minecraft:sheaf_pottery_sherd",
+            "name": "sheaf_pottery_sherd",
             "price": 14,
             "value": 1
         },
         "Глиняный черепок «Убежище»": {
-            "name": "minecraft:shelter_pottery_sherd",
+            "name": "shelter_pottery_sherd",
             "price": 16,
             "value": 1
         },
         "Глиняный черепок «Угроза»": {
-            "name": "minecraft:danger_pottery_sherd",
+            "name": "danger_pottery_sherd",
             "price": 12,
             "value": 1
         },
         "Глиняный черепок «Череп»": {
-            "name": "minecraft:skull_pottery_sherd",
+            "name": "skull_pottery_sherd",
             "price": 20,
             "value": 1
         },
         "Глиняный черепок «Шахтёр»": {
-            "name": "minecraft:miner_pottery_sherd",
+            "name": "miner_pottery_sherd",
             "price": 18,
             "value": 1
         },
         "Кость": {
-            "name": "minecraft:bone",
+            "name": "bone",
             "price": 3,
             "value": 8
         },
         "Костяной блок": {
-            "name": "minecraft:bone_block",
+            "name": "bone_block",
             "price": 5,
             "value": 1
         },
         "Глиняный кирпич": {
-            "name": "minecraft:brick",
+            "name": "brick",
             "price": 5,
             "value": 4
         },
         "Декоративный горшок": {
-            "name": "minecraft:decorated_pot",
+            "name": "decorated_pot",
             "price": 40,
             "value": 1
         },
         "Кисть": {
-            "name": "minecraft:brush",
+            "name": "brush",
             "price": 5,
             "value": 1
         },
         "Уголь": {
-            "name": "minecraft:coal",
+            "name": "coal",
             "price": 4,
             "value": 16
         }
     },
     "sculk": {
         "Скалк": {
-            "name": "minecraft:sculk",
+            "name": "sculk",
             "price": 4,
             "value": 3
         },
         "Скалк-сенсор": {
-            "name": "minecraft:sculk_sensor",
+            "name": "sculk_sensor",
             "price": 12,
             "value": 2
         },
         "Скалковая жила": {
-            "name": "minecraft:sculk_vein",
+            "name": "sculk_vein",
             "price": 3,
             "value": 2
         },
         "Скалковый катализатор": {
-            "name": "minecraft:sculk_catalyst",
+            "name": "sculk_catalyst",
             "price": 18,
             "value": 1
         },
         "Скалковый крикун": {
-            "name": "minecraft:sculk_shrieker",
+            "name": "sculk_shrieker",
             "price": 12,
             "value": 1
         },
         "Возвратный компас": {
-            "name": "minecraft:recovery_compass",
+            "name": "recovery_compass",
             "price": 16,
             "value": 1
         },
         "Осколок пластинки": {
-            "name": "minecraft:disc_fragment_5",
+            "name": "disc_fragment_5",
             "price": 10,
             "value": 1
         },
         "Осколок эха": {
-            "name": "minecraft:echo_shard",
+            "name": "echo_shard",
             "price": 11,
             "value": 1
         }
     },
     "water": {
         "Аксолотль в ведре": {
-            "name": "minecraft:axolotl_bucket",
+            "name": "axolotl_bucket",
             "price": 5,
             "value": 1
         },
         "Головастик в ведре": {
-            "name": "minecraft:tadpole_bucket",
+            "name": "tadpole_bucket",
             "price": 3,
             "value": 1
         },
         "Жареная треска": {
-            "name": "minecraft:cooked_cod",
+            "name": "cooked_cod",
             "price": 2,
             "value": 16
         },
         "Лосось в ведре": {
-            "name": "minecraft:salmon_bucket",
+            "name": "salmon_bucket",
             "price": 3,
             "value": 1
         },
         "Сырая треска": {
-            "name": "minecraft:cod",
+            "name": "cod",
             "price": 5,
             "value": 20
         },
         "Треска в ведре": {
-            "name": "minecraft:cod_bucket",
+            "name": "cod_bucket",
             "price": 3,
             "value": 1
         },
         "Тропическая рыба в ведре": {
-            "name": "minecraft:tropical_fish_bucket",
+            "name": "tropical_fish_bucket",
             "price": 3,
             "value": 1
         },
         "Кристалл призмарина": {
-            "name": "minecraft:prismarine_crystals",
+            "name": "prismarine_crystals",
             "price": 4,
             "value": 20
         },
         "Осколок призмарина": {
-            "name": "minecraft:prismarine_shard",
+            "name": "prismarine_shard",
             "price": 4,
             "value": 20
         },
         "Раковина наутилуса": {
-            "name": "minecraft:nautilus_shell",
+            "name": "nautilus_shell",
             "price": 7,
             "value": 1
         },
         "Морской источник": {
-            "name": "minecraft:conduit",
+            "name": "conduit",
             "price": 7,
             "value": 1
         },
         "Губка": {
-            "name": "minecraft:sponge",
+            "name": "sponge",
             "price": 8,
             "value": 1
         },
         "Книга «Подводник»": {
-            "name": "enchanted_book[stored_enchantments={levels:{\"minecraft:aqua_affinity\":1}}]",
+            "name": "enchanted_book[stored_enchantments={levels:{\"aqua_affinity\":1}}]",
             "price": 24,
             "value": 1
         }
     },
     "witch": {
         "Бутылочка": {
-            "name": "minecraft:glass_bottle",
+            "name": "glass_bottle",
             "price": 6,
             "value": 25
         },
         "Драконье дыхание": {
-            "name": "minecraft:dragon_breath",
+            "name": "dragon_breath",
             "price": 20,
             "value": 1
         },
         "Золотая морковь": {
-            "name": "minecraft:golden_carrot",
+            "name": "golden_carrot",
             "price": 20,
             "value": 28
         },
         "Иглобрюх": {
-            "name": "minecraft:pufferfish",
+            "name": "pufferfish",
             "price": 5,
             "value": 11
         },
         "Кроличья лапка": {
-            "name": "minecraft:rabbit_foot",
+            "name": "rabbit_foot",
             "price": 6,
             "value": 17
         },
         "Маринованный паучий глаз": {
-            "name": "minecraft:fermented_spider_eye",
+            "name": "fermented_spider_eye",
             "price": 10,
             "value": 32
         },
         "Огненный порошок": {
-            "name": "minecraft:blaze_powder",
+            "name": "blaze_powder",
             "price": 9,
             "value": 54
         },
         "Паучий глаз": {
-            "name": "minecraft:spider_eye",
+            "name": "spider_eye",
             "price": 18,
             "value": 32
         },
         "Порох": {
-            "name": "minecraft:gunpowder",
+            "name": "gunpowder",
             "price": 17,
             "value": 29
         },
         "Редстоуновая пыль": {
-            "name": "minecraft:redstone",
+            "name": "redstone",
             "price": 7,
             "value": 21
         },
         "Сахар": {
-            "name": "minecraft:sugar",
+            "name": "sugar",
             "price": 12,
             "value": 23
         },
         "Сверкающий ломтик арбуза": {
-            "name": "minecraft:glistering_melon_slice",
+            "name": "glistering_melon_slice",
             "price": 5,
             "value": 8
         },
         "Светокаменная пыль": {
-            "name": "minecraft:glowstone_dust",
+            "name": "glowstone_dust",
             "price": 13,
             "value": 34
         },
         "Сгусток магмы": {
-            "name": "minecraft:magma_cream",
+            "name": "magma_cream",
             "price": 14,
             "value": 23
         },
         "Слеза гаста": {
-            "name": "minecraft:ghast_tear",
+            "name": "ghast_tear",
             "price": 10,
             "value": 7
         }
     },
     "blacksmith": {
         "Бирка": {
-            "name": "minecraft:name_tag",
+            "name": "name_tag",
             "price": 5,
             "value": 1
         },
         "Воронка": {
-            "name": "minecraft:hopper",
+            "name": "hopper",
             "price": 15,
             "value": 5
         },
         "Древние обломки": {
-            "name": "minecraft:ancient_debris",
+            "name": "ancient_debris",
             "price": 64,
             "value": 3
         },
         "Железная конская броня": {
-            "name": "minecraft:iron_horse_armor",
+            "name": "iron_horse_armor",
             "price": 5,
             "value": 1
         },
         "Кузнечный шаблон «Берег»": {
-            "name": "minecraft:coast_armor_trim_smithing_template",
+            "name": "coast_armor_trim_smithing_template",
             "price": 10,
             "value": 1
         },
         "Кузнечный шаблон «Вождь»": {
-            "name": "minecraft:host_armor_trim_smithing_template",
+            "name": "host_armor_trim_smithing_template",
             "price": 31,
             "value": 1
         },
         "Кузнечный шаблон «Вредина»": {
-            "name": "minecraft:vex_armor_trim_smithing_template",
+            "name": "vex_armor_trim_smithing_template",
             "price": 15,
             "value": 1
         },
         "Кузнечный шаблон «Дебри»": {
-            "name": "minecraft:wild_armor_trim_smithing_template",
+            "name": "wild_armor_trim_smithing_template",
             "price": 12,
             "value": 1
         },
         "Кузнечный шаблон «Дюна»": {
-            "name": "minecraft:dune_armor_trim_smithing_template",
+            "name": "dune_armor_trim_smithing_template",
             "price": 12,
             "value": 1
         },
         "Кузнечный шаблон «Искатель»": {
-            "name": "minecraft:wayfinder_armor_trim_smithing_template",
+            "name": "wayfinder_armor_trim_smithing_template",
             "price": 12,
             "value": 1
         },
         "Кузнечный шаблон «Око»": {
-            "name": "minecraft:eye_armor_trim_smithing_template",
+            "name": "eye_armor_trim_smithing_template",
             "price": 12,
             "value": 1
         },
         "Кузнечный шаблон «Ось»": {
-            "name": "minecraft:bolt_armor_trim_smithing_template",
+            "name": "bolt_armor_trim_smithing_template",
             "price": 25,
             "value": 1
         },
         "Кузнечный шаблон «Поток»": {
-            "name": "minecraft:flow_armor_trim_smithing_template",
+            "name": "flow_armor_trim_smithing_template",
             "price": 10,
             "value": 1
         },
         "Кузнечный шаблон «Прилив»": {
-            "name": "minecraft:tide_armor_trim_smithing_template",
+            "name": "tide_armor_trim_smithing_template",
             "price": 10,
             "value": 1
         },
         "Кузнечный шаблон «Ребро»": {
-            "name": "minecraft:rib_armor_trim_smithing_template",
+            "name": "rib_armor_trim_smithing_template",
             "price": 10,
             "value": 1
         },
         "Кузнечный шаблон «Рыло»": {
-            "name": "minecraft:snout_armor_trim_smithing_template",
+            "name": "snout_armor_trim_smithing_template",
             "price": 10,
             "value": 1
         },
         "Кузнечный шаблон «Скульптор»": {
-            "name": "minecraft:shaper_armor_trim_smithing_template",
+            "name": "shaper_armor_trim_smithing_template",
             "price": 10,
             "value": 1
         },
         "Кузнечный шаблон «Собиратель»": {
-            "name": "minecraft:raiser_armor_trim_smithing_template",
+            "name": "raiser_armor_trim_smithing_template",
             "price": 10,
             "value": 1
         },
         "Кузнечный шаблон «Страж»": {
-            "name": "minecraft:sentry_armor_trim_smithing_template",
+            "name": "sentry_armor_trim_smithing_template",
             "price": 10,
             "value": 1
         },
         "Кузнечный шаблон «Тишина»": {
-            "name": "minecraft:silence_armor_trim_smithing_template",
+            "name": "silence_armor_trim_smithing_template",
             "price": 45,
             "value": 1
         },
         "Кузнечный шаблон «Хранитель»": {
-            "name": "minecraft:ward_armor_trim_smithing_template",
+            "name": "ward_armor_trim_smithing_template",
             "price": 30,
             "value": 1
         },
         "Кузнечный шаблон «Шпиль»": {
-            "name": "minecraft:spire_armor_trim_smithing_template",
+            "name": "spire_armor_trim_smithing_template",
             "price": 27,
             "value": 1
         },
         "Наковальня": {
-            "name": "minecraft:anvil",
+            "name": "anvil",
             "price": 10,
             "value": 1
         },
         "Незеритовое улучшение": {
-            "name": "minecraft:netherite_upgrade_smithing_template",
+            "name": "netherite_upgrade_smithing_template",
             "price": 45,
             "value": 1
         },
         "Рельсы": {
-            "name": "minecraft:rail",
+            "name": "rail",
             "price": 20,
             "value": 64
         },
         "Стол кузнеца": {
-            "name": "minecraft:smithing_table",
+            "name": "smithing_table",
             "price": 2,
             "value": 1
         },
         "Точило": {
-            "name": "minecraft:grindstone",
+            "name": "grindstone",
             "price": 2,
             "value": 1
         },
         "Яйцо призыва железного голема": {
-            "name": "minecraft:iron_golem_spawn_egg",
+            "name": "iron_golem_spawn_egg",
             "price": 26,
             "value": 1
         },
@@ -1047,32 +1047,32 @@
     },
     "end": {
         "Стержень Энда": {
-            "name": "minecraft:end_rod",
+            "name": "end_rod",
             "price": 13,
             "value": 1
         },
         "Голова дракона": {
-            "name": "minecraft:dragon_head",
+            "name": "dragon_head",
             "price": 36,
             "value": 1
         },
         "Элитры": {
-            "name": "minecraft:elytra",
+            "name": "elytra",
             "price": 176,
             "value": 1
         },
         "Кристалл Энда": {
-            "name": "minecraft:end_crystal",
+            "name": "end_crystal",
             "price": 32,
             "value": 2
         },
         "Драконье дыхание": {
-            "name": "minecraft:dragon_breath",
+            "name": "dragon_breath",
             "price": 20,
             "value": 1
         },
         "Плод хоруса": {
-            "name": "minecraft:chorus_fruit",
+            "name": "chorus_fruit",
             "price": 16,
             "value": 3
         },
@@ -1084,122 +1084,122 @@
     },
     "redstone": {
         "Поршень": {
-            "name": "minecraft:piston",
+            "name": "piston",
             "price": 3,
             "value": 1
         },
         "Липкий поршень": {
-            "name": "minecraft:sticky_piston",
+            "name": "sticky_piston",
             "price": 4,
             "value": 1
         },
         "Компаратор": {
-            "name": "minecraft:comparator",
+            "name": "comparator",
             "price": 5,
             "value": 1
         },
         "Повторитель": {
-            "name": "minecraft:repeater",
+            "name": "repeater",
             "price": 3,
             "value": 1
         },
         "Редстоун": {
-            "name": "minecraft:redstone",
+            "name": "redstone",
             "price": 1,
             "value": 16
         },
         "Редстоуновый факел": {
-            "name": "minecraft:redstone_torch",
+            "name": "redstone_torch",
             "price": 2,
             "value": 4
         },
         "Редстоуновый блок": {
-            "name": "minecraft:redstone_block",
+            "name": "redstone_block",
             "price": 9,
             "value": 1
         },
         "Нажимная плита (камень)": {
-            "name": "minecraft:stone_pressure_plate",
+            "name": "stone_pressure_plate",
             "price": 2,
             "value": 1
         },
         "Нажимная плита (дерево)": {
-            "name": "minecraft:oak_pressure_plate",
+            "name": "oak_pressure_plate",
             "price": 1,
             "value": 1
         },
         "Нажимная плита (золото)": {
-            "name": "minecraft:light_weighted_pressure_plate",
+            "name": "light_weighted_pressure_plate",
             "price": 5,
             "value": 1
         },
         "Нажимная плита (железо)": {
-            "name": "minecraft:heavy_weighted_pressure_plate",
+            "name": "heavy_weighted_pressure_plate",
             "price": 5,
             "value": 1
         },
         "Наблюдатель": {
-            "name": "minecraft:observer",
+            "name": "observer",
             "price": 6,
             "value": 1
         },
         "Детектор света": {
-            "name": "minecraft:daylight_detector",
+            "name": "daylight_detector",
             "price": 4,
             "value": 1
         },
         "Раздатчик": {
-            "name": "minecraft:dispenser",
+            "name": "dispenser",
             "price": 7,
             "value": 1
         },
         "Выбрасыватель": {
-            "name": "minecraft:dropper",
+            "name": "dropper",
             "price": 7,
             "value": 1
         },
         "Лампа из редстоуна": {
-            "name": "minecraft:redstone_lamp",
+            "name": "redstone_lamp",
             "price": 4,
             "value": 1
         },
         "Наковальня": {
-            "name": "minecraft:anvil",
+            "name": "anvil",
             "price": 10,
             "value": 1
         },
         "Рычаг": {
-            "name": "minecraft:lever",
+            "name": "lever",
             "price": 1,
             "value": 1
         },
         "Кнопка (камень)": {
-            "name": "minecraft:stone_button",
+            "name": "stone_button",
             "price": 1,
             "value": 1
         },
         "Кнопка (дерево)": {
-            "name": "minecraft:oak_button",
+            "name": "oak_button",
             "price": 1,
             "value": 1
         },
         "Натяжной датчик": {
-            "name": "minecraft:tripwire_hook",
+            "name": "tripwire_hook",
             "price": 2,
             "value": 1
         },
         "Слизневый блок": {
-            "name": "minecraft:slime_block",
+            "name": "slime_block",
             "price": 4,
             "value": 1
         },
         "Медный блок": {
-            "name": "minecraft:copper_block",
+            "name": "copper_block",
             "price": 9,
             "value": 1
         },
         "Восковой медный блок": {
-            "name": "minecraft:waxed_copper_block",
+            "name": "waxed_copper_block",
             "price": 10,
             "value": 1
         }
