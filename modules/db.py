@@ -108,7 +108,7 @@ def add_money(id, count):
 def update_shop():
     "Обновляет магазин"
     "Возвращает тему магазина"
-    with open(path.join("db", "shop_current.json"), "r") as f:
+    with open(path.join("db", "shop_current.json"), "rb") as f:
         last_theme = orjson.loads(f.read())["theme"]
     current_shop = {}
     with open(path.join("db", "shop_all.json"), "rb") as f:
