@@ -823,12 +823,15 @@ class CitiesGame:
         return self.data
 
     def answer(self, id: str, city: str):
+        city = city.strip().lower()
         if id not in self.data['current_game']['players']:
             return 3
-        if city not in open(check_city_path, encoding="utf8").read().split('\n'):
-            return 1
         if id != self.data['current_game']['current_player_id']:
             return 2
+        if city not in open(check_city_path, encoding="utf8").read().split('\n'):
+            return 1
+        if city[0] != self.data['current_game']['last_city'][-1]:
+            return 4
         self.data['current_game']['last_city'] = city
         self.add_stat(id)
         self.next_answer()
