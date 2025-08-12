@@ -750,7 +750,7 @@ class CitiesGame:
         return {
             'current_game': {
                 'players': [],
-                'current_player_index': 0,
+                'current_player_id': 0,
                 'last_city': None
             },
             'statistics': {}
@@ -779,18 +779,17 @@ class CitiesGame:
         players = self.get_players()
         if not players:
             return None
-        current_index = self.data['current_game']['current_player_index']
+        current_index = self.data['current_game']['current_player_id']
         return players[current_index]
     
     def next_answer(self):
         """Переключает очередь на следующего игрока"""
         players = self.get_players()
         if not players:
-            return
-            
-        current_index = self.data['current_game']['current_player_index']
+            return False
+        current_index = self.data['current_game']['current_player_id']
         next_index = (current_index + 1) % len(players)
-        self.data['current_game']['current_player_index'] = next_index
+        self.data['current_game']['current_player_id'] = next_index
         self._save_data()
     
     def add_stat(self, player_id: int):
@@ -811,20 +810,23 @@ class CitiesGame:
         """Завершает игру, очищая текущие данные"""
         self.data['current_game'] = {
             'players': [],
-            'current_player_index': 0,
+            'current_player_id': 0,
             'last_city': None
         }
         self._save_data()
     
     def start_game(self):
         """Начинает новую игру, сохраняя начальные данные"""
-        self.data['current_game']['last_city'] = None
-        self.data['current_game']['current_player_index'] = 0
+        self.data['current_game']['last_city'] = choice(open(check_city_path, encoding="utf8").read().split('\n'))
+        self.data['current_game']['current_player_id'] = self.get_players()[0]
         self._save_data()
-    
-    def set_last_city(self, city: str):
-        """Устанавливает последний названный город"""
+        return self.data
+
+    def answer(self, id: str, city: str):
+        if city not in open(check_city_path, encoding="utf8").read().split('\n'):
+            return False
         self.data['current_game']['last_city'] = city
+        self.add_stat(id)
         self._save_data()
     
     def get_last_city(self) -> Optional[str]:

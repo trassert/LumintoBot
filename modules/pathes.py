@@ -15,6 +15,7 @@ data_path = path.join("db", "data.json")
 withdraws_path = path.join("db", "users", "withdraws.json")
 ref_path = path.join("db", "users", "ref.json")
 cities_path = path.join("db", "cities", "game.json")
+check_city_path = path.join("db", "cities", "cities.txt")
 
 bot_path = path.join("db", "bot")
 old_states_path = path.join("backup", "states")
