@@ -779,16 +779,16 @@ class CitiesGame:
         players = self.get_players()
         if not players:
             return None
-        current_index = self.data['current_game']['current_player_id']
-        return current_index
+        current_id = self.data['current_game']['current_player_id']
+        return current_id
     
     def next_answer(self):
         """Переключает очередь на следующего игрока"""
         players = self.get_players()
         if not players:
             return False
-        current_index = self.data['current_game']['current_player_id']
-        next_index = (current_index + 1) % len(players)
+        current_id = self.data['current_game']['current_player_id']
+        next_index = (current_id + 1) % len(players)
         self.data['current_game']['current_player_id'] = next_index
         self._save_data()
     
