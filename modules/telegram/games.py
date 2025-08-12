@@ -153,6 +153,16 @@ async def super_game(event: Message):
     return await client.send_message(config.chats.chat, phrase.crocodile.super_game)
 
 
+@client.on(events.NewMessage(pattern=r"(?i)^/города$", func=checks))
+@client.on(events.NewMessage(pattern=r"(?i)^/cities$", func=checks))
+@client.on(events.NewMessage(pattern=r"(?i)^/города старт$", func=checks))
+@client.on(events.NewMessage(pattern=r"(?i)^/cities start$", func=checks))
+@client.on(events.NewMessage(pattern=r"(?i)^/миниигра города$", func=checks))
+@client.on(events.NewMessage(pattern=r"(?i)^/minigame cities$", func=checks))
+async def cities_start(event: Message):
+    pass
+
+
 async def crocodile_handler(event: Message):
     if (event.reply_to_msg_id != config.chats.topics.games) and (
         getattr(event.reply_to, "reply_to_top_id", None) != config.chats.topics.games
