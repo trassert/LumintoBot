@@ -787,9 +787,10 @@ class CitiesGame:
         players = self.get_players()
         if not players:
             return False
-        current_id = self.data['current_game']['current_player_id']
-        next_index = (current_id + 1) % len(players)
-        self.data['current_game']['current_player_id'] = next_index
+        index = self.data['current_game']['players'].index(
+            self.data['current_game']['current_player_id']
+        )
+        self.data['current_game']['current_player_id'] = self.data['current_game']['players'][index+1]
         self._save_data()
     
     def add_stat(self, player_id: int):
