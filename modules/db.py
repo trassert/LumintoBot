@@ -755,7 +755,9 @@ class CitiesGame:
             },
             'statistics': {}
         }
-    
+
+    def logger(msg: str):
+        logger.info(f"[Города] {msg}")
     def _save_data(self):
         """Сохраняет данные в JSON файл с помощью orjson"""
         with open(self.data_file, 'wb') as f:
@@ -794,6 +796,7 @@ class CitiesGame:
             self.data['current_game']['current_player_id'] = self.data['current_game']['players'][index+1]
         except IndexError:
             self.data['current_game']['current_player_id'] = self.data['current_game']['players'][0]
+        self.logger(f"Очередь игрока {self.data['current_game']['current_player_id']} отвечать")
         self._save_data()
     
     def add_stat(self, player_id: int):
@@ -818,24 +821,33 @@ class CitiesGame:
             'last_city': None
         }
         self.data['statistics'] = {}
+        self.logger("Экземпляр Города закончен.")
         self._save_data()
     
     def start_game(self):
         """Начинает новую игру, сохраняя начальные данные"""
-        self.data['current_game']['last_city'] = choice(open(check_city_path, encoding="utf8").read().split('\n'))
+        city = choice(open(check_city_path, encoding="utf8").read().split('\n'))
+        self.data['current_game']['last_city'] = city
+        self.logger(f"Запущена игра Города. Начинается с города {city}")
         self.data['current_game']['current_player_id'] = choice(self.get_players())
+        self.logger(f"Игроки: {self.get_players()}")
+        self.logger(f"Отвечает: {self.data['current_game']['current_player_id']}")
         self._save_data()
         return self.data
 
     def answer(self, id: str, city: str):
         city = city.strip().lower()
         if id not in self.data['current_game']['players']:
+            self.logger(f"{id} не в списке игроков")
             return 3
         if id != self.data['current_game']['current_player_id']:
+            self.logger("{id} сейчас не должен отвечать")
             return 2
         if city not in open(check_city_path, encoding="utf8").read().split('\n'):
+            self.logger(f"{id} ответил неизвестным городом")
             return 1
         if city[0] != self.data['current_game']['last_city'][-1]:
+            self.logger(f"{id} ответил городом с разными буквами ({city[0]} != {self.data['current_game']['last_city'][-1]})")
             return 4
         self.data['current_game']['last_city'] = city
         self.add_stat(id)
