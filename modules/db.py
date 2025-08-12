@@ -1,7 +1,7 @@
 import orjson
 import aiomysql
 
-from typing import Dict
+from typing import Dict, List, Optional
 from loguru import logger
 from datetime import datetime, timedelta, date
 from os import path, listdir, replace, makedirs, remove
@@ -177,7 +177,7 @@ class roles:
             f.write(
                 orjson.dumps(
                     dict(sorted(data.items(), key=lambda x: (-x[1], x[0]))),
-                    option=orjson.OPT_INDENT_2
+                    option=orjson.OPT_INDENT_2,
                 )
             )
 
@@ -381,7 +381,7 @@ class ticket:
                 f.write(
                     orjson.dumps(
                         {random_id: {"author": int(author), "value": int(value)}},
-                        option=orjson.OPT_SORT_KEYS
+                        option=orjson.OPT_SORT_KEYS,
                     )
                 )
             return random_id
@@ -418,9 +418,7 @@ class state:
         self.money = all["money"]
 
     def change(self, key, value):
-        with open(
-            path.join(states_path, f"{self.name}.json"), "wb"
-        ) as f:
+        with open(path.join(states_path, f"{self.name}.json"), "wb") as f:
             self.all[key] = value
             f.write(orjson.dumps(self.all, option=orjson.OPT_INDENT_2))
 
@@ -454,7 +452,7 @@ class states:
                         "author": author,
                         "coordinates": "Не найдено",
                     },
-                    option=orjson.OPT_INDENT_2
+                    option=orjson.OPT_INDENT_2,
                 )
             )
             return True
@@ -737,3 +735,98 @@ class RefCodes:
                     return id
             except Exception:
                 pass
+
+
+class CitiesGame:
+    def __init__(self):
+        self.data_file = cities_path
+        self.data = self._load_data()
+        
+    def _load_data(self) -> Dict:
+        """Загружает данные из JSON файла или создаёт новый, если файла нет"""
+        if path.exists(self.data_file):
+            with open(self.data_file, 'rb') as f:
+                return orjson.loads(f.read())
+        return {
+            'current_game': {
+                'players': [],
+                'current_player_index': 0,
+                'last_city': None
+            },
+            'statistics': {}
+        }
+    
+    def _save_data(self):
+        """Сохраняет данные в JSON файл с помощью orjson"""
+        with open(self.data_file, 'wb') as f:
+            f.write(orjson.dumps(
+                self.data,
+                option=orjson.OPT_INDENT_2
+            ))
+    
+    def get_players(self) -> List[int]:
+        """Возвращает список ID игроков в текущем раунде"""
+        return self.data['current_game']['players']
+    
+    def add_player(self, player_id: int):
+        """Добавляет игрока в текущий раунд"""
+        if player_id not in self.data['current_game']['players']:
+            self.data['current_game']['players'].append(player_id)
+            self._save_data()
+    
+    def who_answer(self) -> Optional[int]:
+        """Возвращает ID игрока, который должен отвечать сейчас"""
+        players = self.get_players()
+        if not players:
+            return None
+        current_index = self.data['current_game']['current_player_index']
+        return players[current_index]
+    
+    def next_answer(self):
+        """Переключает очередь на следующего игрока"""
+        players = self.get_players()
+        if not players:
+            return
+            
+        current_index = self.data['current_game']['current_player_index']
+        next_index = (current_index + 1) % len(players)
+        self.data['current_game']['current_player_index'] = next_index
+        self._save_data()
+    
+    def add_stat(self, player_id: int):
+        """Увеличивает статистику побед игрока на 1"""
+        stats = self.data['statistics']
+        stats[player_id] = stats.get(player_id, 0) + 1
+        self._save_data()
+    
+    def get_all_stat(self) -> Dict[int, int]:
+        """Возвращает отсортированную статистику по убыванию побед"""
+        return dict(sorted(
+            self.data['statistics'].items(),
+            key=lambda item: item[1],
+            reverse=True
+        ))
+    
+    def end_game(self):
+        """Завершает игру, очищая текущие данные"""
+        self.data['current_game'] = {
+            'players': [],
+            'current_player_index': 0,
+            'last_city': None
+        }
+        self._save_data()
+    
+    def start_game(self):
+        """Начинает новую игру, сохраняя начальные данные"""
+        self.data['current_game']['last_city'] = None
+        self.data['current_game']['current_player_index'] = 0
+        self._save_data()
+    
+    def set_last_city(self, city: str):
+        """Устанавливает последний названный город"""
+        self.data['current_game']['last_city'] = city
+        self._save_data()
+    
+    def get_last_city(self) -> Optional[str]:
+        """Возвращает последний названный город"""
+        return self.data['current_game']['last_city']

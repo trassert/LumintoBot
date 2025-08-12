@@ -13,6 +13,7 @@ db/crocodile/*
 db/timings/*
 db/users/*
 db/notes/*
+db/cities/*
 
 backup/states/*
 
