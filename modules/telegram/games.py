@@ -160,6 +160,10 @@ async def super_game(event: Message):
 @client.on(events.NewMessage(pattern=r"(?i)^/миниигра города$", func=checks))
 @client.on(events.NewMessage(pattern=r"(?i)^/minigame cities$", func=checks))
 async def cities_start(event: Message):
+    if (event.reply_to_msg_id != config.chats.topics.games) and (
+        getattr(event.reply_to, "reply_to_top_id", None) != config.chats.topics.games
+    ):
+        return await event.reply(phrase.game_topic_warning)
     return await event.reply("⚠️ В разработке!")
 
 
