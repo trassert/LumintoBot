@@ -790,7 +790,10 @@ class CitiesGame:
         index = self.data['current_game']['players'].index(
             self.data['current_game']['current_player_id']
         )
-        self.data['current_game']['current_player_id'] = self.data['current_game']['players'][index+1]
+        try:
+            self.data['current_game']['current_player_id'] = self.data['current_game']['players'][index+1]
+        except IndexError:
+            self.data['current_game']['current_player_id'] = self.data['current_game']['players'][0]
         self._save_data()
     
     def add_stat(self, player_id: int):
@@ -814,6 +817,7 @@ class CitiesGame:
             'current_player_id': 0,
             'last_city': None
         }
+        self.data['statistics'] = {}
         self._save_data()
     
     def start_game(self):
