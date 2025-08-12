@@ -158,7 +158,19 @@ async def super_game(event: Message):
 
 
 async def cities_logic():
-    pass
+    players = []
+    async def cities_callback(event: events.CallbackQuery.Event):
+        data = event.data.decode("utf-8").split(".")
+        if data[1] == "start":
+            if not len(players) > 0:
+                return await event.answer(phrase.cities.super_game_here, alert=True)
+            client.remove_event_handler(cities_callback)
+        elif data[1] == "add":
+            players.append(event.sender_id)
+
+    client.add_event_handler(
+        cities_callback, events.CallbackQuery(func=checks, pattern=r"^cities")
+    )
 
 
 @client.on(events.NewMessage(pattern=r"(?i)^/города$", func=checks))
@@ -173,21 +185,15 @@ async def cities_start(event: Message):
     ):
         return await event.reply(phrase.game_topic_warning)
     keyboard = [
-        [
-            KeyboardButtonCallback(
-                text="➕ Вступить", data=f"cities.add"
-            )
-        ],
-        [
-            KeyboardButtonCallback(
-                text="✅ Начать игру", data=b"cities.start"
-            )
-        ],
+        [KeyboardButtonCallback(text="➕ Вступить", data=f"cities.add")],
+        [KeyboardButtonCallback(text="✅ Начать игру", data=b"cities.start")],
     ]
     await event.reply(
-        phrase.casino.start.format(await func.get_name(event.sender_id)), buttons=keyboard
+        phrase.casino.start.format(await func.get_name(event.sender_id)),
+        buttons=keyboard,
     )
-    return await cities_logic()
+    return await cities_logic(event.sender_id)
+
 
 async def crocodile_handler(event: Message):
     if (event.reply_to_msg_id != config.chats.topics.games) and (
