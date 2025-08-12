@@ -17,8 +17,12 @@ from telethon.tl.types import (
 
 from .client import client
 from .global_checks import *
+from . import func
 
-from .. import phrase, ai, config, formatter
+from .. import phrase, ai, config, formatter, db
+
+
+Cities = db.CitiesGame()
 
 
 @client.on(events.NewMessage(config.chats.chat, pattern=r"(?i)^/казино$", func=checks))
@@ -153,6 +157,10 @@ async def super_game(event: Message):
     return await client.send_message(config.chats.chat, phrase.crocodile.super_game)
 
 
+async def cities_logic():
+    pass
+
+
 @client.on(events.NewMessage(pattern=r"(?i)^/города$", func=checks))
 @client.on(events.NewMessage(pattern=r"(?i)^/cities$", func=checks))
 @client.on(events.NewMessage(pattern=r"(?i)^/города старт$", func=checks))
@@ -164,8 +172,22 @@ async def cities_start(event: Message):
         getattr(event.reply_to, "reply_to_top_id", None) != config.chats.topics.games
     ):
         return await event.reply(phrase.game_topic_warning)
-    return await event.reply("⚠️ В разработке!")
-
+    keyboard = [
+        [
+            KeyboardButtonCallback(
+                text="➕ Вступить", data=f"cities.add"
+            )
+        ],
+        [
+            KeyboardButtonCallback(
+                text="✅ Начать игру", data=b"cities.start"
+            )
+        ],
+    ]
+    await event.reply(
+        phrase.casino.start.format(await func.get_name(event.sender_id)), buttons=keyboard
+    )
+    return await cities_logic()
 
 async def crocodile_handler(event: Message):
     if (event.reply_to_msg_id != config.chats.topics.games) and (
