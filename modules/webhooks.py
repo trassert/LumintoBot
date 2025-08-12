@@ -72,7 +72,7 @@ async def server():
         nick = request.query.get("nick")
         # message = request.query.get('message') Для будущих нужд
         db.statistic.add(nick=nick)
-        logger.info(f"+ соо. от {nick}")
+        logger.debug(f"+ соо. от {nick}")
         return aiohttp.web.Response(text="ok")
 
     async def github(request):

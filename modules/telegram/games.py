@@ -160,7 +160,7 @@ async def super_game(event: Message):
 @client.on(events.NewMessage(pattern=r"(?i)^/миниигра города$", func=checks))
 @client.on(events.NewMessage(pattern=r"(?i)^/minigame cities$", func=checks))
 async def cities_start(event: Message):
-    pass
+    return await event.reply("⚠️ В разработке!")
 
 
 async def crocodile_handler(event: Message):
