@@ -818,15 +818,17 @@ class CitiesGame:
     def start_game(self):
         """Начинает новую игру, сохраняя начальные данные"""
         self.data['current_game']['last_city'] = choice(open(check_city_path, encoding="utf8").read().split('\n'))
-        self.data['current_game']['current_player_id'] = self.get_players()[0]
+        self.data['current_game']['current_player_id'] = choice(self.get_players())
         self._save_data()
         return self.data
 
     def answer(self, id: str, city: str):
         if city not in open(check_city_path, encoding="utf8").read().split('\n'):
-            return False
+            return 0
+        if id != self.data['current_game']['current_player_id']
         self.data['current_game']['last_city'] = city
         self.add_stat(id)
+        self.next_answer()
         self._save_data()
     
     def get_last_city(self) -> Optional[str]:
