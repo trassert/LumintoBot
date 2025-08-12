@@ -780,7 +780,7 @@ class CitiesGame:
         if not players:
             return None
         current_index = self.data['current_game']['current_player_id']
-        return players[current_index]
+        return current_index
     
     def next_answer(self):
         """Переключает очередь на следующего игрока"""
