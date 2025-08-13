@@ -157,18 +157,18 @@ async def super_game(event: Message):
     return await client.send_message(config.chats.chat, phrase.crocodile.super_game)
 
 
-async def cities_logic():
-    players = []
+async def cities_logic(author):
+    Cities.add_player(author)
     async def cities_callback(event: events.CallbackQuery.Event):
         data = event.data.decode("utf-8").split(".")
         if data[1] == "start":
-            if not len(players) > 0:
+            if not len(Cities.get_players()) > 0:
                 return await event.answer(phrase.cities.low_players, alert=True)
             client.remove_event_handler(cities_callback)
         elif data[1] == "add":
-            if str(event.sender_id) in players:
+            if str(event.sender_id) in Cities.get_players():
                 return await event.answer(phrase.cities.already_ingame, alert=True)
-            players.append(event.sender_id)
+            Cities.add_player(event.sender_id)
 
     client.add_event_handler(
         cities_callback, events.CallbackQuery(func=checks, pattern=r"^cities")
@@ -186,12 +186,14 @@ async def cities_start(event: Message):
         getattr(event.reply_to, "reply_to_top_id", None) != config.chats.topics.games
     ):
         return await event.reply(phrase.game_topic_warning)
+    if len(Cities.get_players()) > 0:
+        return await event.reply(phrase.cities.already_started)
     keyboard = [
         [KeyboardButtonCallback(text="➕ Вступить", data=f"cities.add")],
         [KeyboardButtonCallback(text="✅ Начать игру", data=b"cities.start")],
     ]
     await event.reply(
-        phrase.casino.start.format(await func.get_name(event.sender_id)),
+        phrase.cities.start.format(await func.get_name(event.sender_id)),
         buttons=keyboard,
     )
     return await cities_logic(event.sender_id)
