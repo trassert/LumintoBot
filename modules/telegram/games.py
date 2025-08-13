@@ -163,9 +163,11 @@ async def cities_logic():
         data = event.data.decode("utf-8").split(".")
         if data[1] == "start":
             if not len(players) > 0:
-                return await event.answer(phrase.cities.super_game_here, alert=True)
+                return await event.answer(phrase.cities.low_players, alert=True)
             client.remove_event_handler(cities_callback)
         elif data[1] == "add":
+            if str(event.sender_id) in players:
+                return await event.answer(phrase.cities.already_ingame, alert=True)
             players.append(event.sender_id)
 
     client.add_event_handler(
