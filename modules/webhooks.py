@@ -128,8 +128,8 @@ async def server():
     try:
         await runner.setup()
         ipv4 = aiohttp.web.TCPSite(runner, "0.0.0.0", 5000)
-        ipv6 = aiohttp.web.TCPSite(runner, "::1", 5000)
+        # ipv6 = aiohttp.web.TCPSite(runner, "::1", 5000)
         await ipv4.start()
-        await ipv6.start()
+        # await ipv6.start()
     except asyncio.CancelledError:
         return logger.warning("Вебхуки остановлены")

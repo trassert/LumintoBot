@@ -169,6 +169,7 @@ async def cities_logic(author):
             if str(event.sender_id) in Cities.get_players():
                 return await event.answer(phrase.cities.already_ingame, alert=True)
             Cities.add_player(event.sender_id)
+            
 
     client.add_event_handler(
         cities_callback, events.CallbackQuery(func=checks, pattern=r"^cities")
