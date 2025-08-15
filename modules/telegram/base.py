@@ -586,3 +586,14 @@ async def vote(event: Message):
     return await client.send_message(
         event.chat_id, reply_to=event.id, message=phrase.vote, link_preview=False
     )
+
+
+@client.on(events.NewMessage(pattern=r"(?i)^/нпоиск (.+)", func=checks))
+@client.on(events.NewMessage(pattern=r"(?i)^/пник (.+)", func=checks))
+@client.on(events.NewMessage(pattern=r"(?i)^/игрок (.+)", func=checks))
+@client.on(events.NewMessage(pattern=r"(?i)^/поискпонику (.+)", func=checks))
+@client.on(events.NewMessage(pattern=r"(?i)^игрок (.+)", func=checks))
+@client.on(events.NewMessage(pattern=r"(?i)^нпоиск (.+)", func=checks))
+@client.on(events.NewMessage(pattern=r"(?i)^пник (.+)", func=checks))
+async def check_info_by_nick(event: Message):
+    await event.reply("В разработке")
