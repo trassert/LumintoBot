@@ -180,28 +180,28 @@ async def cities_logic(author):
     )
 
 
-@client.on(events.NewMessage(pattern=r"(?i)^/города$", func=checks))
-@client.on(events.NewMessage(pattern=r"(?i)^/cities$", func=checks))
-@client.on(events.NewMessage(pattern=r"(?i)^/города старт$", func=checks))
-@client.on(events.NewMessage(pattern=r"(?i)^/cities start$", func=checks))
-@client.on(events.NewMessage(pattern=r"(?i)^/миниигра города$", func=checks))
-@client.on(events.NewMessage(pattern=r"(?i)^/minigame cities$", func=checks))
-async def cities_start(event: Message):
-    if (event.reply_to_msg_id != config.chats.topics.games) and (
-        getattr(event.reply_to, "reply_to_top_id", None) != config.chats.topics.games
-    ):
-        return await event.reply(phrase.game_topic_warning)
-    if len(Cities.get_players()) > 0:
-        return await event.reply(phrase.cities.already_started)
-    keyboard = [
-        [KeyboardButtonCallback(text="➕ Вступить", data=f"cities.add")],
-        [KeyboardButtonCallback(text="✅ Начать игру", data=b"cities.start")],
-    ]
-    await event.reply(
-        phrase.cities.start.format(await func.get_name(event.sender_id)),
-        buttons=keyboard,
-    )
-    return await cities_logic(event.sender_id)
+# @client.on(events.NewMessage(pattern=r"(?i)^/города$", func=checks))
+# @client.on(events.NewMessage(pattern=r"(?i)^/cities$", func=checks))
+# @client.on(events.NewMessage(pattern=r"(?i)^/города старт$", func=checks))
+# @client.on(events.NewMessage(pattern=r"(?i)^/cities start$", func=checks))
+# @client.on(events.NewMessage(pattern=r"(?i)^/миниигра города$", func=checks))
+# @client.on(events.NewMessage(pattern=r"(?i)^/minigame cities$", func=checks))
+# async def cities_start(event: Message):
+#     if (event.reply_to_msg_id != config.chats.topics.games) and (
+#         getattr(event.reply_to, "reply_to_top_id", None) != config.chats.topics.games
+#     ):
+#         return await event.reply(phrase.game_topic_warning)
+#     if len(Cities.get_players()) > 0:
+#         return await event.reply(phrase.cities.already_started)
+#     keyboard = [
+#         [KeyboardButtonCallback(text="➕ Вступить", data=f"cities.add")],
+#         [KeyboardButtonCallback(text="✅ Начать игру", data=b"cities.start")],
+#     ]
+#     await event.reply(
+#         phrase.cities.start.format(await func.get_name(event.sender_id)),
+#         buttons=keyboard,
+#     )
+#     return await cities_logic(event.sender_id)
 
 
 async def crocodile_handler(event: Message):

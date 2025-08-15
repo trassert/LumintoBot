@@ -515,6 +515,7 @@ class cities:
     )
     low_players = "❌ : Недостаточно игроков!"
     already_ingame = "❌ : Вы уже в игре!"
+    already_started = "❌ : Игра уже набирается и/или запущена!"
     set_ingame = "✅ : Вы вошли в игру!"
 
 
