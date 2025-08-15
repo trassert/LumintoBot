@@ -162,7 +162,7 @@ async def cities_logic(author):
     async def cities_callback(event: events.CallbackQuery.Event):
         data = event.data.decode("utf-8").split(".")
         if data[1] == "start":
-            if not len(Cities.get_players()) > 0:
+            if len(Cities.get_players()) < 2:
                 return await event.answer(phrase.cities.low_players, alert=True)
             client.remove_event_handler(cities_callback)
         elif data[1] == "add":
