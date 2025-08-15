@@ -614,7 +614,7 @@ async def check_info_by_nick(event: Message):
         phrase.nick.info.format(
             tg=await func.get_name(userid),
             role=phrase.roles.types[db.roles().get(userid)],
-            state=
+            state=state
         )
     )
 
