@@ -21,11 +21,13 @@ async def get_name(id, push=False, minecraft=False):
         if user_name.username is not None and push:
             return f"@{user_name.username}"
         elif user_name.username is None or not push:
+            fn = user_name.first_name.replace("[", "(").replace("]", ")")
             if user_name.last_name is None:
-                return f"[{user_name.first_name}]" f"(tg://user?id={id})"
+                return f"[{fn}]" f"(tg://user?id={id})"
             else:
+                ln = user_name.last_name.replace("[", "(").replace("]", ")")
                 return (
-                    f"[{user_name.first_name} {user_name.last_name}]"
+                    f"[{fn} {ln}]"
                     f"(tg://user?id={id})"
                 )
         else:

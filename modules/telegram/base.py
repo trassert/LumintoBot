@@ -596,4 +596,35 @@ async def vote(event: Message):
 @client.on(events.NewMessage(pattern=r"(?i)^нпоиск (.+)", func=checks))
 @client.on(events.NewMessage(pattern=r"(?i)^пник (.+)", func=checks))
 async def check_info_by_nick(event: Message):
-    await event.reply("В разработке")
+    nick = event.pattern_match.group(1).strip()
+    userid = db.nicks(nick=nick).get()
+    if userid is None:
+        return await event.reply(phrase.nick.not_find)
+
+    state = "Нет"
+    state_player = db.states.if_player(event.sender_id)
+    if state_player is not False:
+        state = state_player
+    else:
+        state_author = db.states.if_author(userid)
+        if state_author is not False:
+            state = state_author
+
+    return await event.reply(
+        phrase.nick.info.format(
+            tg=await func.get_name(userid),
+            role=phrase.roles.types[db.roles().get(userid)],
+            state=
+        )
+    )
+
+
+@client.on(events.NewMessage(pattern=r"(?i)^/нпоиск$", func=checks))
+@client.on(events.NewMessage(pattern=r"(?i)^/пник$", func=checks))
+@client.on(events.NewMessage(pattern=r"(?i)^/игрок$", func=checks))
+@client.on(events.NewMessage(pattern=r"(?i)^/поискпонику$", func=checks))
+@client.on(events.NewMessage(pattern=r"(?i)^игрок$", func=checks))
+@client.on(events.NewMessage(pattern=r"(?i)^нпоиск$", func=checks))
+@client.on(events.NewMessage(pattern=r"(?i)^пник$", func=checks))
+async def check_info_by_nick(event: Message):
+    return await event.reply(phrase.nick.empty)
