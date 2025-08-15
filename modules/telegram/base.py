@@ -602,7 +602,7 @@ async def check_info_by_nick(event: Message):
         return await event.reply(phrase.nick.not_find)
 
     state = "Нет"
-    state_player = db.states.if_player(event.sender_id)
+    state_player = db.states.if_player(userid)
     if state_player is not False:
         state = state_player
     else:
