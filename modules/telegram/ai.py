@@ -27,11 +27,11 @@ async def gemini(event: Message):
             phrase.wait.until.format(formatter.value_to_str(request, "секунд"))
         )
     text = event.pattern_match.group(1).strip()
-    logger.info(f"Запрос {text}")
-    try:
-        response = (await ai.chat.send_message(f"{event.sender_id} | {text}")).text
-    except Exception:
-        return logger.error("Не удалось получить ответ ИИ")
+    # logger.info(f"Запрос {text}")
+    # try:
+    #     response = (await ai.chat.send_message(f"{event.sender_id} | {text}")).text
+    # except Exception:
+    #     return logger.error("Не удалось получить ответ ИИ")
     # try:
     #     if len(response) > 4096:
     #         response = formatter.splitter(response)
@@ -41,12 +41,12 @@ async def gemini(event: Message):
     #         await event.reply(response)
     # except Exception:
     #     await event.reply(phrase.ai.error)
-    text = ""
+    generated_text = ""
     initial = await event.reply(phrase.ai.response)
     async for chunk in await ai.chat.send_message_stream(f"{event.sender_id} | {text}"):
         if chunk.text and len(chunk.text.strip()) > 0:
-            text += chunk.text
-            await initial.edit(text)
+            generated_text += chunk.text
+            await initial.edit(generated_text)
 
 
 @client.on(events.NewMessage(pattern=r"(?i)^/ии$", func=checks))
