@@ -14,5 +14,6 @@ client = genai.Client(
         async_client_args={"proxy": config.tokens.proxy},
     ),
 )
+
 chat = client.aio.chats.create(model=model)
 crocodile = client.aio.chats.create(model=model)
