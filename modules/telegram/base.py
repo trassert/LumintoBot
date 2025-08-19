@@ -554,7 +554,7 @@ async def link_nick(event: Message):
 @client.on(events.NewMessage(pattern=r"(?i)^/сервер", func=checks))
 @client.on(events.NewMessage(pattern=r"(?i)^/server", func=checks))
 async def sysinfo(event: Message):
-    await event.reply(get_system_info())
+    await event.reply(await get_system_info())
 
 
 @client.on(events.NewMessage(pattern=r"(?i)^/randompic", func=checks))
