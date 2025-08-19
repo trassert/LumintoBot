@@ -3,6 +3,7 @@ from loguru import logger
 logger.info(f"Загружен модуль {__name__}!")
 
 from telethon.tl.custom import Message
+from telethon.errors import MessageTooLongError
 from telethon import events
 
 from .client import client
@@ -27,26 +28,20 @@ async def gemini(event: Message):
             phrase.wait.until.format(formatter.value_to_str(request, "секунд"))
         )
     text = event.pattern_match.group(1).strip()
-    # logger.info(f"Запрос {text}")
-    # try:
-    #     response = (await ai.chat.send_message(f"{event.sender_id} | {text}")).text
-    # except Exception:
-    #     return logger.error("Не удалось получить ответ ИИ")
-    # try:
-    #     if len(response) > 4096:
-    #         response = formatter.splitter(response)
-    #         for chunk in response:
-    #             await event.reply(chunk)
-    #     else:
-    #         await event.reply(response)
-    # except Exception:
-    #     await event.reply(phrase.ai.error)
-    generated_text = ""
-    initial = await event.reply(phrase.ai.response)
-    async for chunk in await ai.chat.send_message_stream(f"{event.sender_id} | {text}"):
-        if chunk.text and len(chunk.text.strip()) > 0:
-            generated_text += chunk.text
-            await initial.edit(generated_text)
+    logger.info(f"Запрос {text}")
+    try:
+        response = (await ai.chat.send_message(f"{event.sender_id} | {text}")).text
+    except Exception:
+        return logger.error("Не удалось получить ответ ИИ")
+    try:
+        if len(response) > 4096:
+            response = formatter.splitter(response)
+            for chunk in response:
+                await event.reply(chunk)
+        else:
+            await event.reply(response)
+    except Exception:
+        await event.reply(phrase.ai.error)
 
 
 @client.on(events.NewMessage(pattern=r"(?i)^/ии$", func=checks))
