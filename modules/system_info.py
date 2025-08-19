@@ -1,14 +1,15 @@
 import psutil
 import platform
 import WinTmp
+import asyncio
+
 from time import time
-from asyncio import sleep
 
 
 
 async def get_current_speed():
     start_counters = psutil.net_io_counters()
-    await sleep(0.1)
+    await asyncio.sleep(0.1)
     end_counters = psutil.net_io_counters()
     delta_bytes_sent = end_counters.bytes_sent - start_counters.bytes_sent
     delta_bytes_recv = end_counters.bytes_recv - start_counters.bytes_recv
