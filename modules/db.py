@@ -753,10 +753,11 @@ class CitiesGame:
                 'current_player_id': 0,
                 'last_city': None
             },
-            'statistics': {}
+            'statistics': {},
+            'status': False
         }
 
-    def logger(msg: str):
+    def logger(self, msg: str):
         logger.info(f"[Города] {msg}")
 
     def _save_data(self):
