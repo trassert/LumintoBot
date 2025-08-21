@@ -371,7 +371,7 @@ async def cities_callback(event: events.CallbackQuery.Event):
         data = Cities.start_game()
         current_player = Cities.who_answer()
         return await event.edit(
-            phrase.сities.game_started.format(
+            phrase.cities.game_started.format(
                 Cities.get_last_city().title(), 
                 await func.get_name(current_player)
             )
