@@ -311,6 +311,7 @@ async def cities_timeout(current_player, last_city):
             if Cities.get_last_city() != last_city:
                 return
             if second == 0:
+                await message.delete()
                 data = Cities.get_data()
                 rem_data = Cities.rem_player(current_player)
                 if rem_data is False:
