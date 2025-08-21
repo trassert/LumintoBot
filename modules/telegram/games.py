@@ -306,7 +306,7 @@ async def city_answer(event: Message):
     if event.text.startswith('/'):
         return
     # Активна ли игра
-    if not Cities.get_game_status()['is_active']:
+    if not Cities.get_game_status():
         return
     # Участвует ли пользователь в игре
     if event.sender_id not in Cities.get_players():
