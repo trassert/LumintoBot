@@ -343,7 +343,7 @@ async def cities_callback(event: events.CallbackQuery.Event):
     
     if action == "join":
         if event.sender_id in Cities.get_players():
-            return await event.answer(phrase.Cities.already_ingame, alert=True)
+            return await event.answer(phrase.cities.already_ingame, alert=True)
         
         Cities.add_player(event.sender_id)
 
@@ -354,8 +354,8 @@ async def cities_callback(event: events.CallbackQuery.Event):
             players_names.append(name)
         
         await event.edit(
-            phrase.cities.start.format(", ".join(players_names)),
-            buttons=event.message.buttons
+            phrase.cities.start.format(", ".join(players_names))
+            # buttons=event.message.buttons
         )
         return await event.answer(phrase.cities.set_ingame)
     
