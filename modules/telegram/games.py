@@ -180,28 +180,28 @@ async def cities_logic(author):
     )
 
 
-# @client.on(events.NewMessage(pattern=r"(?i)^/города$", func=checks))
-# @client.on(events.NewMessage(pattern=r"(?i)^/cities$", func=checks))
-# @client.on(events.NewMessage(pattern=r"(?i)^/города старт$", func=checks))
-# @client.on(events.NewMessage(pattern=r"(?i)^/cities start$", func=checks))
-# @client.on(events.NewMessage(pattern=r"(?i)^/миниигра города$", func=checks))
-# @client.on(events.NewMessage(pattern=r"(?i)^/minigame cities$", func=checks))
-# async def cities_start(event: Message):
-#     if (event.reply_to_msg_id != config.chats.topics.games) and (
-#         getattr(event.reply_to, "reply_to_top_id", None) != config.chats.topics.games
-#     ):
-#         return await event.reply(phrase.game_topic_warning)
-#     if len(Cities.get_players()) > 0:
-#         return await event.reply(phrase.cities.already_started)
-#     keyboard = [
-#         [KeyboardButtonCallback(text="➕ Вступить", data=f"cities.add")],
-#         [KeyboardButtonCallback(text="✅ Начать игру", data=b"cities.start")],
-#     ]
-#     await event.reply(
-#         phrase.cities.start.format(await func.get_name(event.sender_id)),
-#         buttons=keyboard,
-#     )
-#     return await cities_logic(event.sender_id)
+@client.on(events.NewMessage(pattern=r"(?i)^/города$", func=checks))
+@client.on(events.NewMessage(pattern=r"(?i)^/cities$", func=checks))
+@client.on(events.NewMessage(pattern=r"(?i)^/города старт$", func=checks))
+@client.on(events.NewMessage(pattern=r"(?i)^/cities start$", func=checks))
+@client.on(events.NewMessage(pattern=r"(?i)^/миниигра города$", func=checks))
+@client.on(events.NewMessage(pattern=r"(?i)^/minigame cities$", func=checks))
+async def cities_start(event: Message):
+    if (event.reply_to_msg_id != config.chats.topics.games) and (
+        getattr(event.reply_to, "reply_to_top_id", None) != config.chats.topics.games
+    ):
+        return await event.reply(phrase.game_topic_warning)
+    if len(Cities.get_players()) > 0:
+        return await event.reply(phrase.cities.already_started)
+    keyboard = [
+        [KeyboardButtonCallback(text="➕ Вступить", data=f"cities.add")],
+        [KeyboardButtonCallback(text="✅ Начать игру", data=b"cities.start")],
+    ]
+    await event.reply(
+        phrase.cities.start.format(await func.get_name(event.sender_id)),
+        buttons=keyboard,
+    )
+    return await cities_logic(event.sender_id)
 
 
 async def crocodile_handler(event: Message):
@@ -301,6 +301,46 @@ async def crocodile_hint(event: Message):
                 return await event.reply(f'{n} буква в слове - **{game["word"][n-1]}**')
             n += 1
     return await event.reply((await ai.crocodile.send_message(word)).text)
+
+
+@client.on(events.NewMessage(chats=config.chats.chat))
+async def city_answer(event: Message):
+    if (event.reply_to_msg_id != config.chats.topics.games) and (
+        getattr(event.reply_to, "reply_to_top_id", None) != config.chats.topics.games
+    ):
+        return
+    if event.text.startswith('/'):
+        return
+    # Активна ли игра
+    if not Cities.get_game_status()['is_active']:
+        return
+    # Участвует ли пользователь в игре
+    if event.sender_id not in Cities.get_players():
+        return
+    city = event.text.strip()
+    result_code = Cities.answer(event.sender_id, city)
+    if result_code == 0:  # Успех
+        current_player = Cities.who_answer()
+        current_name = await func.get_name(current_player)
+        last_city = Cities.get_last_city()
+        await event.reply(
+            phrase.cities.city_accepted.format(
+                last_city.title(),
+                current_name
+            )
+        )
+    else:
+        # Обработка ошибок
+        if result_code == 1:
+            await event.reply(phrase.сities.unknown_city)
+        elif result_code == 2:
+            await event.reply(phrase.сities.not_your_turn)
+        elif result_code == 4:
+            last_city = Cities.get_last_city()
+            required_letter = formatter.city_last_letter(last_city).upper()
+            await event.reply(phrase.сities.wrong_letter.format(required_letter))
+        elif result_code == 5:
+            await event.reply(phrase.сities.city_used)
 
 
 if db.database("current_game") != 0:

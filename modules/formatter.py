@@ -50,3 +50,12 @@ def splitter(text, chunk_size=4096):
 
 def check_zalgo(text):
     return (len(zalgo_pattern.findall(text)) / len(text)) * 100
+
+
+def city_last_letter(city: str) -> str:
+    city = city.strip().lower()
+    excluded_letters = {'ь', 'ъ', 'ы'}
+    for i in range(len(city) - 1, -1, -1):
+        if city[i] not in excluded_letters:
+            return city[i]
+    return city[-1]  # fallback
