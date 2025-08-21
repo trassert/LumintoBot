@@ -299,6 +299,11 @@ async def crocodile_hint(event: Message):
 
 @client.on(events.NewMessage(chats=config.chats.chat))
 async def city_answer(event: Message):
+    async def autodelete(text):
+        message: Message = await event.reply(text)
+        await asyncio.sleep(5)
+        await message.delete()
+
     if (event.reply_to_msg_id != config.chats.topics.games) and (
         getattr(event.reply_to, "reply_to_top_id", None) != config.chats.topics.games
     ):
@@ -324,15 +329,15 @@ async def city_answer(event: Message):
             )
         )
     elif result_code == 1:
-        await event.reply(phrase.cities.unknown_city)
+        await autodelete(phrase.cities.unknown_city)
     elif result_code == 2:
-        await event.reply(phrase.cities.not_your_turn)
+        await autodelete(phrase.cities.not_your_turn)
     elif result_code == 4:
         last_city = Cities.get_last_city()
         required_letter = formatter.city_last_letter(last_city).upper()
-        await event.reply(phrase.cities.wrong_letter.format(required_letter))
+        await autodelete(phrase.cities.wrong_letter.format(required_letter))
     elif result_code == 5:
-        return await event.reply(phrase.cities.already_inlist)
+        await autodelete(phrase.cities.already_inlist)
 
 
 @client.on(events.CallbackQuery(pattern=r'^cities\.'))
