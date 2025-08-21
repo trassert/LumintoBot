@@ -839,7 +839,7 @@ class CitiesGame:
             self.logger(f"{id} не в списке игроков")
             return 3
         if id != self.data['current_game']['current_player_id']:
-            self.logger("{id} сейчас не должен отвечать")
+            self.logger(f"{id} сейчас не должен отвечать")
             return 2
         if city not in open(check_city_path, encoding="utf8").read().split('\n'):
             self.logger(f"{id} ответил неизвестным городом")
