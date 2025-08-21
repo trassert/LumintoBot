@@ -801,12 +801,6 @@ class CitiesGame:
         self.logger(f"Очередь игрока {self.data['current_game']['current_player_id']} отвечать")
         self._save_data()
     
-    def add_stat(self, player_id: int):
-        """Увеличивает статистику побед игрока на 1"""
-        stats = self.data['statistics']
-        stats[player_id] = stats.get(player_id, 0) + 1
-        self._save_data()
-    
     def get_all_stat(self) -> Dict[int, int]:
         """Возвращает отсортированную статистику по убыванию побед"""
         return dict(sorted(
@@ -840,6 +834,7 @@ class CitiesGame:
         return self.data
 
     def answer(self, id: str, city: str):
+        id = str(id)
         city = city.strip().lower()
         if id not in self.data['current_game']['players']:
             self.logger(f"{id} не в списке игроков")
@@ -854,6 +849,7 @@ class CitiesGame:
             self.logger(f"{id} ответил городом с разными буквами ({city[0]} != {self.data['current_game']['last_city'][-1]})")
             return 4
         self.data['current_game']['last_city'] = city
+        self.data['statistics'][id] = self.data['statistics'].get(id, 0) + 1
         self.add_stat(id)
         self.next_answer()
         self._save_data()

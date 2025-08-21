@@ -317,7 +317,7 @@ async def city_answer(event: Message):
         current_player = Cities.who_answer()
         current_name = await func.get_name(current_player)
         last_city = Cities.get_last_city()
-        await event.reply(
+        return await event.reply(
             phrase.cities.city_accepted.format(
                 last_city.title(),
                 current_name
