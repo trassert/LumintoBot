@@ -343,6 +343,29 @@ async def city_answer(event: Message):
             await event.reply(phrase.сities.city_used)
 
 
+@client.on(events.NewMessage(pattern=r'(?i)^/cities$'))
+async def cities_start(event):
+    """Команда запуска игры"""
+    if len(Cities.get_players()) > 0 and Cities.get_game_status()['is_active']:
+        return await event.reply(phrase.Cities.already_started)
+    
+    # Очищаем предыдущую игру
+    Cities.end_game()
+    Cities.add_player(event.sender_id)
+    
+    keyboard = [
+        [KeyboardButtonCallback(text="➕ Присоединиться", data="cities.join")],
+        [KeyboardButtonCallback(text="🎮 Начать игру", data="cities.start")],
+        [KeyboardButtonCallback(text="❌ Отменить", data="cities.cancel")]
+    ]
+    
+    user_name = await func.get_name(event.sender_id)
+    await event.reply(
+        phrase.cities.start.format(user_name),
+        buttons=keyboard
+    )
+
+
 if db.database("current_game") != 0:
     client.add_event_handler(
         crocodile_handler, events.NewMessage(chats=config.chats.chat)
