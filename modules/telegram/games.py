@@ -317,22 +317,22 @@ async def city_answer(event: Message):
         current_player = Cities.who_answer()
         current_name = await func.get_name(current_player)
         last_city = Cities.get_last_city()
-        return await event.reply(
+        await event.reply(
             phrase.cities.city_accepted.format(
                 last_city.title(),
                 current_name
             )
         )
-    else:
-        # Обработка ошибок
-        if result_code == 1:
-            await event.reply(phrase.cities.unknown_city)
-        elif result_code == 2:
-            await event.reply(phrase.cities.not_your_turn)
-        elif result_code == 4:
-            last_city = Cities.get_last_city()
-            required_letter = formatter.city_last_letter(last_city).upper()
-            await event.reply(phrase.cities.wrong_letter.format(required_letter))
+    elif result_code == 1:
+        await event.reply(phrase.cities.unknown_city)
+    elif result_code == 2:
+        await event.reply(phrase.cities.not_your_turn)
+    elif result_code == 4:
+        last_city = Cities.get_last_city()
+        required_letter = formatter.city_last_letter(last_city).upper()
+        await event.reply(phrase.cities.wrong_letter.format(required_letter))
+    elif result_code == 5:
+        return await event.reply(phrase.cities.already_inlist)
 
 
 @client.on(events.CallbackQuery(pattern=r'^cities\.'))

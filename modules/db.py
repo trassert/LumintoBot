@@ -752,7 +752,8 @@ class CitiesGame:
             'current_game': {
                 'players': [],
                 'current_player_id': 0,
-                'last_city': None
+                'last_city': None,
+                'cities': []
             },
             'statistics': {},
             'status': False
@@ -815,7 +816,8 @@ class CitiesGame:
         self.data['current_game'] = {
             'players': [],
             'current_player_id': 0,
-            'last_city': None
+            'last_city': None,
+            'cities': []
         }
         self.data['status'] = False
         self.data['statistics'] = {}
@@ -848,8 +850,12 @@ class CitiesGame:
         if city[0] != formatter.city_last_letter(self.data['current_game']['last_city']):
             self.logger(f"{id} ответил городом с разными буквами ({city[0]} != {self.data['current_game']['last_city'][-1]})")
             return 4
+        if city in self.data['current_game']['cities']:
+            self.logger(f"{id} ответил городом, который был")
+            return 5
         self.data['current_game']['last_city'] = city
         self.data['statistics'][str(id)] = self.data['statistics'].get(str(id), 0) + 1
+        self.data['current_game']['cities'].append(city)
         self.next_answer()
         self._save_data()
         return 0
