@@ -49,3 +49,9 @@ WithdrawDailyLimit: 64
 
 # Рефералы
 RefGift: 25
+
+# Автоудаление сообщений в мини-игре Города
+CitiesAutodelete: 10
+
+# Ставка на города
+CitiesBet: 5

@@ -778,7 +778,21 @@ class CitiesGame:
         """Добавляет игрока в текущий раунд"""
         if player_id not in self.data['current_game']['players']:
             self.data['current_game']['players'].append(player_id)
+            self.data["start_players"] = self.data["start_players"]+1
             self._save_data()
+
+    def rem_player(self, player_id: int):
+        """
+        Удаляет игрока из текущего раунда
+        Если игрок остался один, то игра завершается
+        """
+        self.data['current_game']['players'].remove(player_id)
+        if len(self.data['current_game']['players']) < 2:
+            self.end_game()
+            return False
+        self.next_answer()
+        self._save_data()
+        return self.who_answer()
     
     def who_answer(self) -> Optional[int]:
         """Возвращает ID игрока, который должен отвечать сейчас"""
@@ -819,6 +833,7 @@ class CitiesGame:
             'last_city': None,
             'cities': []
         }
+        self.data["start_players"] = 0
         self.data['status'] = False
         self.data['statistics'] = {}
         self.logger("Экземпляр Города закончен.")
@@ -866,3 +881,6 @@ class CitiesGame:
 
     def get_game_status(self):
         return self.data['status']
+
+    def get_data(self):
+        return self.data

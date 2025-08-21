@@ -23,6 +23,7 @@ from .. import phrase, ai, config, formatter, db
 
 
 Cities = db.CitiesGame()
+CitiesTimerTask: asyncio.Task = None
 
 
 @client.on(events.NewMessage(config.chats.chat, pattern=r"(?i)^/казино$", func=checks))
@@ -297,11 +298,81 @@ async def crocodile_hint(event: Message):
     return await event.reply((await ai.crocodile.send_message(word)).text)
 
 
+async def cities_timeout(current_player, last_city):
+    try:
+        player_name = await func.get_name(current_player)
+        message: Message = None
+        for second in range(45, 0, -1):
+            if not Cities.get_game_status():
+                return
+            who_answer = Cities.who_answer()
+            if who_answer != current_player:
+                return
+            if Cities.get_last_city() != last_city:
+                return
+            if second == 0:
+                data = Cities.get_data()
+                rem_data = Cities.rem_player(current_player)
+                if rem_data is False:
+                    data['current_game']['players'].remove(current_player)
+                    win_money = data["start_players"] * config.coofs.CitiesBet
+                    db.add_money(
+                        data['current_game']['players'][0],
+                        win_money
+                    )
+                    return await client.send_message(
+                        config.chats.chat,
+                        phrase.cities.winner.format(
+                            await func.get_name(
+                                data['current_game']['players'][0],
+                            ),
+                            formatter.value_to_str(
+                                win_money - config.coofs.CitiesBet,
+                                "изумруд"
+                            )
+                        ),
+                        reply_to=config.chats.topics.games
+                    )
+                return await client.send_message(
+                    config.chats.chat,
+                    phrase.cities.timeout_done.format(
+                        player_name,
+                        await func.get_name(
+                            rem_data
+                        )
+                    ),
+                    reply_to=config.chats.topics.games
+                )
+            if second % 5 == 0:
+                if message:
+                    await message.edit(
+                        phrase.cities.timeout.format(
+                            player=player_name,
+                            time=second
+                        )
+                    )
+                message: Message = await client.send_message(
+                    config.chats.chat,
+                    phrase.cities.timeout.format(
+                        player=player_name,
+                        time=second
+                    ),
+                    reply_to=config.chats.topics.games
+                )
+            await asyncio.sleep(1)
+        
+    except asyncio.CancelledError:
+        try:
+            await message.delete()
+        except Exception:
+            pass
+
+
 @client.on(events.NewMessage(chats=config.chats.chat))
-async def city_answer(event: Message):
+async def cities_answer(event: Message):
     async def autodelete(text):
         message: Message = await event.reply(text)
-        await asyncio.sleep(5)
+        await asyncio.sleep(config.coofs.CitiesAutodelete)
         await message.delete()
 
     if (event.reply_to_msg_id != config.chats.topics.games) and (
@@ -319,6 +390,8 @@ async def city_answer(event: Message):
     city = event.text.strip()
     result_code = Cities.answer(event.sender_id, city)
     if result_code == 0:  # Успех
+        if CitiesTimerTask:
+            CitiesTimerTask.cancel()
         current_player = Cities.who_answer()
         current_name = await func.get_name(current_player)
         last_city = Cities.get_last_city()
@@ -327,6 +400,9 @@ async def city_answer(event: Message):
                 last_city.title(),
                 current_name
             )
+        )
+        CitiesTimerTask = asyncio.create_task(
+            cities_timeout(current_player, last_city)
         )
     elif result_code == 1:
         await autodelete(phrase.cities.unknown_city)
