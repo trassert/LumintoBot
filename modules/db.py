@@ -882,5 +882,5 @@ class CitiesGame:
     def get_game_status(self):
         return self.data['status']
 
-    def get_data(self):
-        return self.data
+    def get_count_players(self):
+        return self.data["start_players"]

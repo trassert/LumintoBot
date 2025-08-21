@@ -298,6 +298,7 @@ async def crocodile_hint(event: Message):
     return await event.reply((await ai.crocodile.send_message(word)).text)
 
 
+@logger.catch
 async def cities_timeout(current_player, last_city):
     try:
         player_name = await func.get_name(current_player)
@@ -310,22 +311,26 @@ async def cities_timeout(current_player, last_city):
                 return
             if Cities.get_last_city() != last_city:
                 return
-            if second == 0:
+            if second <= 1:
                 await message.delete()
-                data = Cities.get_data()
+                Cities.logger("Игрока выбросило за тайм-аут!")
+                players_list = Cities.get_players()
+                count = Cities.get_count_players()
                 rem_data = Cities.rem_player(current_player)
+                Cities.logger(f"Удаляем игрока {current_player}...")
                 if rem_data is False:
-                    data['current_game']['players'].remove(current_player)
-                    win_money = data["start_players"] * config.coofs.CitiesBet
+                    Cities.logger("Игра завершена")
+                    win_money = count * config.coofs.CitiesBet
                     db.add_money(
-                        data['current_game']['players'][0],
+                        players_list[0],
                         win_money
                     )
+                    Cities.logger(f"Победитель {players_list[0]} получает {win_money}")
                     return await client.send_message(
                         config.chats.chat,
                         phrase.cities.winner.format(
                             await func.get_name(
-                                data['current_game']['players'][0],
+                                players_list[0],
                             ),
                             formatter.value_to_str(
                                 win_money - config.coofs.CitiesBet,
@@ -362,9 +367,9 @@ async def cities_timeout(current_player, last_city):
                         reply_to=config.chats.topics.games
                     )
             await asyncio.sleep(1)
-        
     except asyncio.CancelledError:
         try:
+            logger.info("Принудительно завершаем тайм-аут")
             await message.delete()
         except Exception:
             pass
