@@ -834,7 +834,6 @@ class CitiesGame:
         return self.data
 
     def answer(self, id: str, city: str):
-        id = str(id)
         city = city.strip().lower()
         if id not in self.data['current_game']['players']:
             self.logger(f"{id} не в списке игроков")
@@ -849,8 +848,7 @@ class CitiesGame:
             self.logger(f"{id} ответил городом с разными буквами ({city[0]} != {self.data['current_game']['last_city'][-1]})")
             return 4
         self.data['current_game']['last_city'] = city
-        self.data['statistics'][id] = self.data['statistics'].get(id, 0) + 1
-        self.add_stat(id)
+        self.data['statistics'][str(id)] = self.data['statistics'].get(str(id), 0) + 1
         self.next_answer()
         self._save_data()
         return 0
