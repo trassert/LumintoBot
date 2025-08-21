@@ -351,14 +351,15 @@ async def cities_timeout(current_player, last_city):
                             time=second
                         )
                     )
-                message: Message = await client.send_message(
-                    config.chats.chat,
-                    phrase.cities.timeout.format(
-                        player=player_name,
-                        time=second
-                    ),
-                    reply_to=config.chats.topics.games
-                )
+                else:
+                    message: Message = await client.send_message(
+                        config.chats.chat,
+                        phrase.cities.timeout.format(
+                            player=player_name,
+                            time=second
+                        ),
+                        reply_to=config.chats.topics.games
+                    )
             await asyncio.sleep(1)
         
     except asyncio.CancelledError:
@@ -390,6 +391,7 @@ async def cities_answer(event: Message):
     city = event.text.strip()
     result_code = Cities.answer(event.sender_id, city)
     if result_code == 0:  # Успех
+        global CitiesTimerTask
         if CitiesTimerTask:
             CitiesTimerTask.cancel()
         current_player = Cities.who_answer()
