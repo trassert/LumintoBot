@@ -758,6 +758,7 @@ class CitiesGame:
 
     def logger(msg: str):
         logger.info(f"[Города] {msg}")
+
     def _save_data(self):
         """Сохраняет данные в JSON файл с помощью orjson"""
         with open(self.data_file, 'wb') as f:
@@ -820,6 +821,7 @@ class CitiesGame:
             'current_player_id': 0,
             'last_city': None
         }
+        self.data['status'] = False
         self.data['statistics'] = {}
         self.logger("Экземпляр Города закончен.")
         self._save_data()
@@ -827,6 +829,7 @@ class CitiesGame:
     def start_game(self):
         """Начинает новую игру, сохраняя начальные данные"""
         city = choice(open(check_city_path, encoding="utf8").read().split('\n'))
+        self.data['status'] = True
         self.data['current_game']['last_city'] = city
         self.logger(f"Запущена игра Города. Начинается с города {city}")
         self.data['current_game']['current_player_id'] = choice(self.get_players())
@@ -858,3 +861,6 @@ class CitiesGame:
     def get_last_city(self) -> Optional[str]:
         """Возвращает последний названный город"""
         return self.data['current_game']['last_city']
+
+    def get_game_status():
+        return self.data['status']

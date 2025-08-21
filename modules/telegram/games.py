@@ -336,7 +336,7 @@ async def city_answer(event: Message):
 
 
 @client.on(events.CallbackQuery(pattern=r'^cities\.'))
-async def cities_callback(event):
+async def cities_callback(event: events.CallbackQuery.Event):
     """Обработчик кнопок игры"""
     data = event.data.decode('utf-8').split('.')
     action = data[1]
@@ -385,8 +385,8 @@ async def cities_callback(event):
 @client.on(events.NewMessage(pattern=r'(?i)^/cities$'))
 async def cities_start(event):
     """Команда запуска игры"""
-    if len(Cities.get_players()) > 0 and Cities.get_game_status()['is_active']:
-        return await event.reply(phrase.Cities.already_started)
+    if len(Cities.get_players()) > 0 or Cities.get_game_status():
+        return await event.reply(phrase.cities.already_started)
     
     # Очищаем предыдущую игру
     Cities.end_game()
