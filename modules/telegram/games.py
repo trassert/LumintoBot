@@ -343,6 +343,57 @@ async def city_answer(event: Message):
             await event.reply(phrase.сities.city_used)
 
 
+@client.on(events.CallbackQuery(pattern=r'^cities\.'))
+async def cities_callback(event):
+    """Обработчик кнопок игры"""
+    data = event.data.decode('utf-8').split('.')
+    action = data[1]
+    
+    if action == "join":
+        if event.sender_id in Cities.get_players():
+            return await event.answer(phrase.Cities.already_ingame, alert=True)
+        
+        Cities.add_player(event.sender_id)
+
+        # Обновляем список игроков
+        players_names = []
+        for player_id in Cities.get_players():
+            name = await func.get_name(player_id)
+            players_names.append(name)
+        
+        await event.edit(
+            phrase.cities.start.format(", ".join(players_names)),
+            buttons=event.message.buttons
+        )
+        await event.answer(phrase.cities.set_ingame)
+    
+    elif action == "start":
+        if len(Cities.get_players()) < 2:
+            return await event.answer(phrase.Cities.low_players, alert=True)
+        
+        success, message = Cities.start_game()
+        if success:
+            current_player = Cities.who_answer()
+            current_name = await get_user_name(current_player)
+            last_city = Cities.get_last_city()
+            from cities_data import get_last_letter
+            next_letter = get_last_letter(last_city).upper()
+            
+            await event.edit(
+                phrase.Cities.game_started.format(
+                    last_city.title(), 
+                    current_name, 
+                    next_letter
+                )
+            )
+        else:
+            await event.answer(message, alert=True)
+    
+    elif action == "cancel":
+        Cities.end_game()
+        await event.edit("❌ Игра отменена.")
+
+
 @client.on(events.NewMessage(pattern=r'(?i)^/cities$'))
 async def cities_start(event):
     """Команда запуска игры"""
