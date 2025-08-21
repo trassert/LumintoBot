@@ -13,6 +13,7 @@ from json import JSONDecodeError
 from . import config
 from .get_theme import weighted_choice
 from .pathes import *
+from . import formatter
 
 
 def database(key, value=None, delete=None, log=True):
@@ -844,7 +845,7 @@ class CitiesGame:
         if city not in open(check_city_path, encoding="utf8").read().split('\n'):
             self.logger(f"{id} ответил неизвестным городом")
             return 1
-        if city[0] != self.data['current_game']['last_city'][-1]:
+        if city[0] != formatter.city_last_letter(self.data['current_game']['last_city']):
             self.logger(f"{id} ответил городом с разными буквами ({city[0]} != {self.data['current_game']['last_city'][-1]})")
             return 4
         self.data['current_game']['last_city'] = city
