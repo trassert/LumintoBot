@@ -365,29 +365,21 @@ async def cities_callback(event):
             phrase.cities.start.format(", ".join(players_names)),
             buttons=event.message.buttons
         )
-        await event.answer(phrase.cities.set_ingame)
+        return await event.answer(phrase.cities.set_ingame)
     
     elif action == "start":
         if len(Cities.get_players()) < 2:
-            return await event.answer(phrase.Cities.low_players, alert=True)
-        
-        success, message = Cities.start_game()
-        if success:
-            current_player = Cities.who_answer()
-            current_name = await get_user_name(current_player)
-            last_city = Cities.get_last_city()
-            from cities_data import get_last_letter
-            next_letter = get_last_letter(last_city).upper()
-            
-            await event.edit(
-                phrase.Cities.game_started.format(
-                    last_city.title(), 
-                    current_name, 
-                    next_letter
-                )
+            return await event.answer(phrase.cities.low_players, alert=True)
+        data = Cities.start_game()
+        current_player = Cities.who_answer()
+        last_city = Cities.get_last_city()
+        return await event.edit(
+            phrase.Cities.game_started.format(
+                last_city.title(), 
+                await func.get_name(current_player), 
+                formatter.city_last_letter(last_city).upper()
             )
-        else:
-            await event.answer(message, alert=True)
+        )
     
     elif action == "cancel":
         Cities.end_game()
