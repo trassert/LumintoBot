@@ -862,5 +862,5 @@ class CitiesGame:
         """Возвращает последний названный город"""
         return self.data['current_game']['last_city']
 
-    def get_game_status():
+    def get_game_status(self):
         return self.data['status']
