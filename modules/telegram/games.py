@@ -377,13 +377,12 @@ async def cities_callback(event: events.CallbackQuery.Event):
 
 
 @client.on(events.NewMessage(pattern=r"(?i)^/города$", func=checks))
-@client.on(events.NewMessage(pattern=r"(?i)^/cities$", func=checks))
 @client.on(events.NewMessage(pattern=r"(?i)^/города старт$", func=checks))
 @client.on(events.NewMessage(pattern=r"(?i)^/cities start$", func=checks))
 @client.on(events.NewMessage(pattern=r"(?i)^/миниигра города$", func=checks))
 @client.on(events.NewMessage(pattern=r"(?i)^/minigame cities$", func=checks))
 @client.on(events.NewMessage(pattern=r'(?i)^/cities$'))
-async def cities_start(event):
+async def cities_start(event: Message):
     """Команда запуска игры"""
     if len(Cities.get_players()) > 0 or Cities.get_game_status():
         return await event.reply(phrase.cities.already_started)
