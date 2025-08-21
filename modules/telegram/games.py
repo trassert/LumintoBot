@@ -326,13 +326,13 @@ async def city_answer(event: Message):
     else:
         # Обработка ошибок
         if result_code == 1:
-            await event.reply(phrase.сities.unknown_city)
+            await event.reply(phrase.cities.unknown_city)
         elif result_code == 2:
-            await event.reply(phrase.сities.not_your_turn)
+            await event.reply(phrase.cities.not_your_turn)
         elif result_code == 4:
             last_city = Cities.get_last_city()
             required_letter = formatter.city_last_letter(last_city).upper()
-            await event.reply(phrase.сities.wrong_letter.format(required_letter))
+            await event.reply(phrase.cities.wrong_letter.format(required_letter))
 
 
 @client.on(events.CallbackQuery(pattern=r'^cities\.'))
@@ -391,7 +391,13 @@ async def cities_callback(event: events.CallbackQuery.Event):
 async def cities_start(event: Message):
     """Команда запуска игры"""
     if len(Cities.get_players()) > 0 or Cities.get_game_status():
-        return await event.reply(phrase.cities.already_started)
+        keyboard = [
+            [KeyboardButtonCallback(text="❌ Отменить", data="cities.cancel")]
+        ]
+        return await event.reply(
+            phrase.cities.already_started,
+            buttons=keyboard
+        )
     
     # Очищаем предыдущую игру
     Cities.end_game()
