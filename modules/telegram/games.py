@@ -342,8 +342,6 @@ async def cities_callback(event: events.CallbackQuery.Event):
     action = data[1]
     
     if action == "join":
-        from rich import print
-        print(event)
         if event.sender_id in Cities.get_players():
             return await event.answer(phrase.cities.already_ingame, alert=True)
         
