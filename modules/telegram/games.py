@@ -180,12 +180,6 @@ async def super_game(event: Message):
 #     )
 
 
-# @client.on(events.NewMessage(pattern=r"(?i)^/города$", func=checks))
-# @client.on(events.NewMessage(pattern=r"(?i)^/cities$", func=checks))
-# @client.on(events.NewMessage(pattern=r"(?i)^/города старт$", func=checks))
-# @client.on(events.NewMessage(pattern=r"(?i)^/cities start$", func=checks))
-# @client.on(events.NewMessage(pattern=r"(?i)^/миниигра города$", func=checks))
-# @client.on(events.NewMessage(pattern=r"(?i)^/minigame cities$", func=checks))
 # async def cities_start(event: Message):
 #     if (event.reply_to_msg_id != config.chats.topics.games) and (
 #         getattr(event.reply_to, "reply_to_top_id", None) != config.chats.topics.games
@@ -372,12 +366,10 @@ async def cities_callback(event):
             return await event.answer(phrase.cities.low_players, alert=True)
         data = Cities.start_game()
         current_player = Cities.who_answer()
-        last_city = Cities.get_last_city()
         return await event.edit(
-            phrase.Cities.game_started.format(
-                last_city.title(), 
-                await func.get_name(current_player), 
-                formatter.city_last_letter(last_city).upper()
+            phrase.сities.game_started.format(
+                Cities.get_last_city().title(), 
+                await func.get_name(current_player)
             )
         )
     
@@ -386,6 +378,12 @@ async def cities_callback(event):
         await event.edit("❌ Игра отменена.")
 
 
+@client.on(events.NewMessage(pattern=r"(?i)^/города$", func=checks))
+@client.on(events.NewMessage(pattern=r"(?i)^/cities$", func=checks))
+@client.on(events.NewMessage(pattern=r"(?i)^/города старт$", func=checks))
+@client.on(events.NewMessage(pattern=r"(?i)^/cities start$", func=checks))
+@client.on(events.NewMessage(pattern=r"(?i)^/миниигра города$", func=checks))
+@client.on(events.NewMessage(pattern=r"(?i)^/minigame cities$", func=checks))
 @client.on(events.NewMessage(pattern=r'(?i)^/cities$'))
 async def cities_start(event):
     """Команда запуска игры"""
