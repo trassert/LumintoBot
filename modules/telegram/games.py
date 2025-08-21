@@ -333,8 +333,6 @@ async def city_answer(event: Message):
             last_city = Cities.get_last_city()
             required_letter = formatter.city_last_letter(last_city).upper()
             await event.reply(phrase.сities.wrong_letter.format(required_letter))
-        elif result_code == 5:
-            await event.reply(phrase.сities.city_used)
 
 
 @client.on(events.CallbackQuery(pattern=r'^cities\.'))
@@ -375,7 +373,7 @@ async def cities_callback(event):
     
     elif action == "cancel":
         Cities.end_game()
-        await event.edit("❌ Игра отменена.")
+        return await event.edit("❌ Игра отменена.")
 
 
 @client.on(events.NewMessage(pattern=r"(?i)^/города$", func=checks))
@@ -401,7 +399,7 @@ async def cities_start(event):
     ]
     
     user_name = await func.get_name(event.sender_id)
-    await event.reply(
+    return await event.reply(
         phrase.cities.start.format(user_name),
         buttons=keyboard
     )
