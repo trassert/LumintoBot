@@ -789,7 +789,6 @@ class CitiesGame:
         self.next_answer()
         self.data['current_game']['players'].remove(player_id)
         if len(self.data['current_game']['players']) < 2:
-            self.end_game()
             return False
         self._save_data()
         return self.who_answer()

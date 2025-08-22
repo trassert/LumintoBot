@@ -158,47 +158,6 @@ async def super_game(event: Message):
     return await client.send_message(config.chats.chat, phrase.crocodile.super_game)
 
 
-# async def cities_logic(author):
-#     Cities.add_player(author)
-#     async def cities_callback(event: events.CallbackQuery.Event):
-#         data = event.data.decode("utf-8").split(".")
-#         if data[1] == "start":
-#             if len(Cities.get_players()) < 2:
-#                 return await event.answer(phrase.cities.low_players, alert=True)
-#             client.remove_event_handler(cities_callback)
-#         elif data[1] == "add":
-#             if event.sender_id in Cities.get_players():
-#                 return await event.answer(phrase.cities.already_ingame, alert=True)
-#             Cities.add_player(event.sender_id)
-#             await event.edit(
-#                 phrase.cities.start.format(
-#                     ", ".join(Cities.get_players())
-#                 )
-#             )
-#             return await event.answer(phrase.cities.set_ingame)
-#     client.add_event_handler(
-#         cities_callback, events.CallbackQuery(func=checks, pattern=r"^cities")
-#     )
-
-
-# async def cities_start(event: Message):
-#     if (event.reply_to_msg_id != config.chats.topics.games) and (
-#         getattr(event.reply_to, "reply_to_top_id", None) != config.chats.topics.games
-#     ):
-#         return await event.reply(phrase.game_topic_warning)
-#     if len(Cities.get_players()) > 0:
-#         return await event.reply(phrase.cities.already_started)
-#     keyboard = [
-#         [KeyboardButtonCallback(text="➕ Вступить", data=f"cities.add")],
-#         [KeyboardButtonCallback(text="✅ Начать игру", data=b"cities.start")],
-#     ]
-#     await event.reply(
-#         phrase.cities.start.format(await func.get_name(event.sender_id)),
-#         buttons=keyboard,
-#     )
-#     return await cities_logic(event.sender_id)
-
-
 async def crocodile_handler(event: Message):
     if (event.reply_to_msg_id != config.chats.topics.games) and (
         getattr(event.reply_to, "reply_to_top_id", None) != config.chats.topics.games
@@ -326,7 +285,11 @@ async def cities_timeout(current_player: int, last_city: str):
                         win_money
                     )
                     Cities.logger(f"Победитель {players_list[0]} получает {win_money}")
-                    return await client.send_message(
+                    statistic = ""
+                    n = 1
+                    for key, value in Cities.get_all_stat().items():
+                        statistic += f"{n if n != 1 else '👑'}. **{await func.get_name(key)}** назвал {value} городов\n"
+                    await client.send_message(
                         config.chats.chat,
                         phrase.cities.winner.format(
                             await func.get_name(
@@ -335,10 +298,12 @@ async def cities_timeout(current_player: int, last_city: str):
                             formatter.value_to_str(
                                 win_money - config.coofs.CitiesBet,
                                 "изумруд"
-                            )
+                            ),
+                            statistic
                         ),
                         reply_to=config.chats.topics.games
                     )
+                    Cities.end_game()
                 global CitiesTimerTask
                 CitiesTimerTask = asyncio.create_task(
                     cities_timeout(rem_data, last_city)
@@ -496,6 +461,8 @@ async def cities_callback(event: events.CallbackQuery.Event):
         )
     
     elif action == "cancel":
+        if event.sender_id not in Cities.get_players():
+            return await event.answer(phrase.cities.not_in_players, alert=True)
         Cities.end_game()
         return await event.edit("❌ Игра отменена.")
 
