@@ -305,7 +305,7 @@ async def cities_timeout(current_player: int, last_city: str):
                         ),
                         reply_to=config.chats.topics.games
                     )
-                    Cities.end_game()
+                    return Cities.end_game()
                 global CitiesTimerTask
                 CitiesTimerTask = asyncio.create_task(
                     cities_timeout(rem_data, last_city)
@@ -321,7 +321,7 @@ async def cities_timeout(current_player: int, last_city: str):
                     ),
                     reply_to=config.chats.topics.games
                 )
-            if second % 5 == 0 and config.coofs.CitiesTimeout / 2 <= second:
+            if second % 5 == 0 and config.coofs.CitiesTimeout / 2 >= second:
                 if message:
                     await message.edit(
                         phrase.cities.timeout.format(
