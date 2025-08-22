@@ -289,6 +289,8 @@ async def cities_timeout(current_player: int, last_city: str):
                     n = 1
                     for key, value in Cities.get_all_stat().items():
                         statistic += f"{n if n != 1 else '👑'}. **{await func.get_name(key)}** назвал {value} городов\n"
+                        n += 1
+                    statistic = "Пусто!" if statistic == "" else statistic
                     await client.send_message(
                         config.chats.chat,
                         phrase.cities.winner.format(
