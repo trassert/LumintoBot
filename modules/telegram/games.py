@@ -303,7 +303,7 @@ async def cities_timeout(current_player: int, last_city: str):
     try:
         player_name = await func.get_name(current_player)
         message: Message = None
-        for second in range(45, 0, -1):
+        for second in range(config.coofs.CitiesTimeout, 0, -1):
             if not Cities.get_game_status():
                 return
             who_answer = Cities.who_answer()
