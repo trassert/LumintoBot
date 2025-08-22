@@ -299,7 +299,7 @@ async def crocodile_hint(event: Message):
 
 
 @logger.catch
-async def cities_timeout(current_player, last_city):
+async def cities_timeout(current_player: int, last_city: str):
     try:
         player_name = await func.get_name(current_player)
         message: Message = None
@@ -339,17 +339,22 @@ async def cities_timeout(current_player, last_city):
                         ),
                         reply_to=config.chats.topics.games
                     )
+                global CitiesTimerTask
+                CitiesTimerTask = asyncio.create_task(
+                    cities_timeout(rem_data, last_city)
+                )
                 return await client.send_message(
                     config.chats.chat,
                     phrase.cities.timeout_done.format(
                         player_name,
                         await func.get_name(
                             rem_data
-                        )
+                        ),
+                        last_city.title()
                     ),
                     reply_to=config.chats.topics.games
                 )
-            if second % 5 == 0:
+            if second % 5 == 0 and config.coofs.CitiesTimeout / 2 <= second:
                 if message:
                     await message.edit(
                         phrase.cities.timeout.format(
@@ -459,6 +464,10 @@ async def cities_callback(event: events.CallbackQuery.Event):
             return await event.answer(phrase.cities.low_players, alert=True)
         data = Cities.start_game()
         current_player = Cities.who_answer()
+        global CitiesTimerTask
+        CitiesTimerTask = asyncio.create_task(
+            cities_timeout(current_player, Cities.get_last_city())
+        )
         return await event.edit(
             phrase.cities.game_started.format(
                 Cities.get_last_city().title(), 

@@ -55,3 +55,6 @@ CitiesAutodelete: 10
 
 # Ставка на города
 CitiesBet: 5
+
+# Время, которое нужно ждать до удаления игрока
+CitiesTimeout: 50

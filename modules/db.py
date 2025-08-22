@@ -786,11 +786,11 @@ class CitiesGame:
         Удаляет игрока из текущего раунда
         Если игрок остался один, то игра завершается
         """
+        self.next_answer()
         self.data['current_game']['players'].remove(player_id)
         if len(self.data['current_game']['players']) < 2:
             self.end_game()
             return False
-        self.next_answer()
         self._save_data()
         return self.who_answer()
     
