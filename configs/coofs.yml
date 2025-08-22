@@ -41,6 +41,7 @@ MineMaxBoost: 50
 # Цены
 PriceForChangeNick: 5
 PriceForCasino: 5
+PriceForCities: 5
 PriceForNewState: 25
 PriceForChangeStateNick: 40
 

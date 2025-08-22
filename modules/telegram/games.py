@@ -438,6 +438,26 @@ async def cities_callback(event: events.CallbackQuery.Event):
     if action == "join":
         if event.sender_id in Cities.get_players():
             return await event.answer(phrase.cities.already_ingame, alert=True)
+
+        balance = db.get_money(event.sender_id)
+        if config.coofs.PriceForCities > balance:
+            return await event.answer(
+                phrase.money.not_enough.format(
+                    formatter.value_to_str(
+                        balance,
+                        "изумруд"
+                    )
+                )
+            )
+        db.add_money(event.sender_id, -config.coofs.PriceForCities)
+        await event.answer(
+            phrase.cities.set_ingame.format(
+                formatter.value_to_str(
+                    config.coofs.PriceForCities,
+                    "изумруд"
+                )
+            )
+        )
         
         Cities.add_player(event.sender_id)
 
