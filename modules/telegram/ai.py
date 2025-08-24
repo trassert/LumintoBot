@@ -12,7 +12,6 @@ from .global_checks import *
 from .. import phrase, ai, config, floodwait, formatter
 
 WaitAI = floodwait.FloodWaitBase("WaitAI", config.flood.ai)
-WaitStaff = floodwait.FloodWaitBase("WaitStaff", config.flood.ai)
 
 
 @client.on(events.NewMessage(pattern=r"(?i)^/ии\s([\s\S]+)", func=checks))
@@ -26,7 +25,7 @@ async def gemini(event: Message):
         request = WaitAI.request()
     elif event.chat_id == config.chats.staff:
         chat = ai.staff
-        request = WaitStaff.request()
+        request = True
     else:
         return await event.reply(phrase.ai.only_chat)
     if request is not True:
