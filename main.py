@@ -42,6 +42,13 @@ async def main():
                     ).text.replace("\n", "")
                 )
             )
+            logger.info(
+                "Стафф-чат - {}".format(
+                    (
+                        await ai.staff.send_message(phrase.ai.staff_prompt)
+                    ).text.replace("\n", "")
+                )
+            )
             await db.Users.initialize()
             await webhooks.server()
             await asyncio.gather(

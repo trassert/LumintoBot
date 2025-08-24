@@ -12,7 +12,7 @@ from .global_checks import *
 from .. import phrase, ai, config, floodwait, formatter
 
 WaitAI = floodwait.FloodWaitBase("WaitAI", config.flood.ai)
-WaitStaff = floodwait.FloodWaitBase("WaitAI", config.flood.ai)
+WaitStaff = floodwait.FloodWaitBase("WaitStaff", config.flood.ai)
 
 
 @client.on(events.NewMessage(pattern=r"(?i)^/ии\s([\s\S]+)", func=checks))
@@ -21,10 +21,10 @@ WaitStaff = floodwait.FloodWaitBase("WaitAI", config.flood.ai)
 @client.on(events.NewMessage(pattern=r"(?i)^/бот\s([\s\S]+)", func=checks))
 @client.on(events.NewMessage(pattern=r"(?i)^/лаи\s([\s\S]+)", func=checks))
 async def gemini(event: Message):
-    if event.chat_id in config.chats.chat:
+    if event.chat_id == config.chats.chat:
         chat = ai.chat
         request = WaitAI.request()
-    elif event.chat_id in config.chats.staff:
+    elif event.chat_id == config.chats.staff:
         chat = ai.staff
         request = WaitStaff.request()
     else:
