@@ -17,3 +17,4 @@ client = genai.Client(
 
 chat = client.aio.chats.create(model=model)
 crocodile = client.aio.chats.create(model=model)
+staff = client.aio.chats.create(model=model)

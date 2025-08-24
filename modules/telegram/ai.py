@@ -12,6 +12,7 @@ from .global_checks import *
 from .. import phrase, ai, config, floodwait, formatter
 
 WaitAI = floodwait.FloodWaitBase("WaitAI", config.flood.ai)
+WaitStaff = floodwait.FloodWaitBase("WaitAI", config.flood.ai)
 
 
 @client.on(events.NewMessage(pattern=r"(?i)^/ии\s([\s\S]+)", func=checks))
@@ -20,9 +21,14 @@ WaitAI = floodwait.FloodWaitBase("WaitAI", config.flood.ai)
 @client.on(events.NewMessage(pattern=r"(?i)^/бот\s([\s\S]+)", func=checks))
 @client.on(events.NewMessage(pattern=r"(?i)^/лаи\s([\s\S]+)", func=checks))
 async def gemini(event: Message):
-    if not event.chat_id == config.chats.chat:
-        return await event.reply(phrase.ai.chat)
-    request = WaitAI.request()
+    if event.chat_id in config.chats.chat:
+        chat = ai.chat
+        request = WaitAI.request()
+    elif event.chat_id in config.chats.staff:
+        chat = ai.staff
+        request = WaitStaff.request()
+    else:
+        return await event.reply(phrase.ai.only_chat)
     if request is not True:
         return await event.reply(
             phrase.wait.until.format(formatter.value_to_str(request, "секунд"))
@@ -30,7 +36,7 @@ async def gemini(event: Message):
     text = event.pattern_match.group(1).strip()
     logger.info(f"Запрос {text}")
     try:
-        response = (await ai.chat.send_message(f"{event.sender_id} | {text}")).text
+        response = (await chat.send_message(f"{event.sender_id} | {text}")).text
     except Exception:
         return logger.error("Не удалось получить ответ ИИ")
     try:
