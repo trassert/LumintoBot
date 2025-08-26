@@ -189,28 +189,28 @@ class crocodile_stat:
             self.id = str(id)
 
     def get(self):
-        with open(crocodile_stats_path, "rb") as f:
+        with open(crocostat_path, "rb") as f:
             load = orjson.loads(f.read())
         if self.id in load:
             return load[self.id]
         else:
-            with open(crocodile_stats_path, "wb") as f:
+            with open(crocostat_path, "wb") as f:
                 load[self.id] = 0
                 f.write(orjson.dumps(load, option=orjson.OPT_SORT_KEYS))
             return 0
 
     def add(self):
-        with open(crocodile_stats_path, "rb") as f:
+        with open(crocostat_path, "rb") as f:
             load = orjson.loads(f.read())
         if self.id in load:
             load[self.id] += 1
         else:
             load[self.id] = 1
-        with open(crocodile_stats_path, "wb") as f:
+        with open(crocostat_path, "wb") as f:
             f.write(orjson.dumps(load, option=orjson.OPT_SORT_KEYS))
 
     def get_all(self=False):
-        with open(crocodile_stats_path, "rb") as f:
+        with open(crocostat_path, "rb") as f:
             load = orjson.loads(f.read())
         return dict(sorted(load.items(), key=lambda item: item[1], reverse=True))
 
@@ -664,11 +664,11 @@ def check_withdraw_limit(id: int, amount: int) -> int | bool:
     if amount > 64:
         return 64
     today = datetime.now().date()
-    if not path.exists(withdraws_path):
+    if not path.exists(wdraw_path):
         logger.error("Файл вывода не найден!")
         data = {}
     else:
-        with open(withdraws_path, "rb") as f:
+        with open(wdraw_path, "rb") as f:
             try:
                 data = orjson.loads(f.read())
             except orjson.JSONDecodeError:
@@ -692,7 +692,7 @@ def check_withdraw_limit(id: int, amount: int) -> int | bool:
     else:
         data[str(id)] = {"date": today.isoformat(), "withdrawn": amount}
 
-    with open(withdraws_path, "wb") as f:
+    with open(wdraw_path, "wb") as f:
         f.write(orjson.dumps(data, option=orjson.OPT_INDENT_2))
     return True
 
@@ -742,21 +742,21 @@ class CitiesGame:
     def __init__(self):
         self.data_file = cities_path
         self.data = self._load_data()
-        
+
     def _load_data(self) -> Dict:
         """Загружает данные из JSON файла или создаёт новый, если файла нет"""
         if path.exists(self.data_file):
-            with open(self.data_file, 'rb') as f:
+            with open(self.data_file, "rb") as f:
                 return orjson.loads(f.read())
         return {
-            'current_game': {
-                'players': [],
-                'current_player_id': 0,
-                'last_city': None,
-                'cities': []
+            "current_game": {
+                "players": [],
+                "current_player_id": 0,
+                "last_city": None,
+                "cities": [],
             },
-            'statistics': {},
-            'status': False
+            "statistics": {},
+            "status": False,
         }
 
     def logger(self, msg: str):
@@ -764,21 +764,18 @@ class CitiesGame:
 
     def _save_data(self):
         """Сохраняет данные в JSON файл с помощью orjson"""
-        with open(self.data_file, 'wb') as f:
-            f.write(orjson.dumps(
-                self.data,
-                option=orjson.OPT_INDENT_2
-            ))
-    
+        with open(self.data_file, "wb") as f:
+            f.write(orjson.dumps(self.data, option=orjson.OPT_INDENT_2))
+
     def get_players(self) -> List[int]:
         """Возвращает список ID игроков в текущем раунде"""
-        return self.data['current_game']['players']
-    
+        return self.data["current_game"]["players"]
+
     def add_player(self, player_id: int):
         """Добавляет игрока в текущий раунд"""
-        if player_id not in self.data['current_game']['players']:
-            self.data['current_game']['players'].append(player_id)
-            self.data["start_players"] = self.data["start_players"]+1
+        if player_id not in self.data["current_game"]["players"]:
+            self.data["current_game"]["players"].append(player_id)
+            self.data["start_players"] = self.data["start_players"] + 1
             self._save_data()
 
     def rem_player(self, player_id: int):
@@ -787,64 +784,70 @@ class CitiesGame:
         Если игрок остался один, то игра завершается
         """
         self.next_answer()
-        self.data['current_game']['players'].remove(player_id)
-        if len(self.data['current_game']['players']) < 2:
+        self.data["current_game"]["players"].remove(player_id)
+        if len(self.data["current_game"]["players"]) < 2:
             return False
         self._save_data()
         return self.who_answer()
-    
+
     def who_answer(self) -> Optional[int]:
         """Возвращает ID игрока, который должен отвечать сейчас"""
         players = self.get_players()
         if not players:
             return None
-        current_id = self.data['current_game']['current_player_id']
+        current_id = self.data["current_game"]["current_player_id"]
         return current_id
-    
+
     def next_answer(self):
         """Переключает очередь на следующего игрока"""
         players = self.get_players()
         if not players:
             return False
-        index = self.data['current_game']['players'].index(
-            self.data['current_game']['current_player_id']
+        index = self.data["current_game"]["players"].index(
+            self.data["current_game"]["current_player_id"]
         )
         try:
-            self.data['current_game']['current_player_id'] = self.data['current_game']['players'][index+1]
+            self.data["current_game"]["current_player_id"] = self.data["current_game"][
+                "players"
+            ][index + 1]
         except IndexError:
-            self.data['current_game']['current_player_id'] = self.data['current_game']['players'][0]
-        self.logger(f"Очередь игрока {self.data['current_game']['current_player_id']} отвечать")
+            self.data["current_game"]["current_player_id"] = self.data["current_game"][
+                "players"
+            ][0]
+        self.logger(
+            f"Очередь игрока {self.data['current_game']['current_player_id']} отвечать"
+        )
         self._save_data()
-    
+
     def get_all_stat(self) -> Dict[int, int]:
         """Возвращает отсортированную статистику по убыванию побед"""
-        return dict(sorted(
-            self.data['statistics'].items(),
-            key=lambda item: item[1],
-            reverse=True
-        ))
-    
+        return dict(
+            sorted(
+                self.data["statistics"].items(), key=lambda item: item[1], reverse=True
+            )
+        )
+
     def end_game(self):
         """Завершает игру, очищая текущие данные"""
-        self.data['current_game'] = {
-            'players': [],
-            'current_player_id': 0,
-            'last_city': None,
-            'cities': []
+        self.data["current_game"] = {
+            "players": [],
+            "current_player_id": 0,
+            "last_city": None,
+            "cities": [],
         }
         self.data["start_players"] = 0
-        self.data['status'] = False
-        self.data['statistics'] = {}
+        self.data["status"] = False
+        self.data["statistics"] = {}
         self.logger("Экземпляр Города закончен.")
         self._save_data()
-    
+
     def start_game(self):
         """Начинает новую игру, сохраняя начальные данные"""
-        city = choice(open(check_city_path, encoding="utf8").read().split('\n'))
-        self.data['status'] = True
-        self.data['current_game']['last_city'] = city
+        city = choice(open(chk_city_path, encoding="utf8").read().split("\n"))
+        self.data["status"] = True
+        self.data["current_game"]["last_city"] = city
         self.logger(f"Запущена игра Города. Начинается с города {city}")
-        self.data['current_game']['current_player_id'] = choice(self.get_players())
+        self.data["current_game"]["current_player_id"] = choice(self.get_players())
         self.logger(f"Игроки: {self.get_players()}")
         self.logger(f"Отвечает: {self.data['current_game']['current_player_id']}")
         self._save_data()
@@ -852,34 +855,56 @@ class CitiesGame:
 
     def answer(self, id: str, city: str):
         city = city.strip().lower()
-        if id not in self.data['current_game']['players']:
+        if id not in self.data["current_game"]["players"]:
             self.logger(f"{id} не в списке игроков")
             return 3
-        if id != self.data['current_game']['current_player_id']:
+        if id != self.data["current_game"]["current_player_id"]:
             self.logger(f"{id} сейчас не должен отвечать")
             return 2
-        if city not in open(check_city_path, encoding="utf8").read().split('\n'):
+        if city not in open(chk_city_path, encoding="utf8").read().split("\n"):
             self.logger(f"{id} ответил неизвестным городом")
             return 1
-        if city[0] != formatter.city_last_letter(self.data['current_game']['last_city']):
-            self.logger(f"{id} ответил городом с разными буквами ({city[0]} != {self.data['current_game']['last_city'][-1]})")
+        if city[0] != formatter.city_last_letter(
+            self.data["current_game"]["last_city"]
+        ):
+            self.logger(
+                f"{id} ответил городом с разными буквами ({city[0]} != {self.data['current_game']['last_city'][-1]})"
+            )
             return 4
-        if city in self.data['current_game']['cities']:
+        if city in self.data["current_game"]["cities"]:
             self.logger(f"{id} ответил городом, который был")
             return 5
-        self.data['current_game']['last_city'] = city
-        self.data['statistics'][str(id)] = self.data['statistics'].get(str(id), 0) + 1
-        self.data['current_game']['cities'].append(city)
+        self.data["current_game"]["last_city"] = city
+        self.data["statistics"][str(id)] = self.data["statistics"].get(str(id), 0) + 1
+        self.data["current_game"]["cities"].append(city)
         self.next_answer()
         self._save_data()
         return 0
-    
+
     def get_last_city(self) -> Optional[str]:
         """Возвращает последний названный город"""
-        return self.data['current_game']['last_city']
+        return self.data["current_game"]["last_city"]
 
     def get_game_status(self):
-        return self.data['status']
+        return self.data["status"]
 
     def get_count_players(self):
         return self.data["start_players"]
+
+
+def hellomsg_check(input_id):
+    "Проверка, приветствовался ли человек ранее."
+    id_str = str(input_id)
+    ids_set = set()
+    if path.exists(hellomsg_path):
+        try:
+            with open(hellomsg_path, "rb") as f:
+                ids_set = set(orjson.loads(f.read()))
+        except (JSONDecodeError, FileNotFoundError):
+            pass
+    if id_str in ids_set:
+        return False
+    ids_set.add(id_str)
+    with open(hellomsg_path, "wb") as f:
+        f.write(orjson.dumps(ids_set, option=orjson.OPT_INDENT_2))
+    return True

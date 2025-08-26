@@ -239,7 +239,7 @@ async def word_callback(event: events.CallbackQuery.Event):
     logger.info(f"КБ кнопка (Word), дата: {data}")
     user_name = await get_name(data[3])
     if data[1] == "yes":
-        with open(pathes.crocodile_path, "a", encoding="utf-8") as f:
+        with open(pathes.crocoall_path, "a", encoding="utf-8") as f:
             f.write(f"\n{data[2]}")
         db.add_money(data[3], config.coofs.WordRequest)
         await client.send_message(
@@ -254,7 +254,7 @@ async def word_callback(event: events.CallbackQuery.Event):
             event.sender_id, event.message_id, phrase.word.add
         )
     if data[1] == "no":
-        with open(pathes.crocodile_blacklist_path, "a", encoding="utf-8") as f:
+        with open(pathes.crocobl_path, "a", encoding="utf-8") as f:
             f.write(f"\n{data[2]}")
         await client.send_message(
             config.chats.chat, phrase.word.no.format(word=data[2], user=user_name)
@@ -307,7 +307,7 @@ async def crocodile_callback(event: events.CallbackQuery.Event):
             return await event.answer(phrase.crocodile.super_game_here, alert=True)
         if db.database("current_game") != 0:
             return await event.answer(phrase.crocodile.no, alert=True)
-        with open(pathes.crocodile_path, "r", encoding="utf8") as f:
+        with open(pathes.crocoall_path, "r", encoding="utf8") as f:
             word = choice(f.read().split("\n"))
         unsec = ""
         for x in list(word):
