@@ -1,3 +1,5 @@
+EthernetChannel: 60 #Mbit/s
+
 TopLowerBets: 5
 TopBets: 1.5
 WordRequest: 2

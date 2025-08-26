@@ -4,7 +4,7 @@ import WinTmp
 import asyncio
 
 from time import time
-
+from . import config
 
 
 async def get_current_speed():
@@ -53,6 +53,7 @@ async def get_system_info():
     Сеть:
         Загрузка: {network[0]} Мбит/с
         Выгрузка: {network[1]} Мбит/с
+        ↳ Нагрузка: ≈{round(((network[0]+network[1])/config.coofs.EthernetChannel)*100)} %
     """
 
 if __name__ == "__main__":
