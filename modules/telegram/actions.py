@@ -28,9 +28,9 @@ async def chat_action(event: events.ChatAction.Event):
                 silent=False,
             )
         if db.hellomsg_check(event.user_id) is False:
-            logger.info(f"{user_name} вступил, но приветствие уже было.")
+            logger.info(f"{event.user_id} вступил, но приветствие уже было.")
             return
-        logger.info(f"Новый участник в чате - {user_name}")
+        logger.info(f"Новый участник в чате - {event.user_id}")
         return await client.send_message(
             config.chats.chat, phrase.chataction.hello.format(user_name)
         )
