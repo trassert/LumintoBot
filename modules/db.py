@@ -895,11 +895,11 @@ class CitiesGame:
 def hellomsg_check(input_id):
     "Проверка, приветствовался ли человек ранее."
     id_str = str(input_id)
-    ids_set = set()
+    ids_set = list()
     if path.exists(hellomsg_path):
         try:
             with open(hellomsg_path, "rb") as f:
-                ids_set = set(orjson.loads(f.read()))
+                ids_set = list(orjson.loads(f.read()))
         except (JSONDecodeError, FileNotFoundError):
             pass
     if id_str in ids_set:
