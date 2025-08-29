@@ -904,7 +904,7 @@ def hellomsg_check(input_id):
             pass
     if id_str in ids_set:
         return False
-    ids_set.add(id_str)
+    ids_set.append(id_str)
     with open(hellomsg_path, "wb") as f:
         f.write(orjson.dumps(ids_set, option=orjson.OPT_INDENT_2))
     return True
