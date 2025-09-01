@@ -1,10 +1,47 @@
 import psutil
 import platform
-import WinTmp
+# 
 import asyncio
 
 from time import time
 from . import config
+
+if platform.system() == "Windows":
+    import WinTmp
+    def get_temperature():
+        temp = WinTmp.CPU_Temps()
+        return f"{round(max(temp))} | {round(sum(temp)/len(temp))} | {round(min(temp))}"
+else:
+    def get_temperature():
+        try:
+            temps = psutil.sensors_temperatures()
+            
+            if not temps:
+                return "N/A | N/A | N/A"
+            
+            core_temps = []
+            
+            if 'coretemp' in temps:
+                for entry in temps['coretemp']:
+                    if 'core' in entry.label.lower() or 'package' not in entry.label.lower():
+                        core_temps.append(entry.current)
+            
+            for sensor_name in ['k10temp', 'zenpower', 'amdgpu', 'nct']:
+                if sensor_name in temps and not core_temps:
+                    for entry in temps[sensor_name]:
+                        if hasattr(entry, 'current'):
+                            core_temps.append(entry.current)
+            
+            if not core_temps:
+                for sensor_entries in temps.values():
+                    for entry in sensor_entries:
+                        if hasattr(entry, 'current'):
+                            core_temps.append(entry.current)
+            
+            return f"{round(max(core_temps))} | {round(sum(core_temps) / len(core_temps))} | {round(min(core_temps))}"
+            
+        except Exception as e:
+            return f"Ошибка получения: {e}"
 
 
 async def get_current_speed():
@@ -35,7 +72,7 @@ async def get_system_info():
     mem_total = mem.total / (1024 * 1024 * 1024)
     mem_avail = mem.available / (1024 * 1024 * 1024)
     mem_used = mem.used / (1024 * 1024 * 1024)
-    temp = WinTmp.CPU_Temps()
+    
     network = await get_current_speed()
     return f"""⚙️ : Информация о хостинге:
     Время работы: {result}
@@ -44,7 +81,7 @@ async def get_system_info():
         Частота: {int(psutil.cpu_freq().current)} МГц
         Ядра/Потоки: {psutil.cpu_count(logical=False)}/{psutil.cpu_count(logical=True)}
         Загрузка: {psutil.cpu_percent(0.5)} %
-        Температура ↑|≈|↓: {round(max(temp))} | {round(sum(temp)/len(temp))} | {round(min(temp))} 
+        Температура ↑|≈|↓: {get_temperature()}
     Память:
         Объём: {mem_total:.1f} ГБ
         Доступно: {mem_avail:.1f} ГБ
