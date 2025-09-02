@@ -673,7 +673,7 @@ async def cities_request(event: Message):
 
 @client.on(events.NewMessage(pattern=r"(?i)^\+города\s([\s\S]+)", func=checks))
 async def cities_requests(event: Message):
-    words = event.pattern_match.group(1).strip().lower().split()
+    words = event.pattern_match.group(1).strip().lower().split("\n")
     text = ""
     message = await event.reply(phrase.cities.checker)
     with open(pathes.chk_city_path, "r", encoding="utf-8") as f:
