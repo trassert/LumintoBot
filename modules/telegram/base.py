@@ -628,3 +628,138 @@ async def check_info_by_nick(event: Message):
 @client.on(events.NewMessage(pattern=r"(?i)^пник$", func=checks))
 async def check_info_by_nick(event: Message):
     return await event.reply(phrase.nick.empty)
+
+
+@client.on(events.NewMessage(pattern=r"(?i)^\+город (.+)", func=checks))
+async def cities_request(event: Message):
+    word = event.pattern_match.group(1).strip().lower()
+    with open(pathes.chk_city_path, "r", encoding="utf-8") as f:
+        if word in f.read().split("\n"):
+            return await event.reply(phrase.cities.exists)
+    with open(pathes.bl_city_path, "r", encoding="utf-8") as f:
+        if word in f.read().split("\n"):
+            return await event.reply(phrase.cities.in_blacklist)
+    entity = await get_name(event.sender_id)
+    logger.info(f'Пользователь {event.sender_id} хочет добавить город "{word}"')
+    keyboard = ReplyInlineMarkup(
+        [
+            KeyboardButtonRow(
+                [
+                    KeyboardButtonCallback(
+                        text="✅ Добавить",
+                        data=f"ca.yes.{word}.{event.sender_id}".encode(),
+                    ),
+                    KeyboardButtonCallback(
+                        text="❌ Отклонить",
+                        data=f"ca.no.{word}.{event.sender_id}".encode(),
+                    ),
+                ]
+            )
+        ]
+    )
+    try:
+        await client.send_message(
+            config.tokens.bot.creator,
+            phrase.cities.request.format(
+                user=entity,
+                word=word
+            ),
+            buttons=keyboard,
+        )
+    except TGErrors.ButtonDataInvalidError:
+        return await event.reply(phrase.cities.long)
+    return await event.reply(phrase.cities.set.format(word=word))
+
+
+@client.on(events.NewMessage(pattern=r"(?i)^\+города\s([\s\S]+)", func=checks))
+async def word_requests(event: Message):
+    words = event.pattern_match.group(1).strip().lower().split()
+    text = ""
+    message = await event.reply(phrase.cities.checker)
+    with open(pathes.chk_city_path, "r", encoding="utf-8") as f:
+        all_words = f.read().split("\n")
+        for word in words:
+            if word in all_words:
+                text += f"Город **{word}** - есть\n"
+                await message.edit(text)
+                words.remove(word)
+    with open(pathes.bl_city_path, "r", encoding="utf-8") as f:
+        all_blacklist = f.read().split("\n")
+        for word in words:
+            if word in all_blacklist:
+                text += f"Город **{word}** - в ЧС\n"
+                await message.edit(text)
+                words.remove(word)
+    if len(words) == 0:
+        return
+    entity = await get_name(event.sender_id)
+    for word in words:
+        logger.info(f'Пользователь {event.sender_id} хочет добавить город "{word}"')
+        keyboard = ReplyInlineMarkup(
+            [
+                KeyboardButtonRow(
+                    [
+                        KeyboardButtonCallback(
+                            text="✅ Добавить",
+                            data=f"ca.yes.{word}.{event.sender_id}".encode(),
+                        ),
+                        KeyboardButtonCallback(
+                            text="❌ Отклонить",
+                            data=f"ca.no.{word}.{event.sender_id}".encode(),
+                        ),
+                    ]
+                )
+            ]
+        )
+        try:
+            await client.send_message(
+                config.tokens.bot.creator,
+                phrase.cities.request.format(
+                    user=entity,
+                    word=word
+                ),
+                buttons=keyboard,
+            )
+            text += f"Город **{word}** - проверяется\n"
+            await message.edit(text)
+        except TGErrors.ButtonDataInvalidError:
+            text += f"Город **{word}** - слишком длинный\n"
+            await message.edit(text)
+
+
+@client.on(events.NewMessage(pattern=r"(?i)^\+города$", func=checks))
+async def word_requests_empty(event: Message):
+    return await event.reply(phrase.cities.empty_long)
+
+
+@client.on(events.NewMessage(pattern=r"(?i)^\+город$", func=checks))
+async def word_request_empty(event: Message):
+    return await event.reply(phrase.cities.empty)
+
+
+@client.on(events.NewMessage(pattern=r"(?i)^\-город$", func=checks))
+async def word_remove_empty(event: Message):
+    roles = db.roles()
+    if roles.get(event.sender_id) < roles.ADMIN:
+        return await event.reply(
+            phrase.roles.no_perms.format(level=roles.ADMIN, name=phrase.roles.admin)
+        )
+    return await event.reply(phrase.cities.rem_empty)
+
+
+@client.on(events.NewMessage(pattern=r"(?i)^\-город\s(.+)", func=checks))
+async def word_remove(event: Message):
+    roles = db.roles()
+    if roles.get(event.sender_id) < roles.ADMIN:
+        return await event.reply(
+            phrase.roles.no_perms.format(level=roles.ADMIN, name=phrase.roles.admin)
+        )
+    word = event.pattern_match.group(1).strip().lower()
+    with open(pathes.chk_city_path, "r", encoding="utf-8") as f:
+        text = f.read().split("\n")
+    if word not in text:
+        return await event.reply(phrase.cities.not_exists)
+    text.remove(word)
+    with open(pathes.chk_city_path, "w", encoding="utf-8") as f:
+        f.write("\n".join(text))
+    return await event.reply(phrase.cities.deleted.format(word))

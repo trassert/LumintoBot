@@ -17,6 +17,7 @@ tickets_path = path.join("db", "tickets.json")
 
 cities_path = path.join("db", "cities", "game.json")
 chk_city_path = path.join("db", "cities", "cities.txt")
+bl_city_path = path.join("db", "cities", "blacklist.txt")
 
 bot_path = path.join("db", "bot")
 states_path = path.join("db", "states")
