@@ -264,10 +264,10 @@ async def word_callback(event: events.CallbackQuery.Event):
         )
 
 
-@client.on(events.CallbackQuery(func=checks, pattern=r"^ca"))
-async def word_callback(event: events.CallbackQuery.Event):
+@client.on(events.CallbackQuery(func=checks, pattern=r"^cityadd"))
+async def cityadd_callback(event: events.CallbackQuery.Event):
     data = event.data.decode("utf-8").split(".")
-    logger.info(f"КБ кнопка (CA), дата: {data}")
+    logger.info(f"КБ кнопка (Cityadd), дата: {data}")
     user_name = await get_name(data[3])
     if data[1] == "yes":
         with open(pathes.chk_city_path, "a", encoding="utf-8") as f:

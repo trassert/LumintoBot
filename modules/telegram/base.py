@@ -647,11 +647,11 @@ async def cities_request(event: Message):
                 [
                     KeyboardButtonCallback(
                         text="✅ Добавить",
-                        data=f"ca.yes.{word}.{event.sender_id}".encode(),
+                        data=f"cityadd.yes.{word}.{event.sender_id}".encode(),
                     ),
                     KeyboardButtonCallback(
                         text="❌ Отклонить",
-                        data=f"ca.no.{word}.{event.sender_id}".encode(),
+                        data=f"cityadd.no.{word}.{event.sender_id}".encode(),
                     ),
                 ]
             )
@@ -701,11 +701,11 @@ async def cities_requests(event: Message):
                     [
                         KeyboardButtonCallback(
                             text="✅ Добавить",
-                            data=f"ca.yes.{word}.{event.sender_id}".encode(),
+                            data=f"cityadd.yes.{word}.{event.sender_id}".encode(),
                         ),
                         KeyboardButtonCallback(
                             text="❌ Отклонить",
-                            data=f"ca.no.{word}.{event.sender_id}".encode(),
+                            data=f"cityadd.no.{word}.{event.sender_id}".encode(),
                         ),
                     ]
                 )
