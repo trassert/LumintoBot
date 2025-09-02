@@ -672,7 +672,7 @@ async def cities_request(event: Message):
 
 
 @client.on(events.NewMessage(pattern=r"(?i)^\+города\s([\s\S]+)", func=checks))
-async def word_requests(event: Message):
+async def cities_requests(event: Message):
     words = event.pattern_match.group(1).strip().lower().split()
     text = ""
     message = await event.reply(phrase.cities.checker)
@@ -728,17 +728,17 @@ async def word_requests(event: Message):
 
 
 @client.on(events.NewMessage(pattern=r"(?i)^\+города$", func=checks))
-async def word_requests_empty(event: Message):
+async def cities_requests_empty(event: Message):
     return await event.reply(phrase.cities.empty_long)
 
 
 @client.on(events.NewMessage(pattern=r"(?i)^\+город$", func=checks))
-async def word_request_empty(event: Message):
+async def cities_request_empty(event: Message):
     return await event.reply(phrase.cities.empty)
 
 
 @client.on(events.NewMessage(pattern=r"(?i)^\-город$", func=checks))
-async def word_remove_empty(event: Message):
+async def cities_remove_empty(event: Message):
     roles = db.roles()
     if roles.get(event.sender_id) < roles.ADMIN:
         return await event.reply(
@@ -748,7 +748,7 @@ async def word_remove_empty(event: Message):
 
 
 @client.on(events.NewMessage(pattern=r"(?i)^\-город\s(.+)", func=checks))
-async def word_remove(event: Message):
+async def cities_remove(event: Message):
     roles = db.roles()
     if roles.get(event.sender_id) < roles.ADMIN:
         return await event.reply(
