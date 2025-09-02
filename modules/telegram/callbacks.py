@@ -264,6 +264,37 @@ async def word_callback(event: events.CallbackQuery.Event):
         )
 
 
+@client.on(events.CallbackQuery(func=checks, pattern=r"^ca"))
+async def word_callback(event: events.CallbackQuery.Event):
+    data = event.data.decode("utf-8").split(".")
+    logger.info(f"КБ кнопка (CA), дата: {data}")
+    user_name = await get_name(data[3])
+    if data[1] == "yes":
+        with open(pathes.chk_city_path, "a", encoding="utf-8") as f:
+            f.write(f"\n{data[2]}")
+        db.add_money(data[3], config.coofs.WordRequest)
+        await client.send_message(
+            config.chats.chat,
+            phrase.cities.success.format(
+                word=data[2],
+                user=user_name,
+                money=formatter.value_to_str(config.coofs.WordRequest, "изумруд"),
+            ),
+        )
+        return await client.edit_message(
+            event.sender_id, event.message_id, phrase.cities.add
+        )
+    if data[1] == "no":
+        with open(pathes.bl_city_path, "a", encoding="utf-8") as f:
+            f.write(f"\n{data[2]}")
+        await client.send_message(
+            config.chats.chat, phrase.cities.no.format(word=data[2], user=user_name)
+        )
+        return await client.edit_message(
+            event.sender_id, event.message_id, phrase.cities.noadd
+        )
+
+
 @client.on(events.CallbackQuery(func=checks, pattern=r"^shop"))
 async def shop_callback(event: events.CallbackQuery.Event):
     data = event.data.decode("utf-8").split(".")
