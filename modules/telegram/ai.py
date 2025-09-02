@@ -3,7 +3,6 @@ from loguru import logger
 logger.info(f"Загружен модуль {__name__}!")
 
 from telethon.tl.custom import Message
-from telethon.errors import MessageTooLongError
 from telethon import events
 
 from .client import client

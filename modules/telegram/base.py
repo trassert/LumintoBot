@@ -4,6 +4,7 @@ logger.info(f"Загружен модуль {__name__}!")
 
 import ping3
 import re
+import asyncio
 
 from time import time
 from random import choice, randint, random
@@ -227,6 +228,8 @@ async def word_request(event: Message):
 @client.on(events.NewMessage(pattern=r"(?i)^/слова\s([\s\S]+)", func=checks))
 async def word_requests(event: Message):
     words = event.pattern_match.group(1).strip().lower().split()
+    words = list(map(lambda x: x.strip(), words))
+    words = [word for word in words if word]
     text = ""
     message = await event.reply(phrase.word.checker)
     with open(pathes.crocoall_path, "r", encoding="utf-8") as f:
@@ -236,6 +239,7 @@ async def word_requests(event: Message):
                 text += f"Слово **{word}** - есть\n"
                 await message.edit(text)
                 words.remove(word)
+                await asyncio.sleep(0.5)
     with open(pathes.crocobl_path, "r", encoding="utf-8") as f:
         all_blacklist = f.read().split("\n")
         for word in words:
@@ -243,6 +247,7 @@ async def word_requests(event: Message):
                 text += f"Слово **{word}** - в ЧС\n"
                 await message.edit(text)
                 words.remove(word)
+                await asyncio.sleep(0.5)
     if len(words) == 0:
         return
     entity = await get_name(event.sender_id)
@@ -276,6 +281,7 @@ async def word_requests(event: Message):
             )
             text += f"Слово **{word}** - проверяется\n"
             await message.edit(text)
+            await asyncio.sleep(0.5)
         except TGErrors.ButtonDataInvalidError:
             text += f"Слово **{word}** - слишком длинное\n"
             await message.edit(text)
@@ -674,22 +680,32 @@ async def cities_request(event: Message):
 @client.on(events.NewMessage(pattern=r"(?i)^\+города\s([\s\S]+)", func=checks))
 async def cities_requests(event: Message):
     words = event.pattern_match.group(1).strip().lower().split("\n")
+    words = list(map(lambda x: x.strip(), words))
+    words = [word for word in words if word]
     text = ""
     message = await event.reply(phrase.cities.checker)
     with open(pathes.chk_city_path, "r", encoding="utf-8") as f:
         all_words = f.read().split("\n")
         for word in words:
-            if word in all_words:
-                text += f"Город **{word}** - есть\n"
-                await message.edit(text)
-                words.remove(word)
+            try:
+                if word in all_words:
+                    text += f"Город **{word}** - есть\n"
+                    await message.edit(text)
+                    words.remove(word)
+                    await asyncio.sleep(0.5)
+            except TGErrors.MessageTooLongError:
+                message = await event.reply(phrase.cities.checker)
     with open(pathes.bl_city_path, "r", encoding="utf-8") as f:
         all_blacklist = f.read().split("\n")
         for word in words:
-            if word in all_blacklist:
-                text += f"Город **{word}** - в ЧС\n"
-                await message.edit(text)
-                words.remove(word)
+            try:
+                if word in all_blacklist:
+                    text += f"Город **{word}** - в ЧС\n"
+                    await message.edit(text)
+                    words.remove(word)
+                    await asyncio.sleep(0.5)
+            except TGErrors.MessageTooLongError:
+                message = await event.reply(phrase.cities.checker)
     if len(words) == 0:
         return
     entity = await get_name(event.sender_id)
@@ -725,6 +741,7 @@ async def cities_requests(event: Message):
         except TGErrors.ButtonDataInvalidError:
             text += f"Город **{word}** - слишком длинный\n"
             await message.edit(text)
+        await asyncio.sleep(0.5)
 
 
 @client.on(events.NewMessage(pattern=r"(?i)^\+города$", func=checks))
