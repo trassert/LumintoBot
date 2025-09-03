@@ -275,7 +275,7 @@ async def cityadd_callback(event: events.CallbackQuery.Event):
         await client.send_message(
             config.chats.chat,
             phrase.cities.success.format(
-                word=data[2],
+                word=data[2].title(),
                 user=user_name,
                 money=formatter.value_to_str(config.coofs.WordRequest, "изумруд"),
             ),
@@ -287,7 +287,7 @@ async def cityadd_callback(event: events.CallbackQuery.Event):
         with open(pathes.bl_city, "a", encoding="utf-8") as f:
             f.write(f"\n{data[2]}")
         await client.send_message(
-            config.chats.chat, phrase.cities.no.format(word=data[2], user=user_name)
+            config.chats.chat, phrase.cities.no.format(word=data[2].title(), user=user_name)
         )
         return await client.edit_message(
             event.sender_id, event.message_id, phrase.cities.noadd
