@@ -1,6 +1,6 @@
 [![Ruff](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/astral-sh/ruff/main/assets/badge/v2.json)](https://github.com/astral-sh/ruff)
 
-# Основной код для тг, био, бота.
+# Luminto - бот сервера
 
 ## Установка на LINUX:
 
