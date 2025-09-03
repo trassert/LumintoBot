@@ -5,7 +5,7 @@ from loguru import logger
 
 logger.info(f"Загружен модуль {__name__}!")
 client = TelegramClient(
-    session=pathes.bot_path,
+    session=pathes.bot,
     api_id=config.tokens.bot.id,
     api_hash=config.tokens.bot.hash,
     device_model="Bot",

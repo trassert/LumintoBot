@@ -8,4 +8,4 @@ logger.info(f"Загружен модуль {__name__}!")
 
 
 def get_random():
-    return path.join(pathes.pic_path, choice(listdir(pathes.pic_path)))
+    return path.join(pathes.pic, choice(listdir(pathes.pic)))

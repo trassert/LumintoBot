@@ -11,11 +11,11 @@ from loguru import logger
 logger.info(f"Загружен модуль {__name__}!")
 
 
-font_properties = font_manager.FontEntry(fname=pathes.font_path, name="minecraft")
+font_properties = font_manager.FontEntry(fname=pathes.font, name="minecraft")
 font_manager.fontManager.ttflist.append(font_properties)
 
 
-def create_plot(data_dict, output_file=pathes.chart_path, time_range_days=None):
+def create_plot(data_dict, output_file=pathes.chart, time_range_days=None):
     "Фукнция для создания линейного графика"
 
     "Данные"
@@ -25,7 +25,7 @@ def create_plot(data_dict, output_file=pathes.chart_path, time_range_days=None):
     "Шрифт"
     plt.rcParams["font.family"] = "sans-serif"
     plt.rcParams["font.sans-serif"] = font_properties.name
-    prop = font_manager.FontProperties(fname=pathes.font_path)
+    prop = font_manager.FontProperties(fname=pathes.font)
     title_font = {
         "fontproperties": prop,
         "fontsize": 16,

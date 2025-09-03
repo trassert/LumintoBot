@@ -30,7 +30,7 @@ async def active_check(event: Message):
                 break
             text += f"{n}. {data[0]} - {data[1]}\n"
             n += 1
-        return await client.send_file(event.chat_id, pathes.chart_path, caption=text)
+        return await client.send_file(event.chat_id, pathes.chart, caption=text)
     try:
         days = int(arg)
         text = phrase.stat.chat.format(formatter.value_to_str(days, "день"))
@@ -44,7 +44,7 @@ async def active_check(event: Message):
                 text += f"{n}. {data[0]} - {data[1]}\n"
                 n += 1
             return await client.send_file(
-                event.chat_id, pathes.chart_path, caption=text
+                event.chat_id, pathes.chart, caption=text
             )
     except ValueError:
         text = phrase.stat.chat.format("день")
