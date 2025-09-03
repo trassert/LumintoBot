@@ -238,6 +238,11 @@ async def word_callback(event: events.CallbackQuery.Event):
     logger.info(f"КБ кнопка (Word), дата: {data}")
     user_name = await get_name(data[3])
     if data[1] == "yes":
+        with open(pathes.crocoall, "r", encoding="utf-8") as f:
+            if data[2] in f.read().split("\n"):
+                return await client.edit_message(
+                    event.sender_id, event.message_id, phrase.word.exists
+                )
         with open(pathes.crocoall, "a", encoding="utf-8") as f:
             f.write(f"\n{data[2]}")
         db.add_money(data[3], config.coofs.WordRequest)
@@ -269,6 +274,11 @@ async def cityadd_callback(event: events.CallbackQuery.Event):
     logger.info(f"КБ кнопка (Cityadd), дата: {data}")
     user_name = await get_name(data[3])
     if data[1] == "yes":
+        with open(pathes.chk_city, "r", encoding="utf-8") as f:
+            if data[2] in f.read().split("\n"):
+                return await client.edit_message(
+                    event.sender_id, event.message_id, phrase.cities.exists
+                )
         with open(pathes.chk_city, "a", encoding="utf-8") as f:
             f.write(f"\n{data[2]}")
         db.add_money(data[3], config.coofs.WordRequest)
