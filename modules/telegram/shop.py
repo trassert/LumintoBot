@@ -72,6 +72,7 @@ async def shop(event: Message):
             price_5=formatter.value_to_str(shop[items[4]]["price"], "изумруд"),
             quote=choice(phrase.shop_quotes[theme]["quotes"]),
             emo=phrase.shop_quotes[theme]["emo"],
+            clock=formatter.get_remaining_time(db.database("shop_update_time"))
         ),
         buttons=keyboard,
         parse_mode="html",
