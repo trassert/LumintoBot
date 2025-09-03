@@ -1,12 +1,10 @@
-from loguru import logger
-
-logger.info(f"Загружен модуль {__name__}!")
-
 from google import genai
 from google.genai import types
 
 from . import config
+from loguru import logger
 
+logger.info(f"Загружен модуль {__name__}!")
 model = "gemini-2.5-flash-lite-preview-06-17"
 
 client = genai.Client(

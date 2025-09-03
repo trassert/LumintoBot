@@ -1,6 +1,8 @@
 import asyncio
 import struct
+from loguru import logger
 
+logger.info(f"Загружен модуль {__name__}!")
 
 class ClientError(Exception):
     pass
@@ -11,7 +13,6 @@ class InvalidPassword(Exception):
 
 
 class MinecraftClient:
-
     def __init__(self, host, port, password):
         self.host = host
         self.port = port

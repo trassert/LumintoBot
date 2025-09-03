@@ -1,36 +1,39 @@
 from os import path
+from loguru import logger
 
-crocoall_path = path.join("db", "crocodile", "all.txt")
-crocobl_path = path.join("db", "crocodile", "blacklist.txt")
+logger.info(f"Загружен модуль {__name__}!")
 
-mine_path = path.join("db", "timings", "mine.json")
+crocoall = path.join("db", "crocodile", "all.txt")
+crocobl = path.join("db", "crocodile", "blacklist.txt")
 
-roles_path = path.join("db", "users", "roles.json")
-money_path = path.join("db", "users", "money.json")
-nick_path = path.join("db", "users", "nicks.json")
-wdraw_path = path.join("db", "users", "withdraws.json")
-ref_path = path.join("db", "users", "ref.json")
-crocostat_path = path.join("db", "users", "crocodile_stat.json")
-hellomsg_path = path.join("db", "users", "hellomsg.json")
+mine = path.join("db", "timings", "mine.json")
 
-tickets_path = path.join("db", "tickets.json")
+roles = path.join("db", "users", "roles.json")
+money = path.join("db", "users", "money.json")
+nick = path.join("db", "users", "nicks.json")
+wdraw = path.join("db", "users", "withdraws.json")
+ref = path.join("db", "users", "ref.json")
+crocostat = path.join("db", "users", "crocodile_stat.json")
+hellomsg = path.join("db", "users", "hellomsg.json")
 
-cities_path = path.join("db", "cities", "game.json")
-chk_city_path = path.join("db", "cities", "cities.txt")
-bl_city_path = path.join("db", "cities", "blacklist.txt")
+tickets = path.join("db", "tickets.json")
 
-bot_path = path.join("db", "bot")
-states_path = path.join("db", "states")
-times_path = path.join("db", "time")
-notes_path = path.join("db", "notes")
-stats_path = path.join("db", "chat_stats")
+cities = path.join("db", "cities", "game.json")
+chk_city = path.join("db", "cities", "cities.txt")
+bl_city = path.join("db", "cities", "blacklist.txt")
 
-old_states_path = path.join("backup", "states")
+bot = path.join("db", "bot")
+states = path.join("db", "states")
+times = path.join("db", "time")
+notes = path.join("db", "notes")
+stats = path.join("db", "chat_stats")
 
-font_path = path.join("fonts", "minecraft.ttf")
+old_states = path.join("backup", "states")
 
-chart_path = path.join("charts", "chart.png")
+font = path.join("fonts", "minecraft.ttf")
 
-data_path = path.join("db", "data.json")
+chart = path.join("charts", "chart.png")
 
-pic_path = "images"
+data = path.join("db", "data.json")
+
+pic = "images"

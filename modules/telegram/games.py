@@ -1,14 +1,9 @@
-from loguru import logger
-
-logger.info(f"Загружен модуль {__name__}!")
-
 import asyncio
 
 from random import randint, random
 
 from telethon import events
 from telethon.tl.custom import Message
-from telethon.tl.types import KeyboardButtonCallback
 from telethon.tl.types import (
     ReplyInlineMarkup,
     KeyboardButtonRow,
@@ -16,11 +11,13 @@ from telethon.tl.types import (
 )
 
 from .client import client
-from .global_checks import *
+from .global_checks import checks
 from . import func
 
 from .. import phrase, ai, config, formatter, db
+from loguru import logger
 
+logger.info(f"Загружен модуль {__name__}!")
 
 Cities = db.CitiesGame()
 CitiesTimerTask: asyncio.Task = None
@@ -252,7 +249,9 @@ async def crocodile_hint(event: Message):
         n = 1
         for letter in list(game["unsec"]):
             if letter == "_":
-                return await event.reply(f'{n} буква в слове - **{game["word"][n-1]}**')
+                return await event.reply(
+                    f"{n} буква в слове - **{game['word'][n - 1]}**"
+                )
             n += 1
     return await event.reply((await ai.crocodile.send_message(word)).text)
 
@@ -280,10 +279,7 @@ async def cities_timeout(current_player: int, last_city: str):
                 if rem_data is False:
                     Cities.logger("Игра завершена")
                     win_money = count * config.coofs.CitiesBet
-                    db.add_money(
-                        players_list[0],
-                        win_money
-                    )
+                    db.add_money(players_list[0], win_money)
                     Cities.logger(f"Победитель {players_list[0]} получает {win_money}")
                     statistic = ""
                     n = 1
@@ -298,12 +294,11 @@ async def cities_timeout(current_player: int, last_city: str):
                                 players_list[0],
                             ),
                             formatter.value_to_str(
-                                win_money - config.coofs.CitiesBet,
-                                "изумруд"
+                                win_money - config.coofs.CitiesBet, "изумруд"
                             ),
-                            statistic
+                            statistic,
                         ),
-                        reply_to=config.chats.topics.games
+                        reply_to=config.chats.topics.games,
                     )
                     return Cities.end_game()
                 global CitiesTimerTask
@@ -313,30 +308,20 @@ async def cities_timeout(current_player: int, last_city: str):
                 return await client.send_message(
                     config.chats.chat,
                     phrase.cities.timeout_done.format(
-                        player_name,
-                        await func.get_name(
-                            rem_data
-                        ),
-                        last_city.title()
+                        player_name, await func.get_name(rem_data), last_city.title()
                     ),
-                    reply_to=config.chats.topics.games
+                    reply_to=config.chats.topics.games,
                 )
             if second % 5 == 0 and config.coofs.CitiesTimeout / 2 >= second:
                 if message:
                     await message.edit(
-                        phrase.cities.timeout.format(
-                            player=player_name,
-                            time=second
-                        )
+                        phrase.cities.timeout.format(player=player_name, time=second)
                     )
                 else:
                     message: Message = await client.send_message(
                         config.chats.chat,
-                        phrase.cities.timeout.format(
-                            player=player_name,
-                            time=second
-                        ),
-                        reply_to=config.chats.topics.games
+                        phrase.cities.timeout.format(player=player_name, time=second),
+                        reply_to=config.chats.topics.games,
                     )
             await asyncio.sleep(1)
     except asyncio.CancelledError:
@@ -358,7 +343,7 @@ async def cities_answer(event: Message):
         getattr(event.reply_to, "reply_to_top_id", None) != config.chats.topics.games
     ):
         return
-    if event.text.startswith('/'):
+    if event.text.startswith("/"):
         return
     # Активна ли игра
     if not Cities.get_game_status():
@@ -376,14 +361,9 @@ async def cities_answer(event: Message):
         current_name = await func.get_name(current_player)
         last_city = Cities.get_last_city()
         await event.reply(
-            phrase.cities.city_accepted.format(
-                last_city.title(),
-                current_name
-            )
+            phrase.cities.city_accepted.format(last_city.title(), current_name)
         )
-        CitiesTimerTask = asyncio.create_task(
-            cities_timeout(current_player, last_city)
-        )
+        CitiesTimerTask = asyncio.create_task(cities_timeout(current_player, last_city))
     elif result_code == 1:
         await autodelete(phrase.cities.unknown_city)
     elif result_code == 2:
@@ -396,12 +376,12 @@ async def cities_answer(event: Message):
         await autodelete(phrase.cities.already_inlist)
 
 
-@client.on(events.CallbackQuery(pattern=r'^cities\.'))
+@client.on(events.CallbackQuery(pattern=r"^cities\."))
 async def cities_callback(event: events.CallbackQuery.Event):
     """Обработчик кнопок игры"""
-    data = event.data.decode('utf-8').split('.')
+    data = event.data.decode("utf-8").split(".")
     action = data[1]
-    
+
     if action == "join":
         if event.sender_id in Cities.get_players():
             return await event.answer(phrase.cities.already_ingame, alert=True)
@@ -410,22 +390,16 @@ async def cities_callback(event: events.CallbackQuery.Event):
         if config.coofs.PriceForCities > balance:
             return await event.answer(
                 phrase.money.not_enough.format(
-                    formatter.value_to_str(
-                        balance,
-                        "изумруд"
-                    )
+                    formatter.value_to_str(balance, "изумруд")
                 )
             )
         db.add_money(event.sender_id, -config.coofs.PriceForCities)
         await event.answer(
             phrase.cities.set_ingame.format(
-                formatter.value_to_str(
-                    config.coofs.PriceForCities,
-                    "изумруд"
-                )
+                formatter.value_to_str(config.coofs.PriceForCities, "изумруд")
             )
         )
-        
+
         Cities.add_player(event.sender_id)
 
         # Обновляем список игроков
@@ -433,19 +407,18 @@ async def cities_callback(event: events.CallbackQuery.Event):
         for player_id in Cities.get_players():
             name = await func.get_name(player_id)
             players_names.append(name)
-        
+
         keyboard = [
             [KeyboardButtonCallback(text="➕ Присоединиться", data="cities.join")],
             [KeyboardButtonCallback(text="🎮 Начать игру", data="cities.start")],
-            [KeyboardButtonCallback(text="❌ Отменить", data="cities.cancel")]
+            [KeyboardButtonCallback(text="❌ Отменить", data="cities.cancel")],
         ]
-        
+
         await event.edit(
-            phrase.cities.start.format(", ".join(players_names)),
-            buttons=keyboard
+            phrase.cities.start.format(", ".join(players_names)), buttons=keyboard
         )
         return await event.answer(phrase.cities.set_ingame)
-    
+
     elif action == "start":
         if len(Cities.get_players()) < 2:
             return await event.answer(phrase.cities.low_players, alert=True)
@@ -457,11 +430,10 @@ async def cities_callback(event: events.CallbackQuery.Event):
         )
         return await event.edit(
             phrase.cities.game_started.format(
-                Cities.get_last_city().title(), 
-                await func.get_name(current_player)
+                Cities.get_last_city().title(), await func.get_name(current_player)
             )
         )
-    
+
     elif action == "cancel":
         if event.sender_id not in Cities.get_players():
             return await event.answer(phrase.cities.not_in_players, alert=True)
@@ -474,33 +446,25 @@ async def cities_callback(event: events.CallbackQuery.Event):
 @client.on(events.NewMessage(pattern=r"(?i)^/cities start$", func=checks))
 @client.on(events.NewMessage(pattern=r"(?i)^/миниигра города$", func=checks))
 @client.on(events.NewMessage(pattern=r"(?i)^/minigame cities$", func=checks))
-@client.on(events.NewMessage(pattern=r'(?i)^/cities$'))
+@client.on(events.NewMessage(pattern=r"(?i)^/cities$"))
 async def cities_start(event: Message):
     """Команда запуска игры"""
     if len(Cities.get_players()) > 0 or Cities.get_game_status():
-        keyboard = [
-            [KeyboardButtonCallback(text="❌ Отменить", data="cities.cancel")]
-        ]
-        return await event.reply(
-            phrase.cities.already_started,
-            buttons=keyboard
-        )
-    
+        keyboard = [[KeyboardButtonCallback(text="❌ Отменить", data="cities.cancel")]]
+        return await event.reply(phrase.cities.already_started, buttons=keyboard)
+
     # Очищаем предыдущую игру
     Cities.end_game()
     Cities.add_player(event.sender_id)
-    
+
     keyboard = [
         [KeyboardButtonCallback(text="➕ Присоединиться", data="cities.join")],
         [KeyboardButtonCallback(text="🎮 Начать игру", data="cities.start")],
-        [KeyboardButtonCallback(text="❌ Отменить", data="cities.cancel")]
+        [KeyboardButtonCallback(text="❌ Отменить", data="cities.cancel")],
     ]
-    
+
     user_name = await func.get_name(event.sender_id)
-    return await event.reply(
-        phrase.cities.start.format(user_name),
-        buttons=keyboard
-    )
+    return await event.reply(phrase.cities.start.format(user_name), buttons=keyboard)
 
 
 if db.database("current_game") != 0:

@@ -1,32 +1,30 @@
+import asyncio
+import re
+from datetime import datetime
+from random import choice, randint, random
+from time import time
 from loguru import logger
 
-logger.info(f"Загружен модуль {__name__}!")
-
 import ping3
-import re
-import asyncio
-
-from time import time
-from random import choice, randint, random
-from datetime import datetime
-
-from telethon.tl.types import (
-    ReplyInlineMarkup,
-    KeyboardButtonRow,
-    KeyboardButtonCallback,
-)
-from telethon.tl.functions.users import GetFullUserRequest
 from telethon import errors as TGErrors
 from telethon import events
 from telethon.tl.custom import Message
+from telethon.tl.functions.users import GetFullUserRequest
+from telethon.tl.types import (
+    KeyboardButtonCallback,
+    KeyboardButtonRow,
+    ReplyInlineMarkup,
+)
 
-from .client import client
-from .global_checks import *
-from .func import get_name
-
-from .. import ai, config, formatter, pathes, pic
-from ..system_info import get_system_info
+from .. import ai, config, formatter, pathes, pic, phrase, db
 from ..mcrcon import MinecraftClient
+from ..system_info import get_system_info
+from .client import client
+from .func import get_name
+from .global_checks import checks, func
+
+
+logger.info(f"Загружен модуль {__name__}!")
 
 
 @client.on(events.NewMessage(pattern=r"(?i)^/хост$", func=checks))
@@ -37,7 +35,7 @@ async def host(event: Message):
     return await event.reply(
         phrase.server.host.format(
             v4=db.database("host"),
-            v6=f'{db.database("ipv6_subdomain")}.{db.database("host")}',
+            v6=f"{db.database('ipv6_subdomain')}.{db.database('host')}",
         )
     )
 
@@ -75,7 +73,7 @@ async def ping(event: Message):
         "full",
     ]:
         all_servers_ping.append(
-            f"🌐 : Пинг сервера - {int(round(ping3.ping('yandex.ru'), 3)*1000)} мс"
+            f"🌐 : Пинг сервера - {int(round(ping3.ping('yandex.ru'), 3) * 1000)} мс"
         )
     text = f"{phrase.ping.set.format(ping)}\n{'\n'.join(all_servers_ping)}"
     return await event.reply(text)
@@ -550,7 +548,7 @@ async def link_nick(event: Message):
 @client.on(events.NewMessage(pattern=r"(?i)^привязать$", func=checks))
 @client.on(events.NewMessage(pattern=r"(?i)^/новый ник$", func=checks))
 @client.on(events.NewMessage(pattern=r"(?i)^/линкник$", func=checks))
-async def link_nick(event: Message):
+async def link_nick_empty(event: Message):
     if not event.chat_id == config.chats.chat:
         return await event.reply(phrase.nick.chat)
     return await event.reply(phrase.nick.not_select)
@@ -632,7 +630,7 @@ async def check_info_by_nick(event: Message):
 @client.on(events.NewMessage(pattern=r"(?i)^игрок$", func=checks))
 @client.on(events.NewMessage(pattern=r"(?i)^нпоиск$", func=checks))
 @client.on(events.NewMessage(pattern=r"(?i)^пник$", func=checks))
-async def check_info_by_nick(event: Message):
+async def check_info_by_nick_empty(event: Message):
     return await event.reply(phrase.nick.empty)
 
 
@@ -666,10 +664,7 @@ async def cities_request(event: Message):
     try:
         await client.send_message(
             config.tokens.bot.creator,
-            phrase.cities.request.format(
-                user=entity,
-                word=word
-            ),
+            phrase.cities.request.format(user=entity, word=word),
             buttons=keyboard,
         )
     except TGErrors.ButtonDataInvalidError:
@@ -730,10 +725,7 @@ async def cities_requests(event: Message):
         try:
             await client.send_message(
                 config.tokens.bot.creator,
-                phrase.cities.request.format(
-                    user=entity,
-                    word=word
-                ),
+                phrase.cities.request.format(user=entity, word=word),
                 buttons=keyboard,
             )
             text += f"Город **{word}** - проверяется\n"

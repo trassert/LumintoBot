@@ -4,9 +4,11 @@ import matplotlib.dates as mdates
 
 from datetime import datetime, timedelta
 from matplotlib import font_manager
-from loguru import logger
 
 from . import pathes
+from loguru import logger
+
+logger.info(f"Загружен модуль {__name__}!")
 
 
 font_properties = font_manager.FontEntry(fname=pathes.font_path, name="minecraft")

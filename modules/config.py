@@ -1,6 +1,9 @@
 from bestconfig import Config
 
 from os import path
+from loguru import logger
+
+logger.info(f"Загружен модуль {__name__}!")
 
 tokens = Config(path.join("configs", "tokens.yml"))
 coofs = Config(path.join("configs", "coofs.yml"))

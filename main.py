@@ -16,13 +16,8 @@ logger.add(
     colorize=True,
 )
 
-from modules.telegram.client import client
-from modules import db
-from modules import config
-from modules import webhooks
-from modules import time_to
-from modules import ai
-from modules import phrase
+from modules.telegram.client import client  # noqa: E402
+from modules import db, config, webhooks, time_to, ai, phrase  # noqa: E402
 
 
 async def main():
@@ -44,9 +39,9 @@ async def main():
             )
             logger.info(
                 "Стафф-чат - {}".format(
-                    (
-                        await ai.staff.send_message(phrase.ai.staff_prompt)
-                    ).text.replace("\n", "")
+                    (await ai.staff.send_message(phrase.ai.staff_prompt)).text.replace(
+                        "\n", ""
+                    )
                 )
             )
             await db.Users.initialize()
@@ -55,7 +50,7 @@ async def main():
                 client.start(bot_token=config.tokens.bot.token),
                 time_to.update_shop(),
                 time_to.rewards(),
-                time_to.remove_states()
+                time_to.remove_states(),
             )
         except ConnectionError:
             logger.error("Жду 20 секунд (нет подключения к интернету)")

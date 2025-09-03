@@ -2,18 +2,19 @@ import orjson
 import aiomysql
 
 from typing import Dict, List, Optional
-from loguru import logger
-from datetime import datetime, timedelta, date
+from datetime import datetime, timedelta
 from os import path, listdir, replace, makedirs, remove
 from time import time
 from random import choice, randint
 from collections import defaultdict
 from json import JSONDecodeError
 
-from . import config
+from . import config, pathes
 from .get_theme import weighted_choice
-from .pathes import *
 from . import formatter
+from loguru import logger
+
+logger.info(f"Загружен модуль {__name__}!")
 
 
 def database(key, value=None, delete=None, log=True):
@@ -22,29 +23,29 @@ def database(key, value=None, delete=None, log=True):
         if log:
             logger.info(f"Значение {key} теперь {value}")
         try:
-            with open(data_path, "rb") as f:
+            with open(pathes.data, "rb") as f:
                 load = orjson.loads(f.read())
-            with open(data_path, "wb") as f:
+            with open(pathes.data, "wb") as f:
                 load[key] = value
                 load = dict(sorted(load.items()))
                 return f.write(orjson.dumps(load, option=orjson.OPT_INDENT_2))
         except FileNotFoundError:
             logger.error("Файл не найден")
-            with open(data_path, "wb") as f:
+            with open(pathes.data, "wb") as f:
                 load = {}
                 load[key] = value
                 return f.write(orjson.dumps(load, option=orjson.OPT_INDENT_2))
         except JSONDecodeError:
             logger.error("Ошибка при чтении файла")
-            with open(data_path, "wb") as f:
+            with open(pathes.data, "wb") as f:
                 f.write(orjson.loads({}, option=orjson.OPT_INDENT_2))
             return None
     elif delete is not None:
         if log:
             logger.info(f"Удаляю ключ: {key}")
-        with open(data_path, "rb") as f:
+        with open(pathes.data, "rb") as f:
             load = orjson.loads(f.read())
-        with open(data_path, "wb") as f:
+        with open(pathes.data, "wb") as f:
             if key in load:
                 del load[key]
             return f.write(orjson.dumps(load, option=orjson.OPT_INDENT_2))
@@ -52,29 +53,29 @@ def database(key, value=None, delete=None, log=True):
         if log:
             logger.info(f"Получаю ключ: {key}")
         try:
-            with open(data_path, "rb") as f:
+            with open(pathes.data, "rb") as f:
                 load = orjson.loads(f.read())
                 return load.get(key)
         except JSONDecodeError:
             logger.error("Ошибка при чтении файла")
-            with open(data_path, "wb") as f:
+            with open(pathes.data, "wb") as f:
                 f.write(orjson.loads({}, option=orjson.OPT_INDENT_2))
             return None
         except FileNotFoundError:
             logger.error("Файл не найден")
-            with open(data_path, "wb") as f:
+            with open(pathes.data, "wb") as f:
                 f.write(orjson.loads({}, option=orjson.OPT_INDENT_2))
             return None
 
 
 def get_money(id):
     id = str(id)
-    with open(money_path, "rb") as f:
+    with open(pathes.money, "rb") as f:
         load = orjson.loads(f.read())
         if id in load:
             return load[id]
 
-    with open(money_path, "wb") as f:
+    with open(pathes.money, "wb") as f:
         load[id] = 0
         f.write(orjson.dumps(load, option=orjson.OPT_INDENT_2))
         return 0
@@ -82,14 +83,14 @@ def get_money(id):
 
 def get_all_money():
     "Получить все деньги"
-    with open(money_path, "rb") as f:
+    with open(pathes.money, "rb") as f:
         load = orjson.loads(f.read())
         return sum(load.values())
 
 
 def add_money(id, count):
     id = str(id)
-    with open(money_path, "rb") as f:
+    with open(pathes.money, "rb") as f:
         load = orjson.loads(f.read())
         if id in load:
             old = load[id]
@@ -100,7 +101,7 @@ def add_money(id, count):
 
     if load[id] < 0:
         load[id] = 0
-    with open(money_path, "wb") as f:
+    with open(pathes.money, "wb") as f:
         f.write(orjson.dumps(load, option=orjson.OPT_INDENT_2))
         logger.info(f"Изменён баланс {id} ({old} -> {load[id]})")
         return load[id]
@@ -140,13 +141,13 @@ def get_shop():
 
 def ready_to_mine(id: str) -> bool:
     id = str(id)
-    with open(mine_path, "rb") as f:
+    with open(pathes.mine, "rb") as f:
         data = orjson.loads(f.read())
     if (id not in data) or (
         int(time()) - data.get(id, int(time())) > config.coofs.MineWait
     ):
         data[id] = int(time())
-        with open(mine_path, "wb") as f:
+        with open(pathes.mine, "wb") as f:
             f.write(orjson.dumps(data, option=orjson.OPT_INDENT_2))
         return True
     return False
@@ -164,17 +165,17 @@ class roles:
     def get(self, id: str) -> int:
         "Получить роль пользователя (U0, если не найдено)"
         id = str(id)
-        with open(roles_path, "rb") as f:
+        with open(pathes.roles, "rb") as f:
             return orjson.loads(f.read()).get(str(id), self.USER)
 
     def set(self, id: str, role: int) -> bool:
         "Установить роль пользователя"
         id = str(id)
         role = int(role)
-        with open(roles_path, "rb") as f:
+        with open(pathes.roles, "rb") as f:
             data = orjson.loads(f.read())
         data[id] = role
-        with open(roles_path, "wb") as f:
+        with open(pathes.roles, "wb") as f:
             f.write(
                 orjson.dumps(
                     dict(sorted(data.items(), key=lambda x: (-x[1], x[0]))),
@@ -189,28 +190,28 @@ class crocodile_stat:
             self.id = str(id)
 
     def get(self):
-        with open(crocostat_path, "rb") as f:
+        with open(pathes.crocostat, "rb") as f:
             load = orjson.loads(f.read())
         if self.id in load:
             return load[self.id]
         else:
-            with open(crocostat_path, "wb") as f:
+            with open(pathes.crocostat, "wb") as f:
                 load[self.id] = 0
                 f.write(orjson.dumps(load, option=orjson.OPT_SORT_KEYS))
             return 0
 
     def add(self):
-        with open(crocostat_path, "rb") as f:
+        with open(pathes.crocostat, "rb") as f:
             load = orjson.loads(f.read())
         if self.id in load:
             load[self.id] += 1
         else:
             load[self.id] = 1
-        with open(crocostat_path, "wb") as f:
+        with open(pathes.crocostat, "wb") as f:
             f.write(orjson.dumps(load, option=orjson.OPT_SORT_KEYS))
 
     def get_all(self=False):
-        with open(crocostat_path, "rb") as f:
+        with open(pathes.crocostat, "rb") as f:
             load = orjson.loads(f.read())
         return dict(sorted(load.items(), key=lambda item: item[1], reverse=True))
 
@@ -223,14 +224,14 @@ class nicks:
     def get(self, if_nothing=None) -> str:
         if self.nick:
             "Получить id игрока по нику"
-            with open(nick_path, "rb") as f:
+            with open(pathes.nick, "rb") as f:
                 load = orjson.loads(f.read())
                 if self.nick in load:
                     return load[self.nick]
                 return if_nothing
         elif self.id:
             "Получить ник по id"
-            with open(nick_path, "rb") as f:
+            with open(pathes.nick, "rb") as f:
                 load = orjson.loads(f.read())
                 for key, value in load.items():
                     if value == self.id:
@@ -240,19 +241,19 @@ class nicks:
             raise TypeError("Нужен ник или id!")
 
     def get_all(self):
-        with open(nick_path, "rb") as f:
+        with open(pathes.nick, "rb") as f:
             load = orjson.loads(f.read())
             return dict(sorted(load.items()))
 
     def link(self):
-        with open(nick_path, "rb") as f:
+        with open(pathes.nick, "rb") as f:
             load = orjson.loads(f.read())
         for key, value in load.items():
             if value == self.id:
                 del load[key]
                 break
         load[self.nick] = int(self.id)
-        with open(nick_path, "wb") as f:
+        with open(pathes.nick, "wb") as f:
             f.write(orjson.dumps(load, option=orjson.OPT_INDENT_2))
         return True
 
@@ -266,15 +267,15 @@ class statistic:
         now = datetime.now().strftime("%Y.%m.%d")
 
         # Если нет файла
-        if not path.exists(path.join(stats_path, f"{nick}.json")):
-            with open(path.join(stats_path, f"{nick}.json"), "wb") as f:
+        if not path.exists(path.join(pathes.stats, f"{nick}.json")):
+            with open(path.join(pathes.stats, f"{nick}.json"), "wb") as f:
                 stats = {}
                 stats[now] = 0
                 f.write(orjson.dumps(stats, option=orjson.OPT_SORT_KEYS))
                 return 0
 
         # Если есть файл
-        with open(path.join(stats_path, f"{nick}.json"), "rb") as f:
+        with open(path.join(pathes.stats, f"{nick}.json"), "rb") as f:
             stats = orjson.loads(f.read())
             if all_days:
                 return sum(stats.values()) or 0
@@ -294,7 +295,7 @@ class statistic:
         "Выдаст игрок: сообщения за days дней"
         "Если all_days указан, выдаст все дни"
         data = {}
-        for file in listdir(stats_path):
+        for file in listdir(pathes.stats):
             nick = file.replace(".json", "")
             nick_stat = self.get(nick, True if all_days else False)
             if nick_stat > 1:
@@ -308,33 +309,33 @@ class statistic:
         now = date if date else datetime.now().strftime("%Y.%m.%d")
 
         # Если нет файла
-        if not path.exists(path.join(stats_path, f"{nick}.json")):
-            with open(path.join(stats_path, f"{nick}.json"), "wb") as f:
+        if not path.exists(path.join(pathes.stats, f"{nick}.json")):
+            with open(path.join(pathes.stats, f"{nick}.json"), "wb") as f:
                 stats = {}
                 stats[now] = 1
                 f.write(orjson.dumps(stats, option=orjson.OPT_SORT_KEYS))
 
         # Если есть файл
-        with open(path.join(stats_path, f"{nick}.json"), "rb") as f:
+        with open(path.join(pathes.stats, f"{nick}.json"), "rb") as f:
             stats = orjson.loads(f.read())
             if now in stats:
                 stats[now] = stats[now] + 1
             else:
                 stats[now] = 1
-        with open(path.join(stats_path, f"{nick}.json"), "wb") as f:
+        with open(path.join(pathes.stats, f"{nick}.json"), "wb") as f:
             f.write(orjson.dumps(stats, option=orjson.OPT_SORT_KEYS))
 
     def get_raw(self) -> dict[str, int]:
         "Выдаёт {дата: сообщения} от всех"
         "Если days не указан, выдаст все"
         totals = defaultdict(int)
-        for json_file in listdir(stats_path):
+        for json_file in listdir(pathes.stats):
             try:
-                with open(path.join(stats_path, json_file), "rb") as f:
+                with open(path.join(pathes.stats, json_file), "rb") as f:
                     data = orjson.loads(f.read())
                     for date, count in data.items():
                         totals[date] += count
-            except (JSONDecodeError, UnicodeDecodeError) as e:
+            except (JSONDecodeError, UnicodeDecodeError):
                 logger.error(f"Ошибка при чтении файла - {json_file}")
                 continue
         if self.days != 1:
@@ -351,22 +352,22 @@ class ticket:
     def get(id):
         id = str(id)
         "Получить чек по id"
-        if path.exists(tickets_path):
-            with open(tickets_path, "rb") as f:
+        if path.exists(pathes.tickets):
+            with open(pathes.tickets, "rb") as f:
                 data = orjson.loads(f.read())
                 if id in data:
                     return data[id]
                 return None
         else:
-            with open(tickets_path, "wb") as f:
+            with open(pathes.tickets, "wb") as f:
                 f.write(orjson.dumps({}))
             return None
 
     def add(author, value):
-        if path.exists(tickets_path):
-            with open(tickets_path, "rb") as f:
+        if path.exists(pathes.tickets):
+            with open(pathes.tickets, "rb") as f:
                 data = orjson.loads(f.read())
-            with open(tickets_path, "wb") as f:
+            with open(pathes.tickets, "wb") as f:
                 random_id = randint(1000, 9999)
                 while random_id in data:
                     random_id = randint(1000, 9999)
@@ -377,7 +378,7 @@ class ticket:
                 f.write(orjson.dumps(data, option=orjson.OPT_INDENT_2))
                 return random_id
         else:
-            with open(tickets_path, "wb") as f:
+            with open(pathes.tickets, "wb") as f:
                 random_id = str(randint(1000, 9999))
                 f.write(
                     orjson.dumps(
@@ -388,13 +389,13 @@ class ticket:
             return random_id
 
     def delete(id):
-        with open(tickets_path, "rb") as f:
+        with open(pathes.tickets, "rb") as f:
             data = orjson.loads(f.read())
             if id not in data:
                 return None
             else:
                 del data[id]
-        with open(tickets_path, "wb") as f:
+        with open(pathes.tickets, "wb") as f:
             f.write(orjson.dumps(data, option=orjson.OPT_INDENT_2))
             return True
 
@@ -405,7 +406,7 @@ class state:
         self._info()
 
     def _info(self):
-        with open(path.join(states_path, f"{self.name}.json"), "rb") as f:
+        with open(path.join(pathes.states, f"{self.name}.json"), "rb") as f:
             all = orjson.loads(f.read())
         self.all = all
         self.price = all["price"]
@@ -419,17 +420,17 @@ class state:
         self.money = all["money"]
 
     def change(self, key, value):
-        with open(path.join(states_path, f"{self.name}.json"), "wb") as f:
+        with open(path.join(pathes.states, f"{self.name}.json"), "wb") as f:
             self.all[key] = value
             f.write(orjson.dumps(self.all, option=orjson.OPT_INDENT_2))
 
     def rename(self, new_name: str):
-        if path.exists(path.join(states_path, f"{new_name}.json")):
+        if path.exists(path.join(pathes.states, f"{new_name}.json")):
             return False
         else:
             replace(
-                path.join(states_path, f"{self.name}.json"),
-                path.join(states_path, f"{new_name}.json"),
+                path.join(pathes.states, f"{self.name}.json"),
+                path.join(pathes.states, f"{new_name}.json"),
             )
             self.name = new_name
             self._info()
@@ -437,9 +438,9 @@ class state:
 
 class states:
     def add(name, author):
-        if path.exists(path.join(states_path, f"{name}.json")):
+        if path.exists(path.join(pathes.states, f"{name}.json")):
             return
-        with open(path.join(states_path, f"{name}.json"), "wb") as f:
+        with open(path.join(pathes.states, f"{name}.json"), "wb") as f:
             f.write(
                 orjson.dumps(
                     {
@@ -459,7 +460,7 @@ class states:
             return True
 
     def check(name):
-        if path.exists(path.join(states_path, f"{name}.json")):
+        if path.exists(path.join(pathes.states, f"{name}.json")):
             return True
         return False
 
@@ -473,42 +474,44 @@ class states:
             dict: Все государства сортированные в реверсе
         """
         all = {}
-        for file in listdir(states_path):
-            with open(path.join(states_path, file), "rb") as f:
+        for file in listdir(pathes.states):
+            with open(path.join(pathes.states, file), "rb") as f:
                 try:
                     all[file.replace(".json", "")] = orjson.loads(f.read())
                 except JSONDecodeError:
                     logger.error(f"Не удалось просмотреть гос-во {file}")
         if sortedby == "money":
-            sort_key = lambda item: item[1][sortedby]
+            def sort_key(item):
+                return item[1][sortedby]
         else:  # По умолчанию сортируем по количеству игроков
-            sort_key = lambda item: len(item[1]["players"])
+            def sort_key(item):
+                return len(item[1]["players"])
         return dict(sorted(all.items(), key=sort_key, reverse=True))
 
     def if_author(id: int):
-        for file in listdir(states_path):
-            with open(path.join(states_path, file), "rb") as f:
+        for file in listdir(pathes.states):
+            with open(path.join(pathes.states, file), "rb") as f:
                 if orjson.loads(f.read())["author"] == id:
                     return file.replace(".json", "")
         return False
 
     def if_player(id: int):
-        for file in listdir(states_path):
-            with open(path.join(states_path, file), "rb") as f:
+        for file in listdir(pathes.states):
+            with open(path.join(pathes.states, file), "rb") as f:
                 for player in orjson.loads(f.read())["players"]:
                     if player == id:
                         return file.replace(".json", "")
         return False
 
     def find(name: str) -> bool:
-        if path.exists(path.join(states_path, f"{name}.json")):
+        if path.exists(path.join(pathes.states, f"{name}.json")):
             return True
         return False
 
     def remove(name: str) -> bool:
-        state = path.join(states_path, f"{name}.json")
+        state = path.join(pathes.states, f"{name}.json")
         if path.exists(state):
-            replace(state, path.join(old_states_path, f"{name}.json"))
+            replace(state, path.join(pathes.old_states, f"{name}.json"))
             return True
         return False
 
@@ -617,7 +620,7 @@ Users = Mysql(
 
 
 class Notes:
-    def __init__(self, storage_dir=notes_path):
+    def __init__(self, storage_dir=pathes.notes):
         self.storage_dir = storage_dir
         makedirs(storage_dir, exist_ok=True)
 
@@ -664,11 +667,11 @@ def check_withdraw_limit(id: int, amount: int) -> int | bool:
     if amount > 64:
         return 64
     today = datetime.now().date()
-    if not path.exists(wdraw_path):
+    if not path.exists(pathes.wdraw):
         logger.error("Файл вывода не найден!")
         data = {}
     else:
-        with open(wdraw_path, "rb") as f:
+        with open(pathes.wdraw, "rb") as f:
             try:
                 data = orjson.loads(f.read())
             except orjson.JSONDecodeError:
@@ -692,18 +695,18 @@ def check_withdraw_limit(id: int, amount: int) -> int | bool:
     else:
         data[str(id)] = {"date": today.isoformat(), "withdrawn": amount}
 
-    with open(wdraw_path, "wb") as f:
+    with open(pathes.wdraw, "wb") as f:
         f.write(orjson.dumps(data, option=orjson.OPT_INDENT_2))
     return True
 
 
 class RefCodes:
     def _read(self) -> dict:
-        with open(ref_path, "rb") as f:
+        with open(pathes.ref, "rb") as f:
             return orjson.loads(f.read())
 
     def _write(self, data):
-        with open(ref_path, "wb") as f:
+        with open(pathes.ref, "wb") as f:
             f.write(orjson.dumps(data, option=orjson.OPT_INDENT_2))
 
     def get_own(self, id: int, default=None) -> str:
@@ -740,7 +743,7 @@ class RefCodes:
 
 class CitiesGame:
     def __init__(self):
-        self.data_file = cities_path
+        self.data_file = pathes.cities
         self.data = self._load_data()
 
     def _load_data(self) -> Dict:
@@ -843,7 +846,7 @@ class CitiesGame:
 
     def start_game(self):
         """Начинает новую игру, сохраняя начальные данные"""
-        city = choice(open(chk_city_path, encoding="utf8").read().split("\n"))
+        city = choice(open(pathes.chk_city, encoding="utf8").read().split("\n"))
         self.data["status"] = True
         self.data["current_game"]["last_city"] = city
         self.logger(f"Запущена игра Города. Начинается с города {city}")
@@ -861,7 +864,7 @@ class CitiesGame:
         if id != self.data["current_game"]["current_player_id"]:
             self.logger(f"{id} сейчас не должен отвечать")
             return 2
-        if city not in open(chk_city_path, encoding="utf8").read().split("\n"):
+        if city not in open(pathes.chk_city, encoding="utf8").read().split("\n"):
             self.logger(f"{id} ответил неизвестным городом")
             return 1
         if city[0] != formatter.city_last_letter(
@@ -896,15 +899,15 @@ def hellomsg_check(input_id):
     "Проверка, приветствовался ли человек ранее."
     id_str = str(input_id)
     ids_set = list()
-    if path.exists(hellomsg_path):
+    if path.exists(pathes.hellomsg):
         try:
-            with open(hellomsg_path, "rb") as f:
+            with open(pathes.hellomsg, "rb") as f:
                 ids_set = list(orjson.loads(f.read()))
         except (JSONDecodeError, FileNotFoundError):
             pass
     if id_str in ids_set:
         return False
     ids_set.append(id_str)
-    with open(hellomsg_path, "wb") as f:
+    with open(pathes.hellomsg, "wb") as f:
         f.write(orjson.dumps(ids_set, option=orjson.OPT_INDENT_2))
     return True

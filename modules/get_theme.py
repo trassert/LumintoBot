@@ -1,6 +1,8 @@
 from random import choices
 from loguru import logger
 
+logger.info(f"Загружен модуль {__name__}!")
+
 
 def weighted_choice(strings, weights):
     if not isinstance(strings, list) or not all(isinstance(s, str) for s in strings):

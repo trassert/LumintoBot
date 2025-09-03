@@ -1,14 +1,13 @@
-from loguru import logger
-
-logger.info(f"Загружен модуль {__name__}!")
-
 from .client import client
-from .global_checks import *
+from .global_checks import checks
 
 from telethon import events
 from telethon.tl.custom import Message
 
 from .. import db, phrase
+from loguru import logger
+
+logger.info(f"Загружен модуль {__name__}!")
 
 
 @client.on(events.NewMessage(pattern=r"(?i)^\+нот (.+)\n([\s\S]+)", func=checks))
@@ -44,7 +43,7 @@ async def add_note_notext(event: Message):
 
 @client.on(events.NewMessage(pattern=r"(?i)^\+нот\n([\s\S]+)", func=checks))
 @client.on(events.NewMessage(pattern=r"(?i)^\+note\n([\s\S]+)", func=checks))
-async def add_note_notext(event: Message):
+async def add_note_noname(event: Message):
     roles = db.roles()
     if roles.get(event.sender_id) < roles.VIP:
         return await event.reply(

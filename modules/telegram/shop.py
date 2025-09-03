@@ -1,7 +1,3 @@
-from loguru import logger
-
-logger.info(f"Загружен модуль {__name__}!")
-
 from telethon import events
 from telethon.tl.custom import Message
 from telethon.tl.types import (
@@ -13,9 +9,12 @@ from telethon.tl.types import (
 from random import choice
 
 from .client import client
-from .global_checks import *
+from .global_checks import checks
 
-from .. import phrase, formatter
+from .. import phrase, formatter, db
+from loguru import logger
+
+logger.info(f"Загружен модуль {__name__}!")
 
 
 @client.on(events.NewMessage(pattern=r"(?i)^/shop", func=checks))
@@ -72,7 +71,7 @@ async def shop(event: Message):
             price_5=formatter.value_to_str(shop[items[4]]["price"], "изумруд"),
             quote=choice(phrase.shop_quotes[theme]["quotes"]),
             emo=phrase.shop_quotes[theme]["emo"],
-            clock=formatter.get_remaining_time(db.database("shop_update_time"))
+            clock=formatter.get_remaining_time(db.database("shop_update_time")),
         ),
         buttons=keyboard,
         parse_mode="html",

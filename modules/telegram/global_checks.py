@@ -1,11 +1,10 @@
-from loguru import logger
-
-logger.info(f"Загружен модуль {__name__}!")
-
 from telethon import events
+from loguru import logger
 
 from .. import db, phrase
 from . import func
+
+logger.info(f"Загружен модуль {__name__}!")
 
 
 async def checks(event):

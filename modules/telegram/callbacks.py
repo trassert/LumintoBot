@@ -1,7 +1,3 @@
-from loguru import logger
-
-logger.info(f"Загружен модуль {__name__}!")
-
 import asyncio
 
 from telethon import events, types
@@ -9,12 +5,15 @@ from telethon import events, types
 from random import choice
 
 from .client import client
-from .global_checks import *
+from .global_checks import checks
 from .func import get_name
 from .games import crocodile_handler, crocodile_hint
 
 from .. import config, pathes, phrase, db, dice, formatter, floodwait
 from ..mcrcon import MinecraftClient
+from loguru import logger
+
+logger.info(f"Загружен модуль {__name__}!")
 
 
 @client.on(events.CallbackQuery(func=checks, pattern=r"^state"))
@@ -71,7 +70,7 @@ async def state_callback(event: events.CallbackQuery.Event):
         if event.sender_id != state.author:
             return await event.answer(phrase.not_for_you, alert=True)
         db.add_money(state.author, state.money)
-        if db.states.remove(data[2]) != True:
+        if not db.states.remove(data[2]):
             return await event.answer(phrase.error, alert=True)
         await client.send_message(
             entity=config.chats.chat,
@@ -320,7 +319,7 @@ async def shop_callback(event: events.CallbackQuery.Event):
             port=config.tokens.rcon.port,
             password=config.tokens.rcon.password,
         ) as rcon:
-            command = f'invgive {nick} {item["name"]} {item["value"]}'
+            command = f"invgive {nick} {item['name']} {item['value']}"
             logger.info(f"Выполняется команда: {command}")
             await rcon.send(command)
     except TimeoutError:

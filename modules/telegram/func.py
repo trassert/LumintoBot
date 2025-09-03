@@ -1,13 +1,12 @@
-from loguru import logger
-
-logger.info(f"Загружен модуль {__name__}!")
-
 import re
 
 from telethon.tl.functions.users import GetFullUserRequest
 
 from .. import db
 from .client import client
+from loguru import logger
+
+logger.info(f"Загружен модуль {__name__}!")
 
 
 async def get_name(id, push=False, minecraft=False):
@@ -16,20 +15,17 @@ async def get_name(id, push=False, minecraft=False):
         if minecraft is True:
             nick = db.nicks(id=int(id)).get()
             if nick is not None:
-                return f"[{nick}]" f"(tg://user?id={id})"
+                return f"[{nick}](tg://user?id={id})"
         user_name = await client.get_entity(int(id))
         if user_name.username is not None and push:
             return f"@{user_name.username}"
         elif user_name.username is None or not push:
             fn = user_name.first_name.replace("[", "(").replace("]", ")")
             if user_name.last_name is None:
-                return f"[{fn}]" f"(tg://user?id={id})"
+                return f"[{fn}](tg://user?id={id})"
             else:
                 ln = user_name.last_name.replace("[", "(").replace("]", ")")
-                return (
-                    f"[{fn} {ln}]"
-                    f"(tg://user?id={id})"
-                )
+                return f"[{fn} {ln}](tg://user?id={id})"
         else:
             return f"@{user_name.username}"
     except Exception:

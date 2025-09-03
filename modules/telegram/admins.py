@@ -1,17 +1,16 @@
-from loguru import logger
-
-logger.info(f"Загружен модуль {__name__}!")
-
 from telethon.tl.custom import Message
 from telethon import events
 from telethon.tl.functions.users import GetFullUserRequest
 
 from .client import client
-from .global_checks import *
+from .global_checks import checks
 from .func import get_name, get_id
 
-from .. import phrase, config, formatter
+from .. import phrase, config, formatter, db
 from ..mcrcon import MinecraftClient
+from loguru import logger
+
+logger.info(f"Загружен модуль {__name__}!")
 
 
 @client.on(events.NewMessage(pattern=r"(?i)^/изменить баланс(.*)", func=checks))
@@ -123,7 +122,7 @@ async def mcrcon(event: Message):
             logger.info(f"Ответ команды:\n{resp}")
             if len(resp) > 4096:
                 for x in range(0, len(resp), 4096):
-                    await event.reply(f"```{resp[x:x+4096]}```")
+                    await event.reply(f"```{resp[x : x + 4096]}```")
                 return
             return await event.reply(f"```{resp}```")
     except TimeoutError:

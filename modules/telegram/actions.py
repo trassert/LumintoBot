@@ -1,13 +1,12 @@
-from loguru import logger
-
-logger.info(f"Загружен модуль {__name__}!")
-
 from telethon import events
 
 from .client import client
 from .func import get_name
 
 from .. import config, phrase, formatter, db
+from loguru import logger
+
+logger.info(f"Загружен модуль {__name__}!")
 
 
 @client.on(events.ChatAction(chats=config.chats.chat))

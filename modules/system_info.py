@@ -1,45 +1,57 @@
 import psutil
 import platform
-# 
+
 import asyncio
 
 from time import time
 from . import config
+from loguru import logger
+
+logger.info(f"Загружен модуль {__name__}!")
 
 if platform.system() == "Windows":
     import WinTmp
+    logger.info("Система - Windows, использую WinTMP")
+
     def get_temperature():
         temp = WinTmp.CPU_Temps()
-        return f"{round(max(temp))} | {round(sum(temp)/len(temp))} | {round(min(temp))}"
+        return (
+            f"{round(max(temp))} | {round(sum(temp) / len(temp))} | {round(min(temp))}"
+        )
 else:
+
+    logger.info("Система - Linux, использую psutil")
     def get_temperature():
         try:
             temps = psutil.sensors_temperatures()
-            
+
             if not temps:
                 return "N/A | N/A | N/A"
-            
+
             core_temps = []
-            
-            if 'coretemp' in temps:
-                for entry in temps['coretemp']:
-                    if 'core' in entry.label.lower() or 'package' not in entry.label.lower():
+
+            if "coretemp" in temps:
+                for entry in temps["coretemp"]:
+                    if (
+                        "core" in entry.label.lower()
+                        or "package" not in entry.label.lower()
+                    ):
                         core_temps.append(entry.current)
-            
-            for sensor_name in ['k10temp', 'zenpower', 'amdgpu', 'nct']:
+
+            for sensor_name in ["k10temp", "zenpower", "amdgpu", "nct"]:
                 if sensor_name in temps and not core_temps:
                     for entry in temps[sensor_name]:
-                        if hasattr(entry, 'current'):
+                        if hasattr(entry, "current"):
                             core_temps.append(entry.current)
-            
+
             if not core_temps:
                 for sensor_entries in temps.values():
                     for entry in sensor_entries:
-                        if hasattr(entry, 'current'):
+                        if hasattr(entry, "current"):
                             core_temps.append(entry.current)
-            
+
             return f"{round(max(core_temps))} | {round(sum(core_temps) / len(core_temps))} | {round(min(core_temps))}"
-            
+
         except Exception as e:
             return f"Ошибка получения: {e}"
 
@@ -72,7 +84,7 @@ async def get_system_info():
     mem_total = mem.total / (1024 * 1024 * 1024)
     mem_avail = mem.available / (1024 * 1024 * 1024)
     mem_used = mem.used / (1024 * 1024 * 1024)
-    
+
     network = await get_current_speed()
     return f"""⚙️ : Информация о хостинге:
     Время работы: {result}
@@ -90,10 +102,13 @@ async def get_system_info():
     Сеть:
         Загрузка: {network[0]} Мбит/с
         Выгрузка: {network[1]} Мбит/с
-        ↳ Нагрузка: ≈{round(((network[0]+network[1])/config.coofs.EthernetChannel)*100, 1)} %
+        ↳ Нагрузка: ≈{round(((network[0] + network[1]) / config.coofs.EthernetChannel) * 100, 1)} %
     """
 
+
 if __name__ == "__main__":
+
     async def main():
         print(await get_system_info())
+
     asyncio.run(main())

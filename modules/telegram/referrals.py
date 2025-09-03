@@ -1,17 +1,15 @@
-from loguru import logger
-
-logger.info(f"Загружен модуль {__name__}!")
-
 import re
 
 from telethon import events
 from telethon.tl.custom import Message
 
 from .client import client
-from .global_checks import *
-from .func import get_name
+from .global_checks import checks
 
-from .. import db
+from .. import db, phrase
+from loguru import logger
+
+logger.info(f"Загружен модуль {__name__}!")
 
 
 @client.on(events.NewMessage(pattern=r"(?i)^/addrefcode (.+)", func=checks))

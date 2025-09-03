@@ -1,14 +1,13 @@
-from loguru import logger
-
-logger.info(f"Загружен модуль {__name__}!")
-
 from telethon.tl.custom import Message
 from telethon import events
 
 from .client import client
-from .global_checks import *
+from .global_checks import checks
 
 from .. import phrase, ai, config, floodwait, formatter
+from loguru import logger
+
+logger.info(f"Загружен модуль {__name__}!")
 
 WaitAI = floodwait.FloodWaitBase("WaitAI", config.flood.ai)
 

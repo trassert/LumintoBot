@@ -1,12 +1,13 @@
 import asyncio
 
 from datetime import timedelta, datetime
-from loguru import logger
 
 from . import db
 from .telegram.client import client
 from . import config, phrase, formatter
+from loguru import logger
 
+logger.info(f"Загружен модуль {__name__}!")
 
 def get_last_update(name):
     last = db.database(name)

@@ -2,12 +2,14 @@ import aiohttp
 import asyncio
 import aiohttp.web
 
-from loguru import logger
 from hashlib import sha1, md5
 
 from . import config, db, phrase, formatter
 from .telegram.client import client
 from .telegram import func
+from loguru import logger
+
+logger.info(f"Загружен модуль {__name__}!")
 
 
 async def server():
@@ -83,7 +85,7 @@ async def server():
         await client.send_message(
             config.chats.chat,
             phrase.github.format(
-                author=f'[{head["author"]["name"]}](https://github.com/{head["author"]["name"]})',
+                author=f"[{head['author']['name']}](https://github.com/{head['author']['name']})",
                 message=head["message"],
             ),
             link_preview=False,

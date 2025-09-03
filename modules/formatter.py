@@ -2,6 +2,9 @@ import re
 
 from datetime import datetime
 from pymorphy3 import MorphAnalyzer
+from loguru import logger
+
+logger.info(f"Загружен модуль {__name__}!")
 
 
 morph = MorphAnalyzer()
@@ -57,12 +60,11 @@ def check_zalgo(text):
 
 def city_last_letter(city: str) -> str:
     city = city.strip().lower()
-    excluded_letters = {'ь', 'ъ', 'ы'}
+    excluded_letters = {"ь", "ъ", "ы"}
     for i in range(len(city) - 1, -1, -1):
         if city[i] not in excluded_letters:
             return city[i]
     return city[-1]  # fallback
-
 
 
 def get_remaining_time(timestamp: str, remtime=7200):

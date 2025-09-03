@@ -1,18 +1,15 @@
-from loguru import logger
-
-logger.info(f"Загружен модуль {__name__}!")
-
 from telethon import events
 from telethon.tl.custom import Message
 
 from .client import client
-from .global_checks import *
+from .global_checks import checks
 from .func import get_name
 
-from .. import (
-    phrase,
-    formatter
-)
+from .. import phrase, formatter, db
+from loguru import logger
+
+logger.info(f"Загружен модуль {__name__}!")
+
 
 @client.on(events.NewMessage(pattern=r"(?i)^\+чек(.*)", func=checks))
 @client.on(events.NewMessage(pattern=r"(?i)^\+ticket(.*)", func=checks))

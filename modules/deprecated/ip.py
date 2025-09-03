@@ -205,12 +205,12 @@ async def observe():
         await asyncio.sleep(config.coofs.IPSleepTime)
 
 
-@client.on(events.NewMessage(pattern=r"(?i)^/dns$", func=checks))
-@client.on(events.NewMessage(pattern=r"(?i)^/днс$", func=checks))
-async def tg_dns(event: Message):
-    roles = db.roles()
-    if roles.get(event.sender_id) < roles.ADMIN:
-        return await event.reply(
-            phrase.roles.no_perms.format(level=roles.ADMIN, name=phrase.roles.admin)
-        )
-    return await event.reply(phrase.dns.format(await ip.setup(True)), parse_mode="html")
+# @client.on(events.NewMessage(pattern=r"(?i)^/dns$", func=checks))
+# @client.on(events.NewMessage(pattern=r"(?i)^/днс$", func=checks))
+# async def tg_dns(event: Message):
+#     roles = db.roles()
+#     if roles.get(event.sender_id) < roles.ADMIN:
+#         return await event.reply(
+#             phrase.roles.no_perms.format(level=roles.ADMIN, name=phrase.roles.admin)
+#         )
+#     return await event.reply(phrase.dns.format(await ip.setup(True)), parse_mode="html")

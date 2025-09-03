@@ -1,7 +1,9 @@
-from loguru import logger
 from time import time
 
 from . import config
+from loguru import logger
+
+logger.info(f"Загружен модуль {__name__}!")
 
 
 class FloodWaitBase:

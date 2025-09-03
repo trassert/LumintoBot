@@ -1,16 +1,15 @@
-from loguru import logger
-
-logger.info(f"Загружен модуль {__name__}!")
-
 from telethon.tl.custom import Message
 from telethon import events
 
 from .client import client
-from .global_checks import *
+from .global_checks import checks
 from .func import get_name
 
 from .. import config, phrase, db, pathes, formatter, chart
 from ..mcrcon import MinecraftClient
+from loguru import logger
+
+logger.info(f"Загружен модуль {__name__}!")
 
 
 @client.on(events.NewMessage(pattern=r"(?i)^/топ соо(.*)", func=checks))
@@ -44,7 +43,9 @@ async def active_check(event: Message):
                     break
                 text += f"{n}. {data[0]} - {data[1]}\n"
                 n += 1
-            return await client.send_file(event.chat_id, pathes.chart_path, caption=text)
+            return await client.send_file(
+                event.chat_id, pathes.chart_path, caption=text
+            )
     except ValueError:
         text = phrase.stat.chat.format("день")
         all_data = db.statistic().get_all()
@@ -79,7 +80,9 @@ async def crocodile_wins(event: Message):
 @client.on(events.NewMessage(pattern=r"(?i)^/банк$", func=checks))
 async def all_money(event: Message):
     return await event.reply(
-        phrase.money.all_money.format(formatter.value_to_str(db.get_all_money(), "изумруд"))
+        phrase.money.all_money.format(
+            formatter.value_to_str(db.get_all_money(), "изумруд")
+        )
     )
 
 

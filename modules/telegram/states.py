@@ -1,7 +1,3 @@
-from loguru import logger
-
-logger.info(f"Загружен модуль {__name__}!")
-
 import re
 import asyncio
 
@@ -16,10 +12,13 @@ from telethon import errors as TGErrors
 from random import choice
 
 from .client import client
-from .global_checks import *
+from .global_checks import checks
 from .func import get_name, get_id
 
-from .. import config, phrase, formatter
+from .. import config, phrase, formatter, db
+from loguru import logger
+
+logger.info(f"Загружен модуль {__name__}!")
 
 
 @client.on(events.NewMessage(pattern=r"(?i)^/states$", func=checks))
@@ -35,7 +34,7 @@ async def states_all(event: Message):
     text = phrase.state.all
     n = 1
     for state in data:
-        text += f'{n}. **{state}** - {len(data[state]["players"])+1} чел.\n'
+        text += f"{n}. **{state}** - {len(data[state]['players']) + 1} чел.\n"
         n += 1
     return await event.reply(text)
 
@@ -49,7 +48,7 @@ async def states_all(event: Message):
 @client.on(events.NewMessage(pattern=r"(?i)^/ктоп$", func=checks))
 @client.on(events.NewMessage(pattern=r"(?i)^казна топ$", func=checks))
 @client.on(events.NewMessage(pattern=r"(?i)^казтоп$", func=checks))
-async def states_all(event: Message):
+async def states_all_top(event: Message):
     data = db.states.get_all(sortedby="money")
     if data == {}:
         return await event.reply(phrase.state.empty_list)
@@ -57,7 +56,7 @@ async def states_all(event: Message):
     n = 1
     for state in data:
         if data[state]["money"] > 0:
-            text += f'{n}. **{state}** - {data[state]["money"]} изм.\n'
+            text += f"{n}. **{state}** - {data[state]['money']} изм.\n"
             n += 1
     return await event.reply(text)
 
@@ -89,7 +88,7 @@ async def state_make(event: Message):
             buttons=[
                 [
                     KeyboardButtonCallback(
-                        text=f"🏰 Создать государство",
+                        text="🏰 Создать государство",
                         data=f"state.m.{event.sender_id}.{arg.capitalize()}".encode(),
                     )
                 ]
@@ -102,7 +101,7 @@ async def state_make(event: Message):
 @client.on(events.NewMessage(pattern=r"(?i)^/создать госво$", func=checks))
 @client.on(events.NewMessage(pattern=r"(?i)^\+госво$", func=checks))
 @client.on(events.NewMessage(pattern=r"(?i)^\+государство$", func=checks))
-async def state_make(event: Message):
+async def state_make_empty(event: Message):
     return await event.reply(phrase.state.no_name)
 
 
@@ -124,7 +123,7 @@ async def state_enter(event: Message):
     if db.states.if_author(event.sender_id) is not False:
         return await event.reply(phrase.state.already_author)
     state = db.state(arg)
-    if state.enter != True:
+    if not state.enter:
         return await event.reply(phrase.state.enter_exit)
     if state.price != 0:
         return await event.reply(
@@ -328,7 +327,7 @@ async def state_coords(event: Message):
 
 @client.on(events.NewMessage(pattern=r"(?i)^/г входы\s(.+)", func=checks))
 @client.on(events.NewMessage(pattern=r"(?i)^/г вступления\s(.+)", func=checks))
-async def state_enter(event: Message):
+async def state_enter_arg(event: Message):
     state_name = db.states.if_author(event.sender_id)
     if state_name is False:
         return await event.reply(phrase.state.not_a_author)
@@ -368,7 +367,7 @@ async def state_enter(event: Message):
 
 @client.on(events.NewMessage(pattern=r"(?i)^/г входы$", func=checks))
 @client.on(events.NewMessage(pattern=r"(?i)^/г вступления$", func=checks))
-async def state_enter(event: Message):
+async def state_enter_empty(event: Message):
     state_name = db.states.if_author(event.sender_id)
     if state_name is False:
         return await event.reply(phrase.state.not_a_author)
@@ -394,12 +393,7 @@ async def state_add_money(event: Message):
         if state_name is False:
             return await event.reply(phrase.state.not_a_member)
     arg: str = event.pattern_match.group(1).strip()
-    if arg in [
-        "все",
-        "всё",
-        "все деньги",
-        "на все"
-    ]:
+    if arg in ["все", "всё", "все деньги", "на все"]:
         arg = db.get_money(event.sender_id)
     elif not arg.isdigit():
         return await event.reply(phrase.state.howto_add_balance)
@@ -441,12 +435,7 @@ async def state_rem_money(event: Message):
         return await event.reply(phrase.state.not_a_author)
     arg: str = event.pattern_match.group(1).strip()
     state = db.state(state_name)
-    if arg in [
-        "все",
-        "всё",
-        "все деньги",
-        "на все"
-    ]:
+    if arg in ["все", "всё", "все деньги", "на все"]:
         arg = state.money
     elif not arg.isdigit():
         return await event.reply(phrase.state.howto_rem_balance)
