@@ -1,4 +1,3 @@
-nest_asyncio
 loguru
 aiohttp
 telethon

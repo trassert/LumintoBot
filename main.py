@@ -1,10 +1,8 @@
-import nest_asyncio
 import asyncio
 
 from loguru import logger
 from sys import stderr
 
-nest_asyncio.apply()
 logger.remove()
 logger.add(
     stderr,
@@ -61,6 +59,11 @@ if __name__ == "__main__":
     if sum(db.database("shop_weight").values()) != 100:
         logger.error("Сумма процентов в магазине не равна 100!")
     try:
-        asyncio.run(main())
+        try:
+            import uvloop
+            uvloop.run(main())
+        except ModuleNotFoundError:
+            logger.error("Uvloop не установлен!")
+            asyncio.run(main())
     except (KeyboardInterrupt, asyncio.CancelledError):
         logger.warning("Закрываю бота!")
