@@ -80,17 +80,22 @@ class MinecraftClient:
         self._writer.write(out_len + out)
         await self._writer.drain()
 
-        # Читаем все пакеты ответа, пока не получим пустой (терминатор)
+        # Читаем все пакеты ответа с очень коротким тайм-аутом
         responses = []
         while True:
             try:
-                # Считываем длину пакета
-                in_len_bytes = await self._read_data(4)
+                # Читаем длину пакета с коротким тайм-аутом
+                in_len_bytes = await asyncio.wait_for(self._reader.read(4), timeout=0.1)
                 if not in_len_bytes:
                     break
                 in_len = struct.unpack("<i", in_len_bytes)[0]
-                # Считываем полезную нагрузку
+                
+                # Читаем полезную нагрузку
                 in_payload = await self._read_data(in_len)
+            except asyncio.TimeoutError:
+                # Если срабатывает тайм-аут, значит, сервер прекратил отправку данных.
+                # Это означает, что ответ завершен.
+                break
             except (asyncio.IncompleteReadError, struct.error):
                 raise ClientError("Соединение разорвано или данные некорректны.")
 
@@ -101,12 +106,11 @@ class MinecraftClient:
                 raise ClientError("Неправильное заполнение.")
             if in_id == -1:
                 raise InvalidPassword("Неверный пароль.")
-
             if in_type == 2:  # RconPacketType.SERVERDATA_EXECCOMMAND
                 # Это часть многострочного ответа, добавляем её.
                 responses.append(in_data.decode("utf8"))
             elif in_type == 0:  # RconPacketType.SERVERDATA_RESPONSE_VALUE (терминатор)
-                # Это пустой пакет, который сигнализирует об окончании ответа.
+                # Этот пакет сигнализирует об окончании ответа, выходим из цикла.
                 break
             else:
                 raise ClientError(f"Получен пакет с неправильным типом: {in_type}.")
