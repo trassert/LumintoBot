@@ -1,11 +1,11 @@
 import asyncio
 import re
+import ping3
 from datetime import datetime
 from random import choice, randint, random
 from time import time
 from loguru import logger
 
-import ping3
 from telethon import errors as TGErrors
 from telethon import events
 from telethon.tl.custom import Message
