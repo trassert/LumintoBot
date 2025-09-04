@@ -334,10 +334,6 @@ async def cities_timeout(current_player: int, last_city: str):
 
 @client.on(events.NewMessage(chats=config.chats.chat))
 async def cities_answer(event: Message):
-    async def autodelete(text):
-        message: Message = await event.reply(text)
-        await asyncio.sleep(config.coofs.CitiesAutodelete)
-        await message.delete()
 
     if (event.reply_to_msg_id != config.chats.topics.games) and (
         getattr(event.reply_to, "reply_to_top_id", None) != config.chats.topics.games
@@ -353,6 +349,10 @@ async def cities_answer(event: Message):
         return
     city = event.text.strip()
     result_code = Cities.answer(event.sender_id, city)
+    async def autodelete(text):
+        message: Message = await event.reply(text)
+        await asyncio.sleep(config.coofs.CitiesAutodelete)
+        await message.delete()
     if result_code == 0:  # Успех
         global CitiesTimerTask
         if CitiesTimerTask:
