@@ -61,42 +61,58 @@ class MinecraftClient:
         data = b""
         while len(data) < leng:
             packet = await self._reader.read(leng - len(data))
-            if not packet:  # Проверка отклоняет дубляж пакета (мб)
+            if not packet:
                 break
             data += packet
         return data
 
     async def _send(self, typen, message):
         """
-        Отправляет команду на сервер и получает ответ.
+        Отправляет команду на сервер и получает все пакеты ответа,
+        объединяя их в одну строку.
         """
         if not self._writer:
             raise ClientError("Не подключён.")
 
+        # Отправляем пакет с командой
         out = struct.pack("<li", 0, typen) + message.encode("utf8") + b"\x00\x00"
         out_len = struct.pack("<i", len(out))
         self._writer.write(out_len + out)
-        await self._writer.drain()  # Не даёт дублироваться ответу
+        await self._writer.drain()
 
-        in_len = struct.unpack("<i", await self._read_data(4))
-        in_payload = await self._read_data(in_len[0])
+        # Читаем все пакеты ответа, пока не получим пустой (терминатор)
+        responses = []
+        while True:
+            try:
+                # Считываем длину пакета
+                in_len_bytes = await self._read_data(4)
+                if not in_len_bytes:
+                    break
+                in_len = struct.unpack("<i", in_len_bytes)[0]
+                # Считываем полезную нагрузку
+                in_payload = await self._read_data(in_len)
+            except (asyncio.IncompleteReadError, struct.error):
+                raise ClientError("Соединение разорвано или данные некорректны.")
 
-        in_id, in_type = struct.unpack("<ii", in_payload[:8])
-        in_data, in_padd = in_payload[8:-2], in_payload[-2:]
+            in_id, in_type = struct.unpack("<ii", in_payload[:8])
+            in_data, in_padd = in_payload[8:-2], in_payload[-2:]
 
-        if in_padd != b"\x00\x00":
-            raise ClientError("Неправильное заполнение.")
-        if in_id == -1:
-            raise InvalidPassword("Неверный пароль.")
-        if in_type != typen:  # Проверка отклоняет дубляж пакета (мб)
-            raise ClientError("Получен пакет с неправильным типом.")
+            if in_padd != b"\x00\x00":
+                raise ClientError("Неправильное заполнение.")
+            if in_id == -1:
+                raise InvalidPassword("Неверный пароль.")
 
-        # Главное исправление: нормализация символов новой строки.
-        # Заменяем все возможные варианты ('\r\n', '\r') на стандартный '\n'.
-        data = in_data.decode("utf8")
-        data = data.replace('\r\n', '\n').replace('\r', '\n')
-        
-        return data
+            if in_type == 2:  # RconPacketType.SERVERDATA_EXECCOMMAND
+                # Это часть многострочного ответа, добавляем её.
+                responses.append(in_data.decode("utf8"))
+            elif in_type == 0:  # RconPacketType.SERVERDATA_RESPONSE_VALUE (терминатор)
+                # Это пустой пакет, который сигнализирует об окончании ответа.
+                break
+            else:
+                raise ClientError(f"Получен пакет с неправильным типом: {in_type}.")
+
+        # Объединяем все части ответа в одну строку с переносами.
+        return "\n".join(responses)
 
     async def send(self, cmd):
         """
