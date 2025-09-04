@@ -2,9 +2,8 @@ import asyncio
 
 from datetime import timedelta, datetime
 
-from . import db
 from .telegram.client import client
-from . import config, phrase, formatter
+from . import config, phrase, formatter, db
 from loguru import logger
 
 logger.info(f"Загружен модуль {__name__}!")
@@ -40,7 +39,10 @@ async def update_shop():
             logger.info("Изменена тема магазина")
             await client.send_message(
                 config.chats.chat,
-                phrase.shop.update.format(theme=phrase.shop_quotes[theme]["translate"]),
+                phrase.shop.update.format(
+                    emo=phrase.shop_quotes[theme]["emo"],
+                    theme=phrase.shop_quotes[theme]["translate"]
+                ),
             )
             db.database("shop_version", db.database("shop_version") + 1)
             db.database("shop_update_time", str(today).split(":")[0] + ":00:00.000000")
