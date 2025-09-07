@@ -109,12 +109,21 @@ async def profile(event: Message):
         m_week = db.statistic(7).get(nick)
         m_month = db.statistic(30).get(nick)
         m_all = db.statistic().get(nick, all_days=True)
+        async with MinecraftClient(
+            host=config.tokens.rcon.host,
+            port=config.tokens.rcon.port,
+            password=config.tokens.rcon.password,
+        ) as rcon:
+            time = (await rcon.send(f"papi parse --null %PTM_playtime_{nick}:luminto%")).replace("\n", "")
+            rank = (await rcon.send(f"papi parse --null %PTM_rank_{nick}%")).replace("\n", "")
     else:
         m_day = 0
         m_week = 0
         m_month = 0
         m_all = 0
         nick = "Не привязан"
+        time = "-"
+        rank = "Последнее"
     return await event.reply(
         phrase.profile.full.format(
             name=await get_name(event.sender_id, push=False),
@@ -127,6 +136,8 @@ async def profile(event: Message):
             m_month=m_month,
             m_all=m_all,
             balance=formatter.value_to_str(db.get_money(event.sender_id), "изумруд"),
+            time=time,
+            rank=rank
         )
     )
 
