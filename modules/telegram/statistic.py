@@ -6,7 +6,6 @@ from .global_checks import checks
 from .func import get_name
 
 from .. import config, phrase, db, pathes, formatter, chart
-from ..mcrcon import MinecraftClient
 from loguru import logger
 
 logger.info(f"Загружен модуль {__name__}!")
