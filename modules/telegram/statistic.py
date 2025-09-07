@@ -87,7 +87,9 @@ async def all_money(event: Message):
 
 
 @client.on(events.NewMessage(pattern=r"(?i)^/топ игроков$", func=checks))
+@client.on(events.NewMessage(pattern=r"(?i)^/топигроков$", func=checks))
 @client.on(events.NewMessage(pattern=r"(?i)^/topplayers$", func=checks))
+@client.on(events.NewMessage(pattern=r"(?i)^/playtimetop$", func=checks))
 @client.on(events.NewMessage(pattern=r"(?i)^/bestplayers$", func=checks))
 @client.on(events.NewMessage(pattern=r"(?i)^/toppt", func=checks))
 async def server_top_list(event: Message):
@@ -98,9 +100,7 @@ async def server_top_list(event: Message):
             password=config.tokens.rcon.password,
         ) as rcon:
             await event.reply(
-                formatter.rm_colors(await rcon.send("playtime top"))
-                .replace("[i] Лидеры по времени на сервере", phrase.stat.server)
-                .replace("***", "")
+                f"{phrase.stat.server}\n{'\n'.join(formatter.rm_colors(await rcon.send('playtimetop')).splitlines()[1:-1])}"
             )
     except TimeoutError:
         return await event.reply(phrase.server.stopped)
