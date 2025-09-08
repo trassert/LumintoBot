@@ -371,7 +371,16 @@ async def swap_money(event: Message):
         if count <= 0:
             return await event.reply(phrase.money.negative_count)
     except ValueError:
-        return await event.reply(phrase.money.nan_count + phrase.money.swap_balance_use)
+        if args[0].lower() not in [
+            "все",
+            "всё",
+            "all",
+            "весь"
+        ]:
+            return await event.reply(phrase.money.nan_count + phrase.money.swap_balance_use)
+        count = db.get_money(event.sender_id)
+        if count == 0:
+            return await event.reply(phrase.money.empty)
 
     try:
         tag = args[1]
