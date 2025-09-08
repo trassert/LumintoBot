@@ -401,7 +401,7 @@ class chataction:
         "\n"
         "Есть вопросы?\n"
         "1. Можешь задать их в **нашу техподдержку**:\n"
-        "    **lumintotp.t.me**\n"
+        "    **luminto_support.t.me**\n"
         "2. Можешь посетить **наш канал**:\n"
         "    **lumintoch.t.me**\n"
         "\n"
