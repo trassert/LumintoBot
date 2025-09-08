@@ -13,7 +13,7 @@ logger.info(f"Загружен модуль {__name__}!")
 
 
 async def server():
-    async def hotmc(request):
+    async def hotmc(request: aiohttp.web.Request):
         load = await request.post()
         nick = load["nick"]
         sign = load["sign"]
@@ -40,7 +40,7 @@ async def server():
         )
         return aiohttp.web.Response(text="ok")
 
-    async def mcservers(request):
+    async def mcservers(request: aiohttp.web.Request):
         load = await request.post()
         username = load["username"]
         sign = load["sign"]
@@ -67,7 +67,7 @@ async def server():
         )
         return aiohttp.web.Response(text="ok")
 
-    async def minecraft(request):
+    async def minecraft(request: aiohttp.web.Request):
         if request.query.get("password") != config.tokens.chattohttp:
             logger.info("Неверный пароль (C2HTTP)")
             return aiohttp.web.Response(text="Неверный пароль.", status=401)
@@ -77,23 +77,40 @@ async def server():
         logger.debug(f"+ соо. от {nick}")
         return aiohttp.web.Response(text="ok")
 
-    async def github(request):
+    async def github_bot(request: aiohttp.web.Request):
         "Вебхук для гитхаба"
         load = await request.json()
-        head = load["head_commit"]
-        logger.info("Обновление!")
-        await client.send_message(
-            config.chats.chat,
-            phrase.github.format(
-                author=f"[{head['author']['name']}](https://github.com/{head['author']['name']})",
-                message=head["message"],
-            ),
-            link_preview=False,
-            reply_to=config.chats.topics.updates,
-        )
+        for head in load["commits"]:
+            logger.info("Обновление бота!")
+            await client.send_message(
+                config.chats.chat,
+                phrase.github.bot.format(
+                    author=f"[{head['author']['name']}](https://github.com/{head['author']['name']})",
+                    message=head["message"],
+                ),
+                link_preview=False,
+                reply_to=config.chats.topics.updates,
+            )
         return aiohttp.web.Response(text="ok")
 
-    async def bank(request):
+    async def github_mod(request: aiohttp.web.Request):
+        "Вебхук для гитхаба"
+        load = await request.json()
+        for head in load["commits"]:
+            logger.info("Обновление модпака!")
+            await client.send_message(
+                config.chats.chat,
+                phrase.github.mod.format(
+                    author=f"[{head['author']['name']}](https://github.com/{head['author']['name']})",
+                    message=head["message"],
+                    link=head["url"]
+                ),
+                link_preview=False,
+                reply_to=config.chats.topics.updates,
+            )
+        return aiohttp.web.Response(text="ok")
+
+    async def bank(request: aiohttp.web.Request):
         if request.query.get("key") != config.tokens.bankplugin:
             logger.warning("Неверный пароль (BankPlugin)")
             return aiohttp.web.Response(text="Неверный пароль.", status=401)
@@ -121,7 +138,8 @@ async def server():
         [
             aiohttp.web.post("/hotmc", hotmc),
             aiohttp.web.post("/servers", mcservers),
-            aiohttp.web.post("/github", github),
+            aiohttp.web.post("/github_bot", github_bot),
+            aiohttp.web.post("/github_mod", github_mod),
             aiohttp.web.get("/minecraft", minecraft),
             aiohttp.web.get("/bank", bank),
         ]

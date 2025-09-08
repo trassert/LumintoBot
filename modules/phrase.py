@@ -560,6 +560,11 @@ class cities:
     )
 
 
+class github:
+    bot = "**🎉 : Обновление бота**\n\n👨🏻‍💻 : Автор: **{author}**\n💬 : {message}\n"
+    mod = "**🎉 : Обновление мод-пака**\n\n👨🏻‍💻 : Автор: **{author}**\n💬 : {message}\n\n**[Что изменилось?]({link})**"
+
+
 get_map = "🗺 : **[Кликни, чтобы открыть карту сервера](http://trassert.ru:8123)**\n\n• Используйте внешний браузер"
 error = "Произошла внутренняя ошибка. Попробуйте позже."
 not_for_you = "👎 : Кнопка не для вас"
@@ -591,7 +596,6 @@ servers = (
     "**🗳 : {nick} проголосовал за сервер!**\n{money}"
     "**[Проголосовать](minecraft-servers.ru/server/trassert)**"
 )
-github = "**🎉 : Обновление бота**\n\n👨🏻‍💻 : Автор: **{author}**\n💬 : {message}\n"
 game_topic_warning = (
     "🎮 : Пожалуйста, играйте в мини-игры в другом топике:\n"
     f"**[Мини-игры](https://t.me/lumintomc/{config.chats.topics.games})**"
