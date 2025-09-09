@@ -7,9 +7,9 @@ logger.remove()
 logger.add(
     stderr,
     format="<blue>{time:HH:mm:ss}</blue>"
-    " | <level>{level}</level>"
-    " | <green>{function}</green>"
-    " <cyan>></cyan> {message}",
+    " <bold>|</bold> <level>{level}</level>"
+    " <bold>|</bold> <green>{function}</green>"
+    " <cyan><bold>></bold></cyan> {message}",
     level="INFO",
     colorize=True,
 )
