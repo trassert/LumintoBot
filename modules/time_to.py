@@ -3,7 +3,7 @@ import asyncio
 from datetime import timedelta, datetime
 
 from .telegram.client import client
-from . import config, phrase, formatter, db
+from . import config, phrase, formatter, db, ports
 from loguru import logger
 
 logger.info(f"Загружен модуль {__name__}!")
@@ -108,3 +108,18 @@ async def remove_states():
             )
         logger.info("Жду до следующей проверки государств...")
         await asyncio.sleep(abs(seconds))
+
+
+async def port_checks():
+    await asyncio.sleep(2)  # ! Для предотвращения блокировки
+    ip = db.database("host")
+    while True:
+        if await ports.check_port(ip, 25565) is False:
+            await client.send_message(
+                entity=config.chats.staff,
+                message=phrase.port.false,
+                reply_to=config.chats.topics.rp,
+            )
+            await asyncio.sleep(900)
+        else:
+            await asyncio.sleep(1800)

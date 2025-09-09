@@ -49,6 +49,7 @@ async def main():
                 time_to.update_shop(),
                 time_to.rewards(),
                 time_to.remove_states(),
+                time_to.port_checks()
             )
         except ConnectionError:
             logger.error("Жду 20 секунд (нет подключения к интернету)")
