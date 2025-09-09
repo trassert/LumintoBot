@@ -21,5 +21,5 @@ async def check_port(ip: str, port: int) -> bool:
                     pass
                 elif "error" in answer[node][0]:
                     return False
-                elif "address" in answer[node]:
+                elif "address" in answer[node][0]:
                     return True
