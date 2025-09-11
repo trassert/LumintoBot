@@ -88,7 +88,7 @@ async def server():
                 config.chats.chat,
                 phrase.github.bot.format(
                     author=f"[{head['author']['name']}](https://github.com/{head['author']['name']})",
-                    message=head["message"],
+                    message=head["message"]
                 ),
                 link_preview=False,
                 reply_to=config.chats.topics.updates,
