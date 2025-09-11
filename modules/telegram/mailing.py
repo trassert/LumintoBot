@@ -6,7 +6,6 @@ from .. import db, phrase
 
 from loguru import logger
 from telethon import events
-from datetime import datetime
 from telethon.tl.custom import Message
 
 logger.info(f"Загружен модуль {__name__}!")
@@ -25,7 +24,7 @@ async def send_to_subscribers(message_text):
         try:
             await client.send_message(
                 user_id,
-                f"{phrase.mailing.new}\n\n{message_text}\n\n__{phrase.mailing.upd_hint}__",
+                f"{phrase.mailing.new}\n\n💬 : {message_text}\n\n__{phrase.mailing.upd_hint}__",
             )
             successful_sends += 1
             await asyncio.sleep(0.1)
