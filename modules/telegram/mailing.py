@@ -25,7 +25,7 @@ async def send_to_subscribers(message_text):
         try:
             await client.send_message(
                 user_id,
-                f"{phrase.mailing.new}\n{message_text}\n\n__{phrase.mailing.upd_hint}__",
+                f"{phrase.mailing.new}\n\n{message_text}\n\n__{phrase.mailing.upd_hint}__",
             )
             successful_sends += 1
             await asyncio.sleep(0.1)
