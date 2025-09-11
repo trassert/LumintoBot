@@ -115,6 +115,7 @@ async def port_checks():
     ip = db.database("host")
     while True:
         if await ports.check_port(ip, 25565) is False:
+            logger.warning("Все ноды ответили о закрытом порту!")
             await client.send_message(
                 entity=config.chats.staff,
                 message=phrase.port.false,
@@ -122,4 +123,5 @@ async def port_checks():
             )
             await asyncio.sleep(900)
         else:
+            logger.info("Сервер работает стабильно.")
             await asyncio.sleep(1800)
