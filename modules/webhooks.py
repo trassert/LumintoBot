@@ -6,6 +6,7 @@ from hashlib import sha1, md5
 
 from . import config, db, phrase, formatter
 from .telegram.client import client
+from .telegram.mailing import send_to_subscribers
 from .telegram import func
 from loguru import logger
 
@@ -82,6 +83,7 @@ async def server():
         load = await request.json()
         for head in load["commits"]:
             logger.info("Обновление бота!")
+            await send_to_subscribers(f"Тег: Бот\n{head['message']}")
             await client.send_message(
                 config.chats.chat,
                 phrase.github.bot.format(
@@ -98,6 +100,7 @@ async def server():
         load = await request.json()
         for head in load["commits"]:
             logger.info("Обновление модпака!")
+            await send_to_subscribers(f"Тег: Модпак\n{head['message']}")
             await client.send_message(
                 config.chats.chat,
                 phrase.github.mod.format(

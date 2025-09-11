@@ -481,11 +481,14 @@ class states:
                 except JSONDecodeError:
                     logger.error(f"Не удалось просмотреть гос-во {file}")
         if sortedby == "money":
+
             def sort_key(item):
                 return item[1][sortedby]
         else:  # По умолчанию сортируем по количеству игроков
+
             def sort_key(item):
                 return len(item[1]["players"])
+
         return dict(sorted(all.items(), key=sort_key, reverse=True))
 
     def if_author(id: int):
@@ -911,3 +914,17 @@ def hellomsg_check(input_id):
     with open(pathes.hellomsg, "wb") as f:
         f.write(orjson.dumps(ids_set, option=orjson.OPT_INDENT_2))
     return True
+
+
+def mailing_get():
+    try:
+        with open(pathes.mailing, "rb") as f:
+            return orjson.loads(f.read())
+    except (FileNotFoundError, orjson.JSONDecodeError):
+        return {"subscribers": []}
+
+
+def mailing_save(data):
+    """Сохранение данных в JSON файл"""
+    with open(pathes.mailing, "wb") as f:
+        f.write(orjson.dumps(data))

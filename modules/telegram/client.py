@@ -14,4 +14,4 @@ client = TelegramClient(
     system_lang_code="ru",
 )
 
-from . import actions, admins, ai, base, callbacks, func, games, global_checks, shop, states, statistic, tickets, notes, referrals  # noqa: E402, F401
+from . import actions, admins, ai, base, callbacks, func, games, global_checks, shop, states, statistic, tickets, notes, referrals, mailing  # noqa: E402, F401
