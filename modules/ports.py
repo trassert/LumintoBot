@@ -2,7 +2,10 @@ import aiohttp
 import asyncio
 
 def check_nodes_status(data):
-    return any('address' in item for node in data.values() for item in node)
+    try:
+        return any('address' in item for node in data.values() for item in node)
+    except TypeError:
+        return True
 
 
 async def check_port(ip: str, port: int) -> bool:
