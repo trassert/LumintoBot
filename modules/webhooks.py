@@ -4,7 +4,7 @@ import aiohttp.web
 
 from hashlib import sha1, md5
 
-from . import config, db, phrase, formatter
+from . import config, db, phrase, formatter, ai
 from .telegram.client import client
 from .telegram.mailing import send_to_subscribers
 from .telegram import func
@@ -88,7 +88,7 @@ async def server():
                 config.chats.chat,
                 phrase.github.bot.format(
                     author=f"[{head['author']['name']}](https://github.com/{head['author']['name']})",
-                    message=head["message"]
+                    message=head["message"],
                 ),
                 link_preview=False,
                 reply_to=config.chats.topics.updates,
@@ -106,7 +106,7 @@ async def server():
                 phrase.github.mod.format(
                     author=f"[{head['author']['name']}](https://github.com/{head['author']['name']})",
                     message=head["message"],
-                    link=head["url"]
+                    link=head["url"],
                 ),
                 link_preview=False,
                 reply_to=config.chats.topics.updates,
@@ -136,6 +136,13 @@ async def server():
         logger.info(f"[Bank] Переведено {amount} изумрудов на счет {playerid}")
         return aiohttp.web.Response(text="ok")
 
+    async def genai(request: aiohttp.web.Request):
+        player = request.query.get("player")
+        text = request.query.get("text")
+        logger.info(f"[AI] {player} > {text}")
+        chat = await ai.get_player_chat(player)
+        return aiohttp.web.Response(text=(await chat.send_message(text)).text)
+
     app = aiohttp.web.Application()
     app.add_routes(
         [
@@ -145,6 +152,7 @@ async def server():
             aiohttp.web.post("/github_mod", github_mod),
             aiohttp.web.get("/minecraft", minecraft),
             aiohttp.web.get("/bank", bank),
+            aiohttp.web.get("/genai", genai),
         ]
     )
     runner = aiohttp.web.AppRunner(app)
