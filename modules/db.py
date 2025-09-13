@@ -1,5 +1,6 @@
 import orjson
 import aiomysql
+import random
 
 from typing import Dict, List, Optional
 from datetime import datetime, timedelta
@@ -844,12 +845,14 @@ class CitiesGame:
         self.data["start_players"] = 0
         self.data["status"] = False
         self.data["statistics"] = {}
+        self.data["id"] = self.data["id"]+1 if self.data["id"] < 10 else 1
         self.logger("Экземпляр Города закончен.")
         self._save_data()
 
     def start_game(self):
         """Начинает новую игру, сохраняя начальные данные"""
         city = choice(open(pathes.chk_city, encoding="utf8").read().split("\n"))
+        self.data["id"] = self.data["id"]+1 if self.data["id"] < 10 else 1
         self.data["status"] = True
         self.data["current_game"]["last_city"] = city
         self.logger(f"Запущена игра Города. Начинается с города {city}")
@@ -897,6 +900,8 @@ class CitiesGame:
     def get_count_players(self):
         return self.data["start_players"]
 
+    def get_id(self):
+        return self.data["id"]
 
 def hellomsg_check(input_id):
     "Проверка, приветствовался ли человек ранее."

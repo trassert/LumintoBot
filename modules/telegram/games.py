@@ -464,7 +464,12 @@ async def cities_start(event: Message):
     ]
 
     user_name = await func.get_name(event.sender_id)
-    return await event.reply(phrase.cities.start.format(user_name), buttons=keyboard)
+    message: Message = await event.reply(phrase.cities.start.format(user_name), buttons=keyboard)
+    id = Cities.get_id()
+    await asyncio.sleep(300)
+    if Cities.get_game_status() is False and Cities.get_id() == id:
+        await message.edit(phrase.cities.wait_exceeded)
+        Cities.end_game()
 
 
 if db.database("current_game") != 0:
