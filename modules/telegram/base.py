@@ -345,6 +345,8 @@ async def check_nick(event: Message):
         if reply_to_msg:
             reply_message = await event.get_reply_message()
             user = reply_message.sender_id
+        else:
+            user = event.sender_id
     nick = db.nicks(id=user).get()
     if nick is None:
         return await event.reply(phrase.nick.no_nick)
