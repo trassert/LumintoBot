@@ -114,14 +114,21 @@ async def port_checks():
     await asyncio.sleep(2)  # ! Для предотвращения блокировки
     ip = db.database("host")
     while True:
-        if await ports.check_port(ip, 25565) is False:
-            logger.warning("Все ноды ответили о закрытом порту!")
+        try:
+            if await ports.check_port(ip, 25565) is False:
+                logger.warning("Все ноды ответили о закрытом порту!")
+                await client.send_message(
+                    entity=config.chats.staff,
+                    message=phrase.port.false,
+                )
+                await asyncio.sleep(900)
+            else:
+                logger.info("Сервер работает стабильно.")
+                await asyncio.sleep(1800)
+        except Exception as e:
+            logger.error(f"Ошибка при проверке порта: {e}")
             await client.send_message(
                 entity=config.chats.staff,
-                message=phrase.port.false,
-                reply_to=config.chats.topics.rp,
+                message=phrase.port.false
             )
-            await asyncio.sleep(900)
-        else:
-            logger.info("Сервер работает стабильно.")
-            await asyncio.sleep(1800)
+            await asyncio.sleep(60)
