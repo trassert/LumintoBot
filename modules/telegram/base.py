@@ -1,6 +1,6 @@
 import asyncio
 import re
-import ping3
+import aioping
 from datetime import datetime
 from random import choice, randint, random
 from time import time
@@ -73,7 +73,7 @@ async def ping(event: Message):
         "full",
     ]:
         all_servers_ping.append(
-            f"🌐 : Пинг сервера - {int(round(ping3.ping('yandex.ru'), 3) * 1000)} мс"
+            f"🌐 : Пинг сервера - {int((await aioping.ping('yandex.ru')) * 1000)} мс"
         )
     text = f"{phrase.ping.set.format(ping)}\n{'\n'.join(all_servers_ping)}"
     return await event.reply(text)

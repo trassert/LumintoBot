@@ -11,5 +11,5 @@ psutil
 google-genai[aiohttp]==1.20
 cryptography
 orjson
-ping3
+aioping
 wintmp==1.2.0
