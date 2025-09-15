@@ -1,11 +1,10 @@
 loguru
 aiohttp
 telethon
-requests
 matplotlib
 seaborn
 bestconfig
-aiomysql
+asyncmy
 pymorphy3
 folium
 psutil
