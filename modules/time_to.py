@@ -111,7 +111,7 @@ async def remove_states():
 
 
 async def port_checks():
-    await asyncio.sleep(2)  # ! Для предотвращения блокировки
+    await asyncio.sleep(500)  # Ждать включения сервера
     ip = db.database("host")
     while True:
         try:

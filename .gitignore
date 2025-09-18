@@ -32,5 +32,6 @@ test.*
 
 map.html
 tokens.yml
+chats.yml
 
 venv
