@@ -68,7 +68,6 @@ async def ping(event: Message):
         "полн",
         "полный",
         "весь",
-        "ии",
         "фулл",
         "full",
     ]:
@@ -135,7 +134,7 @@ async def profile(event: Message):
             m_week=m_week,
             m_month=m_month,
             m_all=m_all,
-            balance=formatter.value_to_str(db.get_money(event.sender_id), "изумруд"),
+            balance=formatter.value_to_str(await db.get_money(event.sender_id), "изумруд"),
             time=time,
             rank=rank
         )
@@ -171,7 +170,7 @@ async def mine(event: Message):
     rand = random()
     if rand < config.coofs.ChanceToDie:
         added = randint(1, config.coofs.MineMaxGems)
-        balance = db.get_money(event.sender_id)
+        balance = await db.get_money(event.sender_id)
         if balance < added:
             added = balance
         text = choice(phrase.mine.die).format(
@@ -376,7 +375,7 @@ async def swap_money(event: Message):
             "весь"
         ]:
             return await event.reply(phrase.money.nan_count + phrase.money.swap_balance_use)
-        count = db.get_money(event.sender_id)
+        count = await db.get_money(event.sender_id)
         if count == 0:
             return await event.reply(phrase.money.empty)
 
@@ -400,7 +399,7 @@ async def swap_money(event: Message):
 
     if event.sender_id == user:
         return await event.reply(phrase.money.selfbyself)
-    sender_balance = db.get_money(event.sender_id)
+    sender_balance = await db.get_money(event.sender_id)
     if sender_balance < count:
         return await event.reply(
             phrase.money.not_enough.format(
@@ -438,7 +437,7 @@ async def money_to_server(event: Message):
         return await event.reply(
             phrase.bank.limit.format(formatter.value_to_str(amount, "изумруд"))
         )
-    balance = db.get_money(event.sender_id)
+    balance = await db.get_money(event.sender_id)
     if balance < arg:
         return await event.reply(
             phrase.money.not_enough.format(formatter.value_to_str(balance, "изумруд"))
@@ -481,7 +480,7 @@ async def money_to_server_empty(event: Message):
 async def get_balance(event: Message):
     return await event.reply(
         phrase.money.wallet.format(
-            formatter.value_to_str(db.get_money(event.sender_id), "изумруд")
+            formatter.value_to_str(await db.get_money(event.sender_id), "изумруд")
         )
     )
 

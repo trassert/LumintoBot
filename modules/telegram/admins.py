@@ -43,7 +43,7 @@ async def add_balance(event: Message):
         return await event.reply(
             phrase.money.nan_count + phrase.money.change_balance_use
         )
-    old = db.get_money(user.full_user.id)
+    old = await db.get_money(user.full_user.id)
     db.add_money(user.full_user.id, new)
     await event.reply(phrase.money.add_money.format(name=tag, old=old, new=old + new))
 

@@ -109,7 +109,7 @@ async def crocodile_bet(event: Message):
         bet = db.database("min_bet")
     except ValueError:
         return await event.reply(phrase.money.nan_count)
-    sender_balance = db.get_money(event.sender_id)
+    sender_balance = await db.get_money(event.sender_id)
     if sender_balance < bet:
         return await event.reply(
             phrase.money.not_enough.format(
@@ -386,7 +386,7 @@ async def cities_callback(event: events.CallbackQuery.Event):
         if event.sender_id in Cities.get_players():
             return await event.answer(phrase.cities.already_ingame, alert=True)
 
-        balance = db.get_money(event.sender_id)
+        balance = await db.get_money(event.sender_id)
         if config.coofs.PriceForCities > balance:
             return await event.answer(
                 phrase.money.not_enough.format(

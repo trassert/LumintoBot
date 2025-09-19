@@ -1,5 +1,6 @@
 import orjson
 import asyncmy
+import aiofiles
 
 from typing import Dict, List, Optional
 from datetime import datetime, timedelta
@@ -68,16 +69,16 @@ def database(key, value=None, delete=None, log=True):
             return None
 
 
-def get_money(id):
+async def get_money(id):
     id = str(id)
-    with open(pathes.money, "rb") as f:
-        load = orjson.loads(f.read())
+    async with aiofiles.open(pathes.money, "rb") as f:
+        load = orjson.loads(await f.read())
         if id in load:
             return load[id]
 
-    with open(pathes.money, "wb") as f:
+    async with aiofiles.open(pathes.money, "wb") as f:
         load[id] = 0
-        f.write(orjson.dumps(load, option=orjson.OPT_INDENT_2))
+        await f.write(orjson.dumps(load, option=orjson.OPT_INDENT_2))
         return 0
 
 

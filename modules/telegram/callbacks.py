@@ -28,7 +28,7 @@ async def state_callback(event: events.CallbackQuery.Event):
             return await event.answer(phrase.state.already_player, alert=True)
         if db.states.if_author(event.sender_id) is not False:
             return await event.answer(phrase.state.already_author, alert=True)
-        balance = db.get_money(event.sender_id)
+        balance = await db.get_money(event.sender_id)
         state = db.state(data[2])
         if state.price > balance:
             return await event.answer(
@@ -84,7 +84,7 @@ async def state_callback(event: events.CallbackQuery.Event):
         if event.sender_id != int(data[2]):
             return await event.answer(phrase.not_for_you, alert=True)
         state_name: str = data[3].capitalize()
-        balance = db.get_money(event.sender_id)
+        balance = await db.get_money(event.sender_id)
         if balance < config.coofs.PriceForNewState:
             return await event.answer(
                 phrase.money.not_enough.format(
@@ -114,7 +114,7 @@ async def state_callback(event: events.CallbackQuery.Event):
         state_name = db.states.if_author(event.sender_id)
         if state_name is False:
             return await event.answer(phrase.state.not_a_author, alert=True)
-        balance = db.get_money(event.sender_id)
+        balance = await db.get_money(event.sender_id)
         if balance - config.coofs.PriceForChangeStateNick < 0:
             return await event.answer(
                 phrase.money.not_enough.format(
@@ -147,7 +147,7 @@ async def casino_callback(event: events.CallbackQuery.Event):
         return await event.answer(phrase.casino.floodwait.format(request), alert=True)
     logger.info(f"КБ кнопка (Casino), дата: {data}")
     if data[1] == "auto":
-        balance = db.get_money(event.sender_id)
+        balance = await db.get_money(event.sender_id)
         if balance < config.coofs.PriceForCasino:
             return await event.answer(
                 phrase.money.not_enough.format(
@@ -204,7 +204,7 @@ async def nick_callback(event: events.CallbackQuery.Event):
     old_nick = db.nicks(id=event.sender_id).get()
     if old_nick == data[1]:
         return await event.answer(phrase.nick.already_you, alert=True)
-    balance = db.get_money(event.sender_id)
+    balance = await db.get_money(event.sender_id)
     if balance - config.coofs.PriceForChangeNick < 0:
         return await event.answer(
             phrase.money.not_enough.format(formatter.value_to_str(balance, "изумруд")),
@@ -315,7 +315,7 @@ async def shop_callback(event: events.CallbackQuery.Event):
         return await event.answer(phrase.nick.not_append, alert=True)
     shop = db.get_shop()
     del shop["theme"]
-    balance = db.get_money(event.sender_id)
+    balance = await db.get_money(event.sender_id)
     items = list(shop.keys())
     item = shop[items[int(data[1])]]
     if balance < item["price"]:
@@ -378,7 +378,7 @@ async def crocodile_callback(event: events.CallbackQuery.Event):
         if bets_json != {}:
             bets = round(sum(list(bets_json.values())) / 2)
             bets = 1 if bets < 1 else bets
-            sender_balance = db.get_money(event.sender_id)
+            sender_balance = await db.get_money(event.sender_id)
             if sender_balance < bets:
                 return await event.answer(
                     phrase.crocodile.not_enough.format(

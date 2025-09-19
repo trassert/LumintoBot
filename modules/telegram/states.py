@@ -80,7 +80,7 @@ async def state_make(event: Message):
         return await event.reply(phrase.state.already_player)
     if db.states.check(arg.capitalize()) is True:
         return await event.reply(phrase.state.already_here)
-    if db.get_money(event.sender_id) < config.coofs.PriceForNewState:
+    if await db.get_money(event.sender_id) < config.coofs.PriceForNewState:
         return await event.reply(phrase.state.require_emerald)
     try:
         return await event.reply(
@@ -394,7 +394,7 @@ async def state_add_money(event: Message):
             return await event.reply(phrase.state.not_a_member)
     arg: str = event.pattern_match.group(1).strip()
     if arg in ["все", "всё", "все деньги", "на все"]:
-        arg = db.get_money(event.sender_id)
+        arg = await db.get_money(event.sender_id)
     elif not arg.isdigit():
         return await event.reply(phrase.state.howto_add_balance)
     try:
@@ -403,7 +403,7 @@ async def state_add_money(event: Message):
         return await event.reply(phrase.state.howto_add_balance)
     if arg < 1:
         return await event.reply(phrase.money.negative_count)
-    balance = db.get_money(event.sender_id)
+    balance = await db.get_money(event.sender_id)
     if arg > balance:
         return await event.reply(
             phrase.money.not_enough.format(formatter.value_to_str(balance, "изумруд"))

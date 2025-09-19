@@ -25,7 +25,7 @@ async def do_ticket(event: Message):
         return await event.reply(phrase.ticket.not_int)
     if arg < 1:
         return await event.reply(phrase.ticket.bigger_than_zero)
-    balance = db.get_money(event.sender_id)
+    balance = await db.get_money(event.sender_id)
     if balance < arg:
         return await event.reply(
             phrase.money.not_enough.format(formatter.value_to_str(balance, "изумруд"))
