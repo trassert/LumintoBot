@@ -12,6 +12,7 @@ client = TelegramClient(
     system_version="4.16.30-vxCUSTOM",
     lang_code="ru",
     system_lang_code="ru",
+    use_ipv6=True
 )
 
 from . import actions, admins, ai, base, callbacks, func, games, global_checks, shop, states, statistic, tickets, notes, referrals, mailing  # noqa: E402, F401

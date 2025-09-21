@@ -14,6 +14,9 @@ logger.info(f"Загружен модуль {__name__}!")
 
 
 async def server():
+    async def status(request: aiohttp.web.Request):
+        return aiohttp.web.Response(text="ok")
+
     async def hotmc(request: aiohttp.web.Request):
         load = await request.post()
         nick = load["nick"]
@@ -153,6 +156,7 @@ async def server():
             aiohttp.web.get("/minecraft", minecraft),
             aiohttp.web.get("/bank", bank),
             aiohttp.web.get("/genai", genai),
+            aiohttp.web.get("/", status),
         ]
     )
     runner = aiohttp.web.AppRunner(app)

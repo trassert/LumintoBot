@@ -35,7 +35,7 @@ async def host(event: Message):
     return await event.reply(
         phrase.server.host.format(
             v4=db.database("host"),
-            v6=f"{db.database('ipv6_subdomain')}.{db.database('host')}",
+            v6=db.database("try_host"),
         )
     )
 
