@@ -1,6 +1,3 @@
-db/chat_stats/*
-db/states/*
-
 db/data.json
 db/mailing.json
 db/minecraft.json
@@ -17,6 +14,8 @@ db/timings/*
 db/users/*
 db/notes/*
 db/cities/*
+db/chat_stats/*
+db/states/*
 
 backup/states/*
 
