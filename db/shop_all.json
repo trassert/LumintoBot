@@ -1203,5 +1203,212 @@
             "price": 10,
             "value": 1
         }
+    },
+    "potions": {
+        "Зелье огнестойкости": {
+            "name": "potion[potion_contents={potion:\"fire_resistance\"}]",
+            "price": 15,
+            "value": 1
+        },
+        "Зелье огнестойкости (усиленное)": {
+            "name": "potion[potion_contents={potion:\"long_fire_resistance\"}]",
+            "price": 25,
+            "value": 1
+        },
+        "Зелье урона": {
+            "name": "potion[potion_contents={potion:\"harming\"}]",
+            "price": 20,
+            "value": 1
+        },
+        "Зелье урона II": {
+            "name": "potion[potion_contents={potion:\"strong_harming\"}]",
+            "price": 35,
+            "value": 1
+        },
+        "Зелье лечения": {
+            "name": "potion[potion_contents={potion:\"healing\"}]",
+            "price": 18,
+            "value": 1
+        },
+        "Зелье лечения II": {
+            "name": "potion[potion_contents={potion:\"strong_healing\"}]",
+            "price": 32,
+            "value": 1
+        },
+        "Зелье заражения": {
+            "name": "potion[potion_contents={potion:\"infested\"}]",
+            "price": 45,
+            "value": 1
+        },
+        "Зелье невидимости": {
+            "name": "potion[potion_contents={potion:\"invisibility\"}]",
+            "price": 28,
+            "value": 1
+        },
+        "Зелье невидимости (усиленное)": {
+            "name": "potion[potion_contents={potion:\"long_invisibility\"}]",
+            "price": 42,
+            "value": 1
+        },
+        "Зелье прыгучести": {
+            "name": "potion[potion_contents={potion:\"leaping\"}]",
+            "price": 16,
+            "value": 1
+        },
+        "Зелье прыгучести (усиленное)": {
+            "name": "potion[potion_contents={potion:\"long_leaping\"}]",
+            "price": 26,
+            "value": 1
+        },
+        "Зелье прыгучести II": {
+            "name": "potion[potion_contents={potion:\"strong_leaping\"}]",
+            "price": 38,
+            "value": 1
+        },
+        "Зелье удачи": {
+            "name": "potion[potion_contents={potion:\"luck\"}]",
+            "price": 50,
+            "value": 1
+        },
+        "Зелье ночного зрения": {
+            "name": "potion[potion_contents={potion:\"night_vision\"}]",
+            "price": 14,
+            "value": 1
+        },
+        "Зелье слизи": {
+            "name": "potion[potion_contents={potion:\"oozing\"}]",
+            "price": 40,
+            "value": 1
+        },
+        "Зелье отравления": {
+            "name": "potion[potion_contents={potion:\"poison\"}]",
+            "price": 17,
+            "value": 1
+        },
+        "Зелье отравления (усиленное)": {
+            "name": "potion[potion_contents={potion:\"long_poison\"}]",
+            "price": 27,
+            "value": 1
+        },
+        "Зелье отравления II": {
+            "name": "potion[potion_contents={potion:\"strong_poison\"}]",
+            "price": 36,
+            "value": 1
+        },
+        "Зелье регенерации": {
+            "name": "potion[potion_contents={potion:\"regeneration\"}]",
+            "price": 22,
+            "value": 1
+        },
+        "Зелье регенерации (усиленное)": {
+            "name": "potion[potion_contents={potion:\"long_regeneration\"}]",
+            "price": 34,
+            "value": 1
+        },
+        "Зелье регенерации II": {
+            "name": "potion[potion_contents={potion:\"strong_regeneration\"}]",
+            "price": 45,
+            "value": 1
+        },
+        "Зелье медленного падения": {
+            "name": "potion[potion_contents={potion:\"slow_falling\"}]",
+            "price": 19,
+            "value": 1
+        },
+        "Зелье медленного падения (усиленное)": {
+            "name": "potion[potion_contents={potion:\"long_slow_falling\"}]",
+            "price": 29,
+            "value": 1
+        },
+        "Зелье медлительности": {
+            "name": "potion[potion_contents={potion:\"slowness\"}]",
+            "price": 16,
+            "value": 1
+        },
+        "Зелье медлительности (усиленное)": {
+            "name": "potion[potion_contents={potion:\"long_slowness\"}]",
+            "price": 24,
+            "value": 1
+        },
+        "Зелье медлительности II": {
+            "name": "potion[potion_contents={potion:\"strong_slowness\"}]",
+            "price": 32,
+            "value": 1
+        },
+        "Зелье силы": {
+            "name": "potion[potion_contents={potion:\"strength\"}]",
+            "price": 24,
+            "value": 1
+        },
+        "Зелье силы (усиленное)": {
+            "name": "potion[potion_contents={potion:\"long_strength\"}]",
+            "price": 38,
+            "value": 1
+        },
+        "Зелье силы II": {
+            "name": "potion[potion_contents={potion:\"strong_strength\"}]",
+            "price": 48,
+            "value": 1
+        },
+        "Зелье скорости": {
+            "name": "potion[potion_contents={potion:\"swiftness\"}]",
+            "price": 20,
+            "value": 1
+        },
+        "Зелье скорости (усиленное)": {
+            "name": "potion[potion_contents={potion:\"long_swiftness\"}]",
+            "price": 32,
+            "value": 1
+        },
+        "Зелье скорости II": {
+            "name": "potion[potion_contents={potion:\"strong_swiftness\"}]",
+            "price": 42,
+            "value": 1
+        },
+        "Зелье черепашьей мощи": {
+            "name": "potion[potion_contents={potion:\"turtle_master\"}]",
+            "price": 30,
+            "value": 1
+        },
+        "Зелье черепашьей мощи (усиленное)": {
+            "name": "potion[potion_contents={potion:\"long_turtle_master\"}]",
+            "price": 45,
+            "value": 1
+        },
+        "Зелье черепашьей мощи II": {
+            "name": "potion[potion_contents={potion:\"strong_turtle_master\"}]",
+            "price": 55,
+            "value": 1
+        },
+        "Зелье подводного дыхания": {
+            "name": "potion[potion_contents={potion:\"water_breathing\"}]",
+            "price": 18,
+            "value": 1
+        },
+        "Зелье подводного дыхания (усиленное)": {
+            "name": "potion[potion_contents={potion:\"long_water_breathing\"}]",
+            "price": 28,
+            "value": 1
+        },
+        "Зелье слабости": {
+            "name": "potion[potion_contents={potion:\"weakness\"}]",
+            "price": 12,
+            "value": 1
+        },
+        "Зелье слабости (усиленное)": {
+            "name": "potion[potion_contents={potion:\"long_weakness\"}]",
+            "price": 18,
+            "value": 1
+        },
+        "Зелье плетения": {
+            "name": "potion[potion_contents={potion:\"weaving\"}]",
+            "price": 35,
+            "value": 1
+        },
+        "Зелье ветряного заряда": {
+            "name": "potion[potion_contents={potion:\"wind_charged\"}]",
+            "price": 40,
+            "value": 1
+        }
     }
 }
