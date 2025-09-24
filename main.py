@@ -1,8 +1,10 @@
 import asyncio
+import nest_asyncio
 
 from loguru import logger
 from sys import stderr
 
+nest_asyncio.apply()
 logger.remove()
 logger.add(
     stderr,
@@ -15,6 +17,7 @@ logger.add(
 )
 
 from modules.telegram.client import client  # noqa: E402
+from modules.vk.client import bot # noqa: E402
 from modules import db, config, webhooks, time_to, ai, phrase  # noqa: E402
 
 
@@ -46,6 +49,7 @@ async def main():
             await webhooks.server()
             await asyncio.gather(
                 client.start(bot_token=config.tokens.bot.token),
+                bot.run_polling(),
                 time_to.update_shop(),
                 time_to.rewards(),
                 time_to.remove_states(),
@@ -60,11 +64,11 @@ if __name__ == "__main__":
     if sum(db.database("shop_weight").values()) != 100:
         logger.error("Сумма процентов в магазине не равна 100!")
     try:
-        try:
-            import uvloop
-            uvloop.run(main())
-        except ModuleNotFoundError:
-            logger.warning("Uvloop не установлен!")
-            asyncio.run(main())
+        # try:
+        #     import uvloop
+        #     uvloop.run(main())
+        # except ModuleNotFoundError:
+        #     logger.warning("Uvloop не установлен!")
+        asyncio.run(main())
     except (KeyboardInterrupt, asyncio.CancelledError):
         logger.warning("Закрываю бота!")
