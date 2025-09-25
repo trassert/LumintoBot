@@ -35,3 +35,11 @@ async def ai_message(message: Message, prompt: Optional[str] = None):
             return await message.reply(response)
     except Exception:
         return await message.reply(phrase.ai.error)
+
+
+async def start():
+    "Небольшой костыль для запуска uvloop и telethon с vkbottle"
+    logger.info("Запускаю Polling VKBottle...")
+    async for event in bot.polling.listen():
+        for update in event.get("updates", []):
+            await bot.router.route(update, bot.polling.api)
