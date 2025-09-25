@@ -515,6 +515,9 @@ class states:
     def remove(name: str) -> bool:
         state = path.join(pathes.states, f"{name}.json")
         if path.exists(state):
+            pic = path.join(pathes.states_pic, f"{name}.png")
+            if path.exists(pic):
+                replace(pic, path.join(pathes.old_states, f"{name}.png"))
             replace(state, path.join(pathes.old_states, f"{name}.json"))
             return True
         return False

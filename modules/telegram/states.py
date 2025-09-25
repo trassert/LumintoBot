@@ -10,12 +10,13 @@ from telethon.tl.types import (
 )
 from telethon import errors as TGErrors
 from random import choice
+from os import path
 
 from .client import client
 from .global_checks import checks
 from .func import get_name, get_id
 
-from .. import config, phrase, formatter, db
+from .. import config, phrase, formatter, db, pathes
 from loguru import logger
 
 logger.info(f"Загружен модуль {__name__}!")
@@ -191,6 +192,7 @@ async def state_get(event: Message):
         enter = formatter.value_to_str(state.price, "изумруд")
     tasks = [get_name(player, minecraft=True) for player in state.players]
     idented_players = await asyncio.gather(*tasks)
+    pic_path = path.join(pathes.states_pic, f"{state_name}.png")
     return await client.send_message(
         event.chat_id,
         phrase.state.get.format(
@@ -208,6 +210,7 @@ async def state_get(event: Message):
         reply_to=event.id,
         link_preview=False,
         silent=True,
+        file=pic_path if path.exists(pic_path) else None
     )
 
 
@@ -572,3 +575,16 @@ async def state_rename(event: Message):
         buttons=keyboard,
         parse_mode="html",
     )
+
+
+@client.on(events.NewMessage(pattern=r"(?i)^/г pic$", func=checks))
+@client.on(events.NewMessage(pattern=r"(?i)^/г картинка$", func=checks))
+@client.on(events.NewMessage(pattern=r"(?i)^/г фото$", func=checks))
+async def state_pic(event: Message):
+    state_name = db.states.if_author(event.sender_id)
+    if state_name is False:
+        return await event.reply(phrase.state.not_a_author)
+    if not event.photo:
+        return await event.reply(phrase.state.no_pic)
+    await event.download_media(file=path.join(pathes.states_pic, f"{state_name}.png"))
+    return await event.reply(phrase.state.pic_set)

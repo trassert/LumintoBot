@@ -38,3 +38,4 @@ chart = path.join("charts", "chart.png")
 data = path.join("db", "data.json")
 
 pic = "images"
+states_pic = path.join("images", "states")
