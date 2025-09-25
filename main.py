@@ -34,9 +34,9 @@ async def init():
 
 async def main():
     await init()
-    tg.start(bot_token=config.tokens.bot.token)
     await webhooks.server()
     await asyncio.gather(
+        tg.start(bot_token=config.tokens.bot.token),
         vk.start(),
         time_to.update_shop(),
         time_to.rewards(),
