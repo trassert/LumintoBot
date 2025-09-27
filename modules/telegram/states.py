@@ -210,7 +210,7 @@ async def state_get(event: Message):
         reply_to=event.id,
         link_preview=False,
         silent=True,
-        file=pic_path if path.exists(pic_path) else None
+        file=pic_path if path.exists(pic_path) else None,
     )
 
 

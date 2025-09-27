@@ -2,6 +2,7 @@ from vkbottle.bot import Message
 from typing import Optional
 
 from .. import config, phrase, ai, floodwait, formatter
+from .client import bot
 from loguru import logger
 
 logger.info(f"Загружен модуль {__name__}!")
