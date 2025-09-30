@@ -789,3 +789,8 @@ async def cities_remove(event: Message):
     with open(pathes.chk_city, "w", encoding="utf-8") as f:
         f.write("\n".join(text))
     return await event.reply(phrase.cities.deleted.format(word))
+
+
+@client.on(events.NewMessage(pattern=r"(?i)^/тест", func=checks))
+async def test(event: Message):
+    return await event.reply("test emoji... [🟢](emoji/6278544920286334754)")

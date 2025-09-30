@@ -81,7 +81,7 @@ async def server():
         logger.debug(f"+ соо. от {nick}")
         return aiohttp.web.Response(text="ok")
 
-    async def github_bot(request: aiohttp.web.Request):
+    async def github_bot(request: aiohttp.web.Request): #! End of Life
         "Вебхук для гитхаба"
         load = await request.json()
         for head in load["commits"]:
@@ -98,7 +98,7 @@ async def server():
             )
         return aiohttp.web.Response(text="ok")
 
-    async def github_mod(request: aiohttp.web.Request):
+    async def github_mod(request: aiohttp.web.Request): #! End of Life
         "Вебхук для гитхаба"
         load = await request.json()
         for head in load["commits"]:
@@ -146,13 +146,31 @@ async def server():
         chat = await ai.get_player_chat(player)
         return aiohttp.web.Response(text=(await chat.send_message(text)).text)
 
+    async def github(request: aiohttp.web.Request):
+        load = await request.json()
+        for head in load["commits"]:
+            logger.info("Обновление модпака!")
+            await client.send_message(
+                config.chats.chat,
+                phrase.github.update.format(
+                    author=f"[{head['author']['name']}](https://github.com/{head['author']['name']})",
+                    message=head["message"],
+                    link=head["url"],
+                    repo=f"[{load['repository']['name']}](https://github.com/{load['repository']['full_name']})",
+                ),
+                link_preview=False,
+                reply_to=config.chats.topics.updates,
+            )
+        return aiohttp.web.Response(text="ok")
+
     app = aiohttp.web.Application()
     app.add_routes(
         [
             aiohttp.web.post("/hotmc", hotmc),
             aiohttp.web.post("/servers", mcservers),
-            aiohttp.web.post("/github_bot", github_bot),
-            aiohttp.web.post("/github_mod", github_mod),
+            aiohttp.web.post("/github_bot", github_bot), #! End of Life
+            aiohttp.web.post("/github_mod", github_mod), #! End of Life
+            aiohttp.web.post("/github", github),
             aiohttp.web.get("/minecraft", minecraft),
             aiohttp.web.get("/bank", bank),
             aiohttp.web.get("/genai", genai),
