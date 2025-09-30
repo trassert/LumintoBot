@@ -147,9 +147,12 @@ async def server():
         return aiohttp.web.Response(text=(await chat.send_message(text)).text)
 
     async def github(request: aiohttp.web.Request):
-        load = await request.json()
-        for head in load["commits"]:
-            logger.info("Обновление модпака!")
+        load: dict = await request.json()
+        commits = load.get("commits", None)
+        if commits is None:
+            return aiohttp.web.Response(text="Неверный запрос", status=400)
+        for head in commits:
+            logger.info(f"Обновление! Репо {load['repository']['name']}")
             await client.send_message(
                 config.chats.chat,
                 phrase.github.update.format(
@@ -168,8 +171,8 @@ async def server():
         [
             aiohttp.web.post("/hotmc", hotmc),
             aiohttp.web.post("/servers", mcservers),
-            aiohttp.web.post("/github_bot", github_bot), #! End of Life
-            aiohttp.web.post("/github_mod", github_mod), #! End of Life
+            # End of Life aiohttp.web.post("/github_bot", github_bot), 
+            # End of Life aiohttp.web.post("/github_mod", github_mod), 
             aiohttp.web.post("/github", github),
             aiohttp.web.get("/minecraft", minecraft),
             aiohttp.web.get("/bank", bank),
