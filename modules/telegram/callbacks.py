@@ -1,6 +1,6 @@
 import asyncio
 
-from .telethon import events, types
+from telethon import events, types
 
 from random import choice
 

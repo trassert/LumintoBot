@@ -5,8 +5,8 @@ from .client import client
 from .. import db, phrase
 
 from loguru import logger
-from .telethon import events
-from .telethon.tl.custom import Message
+from telethon import events
+from telethon.tl.custom import Message
 
 logger.info(f"Загружен модуль {__name__}!")
 

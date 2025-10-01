@@ -1,6 +1,6 @@
-from .telethon import events
-from .telethon.tl.custom import Message
-from .telethon.tl.types import (
+from telethon import events
+from telethon.tl.custom import Message
+from telethon.tl.types import (
     ReplyInlineMarkup,
     KeyboardButtonRow,
     KeyboardButtonCallback,

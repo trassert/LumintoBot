@@ -1,14 +1,14 @@
 import re
 import asyncio
 
-from .telethon.tl.custom import Message
-from .telethon import events
-from .telethon.tl.types import (
+from telethon.tl.custom import Message
+from telethon import events
+from telethon.tl.types import (
     ReplyInlineMarkup,
     KeyboardButtonRow,
     KeyboardButtonCallback,
 )
-from .telethon import errors as TGErrors
+from telethon import errors as TGErrors
 from random import choice
 from os import path
 

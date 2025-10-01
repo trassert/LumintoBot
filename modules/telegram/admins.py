@@ -1,6 +1,6 @@
-from .telethon.tl.custom import Message
-from .telethon import events
-from .telethon.tl.functions.users import GetFullUserRequest
+from telethon.tl.custom import Message
+from telethon import events
+from telethon.tl.functions.users import GetFullUserRequest
 
 from .client import client
 from .global_checks import checks

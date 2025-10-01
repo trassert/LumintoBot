@@ -6,11 +6,11 @@ from random import choice, randint, random
 from time import time
 from loguru import logger
 
-from .telethon import errors as TGErrors
-from .telethon import events
-from .telethon.tl.custom import Message
-from .telethon.tl.functions.users import GetFullUserRequest
-from .telethon.tl.types import (
+from telethon import errors as TGErrors
+from telethon import events
+from telethon.tl.custom import Message
+from telethon.tl.functions.users import GetFullUserRequest
+from telethon.tl.types import (
     KeyboardButtonCallback,
     KeyboardButtonRow,
     ReplyInlineMarkup,

@@ -1,4 +1,4 @@
-from .telethon import events
+from telethon import events
 
 from .client import client
 from .func import get_name

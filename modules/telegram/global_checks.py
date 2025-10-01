@@ -1,4 +1,4 @@
-from .telethon import events
+from telethon import events
 from loguru import logger
 
 from .. import db, phrase

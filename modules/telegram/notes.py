@@ -1,8 +1,8 @@
 from .client import client
 from .global_checks import checks
 
-from .telethon import events
-from .telethon.tl.custom import Message
+from telethon import events
+from telethon.tl.custom import Message
 
 from .. import db, phrase
 from loguru import logger

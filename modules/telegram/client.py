@@ -1,4 +1,4 @@
-from .telethon.sync import TelegramClient
+from telethon.sync import TelegramClient
 
 from .. import config, pathes
 from loguru import logger
