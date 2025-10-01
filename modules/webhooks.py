@@ -34,7 +34,9 @@ async def server():
         tg_id = db.nicks(nick=nick).get()
         if tg_id is not None:
             db.add_money(tg_id, 10)
-            give = phrase.vote_money.format(formatter.value_to_str(10, "изумруд"))
+            give = phrase.vote_money.format(
+                formatter.value_to_str(10, "изумруд")
+            )
         else:
             give = ""
         await client.send_message(
@@ -50,7 +52,9 @@ async def server():
         sign = load["sign"]
         time = load["time"]
         logger.warning(f"{username} проголосовал в {time} с хешем {sign}")
-        hash = md5(f"{username}|{time}|{config.tokens.mcservers}".encode()).hexdigest()
+        hash = md5(
+            f"{username}|{time}|{config.tokens.mcservers}".encode()
+        ).hexdigest()
         if sign != hash:
             logger.warning("Хеш не совпал!")
             logger.warning(f"Должен быть: {sign}")
@@ -61,7 +65,9 @@ async def server():
         tg_id = db.nicks(nick=username).get()
         if tg_id is not None:
             db.add_money(tg_id, 10)
-            give = phrase.vote_money.format(formatter.value_to_str(10, "изумруд"))
+            give = phrase.vote_money.format(
+                formatter.value_to_str(10, "изумруд")
+            )
         else:
             give = ""
         await client.send_message(
@@ -81,7 +87,7 @@ async def server():
         logger.debug(f"+ соо. от {nick}")
         return aiohttp.web.Response(text="ok")
 
-    async def github_bot(request: aiohttp.web.Request): #! End of Life
+    async def github_bot(request: aiohttp.web.Request):  #! End of Life
         "Вебхук для гитхаба"
         load = await request.json()
         for head in load["commits"]:
@@ -98,7 +104,7 @@ async def server():
             )
         return aiohttp.web.Response(text="ok")
 
-    async def github_mod(request: aiohttp.web.Request): #! End of Life
+    async def github_mod(request: aiohttp.web.Request):  #! End of Life
         "Вебхук для гитхаба"
         load = await request.json()
         for head in load["commits"]:
@@ -171,8 +177,8 @@ async def server():
         [
             aiohttp.web.post("/hotmc", hotmc),
             aiohttp.web.post("/servers", mcservers),
-            # End of Life aiohttp.web.post("/github_bot", github_bot), 
-            # End of Life aiohttp.web.post("/github_mod", github_mod), 
+            # End of Life aiohttp.web.post("/github_bot", github_bot),
+            # End of Life aiohttp.web.post("/github_mod", github_mod),
             aiohttp.web.post("/github", github),
             aiohttp.web.get("/minecraft", minecraft),
             aiohttp.web.get("/bank", bank),

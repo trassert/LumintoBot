@@ -1,14 +1,14 @@
 import re
 import asyncio
 
-from telethon.tl.custom import Message
-from telethon import events
-from telethon.tl.types import (
+from .telethon.tl.custom import Message
+from .telethon import events
+from .telethon.tl.types import (
     ReplyInlineMarkup,
     KeyboardButtonRow,
     KeyboardButtonCallback,
 )
-from telethon import errors as TGErrors
+from .telethon import errors as TGErrors
 from random import choice
 from os import path
 
@@ -216,7 +216,9 @@ async def state_get(event: Message):
 
 @client.on(events.NewMessage(pattern=r"(?i)^/ливнуть", func=checks))
 @client.on(events.NewMessage(pattern=r"(?i)^/покинуть госво", func=checks))
-@client.on(events.NewMessage(pattern=r"(?i)^/покинуть государство", func=checks))
+@client.on(
+    events.NewMessage(pattern=r"(?i)^/покинуть государство", func=checks)
+)
 @client.on(events.NewMessage(pattern=r"(?i)^выйти из государства", func=checks))
 @client.on(events.NewMessage(pattern=r"(?i)^выйти из госва", func=checks))
 @client.on(events.NewMessage(pattern=r"(?i)^/г покинуть", func=checks))
@@ -239,7 +241,9 @@ async def state_leave(event: Message):
     if (state.type == 2) and (len(state.players) < config.coofs.Type2Players):
         await client.send_message(
             entity=config.chats.chat,
-            message=phrase.state.down.format(name=state.name, type="Государство"),
+            message=phrase.state.down.format(
+                name=state.name, type="Государство"
+            ),
             reply_to=config.chats.topics.rp,
         )
         state.change("type", 1)
@@ -255,9 +259,13 @@ async def state_leave(event: Message):
 
 @client.on(events.NewMessage(pattern=r"(?i)^/уничтожить госво", func=checks))
 @client.on(events.NewMessage(pattern=r"(?i)^/удалить госво", func=checks))
-@client.on(events.NewMessage(pattern=r"(?i)^/уничтожить государство", func=checks))
+@client.on(
+    events.NewMessage(pattern=r"(?i)^/уничтожить государство", func=checks)
+)
 @client.on(events.NewMessage(pattern=r"(?i)^/удалить государство", func=checks))
-@client.on(events.NewMessage(pattern=r"(?i)^уничтожить государство", func=checks))
+@client.on(
+    events.NewMessage(pattern=r"(?i)^уничтожить государство", func=checks)
+)
 @client.on(events.NewMessage(pattern=r"(?i)^удалить государство", func=checks))
 @client.on(events.NewMessage(pattern=r"(?i)^/г уничтожить", func=checks))
 @client.on(events.NewMessage(pattern=r"(?i)^/г удалить", func=checks))
@@ -289,9 +297,13 @@ async def state_desc_empty(event: Message):
     return await event.reply(phrase.state.no_desc)
 
 
-@client.on(events.NewMessage(pattern=r"(?i)^/г описание\s([\s\S]+)", func=checks))
+@client.on(
+    events.NewMessage(pattern=r"(?i)^/г описание\s([\s\S]+)", func=checks)
+)
 @client.on(events.NewMessage(pattern=r"(?i)^/о госве\s([\s\S]+)", func=checks))
-@client.on(events.NewMessage(pattern=r"(?i)^/г о госве\s([\s\S]+)", func=checks))
+@client.on(
+    events.NewMessage(pattern=r"(?i)^/г о госве\s([\s\S]+)", func=checks)
+)
 async def state_desc(event: Message):
     state_name = db.states.if_author(event.sender_id)
     if state_name is False:
@@ -362,7 +374,9 @@ async def state_enter_arg(event: Message):
         state.change("price", arg)
         state.change("enter", True)
         return await event.reply(
-            phrase.state.enter_price.format(formatter.value_to_str(arg, "изумруд"))
+            phrase.state.enter_price.format(
+                formatter.value_to_str(arg, "изумруд")
+            )
         )
     else:
         return await event.reply(phrase.state.howto_enter)
@@ -385,7 +399,9 @@ async def state_enter_empty(event: Message):
         return await event.reply(phrase.state.enter_open)
 
 
-@client.on(events.NewMessage(pattern=r"(?i)^/пополнить казну (.+)", func=checks))
+@client.on(
+    events.NewMessage(pattern=r"(?i)^/пополнить казну (.+)", func=checks)
+)
 @client.on(events.NewMessage(pattern=r"(?i)^/г пополнить (.+)", func=checks))
 @client.on(events.NewMessage(pattern=r"(?i)^\+казна (.+)", func=checks))
 @client.on(events.NewMessage(pattern=r"(?i)^г пополнить (.+)", func=checks))
@@ -409,7 +425,9 @@ async def state_add_money(event: Message):
     balance = await db.get_money(event.sender_id)
     if arg > balance:
         return await event.reply(
-            phrase.money.not_enough.format(formatter.value_to_str(balance, "изумруд"))
+            phrase.money.not_enough.format(
+                formatter.value_to_str(balance, "изумруд")
+            )
         )
     db.add_money(event.sender_id, -arg)
     state = db.state(state_name)
@@ -428,7 +446,9 @@ async def state_add_money_empty(event: Message):
     return await event.reply(phrase.state.howto_add_balance)
 
 
-@client.on(events.NewMessage(pattern=r"(?i)^/забрать из казны\s(.+)", func=checks))
+@client.on(
+    events.NewMessage(pattern=r"(?i)^/забрать из казны\s(.+)", func=checks)
+)
 @client.on(events.NewMessage(pattern=r"(?i)^/г снять\s(.+)", func=checks))
 @client.on(events.NewMessage(pattern=r"(?i)^\-казна\s(.+)", func=checks))
 @client.on(events.NewMessage(pattern=r"(?i)^г снять\s(.+)", func=checks))
@@ -484,7 +504,9 @@ async def state_kick_user(event: Message):
     if (state.type == 2) and (len(state.players) < config.coofs.Type2Players):
         await client.send_message(
             entity=config.chats.chat,
-            message=phrase.state.down.format(name=state.name, type="Государство"),
+            message=phrase.state.down.format(
+                name=state.name, type="Государство"
+            ),
             reply_to=config.chats.topics.rp,
         )
         state.change("type", 1)
@@ -527,7 +549,9 @@ async def state_kick_user_empty(event: Message):
     if (state.type == 2) and (len(state.players) < config.coofs.Type2Players):
         await client.send_message(
             entity=config.chats.chat,
-            message=phrase.state.down.format(name=state.name, type="Государство"),
+            message=phrase.state.down.format(
+                name=state.name, type="Государство"
+            ),
             reply_to=config.chats.topics.rp,
         )
         state.change("type", 1)
@@ -586,5 +610,7 @@ async def state_pic(event: Message):
         return await event.reply(phrase.state.not_a_author)
     if not event.photo:
         return await event.reply(phrase.state.no_pic)
-    await event.download_media(file=path.join(pathes.states_pic, f"{state_name}.png"))
+    await event.download_media(
+        file=path.join(pathes.states_pic, f"{state_name}.png")
+    )
     return await event.reply(phrase.state.pic_set)

@@ -1,6 +1,6 @@
-from telethon.tl.custom import Message
-from telethon import events
-from telethon.tl.functions.users import GetFullUserRequest
+from .telethon.tl.custom import Message
+from .telethon import events
+from .telethon.tl.functions.users import GetFullUserRequest
 
 from .client import client
 from .global_checks import checks
@@ -19,7 +19,9 @@ async def add_balance(event: Message):
     roles = db.roles()
     if roles.get(event.sender_id) < roles.ADMIN:
         return await event.reply(
-            phrase.roles.no_perms.format(level=roles.ADMIN, name=phrase.roles.admin)
+            phrase.roles.no_perms.format(
+                level=roles.ADMIN, name=phrase.roles.admin
+            )
         )
     args = event.pattern_match.group(1).strip().split()
     try:
@@ -45,7 +47,9 @@ async def add_balance(event: Message):
         )
     old = await db.get_money(user.full_user.id)
     db.add_money(user.full_user.id, new)
-    await event.reply(phrase.money.add_money.format(name=tag, old=old, new=old + new))
+    await event.reply(
+        phrase.money.add_money.format(name=tag, old=old, new=old + new)
+    )
 
 
 @client.on(events.NewMessage(pattern=r"(?i)^\+стафф(.*)", func=checks))
@@ -54,7 +58,9 @@ async def add_staff(event: Message):
     roles = db.roles()
     if roles.get(event.sender_id) < roles.OWNER:
         return await event.reply(
-            phrase.roles.no_perms.format(level=roles.OWNER, name=phrase.roles.owner)
+            phrase.roles.no_perms.format(
+                level=roles.OWNER, name=phrase.roles.owner
+            )
         )
     arg = event.pattern_match.group(1).strip()
     try:
@@ -71,7 +77,9 @@ async def add_staff(event: Message):
             return await event.reply(phrase.money.no_people)
     new_role = roles.get(user) + 1
     roles.set(user, new_role)
-    return await event.reply(phrase.perms.upgrade.format(nick=tag, staff=new_role))
+    return await event.reply(
+        phrase.perms.upgrade.format(nick=tag, staff=new_role)
+    )
 
 
 @client.on(events.NewMessage(pattern=r"(?i)^\-staff(.*)", func=checks))
@@ -80,7 +88,9 @@ async def del_staff(event: Message):
     roles = db.roles()
     if roles.get(event.sender_id) < roles.OWNER:
         return await event.reply(
-            phrase.roles.no_perms.format(level=roles.OWNER, name=phrase.roles.owner)
+            phrase.roles.no_perms.format(
+                level=roles.OWNER, name=phrase.roles.owner
+            )
         )
     arg = event.pattern_match.group(1).strip()
     try:
@@ -97,7 +107,9 @@ async def del_staff(event: Message):
             return await event.reply(phrase.money.no_people)
     new_role = roles.get(user) - 1
     roles.set(user, new_role)
-    return await event.reply(phrase.perms.downgrade.format(nick=tag, staff=new_role))
+    return await event.reply(
+        phrase.perms.downgrade.format(nick=tag, staff=new_role)
+    )
 
 
 @client.on(events.NewMessage(pattern=r"//(.+)", func=checks))
@@ -105,7 +117,9 @@ async def mcrcon(event: Message):
     roles = db.roles()
     if roles.get(event.sender_id) < roles.ADMIN:
         return await event.reply(
-            phrase.roles.no_perms.format(level=roles.ADMIN, name=phrase.roles.admin)
+            phrase.roles.no_perms.format(
+                level=roles.ADMIN, name=phrase.roles.admin
+            )
         )
     command = event.pattern_match.group(1).strip()
     logger.info(f"Выполняется команда: {command}")
@@ -162,7 +176,9 @@ async def parse(event: Message):
     roles = db.roles()
     if roles.get(event.sender_id) < roles.ADMIN:
         return await event.reply(
-            phrase.roles.no_perms.format(level=roles.ADMIN, name=phrase.roles.admin)
+            phrase.roles.no_perms.format(
+                level=roles.ADMIN, name=phrase.roles.admin
+            )
         )
     arg = event.pattern_match.group(1).strip()
     await event.reply(f"html\n%\n{arg}\n%", parse_mode="html")

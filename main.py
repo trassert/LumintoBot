@@ -14,12 +14,13 @@ logger.add(
     colorize=True,
 )
 
-from modules.telegram.client import client as tg # noqa: E402
+from modules.telegram.client import client as tg  # noqa: E402
 from modules.vk import client as vk  # noqa: E402
 from modules import db, config, webhooks, time_to, ai, phrase  # noqa: E402
 
 
 async def init():
+    await tg.start(bot_token=config.tokens.bot.token)
     await db.Users.initialize()
     logger.info(
         f"Ответ ИИ - {(await ai.chat.send_message(phrase.ai.main_prompt)).text.replace('\n', '')}"
@@ -36,12 +37,12 @@ async def main():
     await init()
     await webhooks.server()
     await asyncio.gather(
-        tg.start(bot_token=config.tokens.bot.token),
+        tg.run_until_disconnected(),
         vk.start(),
         time_to.update_shop(),
         time_to.rewards(),
         time_to.remove_states(),
-        time_to.port_checks()
+        time_to.port_checks(),
     )
 
 
@@ -51,6 +52,7 @@ if __name__ == "__main__":
     try:
         try:
             import uvloop
+
             uvloop.run(main())
         except ModuleNotFoundError:
             logger.warning("Uvloop не установлен!")

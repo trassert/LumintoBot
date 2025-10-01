@@ -8,10 +8,16 @@ from loguru import logger
 
 logger.info(f"Загружен модуль {__name__}!")
 
+
 def get_last_update(name):
     last = db.database(name)
     if last is not None:
-        last = last.replace(":", "-").replace(".", "-").replace(" ", "-").split("-")
+        last = (
+            last.replace(":", "-")
+            .replace(".", "-")
+            .replace(" ", "-")
+            .split("-")
+        )
     try:
         return datetime(
             int(last[0]),
@@ -41,11 +47,13 @@ async def update_shop():
                 config.chats.chat,
                 phrase.shop.update.format(
                     emo=phrase.shop_quotes[theme]["emo"],
-                    theme=phrase.shop_quotes[theme]["translate"]
+                    theme=phrase.shop_quotes[theme]["translate"],
                 ),
             )
             db.database("shop_version", db.database("shop_version") + 1)
-            db.database("shop_update_time", str(today).split(":")[0] + ":00:00.000000")
+            db.database(
+                "shop_update_time", str(today).split(":")[0] + ":00:00.000000"
+            )
         logger.info(f"Жду следующий ивент... ({abs(seconds)})")
         await asyncio.sleep(abs(seconds))
 
@@ -74,7 +82,9 @@ async def rewards():
                     )
                     logger.info("Начислен подарок за активность!")
                     break
-            db.database("stat_update_time", str(today).split(":")[0] + ":00:00.000000")
+            db.database(
+                "stat_update_time", str(today).split(":")[0] + ":00:00.000000"
+            )
         logger.info("Жду до следующей награды...")
         await asyncio.sleep(abs(seconds))
 
@@ -92,7 +102,8 @@ async def remove_states():
                 state_info = states[state]
                 state_date = list(map(int, state_info["date"].split(".")))
                 if (len(state_info["players"]) == 0) and (
-                    today - datetime(state_date[0], state_date[1], state_date[2])
+                    today
+                    - datetime(state_date[0], state_date[1], state_date[2])
                     > timedelta(days=config.coofs.DaysToStatesRemove)
                 ):
                     db.add_money(state_info["author"], state_info["money"])
@@ -128,7 +139,6 @@ async def port_checks():
         except Exception as e:
             logger.error(f"Ошибка при проверке порта: {e}")
             await client.send_message(
-                entity=config.chats.staff,
-                message=phrase.port.false
+                entity=config.chats.staff, message=phrase.port.false
             )
             await asyncio.sleep(60)

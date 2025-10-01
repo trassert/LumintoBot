@@ -1,7 +1,7 @@
 import re
 
-from telethon import events
-from telethon.tl.custom import Message
+from .telethon import events
+from .telethon.tl.custom import Message
 
 from .client import client
 from .global_checks import checks

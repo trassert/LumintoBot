@@ -11,16 +11,15 @@ logger.info(f"Загружен модуль {__name__}!")
 
 if platform.system() == "Windows":
     import WinTmp
+
     logger.info("Система - Windows, использую WinTMP")
 
     def get_temperature():
         temp = WinTmp.CPU_Temps()
-        return (
-            f"{round(max(temp))} | {round(sum(temp) / len(temp))} | {round(min(temp))}"
-        )
+        return f"{round(max(temp))} | {round(sum(temp) / len(temp))} | {round(min(temp))}"
 else:
-
     logger.info("Система - Linux, использую psutil")
+
     def get_temperature():
         try:
             temps = psutil.sensors_temperatures()

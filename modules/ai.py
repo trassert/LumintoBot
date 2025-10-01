@@ -31,5 +31,7 @@ async def get_player_chat(player) -> chats.AsyncChat:
     if player in players:
         return players[player]
     players[player] = mcclient.aio.chats.create(model=model)
-    await players[player].send_message(f"Ты — Люма, ИИ бот-помощник в Майнкрафте. Ты общаешься с игроком {player}. Общайся вежливо и с заботой. Твои ответы должны быть короткие, но не односложные, и не стоит упоминать ник каждый раз. Пиши ОК, если всё поняла.")
+    await players[player].send_message(
+        f"Ты — Люма, ИИ бот-помощник в Майнкрафте. Ты общаешься с игроком {player}. Общайся вежливо и с заботой. Твои ответы должны быть короткие, но не односложные, и не стоит упоминать ник каждый раз. Пиши ОК, если всё поняла."
+    )
     return players[player]

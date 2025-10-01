@@ -1,8 +1,8 @@
 from .client import client
 from .global_checks import checks
 
-from telethon import events
-from telethon.tl.custom import Message
+from .telethon import events
+from .telethon.tl.custom import Message
 
 from .. import db, phrase
 from loguru import logger
@@ -10,8 +10,12 @@ from loguru import logger
 logger.info(f"Загружен модуль {__name__}!")
 
 
-@client.on(events.NewMessage(pattern=r"(?i)^\+нот (.+)\n([\s\S]+)", func=checks))
-@client.on(events.NewMessage(pattern=r"(?i)^\+note (.+)\n([\s\S]+)", func=checks))
+@client.on(
+    events.NewMessage(pattern=r"(?i)^\+нот (.+)\n([\s\S]+)", func=checks)
+)
+@client.on(
+    events.NewMessage(pattern=r"(?i)^\+note (.+)\n([\s\S]+)", func=checks)
+)
 async def add_note(event: Message):
     roles = db.roles()
     if roles.get(event.sender_id) < roles.VIP:
@@ -20,7 +24,8 @@ async def add_note(event: Message):
         )
     if (
         db.Notes().create(
-            event.pattern_match.group(1).strip(), event.text.split("\n", maxsplit=1)[1]
+            event.pattern_match.group(1).strip(),
+            event.text.split("\n", maxsplit=1)[1],
         )
         is True
     ):
@@ -59,7 +64,10 @@ async def get_note(event: Message):
         if event.reply_to_msg_id:
             reply_message: Message = await event.get_reply_message()
             return await client.send_message(
-                event.chat_id, note_text, reply_to=reply_message.id, link_preview=False
+                event.chat_id,
+                note_text,
+                reply_to=reply_message.id,
+                link_preview=False,
             )
         return await client.send_message(
             event.chat_id, note_text, reply_to=event.id, link_preview=False

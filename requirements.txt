@@ -1,5 +1,4 @@
 loguru
-telethon
 vkbottle
 matplotlib
 seaborn

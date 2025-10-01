@@ -5,8 +5,8 @@ from .client import client
 from .. import db, phrase
 
 from loguru import logger
-from telethon import events
-from telethon.tl.custom import Message
+from .telethon import events
+from .telethon.tl.custom import Message
 
 logger.info(f"Загружен модуль {__name__}!")
 
@@ -39,7 +39,9 @@ async def admin_broadcast(event: Message):
     roles = db.roles()
     if roles.get(event.sender_id) < roles.ADMIN:
         return await event.reply(
-            phrase.roles.no_perms.format(level=roles.ADMIN, name=phrase.roles.admin)
+            phrase.roles.no_perms.format(
+                level=roles.ADMIN, name=phrase.roles.admin
+            )
         )
     await event.reply(
         phrase.mailing.done.format(

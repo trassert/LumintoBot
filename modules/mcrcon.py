@@ -52,7 +52,9 @@ class MinecraftClient:
         if not self._writer:
             raise ClientError("Не подключён.")
 
-        out = struct.pack("<li", 0, typen) + message.encode("utf8") + b"\x00\x00"
+        out = (
+            struct.pack("<li", 0, typen) + message.encode("utf8") + b"\x00\x00"
+        )
         out_len = struct.pack("<i", len(out))
         self._writer.write(out_len + out)
         await self._writer.drain()  # Не даёт дублироваться ответу

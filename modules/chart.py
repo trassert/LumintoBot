@@ -41,7 +41,9 @@ def create_plot(data_dict, output_file=pathes.chart, time_range_days=None):
         today = max(dates) if dates else datetime.now()
         cutoff_date = today - timedelta(days=time_range_days)
         filtered_data = [
-            (date, value) for date, value in zip(dates, values) if date >= cutoff_date
+            (date, value)
+            for date, value in zip(dates, values)
+            if date >= cutoff_date
         ]
         if filtered_data:
             dates, values = zip(*filtered_data)

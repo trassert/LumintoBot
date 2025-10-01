@@ -41,7 +41,9 @@ def value_to_str(number, noun):
 
 def rm_badtext(text):
     text = re.sub(r"\\boxed\{.*?\}", "", text)
-    return text.replace("$", "**").replace("\\cdot", "×")  # ! Экранизация необходима
+    return text.replace("$", "**").replace(
+        "\\cdot", "×"
+    )  # ! Экранизация необходима
 
 
 def rm_colors(text):

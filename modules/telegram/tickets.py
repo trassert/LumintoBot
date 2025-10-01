@@ -1,5 +1,5 @@
-from telethon import events
-from telethon.tl.custom import Message
+from .telethon import events
+from .telethon.tl.custom import Message
 
 from .client import client
 from .global_checks import checks
@@ -28,7 +28,9 @@ async def do_ticket(event: Message):
     balance = await db.get_money(event.sender_id)
     if balance < arg:
         return await event.reply(
-            phrase.money.not_enough.format(formatter.value_to_str(balance, "изумруд"))
+            phrase.money.not_enough.format(
+                formatter.value_to_str(balance, "изумруд")
+            )
         )
     db.add_money(event.sender_id, -arg)
     ticket_id = db.ticket.add(event.sender_id, arg)

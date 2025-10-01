@@ -124,7 +124,9 @@ def update_shop():
         current_shop["theme"] = weighted_choice(themes, database("shop_weight"))
     current_items = []
     all_items = list(load[current_shop["theme"]].keys())
-    while len(set(current_items)) != len(current_items) or len(current_items) < 5:
+    while (
+        len(set(current_items)) != len(current_items) or len(current_items) < 5
+    ):
         current_items = list(set(current_items))
         current_items.append(choice(all_items))
     for item in current_items:
@@ -214,7 +216,9 @@ class crocodile_stat:
     def get_all(self=False):
         with open(pathes.crocostat, "rb") as f:
             load = orjson.loads(f.read())
-        return dict(sorted(load.items(), key=lambda item: item[1], reverse=True))
+        return dict(
+            sorted(load.items(), key=lambda item: item[1], reverse=True)
+        )
 
 
 class nicks:
@@ -383,7 +387,12 @@ class ticket:
                 random_id = str(randint(1000, 9999))
                 f.write(
                     orjson.dumps(
-                        {random_id: {"author": int(author), "value": int(value)}},
+                        {
+                            random_id: {
+                                "author": int(author),
+                                "value": int(value),
+                            }
+                        },
                         option=orjson.OPT_SORT_KEYS,
                     )
                 )
@@ -586,7 +595,10 @@ class Mysql:
                 )
                 results = await cur.fetchall()
                 return {
-                    row[0]: {"wins_casino": row[1], "lose_moneys_in_casino": row[2]}
+                    row[0]: {
+                        "wins_casino": row[1],
+                        "lose_moneys_in_casino": row[2],
+                    }
                     for row in results
                 }
 
@@ -685,7 +697,9 @@ def check_withdraw_limit(id: int, amount: int) -> int | bool:
                 logger.error("Ошибка при чтении файла вывода!")
                 data = {}
     if str(id) in data:
-        record_date = datetime.strptime(data[str(id)]["date"], "%Y-%m-%d").date()
+        record_date = datetime.strptime(
+            data[str(id)]["date"], "%Y-%m-%d"
+        ).date()
         if record_date == today:
             already_withdrawn = data[str(id)]["withdrawn"]
             remaining = 64 - already_withdrawn
@@ -817,13 +831,13 @@ class CitiesGame:
             self.data["current_game"]["current_player_id"]
         )
         try:
-            self.data["current_game"]["current_player_id"] = self.data["current_game"][
-                "players"
-            ][index + 1]
+            self.data["current_game"]["current_player_id"] = self.data[
+                "current_game"
+            ]["players"][index + 1]
         except IndexError:
-            self.data["current_game"]["current_player_id"] = self.data["current_game"][
-                "players"
-            ][0]
+            self.data["current_game"]["current_player_id"] = self.data[
+                "current_game"
+            ]["players"][0]
         self.logger(
             f"Очередь игрока {self.data['current_game']['current_player_id']} отвечать"
         )
@@ -833,7 +847,9 @@ class CitiesGame:
         """Возвращает отсортированную статистику по убыванию побед"""
         return dict(
             sorted(
-                self.data["statistics"].items(), key=lambda item: item[1], reverse=True
+                self.data["statistics"].items(),
+                key=lambda item: item[1],
+                reverse=True,
             )
         )
 
@@ -859,9 +875,13 @@ class CitiesGame:
         self.data["status"] = True
         self.data["current_game"]["last_city"] = city
         self.logger(f"Запущена игра Города. Начинается с города {city}")
-        self.data["current_game"]["current_player_id"] = choice(self.get_players())
+        self.data["current_game"]["current_player_id"] = choice(
+            self.get_players()
+        )
         self.logger(f"Игроки: {self.get_players()}")
-        self.logger(f"Отвечает: {self.data['current_game']['current_player_id']}")
+        self.logger(
+            f"Отвечает: {self.data['current_game']['current_player_id']}"
+        )
         self._save_data()
         return self.data
 
@@ -873,7 +893,9 @@ class CitiesGame:
         if id != self.data["current_game"]["current_player_id"]:
             self.logger(f"{id} сейчас не должен отвечать")
             return 2
-        if city not in open(pathes.chk_city, encoding="utf8").read().split("\n"):
+        if city not in open(pathes.chk_city, encoding="utf8").read().split(
+            "\n"
+        ):
             self.logger(f"{id} ответил неизвестным городом")
             return 1
         if city[0] != formatter.city_last_letter(
@@ -887,7 +909,9 @@ class CitiesGame:
             self.logger(f"{id} ответил городом, который был")
             return 5
         self.data["current_game"]["last_city"] = city
-        self.data["statistics"][str(id)] = self.data["statistics"].get(str(id), 0) + 1
+        self.data["statistics"][str(id)] = (
+            self.data["statistics"].get(str(id), 0) + 1
+        )
         self.data["current_game"]["cities"].append(city)
         self.next_answer()
         self._save_data()

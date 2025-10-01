@@ -6,11 +6,11 @@ from random import choice, randint, random
 from time import time
 from loguru import logger
 
-from telethon import errors as TGErrors
-from telethon import events
-from telethon.tl.custom import Message
-from telethon.tl.functions.users import GetFullUserRequest
-from telethon.tl.types import (
+from .telethon import errors as TGErrors
+from .telethon import events
+from .telethon.tl.custom import Message
+from .telethon.tl.functions.users import GetFullUserRequest
+from .telethon.tl.types import (
     KeyboardButtonCallback,
     KeyboardButtonRow,
     ReplyInlineMarkup,
@@ -82,7 +82,8 @@ async def ping(event: Message):
 @client.on(events.NewMessage(pattern=r"(?i)^/старт$", func=checks))
 async def start(event: Message):
     return await event.reply(
-        phrase.start.format(await get_name(event.sender_id, push=False)), silent=True
+        phrase.start.format(await get_name(event.sender_id, push=False)),
+        silent=True,
     )
 
 
@@ -113,8 +114,14 @@ async def profile(event: Message):
             port=config.tokens.rcon.port,
             password=config.tokens.rcon.password,
         ) as rcon:
-            time = (await rcon.send(f"papi parse --null %PTM_playtime_{nick}:luminto%")).replace("\n", "")
-            rank = (await rcon.send(f"papi parse --null %PTM_rank_{nick}%")).replace("\n", "")
+            time = (
+                await rcon.send(
+                    f"papi parse --null %PTM_playtime_{nick}:luminto%"
+                )
+            ).replace("\n", "")
+            rank = (
+                await rcon.send(f"papi parse --null %PTM_rank_{nick}%")
+            ).replace("\n", "")
     else:
         m_day = 0
         m_week = 0
@@ -134,9 +141,11 @@ async def profile(event: Message):
             m_week=m_week,
             m_month=m_month,
             m_all=m_all,
-            balance=formatter.value_to_str(await db.get_money(event.sender_id), "изумруд"),
+            balance=formatter.value_to_str(
+                await db.get_money(event.sender_id), "изумруд"
+            ),
             time=time,
-            rank=rank
+            rank=rank,
         )
     )
 
@@ -146,7 +155,9 @@ async def profile(event: Message):
 @client.on(events.NewMessage(pattern=r"(?i)^/мск$", func=checks))
 @client.on(events.NewMessage(pattern=r"(?i)^/msk$", func=checks))
 async def msktime(event: Message):
-    return await event.reply(phrase.time.format(datetime.now().strftime("%H:%M:%S")))
+    return await event.reply(
+        phrase.time.format(datetime.now().strftime("%H:%M:%S"))
+    )
 
 
 @client.on(events.NewMessage(pattern=r"(?i)^/г шахта$", func=checks))
@@ -260,7 +271,9 @@ async def word_requests(event: Message):
         return
     entity = await get_name(event.sender_id)
     for word in words:
-        logger.info(f'Пользователь {event.sender_id} хочет добавить слово "{word}"')
+        logger.info(
+            f'Пользователь {event.sender_id} хочет добавить слово "{word}"'
+        )
         keyboard = ReplyInlineMarkup(
             [
                 KeyboardButtonRow(
@@ -310,7 +323,9 @@ async def word_remove_empty(event: Message):
     roles = db.roles()
     if roles.get(event.sender_id) < roles.ADMIN:
         return await event.reply(
-            phrase.roles.no_perms.format(level=roles.ADMIN, name=phrase.roles.admin)
+            phrase.roles.no_perms.format(
+                level=roles.ADMIN, name=phrase.roles.admin
+            )
         )
     return await event.reply(phrase.word.rem_empty)
 
@@ -320,7 +335,9 @@ async def word_remove(event: Message):
     roles = db.roles()
     if roles.get(event.sender_id) < roles.ADMIN:
         return await event.reply(
-            phrase.roles.no_perms.format(level=roles.ADMIN, name=phrase.roles.admin)
+            phrase.roles.no_perms.format(
+                level=roles.ADMIN, name=phrase.roles.admin
+            )
         )
     word = event.pattern_match.group(1).strip().lower()
     with open(pathes.crocoall, "r", encoding="utf-8") as f:
@@ -337,7 +354,9 @@ async def word_remove(event: Message):
 @client.on(events.NewMessage(pattern=r"(?i)^/ник(.*)", func=checks))
 async def check_nick(event: Message):
     try:
-        user = await client(GetFullUserRequest(event.pattern_match.group(1).strip()))
+        user = await client(
+            GetFullUserRequest(event.pattern_match.group(1).strip())
+        )
         user = user.full_user.id
     except (TypeError, ValueError, IndexError):
         reply_to_msg = event.reply_to_msg_id
@@ -360,7 +379,9 @@ async def check_nick(event: Message):
 async def swap_money(event: Message):
     args: str = event.pattern_match.group(1).strip()
     if len(args) < 1:
-        return await event.reply(phrase.money.no_count + phrase.money.swap_balance_use)
+        return await event.reply(
+            phrase.money.no_count + phrase.money.swap_balance_use
+        )
     args = args.split()
 
     try:
@@ -368,13 +389,10 @@ async def swap_money(event: Message):
         if count <= 0:
             return await event.reply(phrase.money.negative_count)
     except ValueError:
-        if args[0].lower() not in [
-            "все",
-            "всё",
-            "all",
-            "весь"
-        ]:
-            return await event.reply(phrase.money.nan_count + phrase.money.swap_balance_use)
+        if args[0].lower() not in ["все", "всё", "all", "весь"]:
+            return await event.reply(
+                phrase.money.nan_count + phrase.money.swap_balance_use
+            )
         count = await db.get_money(event.sender_id)
         if count == 0:
             return await event.reply(phrase.money.empty)
@@ -440,7 +458,9 @@ async def money_to_server(event: Message):
     balance = await db.get_money(event.sender_id)
     if balance < arg:
         return await event.reply(
-            phrase.money.not_enough.format(formatter.value_to_str(balance, "изумруд"))
+            phrase.money.not_enough.format(
+                formatter.value_to_str(balance, "изумруд")
+            )
         )
     db.add_money(event.sender_id, -arg)
     try:
@@ -480,16 +500,28 @@ async def money_to_server_empty(event: Message):
 async def get_balance(event: Message):
     return await event.reply(
         phrase.money.wallet.format(
-            formatter.value_to_str(await db.get_money(event.sender_id), "изумруд")
+            formatter.value_to_str(
+                await db.get_money(event.sender_id), "изумруд"
+            )
         )
     )
 
 
-@client.on(events.NewMessage(pattern=r"(?i)^/linknick (\S+)\s*(\S*)$", func=checks))
-@client.on(events.NewMessage(pattern=r"(?i)^/привязать (\S+)\s*(\S*)$", func=checks))
-@client.on(events.NewMessage(pattern=r"(?i)^привязать (\S+)\s*(\S*)$", func=checks))
-@client.on(events.NewMessage(pattern=r"(?i)^/новый ник (\S+)\s*(\S*)$", func=checks))
-@client.on(events.NewMessage(pattern=r"(?i)^/линкник (\S+)\s*(\S*)$", func=checks))
+@client.on(
+    events.NewMessage(pattern=r"(?i)^/linknick (\S+)\s*(\S*)$", func=checks)
+)
+@client.on(
+    events.NewMessage(pattern=r"(?i)^/привязать (\S+)\s*(\S*)$", func=checks)
+)
+@client.on(
+    events.NewMessage(pattern=r"(?i)^привязать (\S+)\s*(\S*)$", func=checks)
+)
+@client.on(
+    events.NewMessage(pattern=r"(?i)^/новый ник (\S+)\s*(\S*)$", func=checks)
+)
+@client.on(
+    events.NewMessage(pattern=r"(?i)^/линкник (\S+)\s*(\S*)$", func=checks)
+)
 async def link_nick(event: Message):
     if not event.chat_id == config.chats.chat:
         return await event.reply(phrase.nick.chat)
@@ -520,7 +552,9 @@ async def link_nick(event: Message):
         )
         return await event.reply(
             phrase.nick.already_have.format(
-                price=formatter.value_to_str(config.coofs.PriceForChangeNick, "изумруд")
+                price=formatter.value_to_str(
+                    config.coofs.PriceForChangeNick, "изумруд"
+                )
             ),
             buttons=keyboard,
         )
@@ -605,7 +639,10 @@ async def getmap(event: Message):
 @client.on(events.NewMessage(pattern=r"(?i)^/проголосовать$", func=checks))
 async def vote(event: Message):
     return await client.send_message(
-        event.chat_id, reply_to=event.id, message=phrase.vote, link_preview=False
+        event.chat_id,
+        reply_to=event.id,
+        message=phrase.vote,
+        link_preview=False,
     )
 
 
@@ -722,7 +759,9 @@ async def cities_requests(event: Message):
         return
     entity = await get_name(event.sender_id)
     for word in words:
-        logger.info(f'Пользователь {event.sender_id} хочет добавить город "{word}"')
+        logger.info(
+            f'Пользователь {event.sender_id} хочет добавить город "{word}"'
+        )
         keyboard = ReplyInlineMarkup(
             [
                 KeyboardButtonRow(
@@ -768,7 +807,9 @@ async def cities_remove_empty(event: Message):
     roles = db.roles()
     if roles.get(event.sender_id) < roles.ADMIN:
         return await event.reply(
-            phrase.roles.no_perms.format(level=roles.ADMIN, name=phrase.roles.admin)
+            phrase.roles.no_perms.format(
+                level=roles.ADMIN, name=phrase.roles.admin
+            )
         )
     return await event.reply(phrase.cities.rem_empty)
 
@@ -778,7 +819,9 @@ async def cities_remove(event: Message):
     roles = db.roles()
     if roles.get(event.sender_id) < roles.ADMIN:
         return await event.reply(
-            phrase.roles.no_perms.format(level=roles.ADMIN, name=phrase.roles.admin)
+            phrase.roles.no_perms.format(
+                level=roles.ADMIN, name=phrase.roles.admin
+            )
         )
     word = event.pattern_match.group(1).strip().lower()
     with open(pathes.chk_city, "r", encoding="utf-8") as f:

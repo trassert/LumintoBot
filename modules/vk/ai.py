@@ -9,6 +9,7 @@ logger.info(f"Загружен модуль {__name__}!")
 
 WaitAI = floodwait.FloodWaitBase("WaitAI", config.flood.ai)
 
+
 @bot.on.message(text="/ии <prompt>")
 async def ai_message(message: Message, prompt: Optional[str] = None):
     if prompt is None:

@@ -7,7 +7,6 @@ logger.info(f"Загружен модуль {__name__}!")
 
 bot = Bot(token=config.tokens.bot.vk)
 
-from . import ai
 
 async def start():
     "Небольшой костыль для запуска uvloop и telethon с vkbottle"

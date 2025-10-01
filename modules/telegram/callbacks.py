@@ -1,6 +1,6 @@
 import asyncio
 
-from telethon import events, types
+from .telethon import events, types
 
 from random import choice
 
@@ -44,13 +44,17 @@ async def state_callback(event: events.CallbackQuery.Event):
         state.change("players", players)
         await client.send_message(
             entity=config.chats.chat,
-            message=phrase.state.new_player.format(state=state.name, player=nick),
+            message=phrase.state.new_player.format(
+                state=state.name, player=nick
+            ),
             reply_to=config.chats.topics.rp,
         )
         if (state.type == 0) and (len(players) >= config.coofs.Type1Players):
             await client.send_message(
                 entity=config.chats.chat,
-                message=phrase.state.up.format(name=state.name, type="Государство"),
+                message=phrase.state.up.format(
+                    name=state.name, type="Государство"
+                ),
                 reply_to=config.chats.topics.rp,
             )
             state.change("type", 1)
@@ -61,7 +65,9 @@ async def state_callback(event: events.CallbackQuery.Event):
                 reply_to=config.chats.topics.rp,
             )
             state.change("type", 2)
-        return await event.answer(phrase.state.admit.format(state.name), alert=True)
+        return await event.answer(
+            phrase.state.admit.format(state.name), alert=True
+        )
     elif data[1] == "remove":
         try:
             state = db.state(data[2])
@@ -78,7 +84,9 @@ async def state_callback(event: events.CallbackQuery.Event):
             reply_to=config.chats.topics.rp,
         )
         return await event.reply(
-            phrase.state.removed.format(author=await get_name(state.author, push=False))
+            phrase.state.removed.format(
+                author=await get_name(state.author, push=False)
+            )
         )
     elif data[1] == "m":
         if event.sender_id != int(data[2]):
@@ -144,7 +152,9 @@ async def casino_callback(event: events.CallbackQuery.Event):
     data = event.data.decode("utf-8").split(".")
     request = floodwait.WaitCasino.request()
     if request is not True:
-        return await event.answer(phrase.casino.floodwait.format(request), alert=True)
+        return await event.answer(
+            phrase.casino.floodwait.format(request), alert=True
+        )
     logger.info(f"КБ кнопка (Casino), дата: {data}")
     if data[1] == "auto":
         balance = await db.get_money(event.sender_id)
@@ -173,7 +183,8 @@ async def casino_callback(event: events.CallbackQuery.Event):
             await asyncio.sleep(2)
             return await fm.edit(
                 phrase.casino.win_auto.format(
-                    value=config.coofs.PriceForCasino * config.coofs.CasinoWinRatio,
+                    value=config.coofs.PriceForCasino
+                    * config.coofs.CasinoWinRatio,
                     name=await get_name(event.sender_id),
                 )
             )
@@ -181,10 +192,14 @@ async def casino_callback(event: events.CallbackQuery.Event):
             db.add_money(event.sender_id, config.coofs.PriceForCasino)
             await asyncio.sleep(2)
             return await fm.edit(
-                phrase.casino.partially_auto.format(await get_name(event.sender_id))
+                phrase.casino.partially_auto.format(
+                    await get_name(event.sender_id)
+                )
             )
         else:
-            await db.Users.add_lose_money(event.sender_id, config.coofs.PriceForCasino)
+            await db.Users.add_lose_money(
+                event.sender_id, config.coofs.PriceForCasino
+            )
             logger.info(f"{event.sender_id} проиграл в казино")
             await asyncio.sleep(2)
             return await fm.edit(
@@ -207,7 +222,9 @@ async def nick_callback(event: events.CallbackQuery.Event):
     balance = await db.get_money(event.sender_id)
     if balance - config.coofs.PriceForChangeNick < 0:
         return await event.answer(
-            phrase.money.not_enough.format(formatter.value_to_str(balance, "изумруд")),
+            phrase.money.not_enough.format(
+                formatter.value_to_str(balance, "изумруд")
+            ),
             alert=True,
         )
     try:
@@ -227,7 +244,9 @@ async def nick_callback(event: events.CallbackQuery.Event):
     return await event.reply(
         phrase.nick.buy_nick.format(
             user=user_name,
-            price=formatter.value_to_str(config.coofs.PriceForChangeNick, "изумруд"),
+            price=formatter.value_to_str(
+                config.coofs.PriceForChangeNick, "изумруд"
+            ),
         )
     )
 
@@ -251,7 +270,9 @@ async def word_callback(event: events.CallbackQuery.Event):
             phrase.word.success.format(
                 word=data[2],
                 user=user_name,
-                money=formatter.value_to_str(config.coofs.WordRequest, "изумруд"),
+                money=formatter.value_to_str(
+                    config.coofs.WordRequest, "изумруд"
+                ),
             ),
         )
         return await client.edit_message(
@@ -261,7 +282,8 @@ async def word_callback(event: events.CallbackQuery.Event):
         with open(pathes.crocobl, "a", encoding="utf-8") as f:
             f.write(f"\n{data[2]}")
         await client.send_message(
-            config.chats.chat, phrase.word.no.format(word=data[2], user=user_name)
+            config.chats.chat,
+            phrase.word.no.format(word=data[2], user=user_name),
         )
         return await client.edit_message(
             event.sender_id, event.message_id, phrase.word.noadd
@@ -287,7 +309,9 @@ async def cityadd_callback(event: events.CallbackQuery.Event):
             phrase.cities.success.format(
                 word=data[2].title(),
                 user=user_name,
-                money=formatter.value_to_str(config.coofs.WordRequest, "изумруд"),
+                money=formatter.value_to_str(
+                    config.coofs.WordRequest, "изумруд"
+                ),
             ),
         )
         return await client.edit_message(
@@ -321,7 +345,9 @@ async def shop_callback(event: events.CallbackQuery.Event):
     item = shop[items[int(data[1])]]
     if balance < item["price"]:
         return await event.answer(
-            phrase.money.not_enough.format(formatter.value_to_str(balance, "изумруд")),
+            phrase.money.not_enough.format(
+                formatter.value_to_str(balance, "изумруд")
+            ),
             alert=True,
         )
     try:
@@ -336,7 +362,9 @@ async def shop_callback(event: events.CallbackQuery.Event):
     except TimeoutError:
         return await event.answer(phrase.shop.timeout, alert=True)
     db.add_money(event.sender_id, -item["price"])
-    return await event.answer(phrase.shop.buy.format(items[int(data[1])]), alert=True)
+    return await event.answer(
+        phrase.shop.buy.format(items[int(data[1])]), alert=True
+    )
 
 
 @client.on(events.CallbackQuery(func=checks, pattern=r"^crocodile"))
@@ -345,7 +373,9 @@ async def crocodile_callback(event: events.CallbackQuery.Event):
     logger.info(f"КБ кнопка (Crocodile), дата: {data}")
     if data[1] == "start":
         if db.database("crocodile_super_game") == 1:
-            return await event.answer(phrase.crocodile.super_game_here, alert=True)
+            return await event.answer(
+                phrase.crocodile.super_game_here, alert=True
+            )
         if db.database("current_game") != 0:
             return await event.answer(phrase.crocodile.no, alert=True)
         with open(pathes.crocoall, "r", encoding="utf8") as f:
@@ -374,7 +404,9 @@ async def crocodile_callback(event: events.CallbackQuery.Event):
         if db.database("current_game") == 0:
             return await event.answer(phrase.crocodile.already_down, alert=True)
         if db.database("crocodile_super_game") == 1:
-            return await event.answer(phrase.crocodile.super_game_here, alert=True)
+            return await event.answer(
+                phrase.crocodile.super_game_here, alert=True
+            )
         bets_json = db.database("crocodile_bets")
         if bets_json != {}:
             bets = round(sum(list(bets_json.values())) / 2)
