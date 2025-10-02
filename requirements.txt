@@ -9,6 +9,8 @@ google-genai[aiohttp]==1.20
 cryptography
 orjson
 telethon
+cryptg
+pip-review
 
 aioping
 aiofiles
