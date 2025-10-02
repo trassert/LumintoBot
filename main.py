@@ -1,4 +1,5 @@
 import asyncio
+import logging
 
 from loguru import logger
 from sys import stderr
@@ -8,11 +9,23 @@ logger.add(
     stderr,
     format="<blue>{time:HH:mm:ss}</blue>"
     " <bold>|</bold> <level>{level}</level>"
-    " <bold>|</bold> <green>{function}</green>"
+    " <bold>|</bold> <green>{file}:{function}</green>"
     " <cyan><bold>></bold></cyan> {message}",
     level="INFO",
     colorize=True,
 )
+
+
+class InterceptHandler(logging.Handler):
+    def emit(self, record):
+        level = "TRACE" if record.levelno == 5 else record.levelname
+        logger.opt(depth=6, exception=record.exc_info).log(
+            level, record.getMessage()
+        )
+
+
+logging.basicConfig(handlers=[InterceptHandler()], level=0)
+
 
 from modules.telegram.client import client as tg  # noqa: E402
 from modules.vk import client as vk  # noqa: E402
