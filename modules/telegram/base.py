@@ -629,7 +629,10 @@ async def randompic(event: Message):
 @client.on(events.NewMessage(pattern=r"(?i)^/мап$", func=checks))
 @client.on(events.NewMessage(pattern=r"(?i)^/карта$", func=checks))
 async def getmap(event: Message):
-    return await event.reply(phrase.get_map.format(db.database("host")))
+    return await event.reply(
+        phrase.get_map.format(db.database("host")),
+        link_preview=False
+    )
 
 
 @client.on(events.NewMessage(pattern=r"(?i)^/vote@", func=checks))
