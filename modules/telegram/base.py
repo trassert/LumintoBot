@@ -854,4 +854,4 @@ async def test(event: Message):
 @client.on(events.NewMessage(pattern=r"(?i)^правила сервера$", func=checks))
 @client.on(events.NewMessage(pattern=r"(?i)^правила чата$", func=checks))
 async def rules(event: Message):
-    return await event.reply(phrase.rules.base.format("host"))
+    return await event.reply(phrase.rules.base.format(db.database("host")), link_preview=False)
