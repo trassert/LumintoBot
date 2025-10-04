@@ -630,8 +630,7 @@ async def randompic(event: Message):
 @client.on(events.NewMessage(pattern=r"(?i)^/карта$", func=checks))
 async def getmap(event: Message):
     return await event.reply(
-        phrase.get_map.format(db.database("host")),
-        link_preview=False
+        phrase.get_map.format(db.database("host")), link_preview=False
     )
 
 
@@ -840,3 +839,19 @@ async def cities_remove(event: Message):
 @client.on(events.NewMessage(pattern=r"(?i)^/тест", func=checks))
 async def test(event: Message):
     return await event.reply("test emoji... [🟢](emoji/6278544920286334754)")
+
+
+@client.on(events.NewMessage(pattern=r"(?i)^/rules", func=checks))
+@client.on(events.NewMessage(pattern=r"(?i)^/правила$", func=checks))
+@client.on(events.NewMessage(pattern=r"(?i)^/правилачата$", func=checks))
+@client.on(events.NewMessage(pattern=r"(?i)^/правиласервера$", func=checks))
+@client.on(events.NewMessage(pattern=r"(?i)^/правила сервера$", func=checks))
+@client.on(events.NewMessage(pattern=r"(?i)^/правила чата$", func=checks))
+@client.on(events.NewMessage(pattern=r"(?i)^rules", func=checks))
+@client.on(events.NewMessage(pattern=r"(?i)^правила$", func=checks))
+@client.on(events.NewMessage(pattern=r"(?i)^правилачата$", func=checks))
+@client.on(events.NewMessage(pattern=r"(?i)^правиласервера$", func=checks))
+@client.on(events.NewMessage(pattern=r"(?i)^правила сервера$", func=checks))
+@client.on(events.NewMessage(pattern=r"(?i)^правила чата$", func=checks))
+async def rules(event: Message):
+    return await event.reply(phrase.rules.base.format("host"))
