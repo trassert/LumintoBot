@@ -1,37 +1,38 @@
 from google import genai
 from google.genai import types, chats
 
-from . import config
+from . import config, phrase
 from loguru import logger
 
 logger.info(f"Загружен модуль {__name__}!")
-model = "gemini-2.5-flash-lite"
 
-tgclient = genai.Client(
-    api_key=config.tokens.gemini,
+model = config.vars.ai_model
+
+soc_client = genai.Client(
+    api_key=config.tokens.ai.social,
+    http_options=types.HttpOptions(
+        async_client_args={"proxy": config.tokens.proxy},
+    ),
+)
+mc_client = genai.Client(
+    api_key=config.tokens.ai.minecraft,
     http_options=types.HttpOptions(
         async_client_args={"proxy": config.tokens.proxy},
     ),
 )
 
-chat = tgclient.aio.chats.create(model=model)
-crocodile = tgclient.aio.chats.create(model=model)
-staff = tgclient.aio.chats.create(model=model)
+chat = soc_client.aio.chats.create(model=model)
+crocodile = soc_client.aio.chats.create(model=model)
+staff = soc_client.aio.chats.create(model=model)
 
-mcclient = genai.Client(
-    api_key=config.tokens.gemini_staff,
-    http_options=types.HttpOptions(
-        async_client_args={"proxy": config.tokens.proxy},
-    ),
-)
 players = {}
 
 
-async def get_player_chat(player) -> chats.AsyncChat:
+async def get_player_chat(player: str) -> chats.AsyncChat:
     if player in players:
         return players[player]
-    players[player] = mcclient.aio.chats.create(model=model)
+    players[player] = mc_client.aio.chats.create(model=model)
     await players[player].send_message(
-        f"Ты — Люма, ИИ бот-помощник в Майнкрафте. Ты общаешься с игроком {player}. Общайся вежливо и с заботой. Твои ответы должны быть короткие, но не односложные, и не стоит упоминать ник каждый раз. Пиши ОК, если всё поняла."
+        phrase.ai.minecraft_prompt.format(player)
     )
     return players[player]
