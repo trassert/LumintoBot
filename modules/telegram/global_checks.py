@@ -21,5 +21,6 @@ async def checks(event):
         return True
     if isinstance(event, events.CallbackQuery.Event):
         await event.answer(phrase.blacklisted, alert=True)
+        return False
     await event.reply(phrase.blacklisted)
     return False

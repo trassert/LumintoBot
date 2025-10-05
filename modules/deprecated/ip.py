@@ -8,12 +8,10 @@ from loguru import logger
 from . import config, db
 
 
-ipinfo = "https://ipinfo.io/{}/json"
-ip_api = "http://ip-api.com/json/{}"
+
 
 dns_servers = ["ns1.reg.ru", "ns2.reg.ru"]
-ident_v4 = ["https://v4.ident.me", "https://api.ipify.org"]
-ident_v6 = ["https://v6.ident.me", "https://api6.ipify.org"]
+
 
 
 async def get_ip(v6=False):
@@ -155,45 +153,7 @@ async def setup(forced=False):
         return await change_ip(v4, v6)
 
 
-async def get_loc(ip_address: str):
-    async with aiohttp.ClientSession() as session:
 
-        async def get(ip):
-            if "%" in ip:
-                ip = ip.split("%")[0]
-            try:
-                await asyncio.sleep(1)
-                async with session.get(ip_api.format(ip)) as response:
-                    if response.status == 429:
-                        await asyncio.sleep(2)
-                        return await get(ip)
-                    info = await response.json()
-                    logger.info(info)
-                    if info["status"] == "success":
-                        return [float(info["lat"]), float(info["lon"])]
-                    else:
-                        raise ValueError
-            except Exception:
-                await asyncio.sleep(1)
-                async with session.get(ipinfo.format(ip)) as response:
-                    info = await response.json()
-                    logger.info(info)
-                    if "status" in info:
-                        if info["status"] == 404:
-                            raise ValueError
-                    location = info.get("loc")
-                    latitude, longitude = location.split(",")
-                    return [float(latitude), float(longitude)]
-
-        try:
-            data = await get(ip_address)
-        except (
-            json.decoder.JSONDecodeError,
-            ValueError,
-            aiohttp.client_exceptions.ContentTypeError,
-        ):
-            data = await get(socket.gethostbyname(ip_address))
-    return data
 
 
 async def observe():
