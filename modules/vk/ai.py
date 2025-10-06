@@ -1,3 +1,5 @@
+import asyncio
+
 from vkbottle.bot import Message
 from typing import Optional
 
@@ -15,10 +17,9 @@ async def ai_message(message: Message, prompt: Optional[str] = None):
     if prompt is None:
         return await message.reply(phrase.ai.no_resp)
     request = WaitAI.request()
-    if request is not True:
-        return await message.reply(
-            phrase.wait.until.format(formatter.value_to_str(request, "секунд"))
-        )
+    if request is False:
+        return await message.reply(phrase.wait.ai)
+    await asyncio.sleep(request)
     logger.info(f"Запрос {prompt}")
     chat = ai.chat
     try:

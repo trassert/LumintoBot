@@ -1,3 +1,5 @@
+import asyncio
+
 from telethon.tl.custom import Message
 from telethon import events
 
@@ -27,29 +29,36 @@ async def gemini(event: Message):
     elif event.chat_id == config.chats.staff:
         chat = ai.staff
         prompt = text
-        request = True
+        request = 0
     else:
         return await event.reply(phrase.ai.only_chat)
 
-    if request is not True:
-        return await event.reply(
-            phrase.wait.until.format(formatter.value_to_str(request, "секунд"))
+    if request is False:
+        return await event.reply(phrase.wait.ai)
+
+    default: Message = await event.reply(
+        phrase.wait.ai_full.format(
+            "" if request == 0 else f" (~{request} сек.)",
         )
+    )
+    await asyncio.sleep(request)
 
     logger.info(f"Запрос {prompt}")
     try:
         response = (await chat.send_message(prompt)).text
     except Exception:
+        await default.edit(phrase.ai.error)
         return logger.error("Не удалось получить ответ ИИ")
     try:
         if len(response) > 4096:
             response = formatter.splitter(response)
+            await default.edit(response.pop(0))
             for chunk in response:
                 await event.reply(chunk)
         else:
-            await event.reply(response)
+            return await default.edit(response)
     except Exception:
-        await event.reply(phrase.ai.error)
+        return await default.edit(phrase.ai.error)
 
 
 @client.on(events.NewMessage(pattern=r"(?i)^/ии$", func=checks))

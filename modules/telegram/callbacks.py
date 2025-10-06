@@ -151,10 +151,8 @@ async def state_callback(event: events.CallbackQuery.Event):
 async def casino_callback(event: events.CallbackQuery.Event):
     data = event.data.decode("utf-8").split(".")
     request = floodwait.WaitCasino.request()
-    if request is not True:
-        return await event.answer(
-            phrase.casino.floodwait.format(request), alert=True
-        )
+    if request is False:
+        return await event.answer(phrase.casino.full_floodwait.format(request))
     logger.info(f"КБ кнопка (Casino), дата: {data}")
     if data[1] == "auto":
         balance = await db.get_money(event.sender_id)
