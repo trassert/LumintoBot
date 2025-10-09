@@ -143,7 +143,7 @@ async def profile(event: Message):
             balance=formatter.value_to_str(
                 await db.get_money(event.sender_id), "изумруд"
             ),
-            time=time
+            time=time,
         )
     )
 
@@ -570,7 +570,7 @@ async def link_nick(event: Message):
             port=config.tokens.rcon.port,
             password=config.tokens.rcon.password,
         ) as rcon:
-            await rcon.send(f"swl add {nick}")
+            await rcon.send(f"nwl add name {nick}")
     except Exception:
         logger.error("Внутренняя ошибка при добавлении в белый список")
         return await event.reply(phrase.nick.error)
@@ -852,4 +852,6 @@ async def test(event: Message):
 @client.on(events.NewMessage(pattern=r"(?i)^правила сервера$", func=checks))
 @client.on(events.NewMessage(pattern=r"(?i)^правила чата$", func=checks))
 async def rules(event: Message):
-    return await event.reply(phrase.rules.base.format(db.database("host")), link_preview=False)
+    return await event.reply(
+        phrase.rules.base.format(db.database("host")), link_preview=False
+    )

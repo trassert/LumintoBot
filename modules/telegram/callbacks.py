@@ -231,8 +231,8 @@ async def nick_callback(event: events.CallbackQuery.Event):
             port=config.tokens.rcon.port,
             password=config.tokens.rcon.password,
         ) as rcon:
-            await rcon.send(f"swl remove {old_nick}")
-            await rcon.send(f"swl add {data[1]}")
+            await rcon.send(f"nwl remove name {old_nick}")
+            await rcon.send(f"nwl add name {data[1]}")
     except Exception:
         logger.error("Внутренняя ошибка при управлении белым списком")
         return await event.answer(phrase.nick.error, alert=True)

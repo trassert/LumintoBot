@@ -154,9 +154,9 @@ async def whitelist(event: Message):
             phrase.roles.no_perms.format(level=roles.VIP, name=phrase.roles.vip)
         )
     if event.text[0] == "-":
-        command = f"swl remove {event.pattern_match.group(1).strip()}"
+        command = f"nwl remove name {event.pattern_match.group(1).strip()}"
     else:
-        command = f"swl add {event.pattern_match.group(1).strip()}"
+        command = f"nwl add name {event.pattern_match.group(1).strip()}"
     logger.info(f"Выполняется команда: {command}")
     try:
         async with MinecraftClient(
