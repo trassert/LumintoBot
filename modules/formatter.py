@@ -1,6 +1,5 @@
 import re
 
-from datetime import datetime
 from pymorphy3 import MorphAnalyzer
 from loguru import logger
 
