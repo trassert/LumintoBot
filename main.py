@@ -29,7 +29,7 @@ logging.basicConfig(handlers=[InterceptHandler()], level=0)
 
 from modules.telegram.client import client as tg  # noqa: E402
 from modules.vk import client as vk  # noqa: E402
-from modules import db, config, webhooks, time_to, ai, phrase  # noqa: E402
+from modules import db, config, webhooks, task_gen, tasks, ai, phrase  # noqa: E402
 
 
 async def init():
@@ -49,13 +49,11 @@ async def init():
 async def main():
     await init()
     await webhooks.server()
+    await task_gen.UpdateShopTask.create(tasks.update_shop, 2)
+    await task_gen.RewardsTask.create(tasks.rewards, "19:00")
+    await task_gen.RemoveStatesTask.create(tasks.remove_states, "17:00")
     await asyncio.gather(
-        tg.run_until_disconnected(),
-        vk.start(),
-        time_to.update_shop(),
-        time_to.rewards(),
-        time_to.remove_states(),
-        time_to.port_checks(),
+        tg.run_until_disconnected(), vk.start(), tasks.port_checks()
     )
 
 

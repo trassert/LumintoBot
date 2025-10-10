@@ -6,7 +6,6 @@ from hashlib import sha1, md5
 
 from . import config, db, phrase, formatter, ai
 from .telegram.client import client
-from .telegram.mailing import send_to_subscribers
 from .telegram import func
 from loguru import logger
 
@@ -87,41 +86,6 @@ async def server():
         logger.debug(f"+ соо. от {nick}")
         return aiohttp.web.Response(text="ok")
 
-    async def github_bot(request: aiohttp.web.Request):  #! End of Life
-        "Вебхук для гитхаба"
-        load = await request.json()
-        for head in load["commits"]:
-            logger.info("Обновление бота!")
-            await send_to_subscribers(f"{head['message']}\n#Бот")
-            await client.send_message(
-                config.chats.chat,
-                phrase.github.bot.format(
-                    author=f"[{head['author']['name']}](https://github.com/{head['author']['name']})",
-                    message=head["message"],
-                ),
-                link_preview=False,
-                reply_to=config.chats.topics.updates,
-            )
-        return aiohttp.web.Response(text="ok")
-
-    async def github_mod(request: aiohttp.web.Request):  #! End of Life
-        "Вебхук для гитхаба"
-        load = await request.json()
-        for head in load["commits"]:
-            logger.info("Обновление модпака!")
-            await send_to_subscribers(f"{head['message']}\n#Модпак")
-            await client.send_message(
-                config.chats.chat,
-                phrase.github.mod.format(
-                    author=f"[{head['author']['name']}](https://github.com/{head['author']['name']})",
-                    message=head["message"],
-                    link=head["url"],
-                ),
-                link_preview=False,
-                reply_to=config.chats.topics.updates,
-            )
-        return aiohttp.web.Response(text="ok")
-
     async def bank(request: aiohttp.web.Request):
         if request.query.get("key") != config.tokens.bankplugin:
             logger.warning("Неверный пароль (BankPlugin)")
@@ -177,8 +141,6 @@ async def server():
         [
             aiohttp.web.post("/hotmc", hotmc),
             aiohttp.web.post("/servers", mcservers),
-            # End of Life aiohttp.web.post("/github_bot", github_bot),
-            # End of Life aiohttp.web.post("/github_mod", github_mod),
             aiohttp.web.post("/github", github),
             aiohttp.web.get("/minecraft", minecraft),
             aiohttp.web.get("/bank", bank),

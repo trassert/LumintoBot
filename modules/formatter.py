@@ -69,17 +69,10 @@ def city_last_letter(city: str) -> str:
     return city[-1]  # fallback
 
 
-def get_remaining_time(timestamp: str, remtime=7200):
-    input_time = datetime.strptime(timestamp, "%Y-%m-%d %H:%M:%S.%f")
-    current_time = datetime.now()
-    time_difference = current_time - input_time
-    total_seconds_passed = time_difference.total_seconds()
-    remaining_seconds = max(0, remtime - total_seconds_passed)
-    hours_remaining = int(remaining_seconds // 3600)
-    minutes_remaining = int((remaining_seconds % 3600) // 60)
-    if hours_remaining == 0:
-        return f"{minutes_remaining} мин."
-    elif hours_remaining == 1:
-        return f"1 час {minutes_remaining} мин."
-    else:
-        return f"{hours_remaining} час. {minutes_remaining} мин."
+def fmtime(s: float) -> str:
+    s = int(s)
+    h, s = divmod(s, 3600)
+    m, s = divmod(s, 60)
+    units = [(h, "ч."), (m, "мин."), (s, "сек.")]
+    parts = [f"{v} {u}" for v, u in units if v > 0]
+    return ", ".join(parts) if parts else "0 сек."

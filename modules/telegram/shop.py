@@ -11,7 +11,7 @@ from random import choice
 from .client import client
 from .global_checks import checks
 
-from .. import phrase, formatter, db
+from .. import phrase, formatter, db, task_gen
 from loguru import logger
 
 logger.info(f"Загружен модуль {__name__}!")
@@ -91,7 +91,7 @@ async def shop(event: Message):
             price_5=formatter.value_to_str(shop[items[4]]["price"], "изумруд"),
             quote=choice(phrase.shop_quotes[theme]["quotes"]),
             emo=phrase.shop_quotes[theme]["emo"],
-            clock=formatter.get_remaining_time(db.database("shop_update_time")),
+            clock=formatter.fmtime(await task_gen.UpdateShopTask.info()),
         ),
         buttons=keyboard,
         parse_mode="html",
