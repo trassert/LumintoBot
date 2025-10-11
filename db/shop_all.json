@@ -1410,5 +1410,217 @@
             "price": 40,
             "value": 1
         }
+    },
+    "books": {
+        "Книга «Подводник»": {
+            "name": "enchanted_book[enchantments={aqua_affinity:1}]",
+            "price": 20,
+            "value": 1
+        },
+        "Книга «Бич членистоногих V»": {
+            "name": "enchanted_book[enchantments={bane_of_arthropods:5}]",
+            "price": 30,
+            "value": 1
+        },
+        "Книга «Взрывоустойчивость IV»": {
+            "name": "enchanted_book[enchantments={blast_protection:4}]",
+            "price": 40,
+            "value": 1
+        },
+        "Книга «Пробитие IV»": {
+            "name": "enchanted_book[enchantments={breach:4}]",
+            "price": 56,
+            "value": 1
+        },
+        "Книга «Громовержец»": {
+            "name": "enchanted_book[enchantments={channeling:1}]",
+            "price": 30,
+            "value": 1
+        },
+        "Книга «Проклятие несъемности»": {
+            "name": "enchanted_book[enchantments={binding_curse:1}]",
+            "price": 10,
+            "value": 1
+        },
+        "Книга «Проклятие исчезновения»": {
+            "name": "enchanted_book[enchantments={vanishing_curse:1}]",
+            "price": 10,
+            "value": 1
+        },
+        "Книга «Плотность V»": {
+            "name": "enchanted_book[enchantments={density:5}]",
+            "price": 30,
+            "value": 1
+        },
+        "Книга «Подводная ходьба III»": {
+            "name": "enchanted_book[enchantments={depth_strider:3}]",
+            "price": 20,
+            "value": 1
+        },
+        "Книга «Эффективность V»": {
+            "name": "enchanted_book[enchantments={efficiency:5}]",
+            "price": 48,
+            "value": 1
+        },
+        "Книга «Невесомость IV»": {
+            "name": "enchanted_book[enchantments={feather_falling:4}]",
+            "price": 24,
+            "value": 1
+        },
+        "Книга «Заговор огня II»": {
+            "name": "enchanted_book[enchantments={fire_aspect:2}]",
+            "price": 26,
+            "value": 1
+        },
+        "Книга «Огнеупорность IV»": {
+            "name": "enchanted_book[enchantments={fire_protection:4}]",
+            "price": 30,
+            "value": 1
+        },
+        "Книга «Воспламенение»": {
+            "name": "enchanted_book[enchantments={flame:1}]",
+            "price": 31,
+            "value": 1
+        },
+        "Книга «Удача III»": {
+            "name": "enchanted_book[enchantments={fortune:3}]",
+            "price": 53,
+            "value": 1
+        },
+        "Книга «Ледоход II»": {
+            "name": "enchanted_book[enchantments={frost_walker:2}]",
+            "price": 22,
+            "value": 1
+        },
+        "Книга «Пронзатель V»": {
+            "name": "enchanted_book[enchantments={impaling:5}]",
+            "price": 30,
+            "value": 1
+        },
+        "Книга «Бесконечность»": {
+            "name": "enchanted_book[enchantments={infinity:1}]",
+            "price": 60,
+            "value": 1
+        },
+        "Книга «Отдача II»": {
+            "name": "enchanted_book[enchantments={knockback:2}]",
+            "price": 27,
+            "value": 1
+        },
+        "Книга «Добыча III»": {
+            "name": "enchanted_book[enchantments={looting:3}]",
+            "price": 50,
+            "value": 1
+        },
+        "Книга «Верность III»": {
+            "name": "enchanted_book[enchantments={loyalty:3}]",
+            "price": 23,
+            "value": 1
+        },
+        "Книга «Везучий рыбак III»": {
+            "name": "enchanted_book[enchantments={luck_of_the_sea:3}]",
+            "price": 21,
+            "value": 1
+        },
+        "Книга «Приманка III»": {
+            "name": "enchanted_book[enchantments={lure:3}]",
+            "price": 20,
+            "value": 1
+        },
+        "Книга «Починка»": {
+            "name": "enchanted_book[enchantments={mending:1}]",
+            "price": 70,
+            "value": 1
+        },
+        "Книга «Тройной выстрел»": {
+            "name": "enchanted_book[enchantments={multishot:1}]",
+            "price": 32,
+            "value": 1
+        },
+        "Книга «Пронзающий выстрел IV»": {
+            "name": "enchanted_book[enchantments={piercing:4}]",
+            "price": 31,
+            "value": 1
+        },
+        "Книга «Сила V»": {
+            "name": "enchanted_book[enchantments={power:5}]",
+            "price": 48,
+            "value": 1
+        },
+        "Книга «Защита от снарядов IV»": {
+            "name": "enchanted_book[enchantments={projectile_protection:4}]",
+            "price": 32,
+            "value": 1
+        },
+        "Книга «Защита IV»": {
+            "name": "enchanted_book[enchantments={protection:4}]",
+            "price": 36,
+            "value": 1
+        },
+        "Книга «Отбрасывание II»": {
+            "name": "enchanted_book[enchantments={punch:2}]",
+            "price": 30,
+            "value": 1
+        },
+        "Книга «Быстрая перезарядка III»": {
+            "name": "enchanted_book[enchantments={quick_charge:3}]",
+            "price": 28,
+            "value": 1
+        },
+        "Книга «Подводное дыхание III»": {
+            "name": "enchanted_book[enchantments={respiration:3}]",
+            "price": 24,
+            "value": 1
+        },
+        "Книга «Тягун III»": {
+            "name": "enchanted_book[enchantments={riptide:3}]",
+            "price": 30,
+            "value": 1
+        },
+        "Книга «Острота V»": {
+            "name": "enchanted_book[enchantments={sharpness:5}]",
+            "price": 43,
+            "value": 1
+        },
+        "Книга «Шёлковое касание»": {
+            "name": "enchanted_book[enchantments={silk_touch:1}]",
+            "price": 61,
+            "value": 1
+        },
+        "Книга «Небесная кара V»": {
+            "name": "enchanted_book[enchantments={smite:5}]",
+            "price": 34,
+            "value": 1
+        },
+        "Книга «Скорость души III»": {
+            "name": "enchanted_book[enchantments={soul_speed:3}]",
+            "price": 32,
+            "value": 1
+        },
+        "Книга «Разящий клинок III»": {
+            "name": "enchanted_book[enchantments={sweeping_edge:3}]",
+            "price": 49,
+            "value": 1
+        },
+        "Книга «Проворство III»": {
+            "name": "enchanted_book[enchantments={swift_sneak:3}]",
+            "price": 28,
+            "value": 1
+        },
+        "Книга «Шипы III»": {
+            "name": "enchanted_book[enchantments={thorns:3}]",
+            "price": 41,
+            "value": 1
+        },
+        "Книга «Прочность III»": {
+            "name": "enchanted_book[enchantments={unbreaking:3}]",
+            "price": 32,
+            "value": 1
+        },
+        "Книга «Порыв ветра III»": {
+            "name": "enchanted_book[enchantments={wind_burst:3}]",
+            "price": 45,
+            "value": 1
+        }
     }
 }
