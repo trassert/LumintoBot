@@ -91,6 +91,7 @@ async def start(event: Message):
 @client.on(events.NewMessage(pattern=r"(?i)^/я$", func=checks))
 @client.on(events.NewMessage(pattern=r"(?i)^/i$", func=checks))
 @client.on(events.NewMessage(pattern=r"(?i)^/profile", func=checks))
+@client.on(events.NewMessage(pattern=r"(?i)^/профиль$", func=checks))
 @client.on(events.NewMessage(pattern=r"(?i)^/myprofile", func=checks))
 async def profile(event: Message):
     role = db.roles().get(event.sender_id)
