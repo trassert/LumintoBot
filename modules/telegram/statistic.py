@@ -5,7 +5,7 @@ from .client import client
 from .global_checks import checks
 from .func import get_name
 
-from .. import config, phrase, db, pathes, formatter, chart
+from .. import config, phrase, db, pathes, formatter, chart, mcrcon
 from loguru import logger
 
 logger.info(f"Загружен модуль {__name__}!")
@@ -83,3 +83,45 @@ async def all_money(event: Message):
             formatter.value_to_str(db.get_all_money(), "изумруд")
         )
     )
+
+
+@client.on(events.NewMessage(pattern=r"(?i)^/топ игроков(.*)", func=checks))
+@client.on(events.NewMessage(pattern=r"(?i)^/топигроков(.*)", func=checks))
+@client.on(events.NewMessage(pattern=r"(?i)^/topplayers(.*)", func=checks))
+@client.on(events.NewMessage(pattern=r"(?i)^/playtimetop(.*)", func=checks))
+@client.on(events.NewMessage(pattern=r"(?i)^/bestplayers(.*)", func=checks))
+@client.on(events.NewMessage(pattern=r"(?i)^/toppt(.*)", func=checks))
+async def server_top_list(event: Message):
+    arg: str = event.pattern_match.group(1).strip()
+    n = 10
+    if arg.isdigit():
+        try:
+            n = max(3, min(30, int(arg)))
+        except Exception:
+            pass
+    try:
+        text = [phrase.stat.server]
+        async with mcrcon.MinecraftClient(
+            host=config.tokens.rcon.host,
+            port=config.tokens.rcon.port,
+            password=config.tokens.rcon.password,
+        ) as rcon:
+            for number in range(1, n+1):
+                text.append(
+                    "{number}. {nickname} - {playtime}".format(
+                        number=number,
+                        nickname=(
+                            await rcon.send(
+                                f"papi parse --null %PTM_nickname_top_{number}%"
+                            )
+                        ).strip(),
+                        playtime=(
+                            await rcon.send(
+                                f"papi parse --null %PTM_playtime_top_{number}:luminto%"
+                            )
+                        ).strip(),
+                    )
+                )
+        return await event.reply("\n".join(text))
+    except TimeoutError:
+        return await event.reply(phrase.server.stopped)

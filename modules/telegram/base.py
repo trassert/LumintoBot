@@ -121,14 +121,8 @@ async def profile(event: Message):
                         f"papi parse --null %PTM_playtime_{nick}:luminto%"
                     )
                 ).replace("\n", "")
-                rank = (
-                    await rcon.send(
-                        f"papi parse --null %PTM_rank_{nick}%"
-                    )
-                ).replace("\n", "")
         except Exception:
             time = "Неизвестно"
-            rank = "Неизвестно"
     else:
         m_day = 0
         m_week = 0
@@ -136,7 +130,6 @@ async def profile(event: Message):
         m_all = 0
         nick = "Не привязан"
         time = "-"
-        rank = "-"
     return await event.reply(
         phrase.profile.full.format(
             name=await get_name(event.sender_id, push=False),
@@ -151,8 +144,7 @@ async def profile(event: Message):
             balance=formatter.value_to_str(
                 await db.get_money(event.sender_id), "изумруд"
             ),
-            time=time,
-            rank=rank
+            time=time
         )
     )
 
