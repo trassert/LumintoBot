@@ -27,13 +27,13 @@ class InterceptHandler(logging.Handler):
 logging.basicConfig(handlers=[InterceptHandler()], level=0)
 
 
-from modules.telegram.client import client as tg  # noqa: E402
-from modules.vk import client as vk  # noqa: E402
-from modules import db, config, webhooks, task_gen, tasks, ai, phrase  # noqa: E402
+async def main():
+    from modules.telegram.client import client as tg  # noqa: E402
+    from modules.vk import client as vk  # noqa: E402
+    from modules import db, config, webhooks, task_gen, tasks, ai, phrase  # noqa: E402
 
-
-async def init():
-    await tg.start(bot_token=config.tokens.bot.token)
+    if sum(db.database("shop_weight").values()) != 100:
+        logger.error("Сумма процентов в магазине не равна 100!")
     await db.Users.initialize()
     logger.info(
         f"Ответ ИИ - {(await ai.chat.send_message(phrase.ai.main_prompt)).text.replace('\n', '')}"
@@ -44,10 +44,7 @@ async def init():
     logger.info(
         f"Стафф - {(await ai.staff.send_message(phrase.ai.staff_prompt)).text.replace('\n', '')}"
     )
-
-
-async def main():
-    await init()
+    await tg.start(bot_token=config.tokens.bot.token)
     await webhooks.server()
     await task_gen.UpdateShopTask.create(tasks.update_shop, 2)
     await task_gen.RewardsTask.create(tasks.rewards, "19:00")
@@ -58,15 +55,9 @@ async def main():
 
 
 if __name__ == "__main__":
-    if sum(db.database("shop_weight").values()) != 100:
-        logger.error("Сумма процентов в магазине не равна 100!")
     try:
-        try:
-            import uvloop
+        import uvloop
 
-            uvloop.run(main())
-        except ModuleNotFoundError:
-            logger.warning("Uvloop не установлен!")
-            asyncio.run(main())
+        uvloop.run(main())
     except (KeyboardInterrupt, asyncio.CancelledError):
         logger.warning("Закрываю бота!")

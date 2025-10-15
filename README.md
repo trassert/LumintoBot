@@ -10,6 +10,13 @@
 
 ## Установка на LINUX:
 
+### С помощью pyenv:
+Устанавливаем пакеты:  
+    `pip install -r requirements.txt`
+Запуск:  
+    `./bot.sh`  
+
+### С помощью venv:
 Делаем установщик исполняемым:  
     `chmod +x install.sh`  
 Запускаем установщик:  
@@ -24,6 +31,4 @@
 Устанавливаем пакеты:  
 `pip install -r requirements.txt`  
 Запуск:  
-
 `bot.cmd`  
-

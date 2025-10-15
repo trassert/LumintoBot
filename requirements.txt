@@ -18,4 +18,4 @@ aiohttp
 asyncmy
 uvloop
 
-wintmp==1.2.0
+#! wintmp==1.2.0 Только при использовании Windows
