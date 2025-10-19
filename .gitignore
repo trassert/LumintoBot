@@ -1,22 +1,4 @@
-db/data.json
-db/mailing.json
-db/minecraft.json
-db/money.json
-db/shop_current.json
-db/crocodile_stat.json
-db/bot.session
-db/bot.session-journal
-db/shop_current.json
-db/tickets.json
-db/tasks.json
-
-db/crocodile/*
-db/timings/*
-db/users/*
-db/notes/*
-db/cities/*
-db/chat_stats/*
-db/states/*
+db/*
 
 backup/states/*
 
@@ -27,12 +9,12 @@ test.*
 
 **/__pycache__/
 .venv
+venv
 .env
 .vscode
 
 map.html
+
 tokens.yml
 chats.yml
 vars.yml
-
-venv

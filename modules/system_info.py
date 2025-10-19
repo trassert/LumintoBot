@@ -10,7 +10,7 @@ from loguru import logger
 logger.info(f"Загружен модуль {__name__}!")
 
 if platform.system() == "Windows":
-    import WinTmp
+    import WinTmp # type: ignore
 
     logger.info("Система - Windows, использую WinTMP")
 

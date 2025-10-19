@@ -24,11 +24,9 @@ async def gemini(event: Message):
 
     if event.chat_id == config.chats.chat:
         chat = ai.chat
-        prompt = f"{event.sender_id} | {text}"
         request = WaitAI.request()
     elif event.chat_id == config.chats.staff:
         chat = ai.staff
-        prompt = text
         request = 0
     else:
         return await event.reply(phrase.ai.only_chat)
@@ -43,12 +41,12 @@ async def gemini(event: Message):
     )
     await asyncio.sleep(request)
 
-    logger.info(f"Запрос {prompt}")
+    logger.info(f"[AI] {event.sender_id}: {text}")
     try:
-        response = (await chat.send_message(prompt)).text
-    except Exception:
+        response = await ai.embedding_request(text, event.sender_id, chat)
+    except Exception as e:
         await default.edit(phrase.ai.error)
-        return logger.error("Не удалось получить ответ ИИ")
+        return logger.error(f"Не удалось получить ответ ИИ: {e}")
     try:
         if len(response) > 4096:
             response = formatter.splitter(response)

@@ -19,6 +19,7 @@ hellomsg = path.join("db", "users", "hellomsg.json")
 tickets = path.join("db", "tickets.json")
 mailing = path.join("db", "mailing.json")
 tasks = path.join("db", "tasks.json")
+embeddings = path.join("db", "embeddings.json")
 
 cities = path.join("db", "cities", "game.json")
 chk_city = path.join("db", "cities", "cities.txt")
