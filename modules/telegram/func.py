@@ -1,6 +1,8 @@
 import re
+import random
 
 from telethon.tl.functions.users import GetFullUserRequest
+from telethon.tl import types
 
 from .. import db
 from .client import client
@@ -44,3 +46,33 @@ async def get_id(str: str) -> int:
         return int(str)
     user = await client(GetFullUserRequest(str))
     return user.full_user.id
+
+
+async def make_quiz_poll(answers: list, correct_answer_id: int, question: str) -> types.MessageMediaPoll:
+    return (
+        types.MessageMediaPoll(
+            poll=types.Poll(
+                id=random.randint(1, 100000),
+                question=types.TextWithEntities(
+                    text=question, entities=[]
+                ),
+                answers=[
+                    types.PollAnswer(
+                        text=types.TextWithEntities(text=option, entities=[]),
+                        option=bytes([i]),
+                    )
+                    for i, option in enumerate(answers, start=1)
+                ],
+                quiz=True,
+            ),
+            results=types.PollResults(
+                results=[
+                    types.PollAnswerVoters(
+                        option=bytes([correct_answer_id]),
+                        voters=0,
+                        correct=True,
+                    )
+                ],
+            ),
+        ),
+    )

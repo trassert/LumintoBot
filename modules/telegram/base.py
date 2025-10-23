@@ -10,11 +10,7 @@ from telethon import errors as TGErrors
 from telethon import events
 from telethon.tl.custom import Message
 from telethon.tl.functions.users import GetFullUserRequest
-from telethon.tl.types import (
-    KeyboardButtonCallback,
-    KeyboardButtonRow,
-    ReplyInlineMarkup,
-)
+from telethon.tl import types
 
 from .. import ai, config, formatter, pathes, pic, phrase, db
 from ..mcrcon import MinecraftClient
@@ -144,7 +140,7 @@ async def profile(event: Message):
             balance=formatter.value_to_str(
                 await db.get_money(event.sender_id), "изумруд"
             ),
-            time=time
+            time=time,
         )
     )
 
@@ -212,15 +208,15 @@ async def word_request(event: Message):
             return await event.reply(phrase.word.in_blacklist)
     entity = await get_name(event.sender_id)
     logger.info(f'Пользователь {event.sender_id} хочет добавить слово "{word}"')
-    keyboard = ReplyInlineMarkup(
+    keyboard = types.ReplyInlineMarkup(
         [
-            KeyboardButtonRow(
+            types.KeyboardButtonRow(
                 [
-                    KeyboardButtonCallback(
+                    types.KeyboardButtonCallback(
                         text="✅ Добавить",
                         data=f"word.yes.{word}.{event.sender_id}".encode(),
                     ),
-                    KeyboardButtonCallback(
+                    types.KeyboardButtonCallback(
                         text="❌ Отклонить",
                         data=f"word.no.{word}.{event.sender_id}".encode(),
                     ),
@@ -273,15 +269,15 @@ async def word_requests(event: Message):
         logger.info(
             f'Пользователь {event.sender_id} хочет добавить слово "{word}"'
         )
-        keyboard = ReplyInlineMarkup(
+        keyboard = types.ReplyInlineMarkup(
             [
-                KeyboardButtonRow(
+                types.KeyboardButtonRow(
                     [
-                        KeyboardButtonCallback(
+                        types.KeyboardButtonCallback(
                             text="✅ Добавить",
                             data=f"word.yes.{word}.{event.sender_id}".encode(),
                         ),
-                        KeyboardButtonCallback(
+                        types.KeyboardButtonCallback(
                             text="❌ Отклонить",
                             data=f"word.no.{word}.{event.sender_id}".encode(),
                         ),
@@ -537,11 +533,11 @@ async def link_nick(event: Message):
     if db.nicks(nick=nick).get() is not None:
         return await event.reply(phrase.nick.taken)
     if db.nicks(id=event.sender_id).get() is not None:
-        keyboard = ReplyInlineMarkup(
+        keyboard = types.ReplyInlineMarkup(
             [
-                KeyboardButtonRow(
+                types.KeyboardButtonRow(
                     [
-                        KeyboardButtonCallback(
+                        types.KeyboardButtonCallback(
                             text="✅ Сменить",
                             data=f"nick.{nick}.{event.sender_id}".encode(),
                         )
@@ -700,15 +696,15 @@ async def cities_request(event: Message):
             return await event.reply(phrase.cities.in_blacklist)
     entity = await get_name(event.sender_id)
     logger.info(f'Пользователь {event.sender_id} хочет добавить город "{word}"')
-    keyboard = ReplyInlineMarkup(
+    keyboard = types.ReplyInlineMarkup(
         [
-            KeyboardButtonRow(
+            types.KeyboardButtonRow(
                 [
-                    KeyboardButtonCallback(
+                    types.KeyboardButtonCallback(
                         text="✅ Добавить",
                         data=f"cityadd.yes.{word}.{event.sender_id}".encode(),
                     ),
-                    KeyboardButtonCallback(
+                    types.KeyboardButtonCallback(
                         text="❌ Отклонить",
                         data=f"cityadd.no.{word}.{event.sender_id}".encode(),
                     ),
@@ -763,15 +759,15 @@ async def cities_requests(event: Message):
         logger.info(
             f'Пользователь {event.sender_id} хочет добавить город "{word}"'
         )
-        keyboard = ReplyInlineMarkup(
+        keyboard = types.ReplyInlineMarkup(
             [
-                KeyboardButtonRow(
+                types.KeyboardButtonRow(
                     [
-                        KeyboardButtonCallback(
+                        types.KeyboardButtonCallback(
                             text="✅ Добавить",
                             data=f"cityadd.yes.{word}.{event.sender_id}".encode(),
                         ),
-                        KeyboardButtonCallback(
+                        types.KeyboardButtonCallback(
                             text="❌ Отклонить",
                             data=f"cityadd.no.{word}.{event.sender_id}".encode(),
                         ),
@@ -835,9 +831,12 @@ async def cities_remove(event: Message):
     return await event.reply(phrase.cities.deleted.format(word))
 
 
-@client.on(events.NewMessage(pattern=r"(?i)^/тест", func=checks))
-async def test(event: Message):
-    return await event.reply("test emoji... [🟢](emoji/6278544920286334754)")
+# @client.on(events.NewMessage(pattern=r"(?i)^/тест", func=checks))
+# async def test(event: types.Message):
+#     await client.send_message(
+#         event.chat.id,
+#         file=func.make_quiz_poll()
+#     )
 
 
 @client.on(events.NewMessage(pattern=r"(?i)^/rules", func=checks))
