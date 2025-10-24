@@ -493,6 +493,13 @@ async def cities_callback(event: events.CallbackQuery.Event):
 @client.on(events.NewMessage(pattern=r"(?i)^/cities$"))
 async def cities_start(event: Message):
     """Команда запуска игры"""
+    if not event.chat_id == config.chats.chat:
+        return await event.reply(phrase.cities.chat)
+    if (event.reply_to_msg_id != config.chats.topics.games) and (
+        getattr(event.reply_to, "reply_to_top_id", None)
+        != config.chats.topics.games
+    ):
+        return await event.reply(phrase.game_topic_warning)
     if len(Cities.get_players()) > 0 or Cities.get_game_status():
         keyboard = [
             [KeyboardButtonCallback(text="❌ Отменить", data="cities.cancel")]
