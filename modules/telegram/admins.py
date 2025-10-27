@@ -4,10 +4,9 @@ from telethon.tl.functions.users import GetFullUserRequest
 
 from .client import client
 from .global_checks import checks
-from .func import get_name, get_id
+from . import func
 
-from .. import phrase, config, formatter, db
-from ..mcrcon import MinecraftClient
+from .. import phrase, formatter, db, mcrcon
 from loguru import logger
 
 logger.info(f"Загружен модуль {__name__}!")
@@ -66,13 +65,13 @@ async def add_staff(event: Message):
     try:
         user = await client(GetFullUserRequest(arg))
         user = user.full_user.id
-        tag = await get_name(user)
+        tag = await func.get_name(user)
     except (IndexError, ValueError):
         reply_to_msg = event.reply_to_msg_id
         if reply_to_msg:
             reply_message = await event.get_reply_message()
             user = reply_message.sender_id
-            tag = await get_name(user)
+            tag = await func.get_name(user)
         else:
             return await event.reply(phrase.money.no_people)
     new_role = roles.get(user) + 1
@@ -96,13 +95,13 @@ async def del_staff(event: Message):
     try:
         user = await client(GetFullUserRequest(arg))
         user = user.full_user.id
-        tag = await get_name(user)
+        tag = await func.get_name(user)
     except (IndexError, ValueError):
         reply_to_msg = event.reply_to_msg_id
         if reply_to_msg:
             reply_message = await event.get_reply_message()
             user = reply_message.sender_id
-            tag = await get_name(user)
+            tag = await func.get_name(user)
         else:
             return await event.reply(phrase.money.no_people)
     new_role = roles.get(user) - 1
@@ -112,8 +111,9 @@ async def del_staff(event: Message):
     )
 
 
-@client.on(events.NewMessage(pattern=r"//(.+)", func=checks))
-async def mcrcon(event: Message):
+@client.on(events.NewMessage(pattern=r"o/(.+)", func=checks))
+@client.on(events.NewMessage(pattern=r"v/(.+)", func=checks))
+async def vanilla_mcrcon(event: Message):
     roles = db.roles()
     if roles.get(event.sender_id) < roles.ADMIN:
         return await event.reply(
@@ -122,13 +122,13 @@ async def mcrcon(event: Message):
             )
         )
     command = event.pattern_match.group(1).strip()
+    if event.text[0] == "o":
+        mode = mcrcon.Oneblock
+    else:
+        mode = mcrcon.Vanilla
     logger.info(f"Выполняется команда: {command}")
     try:
-        async with MinecraftClient(
-            host=config.tokens.rcon.host,
-            port=config.tokens.rcon.port,
-            password=config.tokens.rcon.password,
-        ) as rcon:
+        async with mode as rcon:
             resp = formatter.rm_colors(await rcon.send(command))
             if len(resp) == 0:
                 logger.info("Пустой ответ")
@@ -159,13 +159,11 @@ async def whitelist(event: Message):
         command = f"nwl add name {event.pattern_match.group(1).strip()}"
     logger.info(f"Выполняется команда: {command}")
     try:
-        async with MinecraftClient(
-            host=config.tokens.rcon.host,
-            port=config.tokens.rcon.port,
-            password=config.tokens.rcon.password,
-        ) as rcon:
+        async with mcrcon.Vanilla as rcon:
             resp = formatter.rm_colors(await rcon.send(command)).strip()
             logger.info(f"Ответ команды:\n{resp}")
-            return await event.reply(f"‼️ Команда скоро будет выведена!\n✍🏻 : {resp}")
+            return await event.reply(
+                f"‼️ Команда скоро будет выведена!\n✍🏻 : {resp}"
+            )
     except TimeoutError:
         return await event.reply(phrase.server.stopped)

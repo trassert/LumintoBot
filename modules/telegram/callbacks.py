@@ -9,8 +9,7 @@ from .global_checks import checks
 from .func import get_name
 from .games import crocodile_handler, crocodile_hint
 
-from .. import config, pathes, phrase, db, dice, formatter, floodwait
-from ..mcrcon import MinecraftClient
+from .. import config, pathes, phrase, db, dice, formatter, floodwait, mcrcon
 from loguru import logger
 
 logger.info(f"Загружен модуль {__name__}!")
@@ -226,11 +225,7 @@ async def nick_callback(event: events.CallbackQuery.Event):
             alert=True,
         )
     try:
-        async with MinecraftClient(
-            host=config.tokens.rcon.host,
-            port=config.tokens.rcon.port,
-            password=config.tokens.rcon.password,
-        ) as rcon:
+        async with mcrcon.Vanilla as rcon:
             await rcon.send(f"nwl remove name {old_nick}")
             await rcon.send(f"nwl add name {data[1]}")
     except Exception:
@@ -349,11 +344,7 @@ async def shop_callback(event: events.CallbackQuery.Event):
             alert=True,
         )
     try:
-        async with MinecraftClient(
-            host=config.tokens.rcon.host,
-            port=config.tokens.rcon.port,
-            password=config.tokens.rcon.password,
-        ) as rcon:
+        async with mcrcon.Vanilla as rcon:
             command = f"invgive {nick} {item['name']} {item['value']}"
             logger.info(f"Выполняется команда: {command}")
             await rcon.send(command)

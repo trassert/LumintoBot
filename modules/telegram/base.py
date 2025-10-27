@@ -12,8 +12,7 @@ from telethon.tl.custom import Message
 from telethon.tl.functions.users import GetFullUserRequest
 from telethon.tl import types
 
-from .. import ai, config, formatter, pathes, pic, phrase, db
-from ..mcrcon import MinecraftClient
+from .. import ai, config, formatter, pathes, pic, phrase, db, mcrcon
 from ..system_info import get_system_info
 from .client import client
 from .func import get_name
@@ -107,11 +106,7 @@ async def profile(event: Message):
         m_month = db.statistic(30).get(nick)
         m_all = db.statistic().get(nick, all_days=True)
         try:
-            async with MinecraftClient(
-                host=config.tokens.rcon.host,
-                port=config.tokens.rcon.port,
-                password=config.tokens.rcon.password,
-            ) as rcon:
+            async with mcrcon.Vanilla as rcon:
                 time = (
                     await rcon.send(
                         f"papi parse --null %PTM_playtime_{nick}:luminto%"
@@ -459,11 +454,7 @@ async def money_to_server(event: Message):
         )
     db.add_money(event.sender_id, -arg)
     try:
-        async with MinecraftClient(
-            host=config.tokens.rcon.host,
-            port=config.tokens.rcon.port,
-            password=config.tokens.rcon.password,
-        ) as rcon:
+        async with mcrcon.Vanilla as rcon:
             await rcon.send(f"invgive {nick} emerald {arg}")
     except Exception:
         db.add_money(event.sender_id, arg)
@@ -562,11 +553,7 @@ async def link_nick(event: Message):
         db.add_money(event.sender_id, config.coofs.RefGift)
         reftext = phrase.ref.gift.format(config.coofs.RefGift)
     try:
-        async with MinecraftClient(
-            host=config.tokens.rcon.host,
-            port=config.tokens.rcon.port,
-            password=config.tokens.rcon.password,
-        ) as rcon:
+        async with mcrcon.Vanilla as rcon:
             await rcon.send(f"nwl add name {nick}")
     except Exception:
         logger.error("Внутренняя ошибка при добавлении в белый список")
@@ -829,14 +816,6 @@ async def cities_remove(event: Message):
     with open(pathes.chk_city, "w", encoding="utf-8") as f:
         f.write("\n".join(text))
     return await event.reply(phrase.cities.deleted.format(word))
-
-
-# @client.on(events.NewMessage(pattern=r"(?i)^/тест", func=checks))
-# async def test(event: types.Message):
-#     await client.send_message(
-#         event.chat.id,
-#         file=func.make_quiz_poll()
-#     )
 
 
 @client.on(events.NewMessage(pattern=r"(?i)^/rules", func=checks))
