@@ -1,6 +1,8 @@
 import asyncio
 import struct
 
+from . import config
+
 
 class ClientError(Exception):
     pass
@@ -78,3 +80,15 @@ class MinecraftClient:
     async def send(self, cmd):
         result = await self._send(2, cmd)
         return result
+
+
+Vanilla = MinecraftClient(
+    host=config.tokens.modes.vanilla.host,
+    port=config.tokens.modes.vanilla.port,
+    password=config.tokens.modes.vanilla.password
+)
+Oneblock = MinecraftClient(
+    host=config.tokens.modes.oneblock.host,
+    port=config.tokens.modes.oneblock.port,
+    password=config.tokens.modes.oneblock.password
+)

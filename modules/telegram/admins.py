@@ -166,22 +166,6 @@ async def whitelist(event: Message):
         ) as rcon:
             resp = formatter.rm_colors(await rcon.send(command)).strip()
             logger.info(f"Ответ команды:\n{resp}")
-            return await event.reply(f"✍🏻 : {resp}")
+            return await event.reply(f"‼️ Команда скоро будет выведена!\n✍🏻 : {resp}")
     except TimeoutError:
         return await event.reply(phrase.server.stopped)
-
-
-@client.on(events.NewMessage(pattern=r"(?i)^/парс\s(.+)", func=checks))
-async def parse(event: Message):
-    roles = db.roles()
-    if roles.get(event.sender_id) < roles.ADMIN:
-        return await event.reply(
-            phrase.roles.no_perms.format(
-                level=roles.ADMIN, name=phrase.roles.admin
-            )
-        )
-    arg = event.pattern_match.group(1).strip()
-    await event.reply(f"html\n%\n{arg}\n%", parse_mode="html")
-    await event.reply(f"mkd\n%\n{arg}\n%")
-    await event.reply(f"get-id %{await get_id(arg)}%")
-    await event.reply(f"get-name %{await get_name(arg)}%")
