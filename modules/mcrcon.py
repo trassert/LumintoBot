@@ -18,77 +18,96 @@ class MinecraftClient:
         self.port = port
         self.password = password
 
-        self._auth = None
+        self._auth = False
         self._reader = None
         self._writer = None
+        self._connected = False
 
     async def __aenter__(self):
-        if not self._writer:
+        if not self._connected:
             self._reader, self._writer = await asyncio.open_connection(
                 self.host, self.port
             )
+            self._connected = True
             await self._authenticate()
 
         return self
 
     async def __aexit__(self, exc_type, exc, tb):
-        if self._writer:
+        await self.close()
+
+    async def close(self):
+        if self._writer and not self._writer.is_closing():
             self._writer.close()
-            await self._writer.wait_closed()  # ! Ждать закрытия
+            try:
+                await self._writer.wait_closed()
+            except Exception:
+                pass
+        self._connected = False
+        self._auth = False
+        self._reader = None
+        self._writer = None
 
     async def _authenticate(self):
         if not self._auth:
             await self._send(3, self.password)
             self._auth = True
 
-    async def _read_data(self, leng):
+    async def _read_data(self, length):
         data = b""
-        while len(data) < leng:
-            packet = await self._reader.read(leng - len(data))
-            if not packet:  # Проверка отклоняет дубляж пакета (мб)
-                break
+        while len(data) < length:
+            packet = await self._reader.read(length - len(data))
+            if not packet:
+                raise ClientError("Соединение разорвано")
             data += packet
         return data
 
-    async def _send(self, typen, message):
-        if not self._writer:
+    async def _send(self, message_type, message):
+        if not self._writer or self._writer.is_closing():
             raise ClientError("Не подключён.")
 
-        out = (
-            struct.pack("<li", 0, typen) + message.encode("utf8") + b"\x00\x00"
+        # Packet formatting - len(4) | id(4) | type(4) | тело | 00
+        packet_id = 0
+        body = (
+            struct.pack("<ii", packet_id, message_type)
+            + message.encode("utf8")
+            + b"\x00\x00"
         )
-        out_len = struct.pack("<i", len(out))
-        self._writer.write(out_len + out)
-        await self._writer.drain()  # Не даёт дублироваться ответу
+        body_length = len(body)
 
-        in_len = struct.unpack("<i", await self._read_data(4))
-        in_payload = await self._read_data(in_len[0])
+        # Send packet: len | body
+        self._writer.write(struct.pack("<i", body_length) + body)
+        await self._writer.drain()
 
+        # Read
+        in_length_data = await self._read_data(4)
+        in_length = struct.unpack("<i", in_length_data)[0]
+
+        in_payload = await self._read_data(in_length)
+
+        # Parsing
         in_id, in_type = struct.unpack("<ii", in_payload[:8])
-        in_data, in_padd = in_payload[8:-2], in_payload[-2:]
+        in_data = in_payload[8:-2]
+        in_padding = in_payload[-2:]
 
-        if in_padd != b"\x00\x00":
+        if in_padding != b"\x00\x00":
             raise ClientError("Неправильное заполнение.")
         if in_id == -1:
             raise InvalidPassword("Неверный пароль.")
-        if in_type == typen:  # Проверка отклоняет дубляж пакета (мб)
-            raise ClientError("Получен пакет с неправильным типом.")
 
-        data = in_data.decode("utf8")
-        return data
+        return in_data.decode("utf8")
 
     async def send(self, cmd):
-        result = await self._send(2, cmd)
-        return result
+        return await self._send(2, cmd)
 
 
 Vanilla = MinecraftClient(
     host=config.tokens.modes.vanilla.host,
     port=config.tokens.modes.vanilla.port,
-    password=config.tokens.modes.vanilla.password
+    password=config.tokens.modes.vanilla.password,
 )
 Oneblock = MinecraftClient(
     host=config.tokens.modes.oneblock.host,
     port=config.tokens.modes.oneblock.port,
-    password=config.tokens.modes.oneblock.password
+    password=config.tokens.modes.oneblock.password,
 )
