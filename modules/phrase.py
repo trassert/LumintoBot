@@ -645,6 +645,12 @@ game_topic_warning = (
     "🎮 : Пожалуйста, играйте в мини-игры в другом топике:\n"
     f"**[Мини-игры](https://t.me/lumintomc/{config.chats.topics.games})**"
 )
+online = (
+    "**📝 : Онлайн**\n"
+    "\n"
+    "Ванилла - **{vanilla_count}**: {vanilla_list}\n"
+    "Oneblock - **{oneblock_count}**: {oneblock_list}"
+)
 
 
 all_arg = ["весь", "вся", "общий", "всего"]
