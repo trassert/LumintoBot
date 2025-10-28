@@ -1,6 +1,10 @@
 import aiohttp
 import asyncio
 
+from loguru import logger
+
+logger.info(f"Загружен модуль {__name__}!")
+
 
 def check_nodes_status(data):
     try:

@@ -126,7 +126,6 @@ async def vanilla_mcrcon(event: Message):
         mode = mcrcon.Oneblock
     else:
         mode = mcrcon.Vanilla
-    logger.info(f"Выполняется команда: {command}")
     try:
         async with mode as rcon:
             resp = formatter.rm_colors(await rcon.send(command))

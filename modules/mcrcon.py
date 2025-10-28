@@ -3,6 +3,10 @@ import struct
 
 from . import config
 
+from loguru import logger
+
+logger.info(f"Загружен модуль {__name__}!")
+
 
 class ClientError(Exception):
     pass
@@ -98,6 +102,7 @@ class MinecraftClient:
         return in_data.decode("utf8")
 
     async def send(self, cmd):
+        logger.info(f"RCON: {cmd}")
         return await self._send(2, cmd)
 
 
