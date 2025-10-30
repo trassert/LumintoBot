@@ -1,3 +1,4 @@
+import math
 import matplotlib.pyplot as plt
 import seaborn as sns
 import matplotlib.dates as mdates
@@ -13,6 +14,12 @@ logger.info(f"Загружен модуль {__name__}!")
 
 font_properties = font_manager.FontEntry(fname=pathes.font, name="minecraft")
 font_manager.fontManager.ttflist.append(font_properties)
+
+
+def getsigint(num_points: int) -> int:
+    return max(
+        1, num_points // max(2, int(math.log10(num_points / 5) * 20 + 2))
+    )
 
 
 def create_plot(data_dict, output_file=pathes.chart, time_range_days=None):
@@ -101,7 +108,7 @@ def create_plot(data_dict, output_file=pathes.chart, time_range_days=None):
     n = 0
 
     for date, value in zip(dates, values):
-        if n % 2 == 0:
+        if n % getsigint(len(dates)) == 0:
             ax.text(
                 date,
                 value + 5,
