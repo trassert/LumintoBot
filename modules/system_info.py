@@ -1,16 +1,16 @@
-import psutil
-import platform
-
 import asyncio
-
+import platform
 from time import time
-from . import config
+
+import psutil
 from loguru import logger
+
+from . import config
 
 logger.info(f"Загружен модуль {__name__}!")
 
 if platform.system() == "Windows":
-    import WinTmp # type: ignore
+    import WinTmp  # type: ignore
 
     logger.info("Система - Windows, использую WinTMP")
 

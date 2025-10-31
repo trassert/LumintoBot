@@ -1,10 +1,10 @@
 import asyncio
+from datetime import datetime, timedelta
 
-from datetime import timedelta, datetime
-
-from .telegram.client import client
-from . import config, phrase, formatter, db, ports
 from loguru import logger
+
+from . import config, db, formatter, phrase, ports
+from .telegram.client import client
 
 logger.info(f"Загружен модуль {__name__}!")
 
@@ -35,7 +35,7 @@ async def rewards():
                 phrase.stat.gift.format(
                     user=top[0],
                     gift=formatter.value_to_str(
-                        config.coofs.ActiveGift, "изумруд"
+                        config.coofs.ActiveGift, "изумруд",
                     ),
                 ),
             )
@@ -80,6 +80,6 @@ async def port_checks():
         except Exception as e:
             logger.error(f"Ошибка при проверке порта: {e}")
             await client.send_message(
-                entity=config.chats.staff, message=phrase.port.false
+                entity=config.chats.staff, message=phrase.port.false,
             )
             await asyncio.sleep(60)

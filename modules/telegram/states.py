@@ -1,23 +1,22 @@
-import re
 import asyncio
-
-from telethon.tl.custom import Message
-from telethon import events
-from telethon.tl.types import (
-    ReplyInlineMarkup,
-    KeyboardButtonRow,
-    KeyboardButtonCallback,
-)
-from telethon import errors as TGErrors
-from random import choice
+import re
 from os import path
+from random import choice
 
-from .client import client
-from .global_checks import checks
-from .func import get_name, get_id
-
-from .. import config, phrase, formatter, db, pathes
 from loguru import logger
+from telethon import errors as TGErrors
+from telethon import events
+from telethon.tl.custom import Message
+from telethon.tl.types import (
+    KeyboardButtonCallback,
+    KeyboardButtonRow,
+    ReplyInlineMarkup,
+)
+
+from .. import config, db, formatter, pathes, phrase
+from .client import client
+from .func import get_id, get_name
+from .global_checks import checks
 
 logger.info(f"Загружен модуль {__name__}!")
 
@@ -91,8 +90,8 @@ async def state_make(event: Message):
                     KeyboardButtonCallback(
                         text="🏰 Создать государство",
                         data=f"state.m.{event.sender_id}.{arg.capitalize()}".encode(),
-                    )
-                ]
+                    ),
+                ],
             ],
         )
     except TGErrors.ButtonDataInvalidError:
@@ -136,10 +135,10 @@ async def state_enter(event: Message):
                             KeyboardButtonCallback(
                                 text=f"✅ Оплатить вход ({state.price})",
                                 data=f"state.pay.{state.name}".encode(),
-                            )
-                        ]
-                    )
-                ]
+                            ),
+                        ],
+                    ),
+                ],
             ),
         )
     players = state.players
@@ -179,7 +178,7 @@ async def state_get(event: Message):
         state_name = ""
     if state_name == "":
         check = db.states.if_player(event.sender_id) or db.states.if_author(
-            event.sender_id
+            event.sender_id,
         )
         if check is False:
             return await event.reply(phrase.state.no_name)
@@ -217,7 +216,7 @@ async def state_get(event: Message):
 @client.on(events.NewMessage(pattern=r"(?i)^/ливнуть", func=checks))
 @client.on(events.NewMessage(pattern=r"(?i)^/покинуть госво", func=checks))
 @client.on(
-    events.NewMessage(pattern=r"(?i)^/покинуть государство", func=checks)
+    events.NewMessage(pattern=r"(?i)^/покинуть государство", func=checks),
 )
 @client.on(events.NewMessage(pattern=r"(?i)^выйти из государства", func=checks))
 @client.on(events.NewMessage(pattern=r"(?i)^выйти из госва", func=checks))
@@ -234,7 +233,7 @@ async def state_leave(event: Message):
     await client.send_message(
         entity=config.chats.chat,
         message=phrase.state.leave_player.format(
-            state=state_name, player=db.nicks(id=event.sender_id).get()
+            state=state_name, player=db.nicks(id=event.sender_id).get(),
         ),
         reply_to=config.chats.topics.rp,
     )
@@ -242,7 +241,7 @@ async def state_leave(event: Message):
         await client.send_message(
             entity=config.chats.chat,
             message=phrase.state.down.format(
-                name=state.name, type="Государство"
+                name=state.name, type="Государство",
             ),
             reply_to=config.chats.topics.rp,
         )
@@ -260,11 +259,11 @@ async def state_leave(event: Message):
 @client.on(events.NewMessage(pattern=r"(?i)^/уничтожить госво", func=checks))
 @client.on(events.NewMessage(pattern=r"(?i)^/удалить госво", func=checks))
 @client.on(
-    events.NewMessage(pattern=r"(?i)^/уничтожить государство", func=checks)
+    events.NewMessage(pattern=r"(?i)^/уничтожить государство", func=checks),
 )
 @client.on(events.NewMessage(pattern=r"(?i)^/удалить государство", func=checks))
 @client.on(
-    events.NewMessage(pattern=r"(?i)^уничтожить государство", func=checks)
+    events.NewMessage(pattern=r"(?i)^уничтожить государство", func=checks),
 )
 @client.on(events.NewMessage(pattern=r"(?i)^удалить государство", func=checks))
 @client.on(events.NewMessage(pattern=r"(?i)^/г уничтожить", func=checks))
@@ -280,13 +279,13 @@ async def state_rem(event: Message):
                     KeyboardButtonCallback(
                         text=phrase.state.rem_button,
                         data=f"state.remove.{state_name}".encode(),
-                    )
-                ]
-            )
-        ]
+                    ),
+                ],
+            ),
+        ],
     )
     return await event.reply(
-        phrase.state.rem_message.format(name=state_name), buttons=keyboard
+        phrase.state.rem_message.format(name=state_name), buttons=keyboard,
     )
 
 
@@ -298,11 +297,11 @@ async def state_desc_empty(event: Message):
 
 
 @client.on(
-    events.NewMessage(pattern=r"(?i)^/г описание\s([\s\S]+)", func=checks)
+    events.NewMessage(pattern=r"(?i)^/г описание\s([\s\S]+)", func=checks),
 )
 @client.on(events.NewMessage(pattern=r"(?i)^/о госве\s([\s\S]+)", func=checks))
 @client.on(
-    events.NewMessage(pattern=r"(?i)^/г о госве\s([\s\S]+)", func=checks)
+    events.NewMessage(pattern=r"(?i)^/г о госве\s([\s\S]+)", func=checks),
 )
 async def state_desc(event: Message):
     state_name = db.states.if_author(event.sender_id)
@@ -311,7 +310,7 @@ async def state_desc(event: Message):
     new_desc = event.pattern_match.group(1).strip()
     if len(new_desc) > config.coofs.DescriptionsMaxLen:
         return await event.reply(
-            phrase.state.max_len.format(config.coofs.DescriptionsMaxLen)
+            phrase.state.max_len.format(config.coofs.DescriptionsMaxLen),
         )
     db.state(state_name).change("desc", new_desc)
     return await event.reply(phrase.state.change_desc)
@@ -355,7 +354,7 @@ async def state_enter_arg(event: Message):
             return await event.reply(phrase.state.already_open)
         state.change("enter", True)
         return await event.reply(phrase.state.enter_open)
-    elif arg in [
+    if arg in [
         "нет",
         "-",
         "запретить",
@@ -369,17 +368,16 @@ async def state_enter_arg(event: Message):
             return await event.reply(phrase.state.already_close)
         state.change("enter", False)
         return await event.reply(phrase.state.enter_close)
-    elif arg.isdigit():
+    if arg.isdigit():
         arg = int(arg)
         state.change("price", arg)
         state.change("enter", True)
         return await event.reply(
             phrase.state.enter_price.format(
-                formatter.value_to_str(arg, "изумруд")
-            )
+                formatter.value_to_str(arg, "изумруд"),
+            ),
         )
-    else:
-        return await event.reply(phrase.state.howto_enter)
+    return await event.reply(phrase.state.howto_enter)
 
 
 @client.on(events.NewMessage(pattern=r"(?i)^/г входы$", func=checks))
@@ -394,13 +392,13 @@ async def state_enter_empty(event: Message):
             state.change("price", 0)
         state.change("enter", False)
         return await event.reply(phrase.state.enter_close)
-    elif state.enter is False:
+    if state.enter is False:
         state.change("enter", True)
         return await event.reply(phrase.state.enter_open)
 
 
 @client.on(
-    events.NewMessage(pattern=r"(?i)^/пополнить казну (.+)", func=checks)
+    events.NewMessage(pattern=r"(?i)^/пополнить казну (.+)", func=checks),
 )
 @client.on(events.NewMessage(pattern=r"(?i)^/г пополнить (.+)", func=checks))
 @client.on(events.NewMessage(pattern=r"(?i)^\+казна (.+)", func=checks))
@@ -426,15 +424,15 @@ async def state_add_money(event: Message):
     if arg > balance:
         return await event.reply(
             phrase.money.not_enough.format(
-                formatter.value_to_str(balance, "изумруд")
-            )
+                formatter.value_to_str(balance, "изумруд"),
+            ),
         )
     db.add_money(event.sender_id, -arg)
     state = db.state(state_name)
     state.change("money", state.money + arg)
     logger.info(f"Казна {state_name} пополнена на {arg}")
     return await event.reply(
-        phrase.state.add_treasury.format(formatter.value_to_str(arg, "изумруд"))
+        phrase.state.add_treasury.format(formatter.value_to_str(arg, "изумруд")),
     )
 
 
@@ -447,7 +445,7 @@ async def state_add_money_empty(event: Message):
 
 
 @client.on(
-    events.NewMessage(pattern=r"(?i)^/забрать из казны\s(.+)", func=checks)
+    events.NewMessage(pattern=r"(?i)^/забрать из казны\s(.+)", func=checks),
 )
 @client.on(events.NewMessage(pattern=r"(?i)^/г снять\s(.+)", func=checks))
 @client.on(events.NewMessage(pattern=r"(?i)^\-казна\s(.+)", func=checks))
@@ -473,7 +471,7 @@ async def state_rem_money(event: Message):
     state.change("money", state.money - arg)
     db.add_money(event.sender_id, arg)
     return await event.reply(
-        phrase.state.rem_treasury.format(formatter.value_to_str(arg, "изумруд"))
+        phrase.state.rem_treasury.format(formatter.value_to_str(arg, "изумруд")),
     )
 
 
@@ -505,7 +503,7 @@ async def state_kick_user(event: Message):
         await client.send_message(
             entity=config.chats.chat,
             message=phrase.state.down.format(
-                name=state.name, type="Государство"
+                name=state.name, type="Государство",
             ),
             reply_to=config.chats.topics.rp,
         )
@@ -520,12 +518,12 @@ async def state_kick_user(event: Message):
     await client.send_message(
         entity=config.chats.chat,
         message=choice(phrase.state.kicked_rp).format(
-            state=state_name, player=await get_name(user, minecraft=True)
+            state=state_name, player=await get_name(user, minecraft=True),
         ),
         reply_to=config.chats.topics.rp,
     )
     return await event.reply(
-        phrase.state.kicked.format(await get_name(user, minecraft=True))
+        phrase.state.kicked.format(await get_name(user, minecraft=True)),
     )
 
 
@@ -550,7 +548,7 @@ async def state_kick_user_empty(event: Message):
         await client.send_message(
             entity=config.chats.chat,
             message=phrase.state.down.format(
-                name=state.name, type="Государство"
+                name=state.name, type="Государство",
             ),
             reply_to=config.chats.topics.rp,
         )
@@ -565,12 +563,12 @@ async def state_kick_user_empty(event: Message):
     await client.send_message(
         entity=config.chats.chat,
         message=choice(phrase.state.kicked_rp).format(
-            state=state_name, player=db.nicks(id=event.sender_id).get()
+            state=state_name, player=db.nicks(id=event.sender_id).get(),
         ),
         reply_to=config.chats.topics.rp,
     )
     return await event.reply(
-        phrase.state.kicked.format(await get_name(user, minecraft=True))
+        phrase.state.kicked.format(await get_name(user, minecraft=True)),
     )
 
 
@@ -591,8 +589,8 @@ async def state_rename(event: Message):
             KeyboardButtonCallback(
                 text=phrase.state.button_rename,
                 data=f"state.rn.{new_name}.{event.sender_id}".encode(),
-            )
-        ]
+            ),
+        ],
     ]
     return await event.reply(
         phrase.state.rename.format(new_name.capitalize()),
@@ -611,6 +609,6 @@ async def state_pic(event: Message):
     if not event.photo:
         return await event.reply(phrase.state.no_pic)
     await event.download_media(
-        file=path.join(pathes.states_pic, f"{state_name}.png")
+        file=path.join(pathes.states_pic, f"{state_name}.png"),
     )
     return await event.reply(phrase.state.pic_set)

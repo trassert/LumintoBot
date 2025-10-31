@@ -1,13 +1,12 @@
 import re
 
+from loguru import logger
 from telethon import events
 from telethon.tl.custom import Message
 
+from .. import db, phrase
 from .client import client
 from .global_checks import checks
-
-from .. import db, phrase
-from loguru import logger
 
 logger.info(f"Загружен модуль {__name__}!")
 

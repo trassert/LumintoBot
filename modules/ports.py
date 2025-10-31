@@ -1,6 +1,6 @@
-import aiohttp
 import asyncio
 
+import aiohttp
 from loguru import logger
 
 logger.info(f"Загружен модуль {__name__}!")
@@ -20,12 +20,12 @@ async def check_port(ip: str, port: int) -> bool:
         headers={"Accept": "application/json"},
     ) as session:
         async with session.get(
-            f"https://check-host.net/check-tcp?host={ip}:{port}&max_nodes=2"
+            f"https://check-host.net/check-tcp?host={ip}:{port}&max_nodes=2",
         ) as response:
             if response.status == 200:
                 data = await response.json()
         await asyncio.sleep(5)
         async with session.get(
-            f"https://check-host.net/check-result/{data['request_id']}"
+            f"https://check-host.net/check-result/{data['request_id']}",
         ) as response:
             return check_nodes_status(await response.json())

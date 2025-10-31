@@ -1,7 +1,7 @@
+from loguru import logger
 from telethon.sync import TelegramClient
 
 from .. import config, pathes
-from loguru import logger
 
 logger.info(f"Загружен модуль {__name__}!")
 client = TelegramClient(
@@ -17,4 +17,20 @@ client = TelegramClient(
     retry_delay=2,
 )
 
-from . import actions, admins, ai, base, callbacks, func, games, global_checks, shop, states, statistic, tickets, notes, referrals, mailing  # noqa: E402, F401
+from . import (  # noqa: E402, F401
+    actions,
+    admins,
+    ai,
+    base,
+    callbacks,
+    func,
+    games,
+    global_checks,
+    mailing,
+    notes,
+    referrals,
+    shop,
+    states,
+    statistic,
+    tickets,
+)

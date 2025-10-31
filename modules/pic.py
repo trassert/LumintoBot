@@ -1,8 +1,9 @@
-from random import choice
 from os import listdir, path
+from random import choice
+
+from loguru import logger
 
 from . import pathes
-from loguru import logger
 
 logger.info(f"Загружен модуль {__name__}!")
 

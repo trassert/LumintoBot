@@ -1,18 +1,17 @@
+from random import choice
+
+from loguru import logger
 from telethon import events
 from telethon.tl.custom import Message
 from telethon.tl.types import (
-    ReplyInlineMarkup,
-    KeyboardButtonRow,
     KeyboardButtonCallback,
+    KeyboardButtonRow,
+    ReplyInlineMarkup,
 )
 
-from random import choice
-
+from .. import db, formatter, phrase, task_gen
 from .client import client
 from .global_checks import checks
-
-from .. import phrase, formatter, db, task_gen
-from loguru import logger
 
 logger.info(f"Загружен модуль {__name__}!")
 
@@ -30,23 +29,23 @@ async def shop(event: Message):
             KeyboardButtonRow(
                 [
                     KeyboardButtonCallback(
-                        text="1️⃣", data=f"shop.0.{version}".encode()
+                        text="1️⃣", data=f"shop.0.{version}".encode(),
                     ),
                     KeyboardButtonCallback(
-                        text="2️⃣", data=f"shop.1.{version}".encode()
+                        text="2️⃣", data=f"shop.1.{version}".encode(),
                     ),
                     KeyboardButtonCallback(
-                        text="3️⃣", data=f"shop.2.{version}".encode()
+                        text="3️⃣", data=f"shop.2.{version}".encode(),
                     ),
                     KeyboardButtonCallback(
-                        text="4️⃣", data=f"shop.3.{version}".encode()
+                        text="4️⃣", data=f"shop.3.{version}".encode(),
                     ),
                     KeyboardButtonCallback(
-                        text="5️⃣", data=f"shop.4.{version}".encode()
+                        text="5️⃣", data=f"shop.4.{version}".encode(),
                     ),
-                ]
-            )
-        ]
+                ],
+            ),
+        ],
     )
     shop = db.get_shop()
     theme = shop["theme"]

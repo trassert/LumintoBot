@@ -1,13 +1,13 @@
 import math
+from datetime import datetime, timedelta
+
+import matplotlib.dates as mdates
 import matplotlib.pyplot as plt
 import seaborn as sns
-import matplotlib.dates as mdates
-
-from datetime import datetime, timedelta
+from loguru import logger
 from matplotlib import font_manager
 
 from . import pathes
-from loguru import logger
 
 logger.info(f"Загружен модуль {__name__}!")
 
@@ -18,13 +18,12 @@ font_manager.fontManager.ttflist.append(font_properties)
 
 def getsigint(num_points: int) -> int:
     return max(
-        1, num_points // max(2, int(math.log10(num_points / 5) * 20 + 2))
+        1, num_points // max(2, int(math.log10(num_points / 5) * 20 + 2)),
     )
 
 
 def create_plot(data_dict, output_file=pathes.chart, time_range_days=None):
-    "Фукнция для создания линейного графика"
-
+    """Фукнция для создания линейного графика"""
     "Данные"
     dates = [datetime.strptime(date, "%Y.%m.%d") for date in data_dict.keys()]
     values = list(data_dict.values())
@@ -41,7 +40,7 @@ def create_plot(data_dict, output_file=pathes.chart, time_range_days=None):
     }
     label_font = {"fontproperties": prop, "fontsize": 11, "color": "white"}
     tick_font = {"fontproperties": prop, "fontsize": 10, "color": "lightgray"}
-    logger.info("Загружен шрифт {}".format(font_properties.name))
+    logger.info(f"Загружен шрифт {font_properties.name}")
 
     "Фильтрация данных"
     if time_range_days is not None:
@@ -49,11 +48,11 @@ def create_plot(data_dict, output_file=pathes.chart, time_range_days=None):
         cutoff_date = today - timedelta(days=time_range_days)
         filtered_data = [
             (date, value)
-            for date, value in zip(dates, values)
+            for date, value in zip(dates, values, strict=False)
             if date >= cutoff_date
         ]
         if filtered_data:
-            dates, values = zip(*filtered_data)
+            dates, values = zip(*filtered_data, strict=False)
         else:
             dates, values = [], []
 
@@ -107,7 +106,7 @@ def create_plot(data_dict, output_file=pathes.chart, time_range_days=None):
     "Подписи"
     n = 0
 
-    for date, value in zip(dates, values):
+    for date, value in zip(dates, values, strict=False):
         if n % getsigint(len(dates)) == 0:
             ax.text(
                 date,

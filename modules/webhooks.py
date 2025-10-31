@@ -1,13 +1,13 @@
-import aiohttp
 import asyncio
+from hashlib import md5, sha1
+
+import aiohttp
 import aiohttp.web
-
-from hashlib import sha1, md5
-
-from . import config, db, phrase, formatter, ai
-from .telegram.client import client
-from .telegram import func
 from loguru import logger
+
+from . import ai, config, db, formatter, phrase
+from .telegram import func
+from .telegram.client import client
 
 logger.info(f"Загружен модуль {__name__}!")
 
@@ -28,13 +28,13 @@ async def server():
             logger.warning(f"Должен быть: {sign}")
             logger.warning(f"Имеется: {hash}")
             return aiohttp.web.Response(
-                text="Переданные данные не прошли проверку.", status=401
+                text="Переданные данные не прошли проверку.", status=401,
             )
         tg_id = db.nicks(nick=nick).get()
         if tg_id is not None:
             db.add_money(tg_id, 10)
             give = phrase.vote_money.format(
-                formatter.value_to_str(10, "изумруд")
+                formatter.value_to_str(10, "изумруд"),
             )
         else:
             give = ""
@@ -52,20 +52,20 @@ async def server():
         time = load["time"]
         logger.warning(f"{username} проголосовал в {time} с хешем {sign}")
         hash = md5(
-            f"{username}|{time}|{config.tokens.mcservers}".encode()
+            f"{username}|{time}|{config.tokens.mcservers}".encode(),
         ).hexdigest()
         if sign != hash:
             logger.warning("Хеш не совпал!")
             logger.warning(f"Должен быть: {sign}")
             logger.warning(f"Имеется: {hash}")
             return aiohttp.web.Response(
-                text="Переданные данные не прошли проверку.", status=401
+                text="Переданные данные не прошли проверку.", status=401,
             )
         tg_id = db.nicks(nick=username).get()
         if tg_id is not None:
             db.add_money(tg_id, 10)
             give = phrase.vote_money.format(
-                formatter.value_to_str(10, "изумруд")
+                formatter.value_to_str(10, "изумруд"),
             )
         else:
             give = ""
@@ -118,7 +118,7 @@ async def server():
 
     async def github(request: aiohttp.web.Request):
         load: dict = await request.json()
-        commits = load.get("commits", None)
+        commits = load.get("commits")
         if commits is None:
             return aiohttp.web.Response(text="Неверный запрос", status=400)
         for head in commits:
@@ -146,7 +146,7 @@ async def server():
             aiohttp.web.get("/bank", bank),
             aiohttp.web.get("/genai", genai),
             aiohttp.web.get("/", status),
-        ]
+        ],
     )
     runner = aiohttp.web.AppRunner(app)
     try:

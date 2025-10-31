@@ -1,18 +1,18 @@
-import re
 import random
+import re
 
-from telethon.tl.functions.users import GetFullUserRequest
+from loguru import logger
 from telethon.tl import types
+from telethon.tl.functions.users import GetFullUserRequest
 
 from .. import db
 from .client import client
-from loguru import logger
 
 logger.info(f"Загружен модуль {__name__}!")
 
 
 async def get_name(id, push=False, minecraft=False):
-    "Выдает имя + фамилия, либо @пуш"
+    """Выдает имя + фамилия, либо @пуш"""
     try:
         if minecraft is True:
             nick = db.nicks(id=int(id)).get()
@@ -21,15 +21,13 @@ async def get_name(id, push=False, minecraft=False):
         user_name = await client.get_entity(int(id))
         if user_name.username is not None and push:
             return f"@{user_name.username}"
-        elif user_name.username is None or not push:
+        if user_name.username is None or not push:
             fn = user_name.first_name.replace("[", "(").replace("]", ")")
             if user_name.last_name is None:
                 return f"[{fn}](tg://user?id={id})"
-            else:
-                ln = user_name.last_name.replace("[", "(").replace("]", ")")
-                return f"[{fn} {ln}](tg://user?id={id})"
-        else:
-            return f"@{user_name.username}"
+            ln = user_name.last_name.replace("[", "(").replace("]", ")")
+            return f"[{fn} {ln}](tg://user?id={id})"
+        return f"@{user_name.username}"
     except Exception:
         return "Неопознанный персонаж"
 
@@ -54,7 +52,7 @@ async def make_quiz_poll(answers: list, correct_answer_id: int, question: str) -
             poll=types.Poll(
                 id=random.randint(1, 100000),
                 question=types.TextWithEntities(
-                    text=question, entities=[]
+                    text=question, entities=[],
                 ),
                 answers=[
                     types.PollAnswer(
@@ -71,7 +69,7 @@ async def make_quiz_poll(answers: list, correct_answer_id: int, question: str) -
                         option=bytes([correct_answer_id]),
                         voters=0,
                         correct=True,
-                    )
+                    ),
                 ],
             ),
         ),

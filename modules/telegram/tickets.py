@@ -1,12 +1,11 @@
+from loguru import logger
 from telethon import events
 from telethon.tl.custom import Message
 
+from .. import db, formatter, phrase
 from .client import client
-from .global_checks import checks
 from .func import get_name
-
-from .. import phrase, formatter, db
-from loguru import logger
+from .global_checks import checks
 
 logger.info(f"Загружен модуль {__name__}!")
 
@@ -29,15 +28,15 @@ async def do_ticket(event: Message):
     if balance < arg:
         return await event.reply(
             phrase.money.not_enough.format(
-                formatter.value_to_str(balance, "изумруд")
-            )
+                formatter.value_to_str(balance, "изумруд"),
+            ),
         )
     db.add_money(event.sender_id, -arg)
     ticket_id = db.ticket.add(event.sender_id, arg)
     return await event.reply(
         phrase.ticket.added.format(
-            value=arg, author=await get_name(event.sender_id), id=ticket_id
-        )
+            value=arg, author=await get_name(event.sender_id), id=ticket_id,
+        ),
     )
 
 
@@ -59,5 +58,5 @@ async def get_ticket(event: Message):
         phrase.ticket.got.format(
             author=await get_name(ticket_info["author"]),
             value=formatter.value_to_str(ticket_info["value"], "изумруд"),
-        )
+        ),
     )

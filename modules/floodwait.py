@@ -1,14 +1,15 @@
 from time import time
 
-from . import config
 from loguru import logger
+
+from . import config
 
 logger.info(f"Загружен модуль {__name__}!")
 
 
 class FloodWaitBase:
     def __init__(
-        self, name="FloodWaitSys", timer=5, exit_multiplier=3, lasttime=time()
+        self, name="FloodWaitSys", timer=5, exit_multiplier=3, lasttime=time(),
     ):
         logger.info(f"ФлудВайт: {name} инициализирован")
         self.time = lasttime

@@ -1,5 +1,5 @@
-from telethon import events
 from loguru import logger
+from telethon import events
 
 from .. import db, phrase
 from . import func

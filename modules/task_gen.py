@@ -1,11 +1,13 @@
 import asyncio
 import time
+from collections.abc import Callable
+from datetime import datetime, timedelta
+from datetime import time as dt_time
+from typing import Any, Literal, Union
+
 import aiofiles
 import orjson
-
 from loguru import logger
-from datetime import datetime, time as dt_time, timedelta
-from typing import Union, Callable, Optional, Literal, Dict, Any
 
 from . import pathes
 
@@ -16,15 +18,15 @@ TaskParam = Union[int, str]
 
 
 class Generator:
-    _instances: Dict[str, "Generator"] = {}
+    _instances: dict[str, "Generator"] = {}
 
     def __init__(self, key_name: str, filename: str = pathes.tasks):
         self.key_name = key_name
         self.filename = filename
-        self._task: Optional[asyncio.Task] = None
-        self._task_type: Optional[TaskType] = None
-        self._task_param: Optional[TaskParam] = None
-        self._next_run_timestamp: Optional[float] = None
+        self._task: asyncio.Task | None = None
+        self._task_type: TaskType | None = None
+        self._task_param: TaskParam | None = None
+        self._next_run_timestamp: float | None = None
         logger.info(f"Инициализирован таск-ген {self.key_name}")
         Generator._instances[key_name] = self
 
@@ -43,7 +45,7 @@ class Generator:
             self._task_type = None
             self._task_param = None
             raise ValueError(
-                "Параметр времени должен быть int (часы) или str (HH:MM)"
+                "Параметр времени должен быть int (часы) или str (HH:MM)",
             )
 
     async def _create_interval_task(self, func: Callable, hours: int) -> None:
@@ -60,7 +62,7 @@ class Generator:
             self._next_run_timestamp = last_run + interval_seconds
 
         self._task = asyncio.create_task(
-            self._interval_worker(func, interval_seconds)
+            self._interval_worker(func, interval_seconds),
         )
 
     async def _create_daily_task(self, func: Callable, time_str: str) -> None:
@@ -123,7 +125,7 @@ class Generator:
             target_datetime += timedelta(days=1)
         return target_datetime.timestamp()
 
-    async def _get_all_data(self) -> Dict[str, Any]:
+    async def _get_all_data(self) -> dict[str, Any]:
         """Получает все данные из файла"""
         try:
             async with aiofiles.open(self.filename, "rb") as f:
@@ -132,7 +134,7 @@ class Generator:
         except (FileNotFoundError, orjson.JSONDecodeError):
             return {}
 
-    async def _get_task_data(self) -> Dict[str, Any]:
+    async def _get_task_data(self) -> dict[str, Any]:
         """Получает данные конкретной задачи из файла"""
         all_data = await self._get_all_data()
         return all_data.get(self.key_name, {})
@@ -149,9 +151,8 @@ class Generator:
         async with aiofiles.open(self.filename, "wb") as f:
             await f.write(orjson.dumps(all_data))
 
-    async def info(self) -> Optional[float]:
-        """
-        Возвращает время в секундах до следующего запуска.
+    async def info(self) -> float | None:
+        """Возвращает время в секундах до следующего запуска.
         Корректный расчет благодаря хранению _next_run_timestamp.
         """
         if not self._task or not self._next_run_timestamp:

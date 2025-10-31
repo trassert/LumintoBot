@@ -1,12 +1,11 @@
-import pandas as pd
 import numpy as np
 import orjson
-
+import pandas as pd
 from google import genai
-from google.genai import types, chats
-
-from . import config, phrase, pathes
+from google.genai import chats, types
 from loguru import logger
+
+from . import config, pathes, phrase
 
 logger.info(f"Загружен модуль {__name__}!")
 
@@ -65,7 +64,7 @@ def get_content(query: str, dataframe: pd.DataFrame, model: str) -> str:
     )
 
     dot_products = np.dot(
-        np.stack(dataframe.embeddings), query_embedding.embeddings[0].values
+        np.stack(dataframe.embeddings), query_embedding.embeddings[0].values,
     )
 
     best_passage_index = np.argmax(dot_products)
@@ -78,7 +77,7 @@ async def get_player_chat(player: str) -> chats.AsyncChat:
         return players[player]
     players[player] = mc_client.aio.chats.create(model=model)
     await players[player].send_message(
-        phrase.ai.minecraft_prompt.format(player=player)
+        phrase.ai.minecraft_prompt.format(player=player),
     )
     return players[player]
 
@@ -86,6 +85,6 @@ async def get_player_chat(player: str) -> chats.AsyncChat:
 async def embedding_request(text: str, user: str | int, chat=chat) -> str:
     return (
         await chat.send_message(
-            f"{user}: {text}\nКонтекст: {get_content(text, embeddings_df, embedding_model)}"
+            f"{user}: {text}\nКонтекст: {get_content(text, embeddings_df, embedding_model)}",
         )
     ).text

@@ -1,13 +1,12 @@
-from telethon.tl.custom import Message
+from loguru import logger
 from telethon import events
+from telethon.tl.custom import Message
 from telethon.tl.functions.users import GetFullUserRequest
 
+from .. import db, formatter, mcrcon, phrase
+from . import func
 from .client import client
 from .global_checks import checks
-from . import func
-
-from .. import phrase, formatter, db, mcrcon
-from loguru import logger
 
 logger.info(f"Загружен модуль {__name__}!")
 
@@ -19,8 +18,8 @@ async def add_balance(event: Message):
     if roles.get(event.sender_id) < roles.ADMIN:
         return await event.reply(
             phrase.roles.no_perms.format(
-                level=roles.ADMIN, name=phrase.roles.admin
-            )
+                level=roles.ADMIN, name=phrase.roles.admin,
+            ),
         )
     args = event.pattern_match.group(1).strip().split()
     try:
@@ -28,26 +27,26 @@ async def add_balance(event: Message):
         user = await client(GetFullUserRequest(tag))
     except IndexError:
         return await event.reply(
-            phrase.money.no_people + phrase.money.change_balance_use
+            phrase.money.no_people + phrase.money.change_balance_use,
         )
     except ValueError:
         return await event.reply(
-            phrase.money.no_such_people + phrase.money.change_balance_use
+            phrase.money.no_such_people + phrase.money.change_balance_use,
         )
     try:
         new = int(args[0])
     except IndexError:
         return await event.reply(
-            phrase.money.no_count + phrase.money.change_balance_use
+            phrase.money.no_count + phrase.money.change_balance_use,
         )
     except ValueError:
         return await event.reply(
-            phrase.money.nan_count + phrase.money.change_balance_use
+            phrase.money.nan_count + phrase.money.change_balance_use,
         )
     old = await db.get_money(user.full_user.id)
     db.add_money(user.full_user.id, new)
     await event.reply(
-        phrase.money.add_money.format(name=tag, old=old, new=old + new)
+        phrase.money.add_money.format(name=tag, old=old, new=old + new),
     )
 
 
@@ -58,8 +57,8 @@ async def add_staff(event: Message):
     if roles.get(event.sender_id) < roles.OWNER:
         return await event.reply(
             phrase.roles.no_perms.format(
-                level=roles.OWNER, name=phrase.roles.owner
-            )
+                level=roles.OWNER, name=phrase.roles.owner,
+            ),
         )
     arg = event.pattern_match.group(1).strip()
     try:
@@ -77,7 +76,7 @@ async def add_staff(event: Message):
     new_role = roles.get(user) + 1
     roles.set(user, new_role)
     return await event.reply(
-        phrase.perms.upgrade.format(nick=tag, staff=new_role)
+        phrase.perms.upgrade.format(nick=tag, staff=new_role),
     )
 
 
@@ -88,8 +87,8 @@ async def del_staff(event: Message):
     if roles.get(event.sender_id) < roles.OWNER:
         return await event.reply(
             phrase.roles.no_perms.format(
-                level=roles.OWNER, name=phrase.roles.owner
-            )
+                level=roles.OWNER, name=phrase.roles.owner,
+            ),
         )
     arg = event.pattern_match.group(1).strip()
     try:
@@ -107,7 +106,7 @@ async def del_staff(event: Message):
     new_role = roles.get(user) - 1
     roles.set(user, new_role)
     return await event.reply(
-        phrase.perms.downgrade.format(nick=tag, staff=new_role)
+        phrase.perms.downgrade.format(nick=tag, staff=new_role),
     )
 
 
@@ -118,8 +117,8 @@ async def vanilla_mcrcon(event: Message):
     if roles.get(event.sender_id) < roles.ADMIN:
         return await event.reply(
             phrase.roles.no_perms.format(
-                level=roles.ADMIN, name=phrase.roles.admin
-            )
+                level=roles.ADMIN, name=phrase.roles.admin,
+            ),
         )
     command = event.pattern_match.group(1).strip()
     if event.text[0] == "o":
@@ -136,7 +135,7 @@ async def vanilla_mcrcon(event: Message):
             if len(resp) > 4096:
                 for x in range(0, len(resp), 4096):
                     await event.reply(f"```{resp[x : x + 4096]}```")
-                return
+                return None
             return await event.reply(f"```{resp}```")
     except TimeoutError:
         return await event.reply(phrase.server.stopped)
@@ -150,7 +149,7 @@ async def whitelist(event: Message):
     roles = db.roles()
     if roles.get(event.sender_id) < roles.VIP:
         return await event.reply(
-            phrase.roles.no_perms.format(level=roles.VIP, name=phrase.roles.vip)
+            phrase.roles.no_perms.format(level=roles.VIP, name=phrase.roles.vip),
         )
     if event.text[0] == "-":
         command = f"nwl remove name {event.pattern_match.group(1).strip()}"
@@ -162,7 +161,7 @@ async def whitelist(event: Message):
             resp = formatter.rm_colors(await rcon.send(command)).strip()
             logger.info(f"Ответ команды:\n{resp}")
             return await event.reply(
-                f"‼️ Команда скоро будет выведена!\n✍🏻 : {resp}"
+                f"‼️ Команда скоро будет выведена!\n✍🏻 : {resp}",
             )
     except TimeoutError:
         return await event.reply(phrase.server.stopped)

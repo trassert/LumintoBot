@@ -1,11 +1,10 @@
 import asyncio
 
-from vkbottle.bot import Message
-from typing import Optional
-
-from .. import config, phrase, ai, floodwait, formatter
-from .client import bot
 from loguru import logger
+from vkbottle.bot import Message
+
+from .. import ai, config, floodwait, formatter, phrase
+from .client import bot
 
 logger.info(f"Загружен модуль {__name__}!")
 
@@ -13,7 +12,7 @@ WaitAI = floodwait.FloodWaitBase("WaitAI", config.flood.ai)
 
 
 @bot.on.message(text="/ии <prompt>")
-async def ai_message(message: Message, prompt: Optional[str] = None):
+async def ai_message(message: Message, prompt: str | None = None):
     if prompt is None:
         return await message.reply(phrase.ai.no_resp)
     request = WaitAI.request()

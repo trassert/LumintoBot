@@ -1,13 +1,12 @@
 import asyncio
 
-from telethon.tl.custom import Message
+from loguru import logger
 from telethon import events
+from telethon.tl.custom import Message
 
+from .. import ai, config, floodwait, formatter, phrase
 from .client import client
 from .global_checks import checks
-
-from .. import phrase, ai, config, floodwait, formatter
-from loguru import logger
 
 logger.info(f"Загружен модуль {__name__}!")
 
@@ -37,7 +36,7 @@ async def gemini(event: Message):
     default: Message = await event.reply(
         phrase.wait.ai_full.format(
             "" if request == 0 else f" (~{request} сек.)",
-        )
+        ),
     )
     await asyncio.sleep(request)
 

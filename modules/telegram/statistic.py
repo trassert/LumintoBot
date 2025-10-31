@@ -1,12 +1,11 @@
-from telethon.tl.custom import Message
-from telethon import events
-
-from .client import client
-from .global_checks import checks
-from .func import get_name
-
-from .. import config, phrase, db, pathes, formatter, chart, mcrcon
 from loguru import logger
+from telethon import events
+from telethon.tl.custom import Message
+
+from .. import chart, config, db, formatter, mcrcon, pathes, phrase
+from .client import client
+from .func import get_name
+from .global_checks import checks
 
 logger.info(f"Загружен модуль {__name__}!")
 
@@ -43,7 +42,7 @@ async def active_check(event: Message):
                 text += f"{n}. {data[0]} - {data[1]}\n"
                 n += 1
             return await client.send_file(
-                event.chat_id, pathes.chart, caption=text
+                event.chat_id, pathes.chart, caption=text,
             )
     except ValueError:
         text = phrase.stat.chat.format("день")
@@ -80,8 +79,8 @@ async def crocodile_wins(event: Message):
 async def all_money(event: Message):
     return await event.reply(
         phrase.money.all_money.format(
-            formatter.value_to_str(db.get_all_money(), "изумруд")
-        )
+            formatter.value_to_str(db.get_all_money(), "изумруд"),
+        ),
     )
 
 
@@ -112,15 +111,15 @@ async def server_top_list(event: Message):
                         number=number,
                         nickname=(
                             await rcon.send(
-                                f"papi parse --null %PTM_nickname_top_{number}%"
+                                f"papi parse --null %PTM_nickname_top_{number}%",
                             )
                         ).strip(),
                         playtime=(
                             await rcon.send(
-                                f"papi parse --null %PTM_playtime_top_{number}:luminto%"
+                                f"papi parse --null %PTM_playtime_top_{number}:luminto%",
                             )
                         ).strip(),
-                    )
+                    ),
                 )
         return await event.reply("\n".join(text))
     except TimeoutError:

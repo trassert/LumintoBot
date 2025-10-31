@@ -1,10 +1,9 @@
+from loguru import logger
 from telethon import events
 
+from .. import config, db, formatter, phrase
 from .client import client
 from .func import get_name
-
-from .. import config, phrase, formatter, db
-from loguru import logger
 
 logger.info(f"Загружен модуль {__name__}!")
 
@@ -14,12 +13,12 @@ async def chat_action(event: events.ChatAction.Event):
     user_name = await get_name(event.user_id, push=False)
     if event.user_left:
         return await client.send_message(
-            config.chats.chat, phrase.chataction.leave.format(user_name)
+            config.chats.chat, phrase.chataction.leave.format(user_name),
         )
-    elif event.user_joined or event.user_added:
+    if event.user_joined or event.user_added:
         if formatter.check_zalgo(user_name) > 50:
             await client.edit_permissions(
-                config.chats.chat, event.user_id, send_messages=False
+                config.chats.chat, event.user_id, send_messages=False,
             )
             return await client.send_message(
                 config.chats.chat,
@@ -28,8 +27,8 @@ async def chat_action(event: events.ChatAction.Event):
             )
         if db.hellomsg_check(event.user_id) is False:
             logger.info(f"{event.user_id} вступил, но приветствие уже было.")
-            return
+            return None
         logger.info(f"Новый участник в чате - {event.user_id}")
         return await client.send_message(
-            config.chats.chat, phrase.chataction.hello.format(user_name)
+            config.chats.chat, phrase.chataction.hello.format(user_name),
         )

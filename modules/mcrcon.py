@@ -1,9 +1,9 @@
 import asyncio
 import struct
 
-from . import config
-
 from loguru import logger
+
+from . import config
 
 logger.info(f"Загружен модуль {__name__}!")
 
@@ -30,7 +30,7 @@ class MinecraftClient:
     async def __aenter__(self):
         if not self._connected:
             self._reader, self._writer = await asyncio.open_connection(
-                self.host, self.port
+                self.host, self.port,
             )
             self._connected = True
             await self._authenticate()

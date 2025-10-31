@@ -1,26 +1,25 @@
-from .client import client
-from .global_checks import checks
-
+from loguru import logger
 from telethon import events
 from telethon.tl.custom import Message
 
 from .. import db, phrase
-from loguru import logger
+from .client import client
+from .global_checks import checks
 
 logger.info(f"Загружен модуль {__name__}!")
 
 
 @client.on(
-    events.NewMessage(pattern=r"(?i)^\+нот (.+)\n([\s\S]+)", func=checks)
+    events.NewMessage(pattern=r"(?i)^\+нот (.+)\n([\s\S]+)", func=checks),
 )
 @client.on(
-    events.NewMessage(pattern=r"(?i)^\+note (.+)\n([\s\S]+)", func=checks)
+    events.NewMessage(pattern=r"(?i)^\+note (.+)\n([\s\S]+)", func=checks),
 )
 async def add_note(event: Message):
     roles = db.roles()
     if roles.get(event.sender_id) < roles.VIP:
         return await event.reply(
-            phrase.roles.no_perms.format(level=roles.VIP, name=phrase.roles.vip)
+            phrase.roles.no_perms.format(level=roles.VIP, name=phrase.roles.vip),
         )
     if (
         db.Notes().create(
@@ -30,7 +29,7 @@ async def add_note(event: Message):
         is True
     ):
         return await event.reply(
-            phrase.notes.new.format(event.pattern_match.group(1).strip())
+            phrase.notes.new.format(event.pattern_match.group(1).strip()),
         )
     return await event.reply(phrase.notes.already_added)
 
@@ -41,7 +40,7 @@ async def add_note_notext(event: Message):
     roles = db.roles()
     if roles.get(event.sender_id) < roles.VIP:
         return await event.reply(
-            phrase.roles.no_perms.format(level=roles.VIP, name=phrase.roles.vip)
+            phrase.roles.no_perms.format(level=roles.VIP, name=phrase.roles.vip),
         )
     return await event.reply(phrase.notes.notext)
 
@@ -52,7 +51,7 @@ async def add_note_noname(event: Message):
     roles = db.roles()
     if roles.get(event.sender_id) < roles.VIP:
         return await event.reply(
-            phrase.roles.no_perms.format(level=roles.VIP, name=phrase.roles.vip)
+            phrase.roles.no_perms.format(level=roles.VIP, name=phrase.roles.vip),
         )
     return await event.reply(phrase.notes.noname)
 
@@ -70,7 +69,7 @@ async def get_note(event: Message):
                 link_preview=False,
             )
         return await client.send_message(
-            event.chat_id, note_text, reply_to=event.id, link_preview=False
+            event.chat_id, note_text, reply_to=event.id, link_preview=False,
         )
 
 
@@ -92,7 +91,7 @@ async def del_note(event: Message):
     roles = db.roles()
     if roles.get(event.sender_id) < roles.VIP:
         return await event.reply(
-            phrase.roles.no_perms.format(level=roles.VIP, name=phrase.roles.vip)
+            phrase.roles.no_perms.format(level=roles.VIP, name=phrase.roles.vip),
         )
     if not db.Notes().remove(event.pattern_match.group(1).strip()):
         return await event.reply(phrase.notes.not_found)

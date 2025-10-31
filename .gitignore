@@ -18,3 +18,5 @@ map.html
 tokens.yml
 chats.yml
 vars.yml
+
+ruff.toml

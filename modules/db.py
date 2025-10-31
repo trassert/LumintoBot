@@ -1,25 +1,23 @@
-import orjson
-import asyncmy
-import aiofiles
-
-from typing import Dict, List, Optional
-from datetime import datetime, timedelta
-from os import path, listdir, replace, makedirs, remove
-from time import time
-from random import choice, randint
 from collections import defaultdict
+from datetime import datetime, timedelta
 from json import JSONDecodeError
+from os import listdir, makedirs, path, remove, replace
+from random import choice, randint
+from time import time
 
-from . import config, pathes
-from .get_theme import weighted_choice
-from . import formatter
+import aiofiles
+import asyncmy
+import orjson
 from loguru import logger
+
+from . import config, formatter, pathes
+from .get_theme import weighted_choice
 
 logger.info(f"Загружен модуль {__name__}!")
 
 
 def database(key, value=None, delete=None, log=True):
-    "Изменить/получить ключ из настроек"
+    """Изменить/получить ключ из настроек"""
     if value is not None:
         if log:
             logger.info(f"Значение {key} теперь {value}")
@@ -83,7 +81,7 @@ async def get_money(id):
 
 
 def get_all_money():
-    "Получить все деньги"
+    """Получить все деньги"""
     with open(pathes.money, "rb") as f:
         load = orjson.loads(f.read())
         return sum(load.values())
@@ -100,8 +98,7 @@ def add_money(id, count):
             old = 0
             load[id] = count
 
-    if load[id] < 0:
-        load[id] = 0
+    load[id] = max(load[id], 0)
     with open(pathes.money, "wb") as f:
         f.write(orjson.dumps(load, option=orjson.OPT_INDENT_2))
         logger.info(f"Изменён баланс {id} ({old} -> {load[id]})")
@@ -109,7 +106,7 @@ def add_money(id, count):
 
 
 def update_shop():
-    "Обновляет магазин"
+    """Обновляет магазин"""
     "Возвращает тему магазина"
     with open(path.join("db", "shop_current.json"), "rb") as f:
         last_theme = orjson.loads(f.read())["theme"]
@@ -166,13 +163,13 @@ class roles:
     OWNER = 5
 
     def get(self, id: str) -> int:
-        "Получить роль пользователя (U0, если не найдено)"
+        """Получить роль пользователя (U0, если не найдено)"""
         id = str(id)
         with open(pathes.roles, "rb") as f:
             return orjson.loads(f.read()).get(str(id), self.USER)
 
     def set(self, id: str, role: int) -> bool:
-        "Установить роль пользователя"
+        """Установить роль пользователя"""
         id = str(id)
         role = int(role)
         with open(pathes.roles, "rb") as f:
@@ -183,7 +180,7 @@ class roles:
                 orjson.dumps(
                     dict(sorted(data.items(), key=lambda x: (-x[1], x[0]))),
                     option=orjson.OPT_INDENT_2,
-                )
+                ),
             )
 
 
@@ -197,11 +194,10 @@ class crocodile_stat:
             load = orjson.loads(f.read())
         if self.id in load:
             return load[self.id]
-        else:
-            with open(pathes.crocostat, "wb") as f:
-                load[self.id] = 0
-                f.write(orjson.dumps(load, option=orjson.OPT_SORT_KEYS))
-            return 0
+        with open(pathes.crocostat, "wb") as f:
+            load[self.id] = 0
+            f.write(orjson.dumps(load, option=orjson.OPT_SORT_KEYS))
+        return 0
 
     def add(self):
         with open(pathes.crocostat, "rb") as f:
@@ -217,7 +213,7 @@ class crocodile_stat:
         with open(pathes.crocostat, "rb") as f:
             load = orjson.loads(f.read())
         return dict(
-            sorted(load.items(), key=lambda item: item[1], reverse=True)
+            sorted(load.items(), key=lambda item: item[1], reverse=True),
         )
 
 
@@ -268,7 +264,7 @@ class statistic:
         self.days = days
 
     def get(self, nick, all_days=False, data=False):
-        "Выдаст статистику по заданным аргументам"
+        """Выдаст статистику по заданным аргументам"""
         now = datetime.now().strftime("%Y.%m.%d")
 
         # Если нет файла
@@ -297,7 +293,7 @@ class statistic:
             return sum(filtered_data.values()) or 0
 
     def get_all(self, all_days=False):
-        "Выдаст игрок: сообщения за days дней"
+        """Выдаст игрок: сообщения за days дней"""
         "Если all_days указан, выдаст все дни"
         data = {}
         for file in listdir(pathes.stats):
@@ -308,7 +304,7 @@ class statistic:
         return sorted(data.items(), key=lambda item: item[1], reverse=True)
 
     def add(nick, date=None):
-        "+1 в статистику игрока"
+        """+1 в статистику игрока"""
         "datе указывать при перерасчёте и т.д."
 
         now = date if date else datetime.now().strftime("%Y.%m.%d")
@@ -331,7 +327,7 @@ class statistic:
             f.write(orjson.dumps(stats, option=orjson.OPT_SORT_KEYS))
 
     def get_raw(self) -> dict[str, int]:
-        "Выдаёт {дата: сообщения} от всех"
+        """Выдаёт {дата: сообщения} от всех"""
         "Если days не указан, выдаст все"
         totals = defaultdict(int)
         for json_file in listdir(pathes.stats):
@@ -391,10 +387,10 @@ class ticket:
                             random_id: {
                                 "author": int(author),
                                 "value": int(value),
-                            }
+                            },
                         },
                         option=orjson.OPT_SORT_KEYS,
-                    )
+                    ),
                 )
             return random_id
 
@@ -403,8 +399,7 @@ class ticket:
             data = orjson.loads(f.read())
             if id not in data:
                 return None
-            else:
-                del data[id]
+            del data[id]
         with open(pathes.tickets, "wb") as f:
             f.write(orjson.dumps(data, option=orjson.OPT_INDENT_2))
             return True
@@ -437,19 +432,18 @@ class state:
     def rename(self, new_name: str):
         if path.exists(path.join(pathes.states, f"{new_name}.json")):
             return False
-        else:
-            replace(
-                path.join(pathes.states, f"{self.name}.json"),
-                path.join(pathes.states, f"{new_name}.json"),
-            )
-            self.name = new_name
-            self._info()
+        replace(
+            path.join(pathes.states, f"{self.name}.json"),
+            path.join(pathes.states, f"{new_name}.json"),
+        )
+        self.name = new_name
+        self._info()
 
 
 class states:
     def add(name, author):
         if path.exists(path.join(pathes.states, f"{name}.json")):
-            return
+            return None
         with open(path.join(pathes.states, f"{name}.json"), "wb") as f:
             f.write(
                 orjson.dumps(
@@ -465,7 +459,7 @@ class states:
                         "coordinates": "Не найдено",
                     },
                     option=orjson.OPT_INDENT_2,
-                )
+                ),
             )
             return True
 
@@ -565,42 +559,40 @@ class Mysql:
             maxsize=self.maxsize,
         )
 
-    async def get_by_id(self, id: int) -> Dict[str, int]:
-        async with self.pool.acquire() as conn:
-            async with conn.cursor() as cur:
-                await cur.execute(
-                    f"""
+    async def get_by_id(self, id: int) -> dict[str, int]:
+        async with self.pool.acquire() as conn, conn.cursor() as cur:
+            await cur.execute(
+                f"""
                 SELECT wins_casino, lose_moneys_in_casino 
                 FROM {self.table_name} 
                 WHERE id = %s
                 """,
-                    (id,),
-                )
-                result = await cur.fetchone()
-                if result:
-                    return {
-                        "wins_casino": result[0],
-                        "lose_moneys_in_casino": result[1],
-                    }
-                return {"wins_casino": 0, "lose_moneys_in_casino": 0}
+                (id,),
+            )
+            result = await cur.fetchone()
+            if result:
+                return {
+                    "wins_casino": result[0],
+                    "lose_moneys_in_casino": result[1],
+                }
+            return {"wins_casino": 0, "lose_moneys_in_casino": 0}
 
-    async def get_all(self) -> Dict[int, Dict[str, int]]:
-        async with self.pool.acquire() as conn:
-            async with conn.cursor() as cur:
-                await cur.execute(
-                    f"""
+    async def get_all(self) -> dict[int, dict[str, int]]:
+        async with self.pool.acquire() as conn, conn.cursor() as cur:
+            await cur.execute(
+                f"""
                 SELECT id, wins_casino, lose_moneys_in_casino 
                 FROM {self.table_name}
-                """
-                )
-                results = await cur.fetchall()
-                return {
-                    row[0]: {
-                        "wins_casino": row[1],
-                        "lose_moneys_in_casino": row[2],
-                    }
-                    for row in results
+                """,
+            )
+            results = await cur.fetchall()
+            return {
+                row[0]: {
+                    "wins_casino": row[1],
+                    "lose_moneys_in_casino": row[2],
                 }
+                for row in results
+            }
 
     async def add_win(self, id: int):
         async with self.pool.acquire() as conn:
@@ -652,7 +644,7 @@ class Notes:
         file_path = self._get_file_path(name.lower())
         if not path.exists(file_path):
             return None
-        with open(file_path, "r", encoding="utf8") as f:
+        with open(file_path, encoding="utf8") as f:
             return f.read()
 
     def create(self, name: str, text: str):
@@ -698,18 +690,17 @@ def check_withdraw_limit(id: int, amount: int) -> int | bool:
                 data = {}
     if str(id) in data:
         record_date = datetime.strptime(
-            data[str(id)]["date"], "%Y-%m-%d"
+            data[str(id)]["date"], "%Y-%m-%d",
         ).date()
         if record_date == today:
             already_withdrawn = data[str(id)]["withdrawn"]
             remaining = 64 - already_withdrawn
             if amount > remaining:
                 return remaining
-            else:
-                data[str(id)] = {
-                    "date": today.isoformat(),
-                    "withdrawn": already_withdrawn + amount,
-                }
+            data[str(id)] = {
+                "date": today.isoformat(),
+                "withdrawn": already_withdrawn + amount,
+            }
         else:
             # Дата устарела, сбрасываем счетчик
             data[str(id)] = {"date": today.isoformat(), "withdrawn": amount}
@@ -767,7 +758,7 @@ class CitiesGame:
         self.data_file = pathes.cities
         self.data = self._load_data()
 
-    def _load_data(self) -> Dict:
+    def _load_data(self) -> dict:
         """Загружает данные из JSON файла или создаёт новый, если файла нет"""
         if path.exists(self.data_file):
             with open(self.data_file, "rb") as f:
@@ -791,7 +782,7 @@ class CitiesGame:
         with open(self.data_file, "wb") as f:
             f.write(orjson.dumps(self.data, option=orjson.OPT_INDENT_2))
 
-    def get_players(self) -> List[int]:
+    def get_players(self) -> list[int]:
         """Возвращает список ID игроков в текущем раунде"""
         return self.data["current_game"]["players"]
 
@@ -803,8 +794,7 @@ class CitiesGame:
             self._save_data()
 
     def rem_player(self, player_id: int):
-        """
-        Удаляет игрока из текущего раунда
+        """Удаляет игрока из текущего раунда
         Если игрок остался один, то игра завершается
         """
         self.next_answer()
@@ -814,7 +804,7 @@ class CitiesGame:
         self._save_data()
         return self.who_answer()
 
-    def who_answer(self) -> Optional[int]:
+    def who_answer(self) -> int | None:
         """Возвращает ID игрока, который должен отвечать сейчас"""
         players = self.get_players()
         if not players:
@@ -828,7 +818,7 @@ class CitiesGame:
         if not players:
             return False
         index = self.data["current_game"]["players"].index(
-            self.data["current_game"]["current_player_id"]
+            self.data["current_game"]["current_player_id"],
         )
         try:
             self.data["current_game"]["current_player_id"] = self.data[
@@ -839,18 +829,18 @@ class CitiesGame:
                 "current_game"
             ]["players"][0]
         self.logger(
-            f"Очередь игрока {self.data['current_game']['current_player_id']} отвечать"
+            f"Очередь игрока {self.data['current_game']['current_player_id']} отвечать",
         )
         self._save_data()
 
-    def get_all_stat(self) -> Dict[int, int]:
+    def get_all_stat(self) -> dict[int, int]:
         """Возвращает отсортированную статистику по убыванию побед"""
         return dict(
             sorted(
                 self.data["statistics"].items(),
                 key=lambda item: item[1],
                 reverse=True,
-            )
+            ),
         )
 
     def end_game(self):
@@ -876,11 +866,11 @@ class CitiesGame:
         self.data["current_game"]["last_city"] = city
         self.logger(f"Запущена игра Города. Начинается с города {city}")
         self.data["current_game"]["current_player_id"] = choice(
-            self.get_players()
+            self.get_players(),
         )
         self.logger(f"Игроки: {self.get_players()}")
         self.logger(
-            f"Отвечает: {self.data['current_game']['current_player_id']}"
+            f"Отвечает: {self.data['current_game']['current_player_id']}",
         )
         self._save_data()
         return self.data
@@ -894,15 +884,15 @@ class CitiesGame:
             self.logger(f"{id} сейчас не должен отвечать")
             return 2
         if city not in open(pathes.chk_city, encoding="utf8").read().split(
-            "\n"
+            "\n",
         ):
             self.logger(f"{id} ответил неизвестным городом")
             return 1
         if city[0] != formatter.city_last_letter(
-            self.data["current_game"]["last_city"]
+            self.data["current_game"]["last_city"],
         ):
             self.logger(
-                f"{id} ответил городом с разными буквами ({city[0]} != {self.data['current_game']['last_city'][-1]})"
+                f"{id} ответил городом с разными буквами ({city[0]} != {self.data['current_game']['last_city'][-1]})",
             )
             return 4
         if city in self.data["current_game"]["cities"]:
@@ -917,7 +907,7 @@ class CitiesGame:
         self._save_data()
         return 0
 
-    def get_last_city(self) -> Optional[str]:
+    def get_last_city(self) -> str | None:
         """Возвращает последний названный город"""
         return self.data["current_game"]["last_city"]
 
@@ -932,7 +922,7 @@ class CitiesGame:
 
 
 def hellomsg_check(input_id):
-    "Проверка, приветствовался ли человек ранее."
+    """Проверка, приветствовался ли человек ранее."""
     id_str = str(input_id)
     ids_set = list()
     if path.exists(pathes.hellomsg):

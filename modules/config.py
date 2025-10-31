@@ -1,6 +1,6 @@
-from bestconfig import Config
-
 from os import path
+
+from bestconfig import Config
 from loguru import logger
 
 logger.info(f"Загружен модуль {__name__}!")
