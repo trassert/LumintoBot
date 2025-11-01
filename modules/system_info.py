@@ -4,7 +4,6 @@ from time import time
 
 import psutil
 from loguru import logger
-
 from . import config
 
 logger.info(f"Загружен модуль {__name__}!")
@@ -103,11 +102,3 @@ async def get_system_info() -> str:
         Выгрузка: {network[1]} Мбит/с
         ↳ Нагрузка: ≈{round(((network[0] + network[1]) / config.coofs.EthernetChannel) * 100, 1)} %
     """
-
-
-if __name__ == "__main__":
-
-    async def main() -> None:
-        pass
-
-    asyncio.run(main())
