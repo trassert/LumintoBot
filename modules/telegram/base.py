@@ -50,10 +50,7 @@ async def help(event: Message):
 async def ping(event: Message):
     arg = event.pattern_match.group(1).strip()
     ping = round(time() - event.date.timestamp(), 2)
-    if ping <= 0:
-        ping = phrase.ping.min
-    else:
-        ping = f"за {ping!s} сек."
+    ping = phrase.ping.min if ping <= 0 else f"за {ping!s} сек."
     all_servers_ping = []
     if arg in [
         "all",
@@ -233,9 +230,9 @@ async def word_request(event: Message):
 
 
 @client.on(events.NewMessage(pattern=r"(?i)^/слова\s([\s\S]+)", func=checks))
-async def word_requests(event: Message):
+async def word_requests(event: Message) -> None:
     words = event.pattern_match.group(1).strip().lower().split()
-    words = list(map(lambda x: x.strip(), words))
+    words = [x.strip() for x in words]
     words = [word for word in words if word]
     text = ""
     message = await event.reply(phrase.word.checker)
@@ -507,7 +504,7 @@ async def get_balance(event: Message):
     events.NewMessage(pattern=r"(?i)^/линкник (\S+)\s*(\S*)$", func=checks),
 )
 async def link_nick(event: Message):
-    if not event.chat_id == config.chats.chat:
+    if event.chat_id != config.chats.chat:
         return await event.reply(phrase.nick.chat)
     nick = event.pattern_match.group(1).strip()
     refcode = event.pattern_match.group(2).strip()
@@ -572,6 +569,7 @@ async def link_nick(event: Message):
                 amount=config.coofs.RefGift,
             ),
         )
+    return None
 
 
 @client.on(events.NewMessage(pattern=r"(?i)^/linknick$", func=checks))
@@ -580,7 +578,7 @@ async def link_nick(event: Message):
 @client.on(events.NewMessage(pattern=r"(?i)^/новый ник$", func=checks))
 @client.on(events.NewMessage(pattern=r"(?i)^/линкник$", func=checks))
 async def link_nick_empty(event: Message):
-    if not event.chat_id == config.chats.chat:
+    if event.chat_id != config.chats.chat:
         return await event.reply(phrase.nick.chat)
     return await event.reply(phrase.nick.not_select)
 
@@ -588,7 +586,7 @@ async def link_nick_empty(event: Message):
 @client.on(events.NewMessage(pattern=r"(?i)^/серв$", func=checks))
 @client.on(events.NewMessage(pattern=r"(?i)^/сервер", func=checks))
 @client.on(events.NewMessage(pattern=r"(?i)^/server", func=checks))
-async def sysinfo(event: Message):
+async def sysinfo(event: Message) -> None:
     await event.reply(await get_system_info())
 
 
@@ -709,9 +707,9 @@ async def cities_request(event: Message):
 
 
 @client.on(events.NewMessage(pattern=r"(?i)^\+города\s([\s\S]+)", func=checks))
-async def cities_requests(event: Message):
+async def cities_requests(event: Message) -> None:
     words = event.pattern_match.group(1).strip().lower().split("\n")
-    words = list(map(lambda x: x.strip(), words))
+    words = [x.strip() for x in words]
     words = [word for word in words if word]
     text = ""
     message = await event.reply(phrase.cities.checker)

@@ -64,7 +64,8 @@ def get_content(query: str, dataframe: pd.DataFrame, model: str) -> str:
     )
 
     dot_products = np.dot(
-        np.stack(dataframe.embeddings), query_embedding.embeddings[0].values,
+        np.stack(dataframe.embeddings),
+        query_embedding.embeddings[0].values,
     )
 
     best_passage_index = np.argmax(dot_products)

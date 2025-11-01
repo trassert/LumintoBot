@@ -11,7 +11,7 @@ logger.info(f"Загружен модуль {__name__}!")
 
 
 async def send_to_subscribers(message_text):
-    """Отправка сообщения всем подписчикам"""
+    """Отправка сообщения всем подписчикам."""
     data = db.mailing_get()
     subscribers = data.get("subscribers", [])
 
@@ -47,11 +47,12 @@ async def admin_broadcast(event: Message):
             await send_to_subscribers(event.pattern_match.group(1).strip()),
         ),
     )
+    return None
 
 
 @client.on(events.NewMessage(pattern=r"(?i)^\+обновления"))
 async def subscribe_command(event: Message):
-    """Обработчик команды подписки"""
+    """Обработчик команды подписки."""
     data = db.mailing_get()
     subscribers = data.get("subscribers", [])
 
@@ -65,7 +66,7 @@ async def subscribe_command(event: Message):
 
 @client.on(events.NewMessage(pattern=r"(?i)^\/отписаться$"))
 async def unsubscribe_command(event: Message):
-    """Обработчик команды отписки"""
+    """Обработчик команды отписки."""
     data = db.mailing_get()
     subscribers = data.get("subscribers", [])
 

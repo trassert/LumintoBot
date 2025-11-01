@@ -1,4 +1,5 @@
 import asyncio
+import contextlib
 import struct
 
 from loguru import logger
@@ -17,7 +18,7 @@ class InvalidPassword(Exception):
 
 
 class MinecraftClient:
-    def __init__(self, host, port, password):
+    def __init__(self, host, port, password) -> None:
         self.host = host
         self.port = port
         self.password = password
@@ -40,19 +41,17 @@ class MinecraftClient:
     async def __aexit__(self, exc_type, exc, tb):
         await self.close()
 
-    async def close(self):
+    async def close(self) -> None:
         if self._writer and not self._writer.is_closing():
             self._writer.close()
-            try:
+            with contextlib.suppress(Exception):
                 await self._writer.wait_closed()
-            except Exception:
-                pass
         self._connected = False
         self._auth = False
         self._reader = None
         self._writer = None
 
-    async def _authenticate(self):
+    async def _authenticate(self) -> None:
         if not self._auth:
             await self._send(3, self.password)
             self._auth = True
@@ -62,13 +61,15 @@ class MinecraftClient:
         while len(data) < length:
             packet = await self._reader.read(length - len(data))
             if not packet:
-                raise ClientError("Соединение разорвано")
+                msg = "Соединение разорвано"
+                raise ClientError(msg)
             data += packet
         return data
 
     async def _send(self, message_type, message):
         if not self._writer or self._writer.is_closing():
-            raise ClientError("Не подключён.")
+            msg = "Не подключён."
+            raise ClientError(msg)
 
         # Packet formatting - len(4) | id(4) | type(4) | тело | 00
         packet_id = 0
@@ -90,14 +91,16 @@ class MinecraftClient:
         in_payload = await self._read_data(in_length)
 
         # Parsing
-        in_id, in_type = struct.unpack("<ii", in_payload[:8])
+        in_id, _in_type = struct.unpack("<ii", in_payload[:8])
         in_data = in_payload[8:-2]
         in_padding = in_payload[-2:]
 
         if in_padding != b"\x00\x00":
-            raise ClientError("Неправильное заполнение.")
+            msg = "Неправильное заполнение."
+            raise ClientError(msg)
         if in_id == -1:
-            raise InvalidPassword("Неверный пароль.")
+            msg = "Неверный пароль."
+            raise InvalidPassword(msg)
 
         return in_data.decode("utf8")
 

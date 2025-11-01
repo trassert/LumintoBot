@@ -11,8 +11,8 @@ from .client import client
 logger.info(f"Загружен модуль {__name__}!")
 
 
-async def get_name(id, push=False, minecraft=False):
-    """Выдает имя + фамилия, либо @пуш"""
+async def get_name(id, push=False, minecraft=False) -> str | None:
+    """Выдает имя + фамилия, либо @пуш."""
     try:
         if minecraft is True:
             nick = db.nicks(id=int(id)).get()

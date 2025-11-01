@@ -395,6 +395,7 @@ async def state_enter_empty(event: Message):
     if state.enter is False:
         state.change("enter", True)
         return await event.reply(phrase.state.enter_open)
+    return None
 
 
 @client.on(

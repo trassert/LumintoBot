@@ -14,7 +14,7 @@ def check_nodes_status(data):
 
 
 async def check_port(ip: str, port: int) -> bool:
-    """Проверяет открыт ли порт через API check-host.net"""
+    """Проверяет открыт ли порт через API check-host.net."""
     async with aiohttp.ClientSession(
         timeout=aiohttp.ClientTimeout(total=5),
         headers={"Accept": "application/json"},

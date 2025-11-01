@@ -1,3 +1,5 @@
+import contextlib
+
 from loguru import logger
 from telethon import events
 from telethon.tl.custom import Message
@@ -67,7 +69,7 @@ async def crocodile_wins(event: Message):
     all = db.crocodile_stat.get_all()
     text = ""
     n = 1
-    for id in all.keys():
+    for id in all:
         if n > 10:
             break
         text += f"{n}. **{await get_name(id)}**: {all[id]} побед\n"
@@ -94,10 +96,8 @@ async def server_top_list(event: Message):
     arg: str = event.pattern_match.group(1).strip()
     n = 10
     if arg.isdigit():
-        try:
+        with contextlib.suppress(Exception):
             n = max(3, min(30, int(arg)))
-        except Exception:
-            pass
     try:
         text = [phrase.stat.server]
         async with mcrcon.MinecraftClient(

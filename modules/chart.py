@@ -18,14 +18,15 @@ font_manager.fontManager.ttflist.append(font_properties)
 
 def getsigint(num_points: int) -> int:
     return max(
-        1, num_points // max(2, int(math.log10(num_points / 5) * 20 + 2)),
+        1,
+        num_points // max(2, int(math.log10(num_points / 5) * 20 + 2)),
     )
 
 
-def create_plot(data_dict, output_file=pathes.chart, time_range_days=None):
-    """Фукнция для создания линейного графика"""
+def create_plot(data_dict, output_file=pathes.chart, time_range_days=None) -> None:
+    """Фукнция для создания линейного графика."""
     "Данные"
-    dates = [datetime.strptime(date, "%Y.%m.%d") for date in data_dict.keys()]
+    dates = [datetime.strptime(date, "%Y.%m.%d") for date in data_dict]
     values = list(data_dict.values())
 
     "Шрифт"
@@ -101,12 +102,10 @@ def create_plot(data_dict, output_file=pathes.chart, time_range_days=None):
     plt.xticks(rotation=90)
 
     "Cетка"
-    ax.grid(True, linestyle="--", alpha=0.5, color="#3d3d3d")
+    ax.grid(visible=True, linestyle="--", alpha=0.5, color="#3d3d3d")
 
     "Подписи"
-    n = 0
-
-    for date, value in zip(dates, values, strict=False):
+    for n, (date, value) in enumerate(zip(dates, values, strict=False)):
         if n % getsigint(len(dates)) == 0:
             ax.text(
                 date,
@@ -116,14 +115,13 @@ def create_plot(data_dict, output_file=pathes.chart, time_range_days=None):
                 va="bottom",
                 fontsize=9,
                 color="white",
-                bbox=dict(
-                    facecolor="#333333",
-                    alpha=0.7,
-                    edgecolor="none",
-                    boxstyle="round,pad=0.2",
-                ),
+                bbox={
+                    "facecolor": "#333333",
+                    "alpha": 0.7,
+                    "edgecolor": "none",
+                    "boxstyle": "round,pad=0.2",
+                },
             )
-        n += 1
     ax.set_facecolor("#1e1e1e")
     plt.tight_layout()
 

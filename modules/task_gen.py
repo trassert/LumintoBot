@@ -20,7 +20,7 @@ TaskParam = Union[int, str]
 class Generator:
     _instances: dict[str, "Generator"] = {}
 
-    def __init__(self, key_name: str, filename: str = pathes.tasks):
+    def __init__(self, key_name: str, filename: str = pathes.tasks) -> None:
         self.key_name = key_name
         self.filename = filename
         self._task: asyncio.Task | None = None
@@ -31,7 +31,7 @@ class Generator:
         Generator._instances[key_name] = self
 
     async def create(self, func: Callable, task_param: TaskParam) -> None:
-        """Создает периодическую задачу"""
+        """Создает периодическую задачу."""
         self.stop()
         if isinstance(task_param, int):
             self._task_type = "interval"
@@ -44,12 +44,13 @@ class Generator:
         else:
             self._task_type = None
             self._task_param = None
+            msg = "Параметр времени должен быть int (часы) или str (HH:MM)"
             raise ValueError(
-                "Параметр времени должен быть int (часы) или str (HH:MM)",
+                msg,
             )
 
     async def _create_interval_task(self, func: Callable, hours: int) -> None:
-        """Создает задачу с интервальным выполнением"""
+        """Создает задачу с интервальным выполнением."""
         interval_seconds = hours * 3600
         task_data = await self._get_task_data()
         last_run = task_data.get("last_run")
@@ -66,11 +67,12 @@ class Generator:
         )
 
     async def _create_daily_task(self, func: Callable, time_str: str) -> None:
-        """Создает задачу с ежедневным выполнением"""
+        """Создает задачу с ежедневным выполнением."""
         try:
             target_time = datetime.strptime(time_str, "%H:%M").time()
         except ValueError:
-            raise ValueError("Неверный формат времени. Используйте 'HH:MM'.")
+            msg = "Неверный формат времени. Используйте 'HH:MM'."
+            raise ValueError(msg)
 
         self._next_run_timestamp = self._get_next_daily_run(target_time)
         task_data = await self._get_task_data()
@@ -81,8 +83,8 @@ class Generator:
 
         self._task = asyncio.create_task(self._daily_worker(func, target_time))
 
-    async def _interval_worker(self, func: Callable, interval: int):
-        """Рабочий для интервальных задач"""
+    async def _interval_worker(self, func: Callable, interval: int) -> None:
+        """Рабочий для интервальных задач."""
         while True:
             current_time = time.time()
 
@@ -92,8 +94,8 @@ class Generator:
             await self._safe_execute(func)
             self._next_run_timestamp = time.time() + interval
 
-    async def _daily_worker(self, func: Callable, target_time: dt_time):
-        """Рабочий для ежедневных задач"""
+    async def _daily_worker(self, func: Callable, target_time: dt_time) -> None:
+        """Рабочий для ежедневных задач."""
         while True:
             current_time = time.time()
 
@@ -104,20 +106,20 @@ class Generator:
             self._next_run_timestamp = self._get_next_daily_run(target_time)
 
     async def _safe_execute(self, func: Callable) -> None:
-        """Безопасно выполняет функцию и сохраняет время запуска"""
+        """Безопасно выполняет функцию и сохраняет время запуска."""
         start_time = time.time()
         try:
             if asyncio.iscoroutinefunction(func):
                 await func()
             else:
                 await asyncio.get_event_loop().run_in_executor(None, func)
-        except Exception as e:
-            print(f"Ошибка выполнения задачи '{self.key_name}': {e}")
+        except Exception:
+            pass
         finally:
             await self._update_task_data(start_time)
 
     def _get_next_daily_run(self, target_time: dt_time) -> float:
-        """Вычисляет временную метку следующего запуска для ежедневной задачи"""
+        """Вычисляет временную метку следующего запуска для ежедневной задачи."""
         now = datetime.now()
         target_datetime = datetime.combine(now.date(), target_time)
 
@@ -126,7 +128,7 @@ class Generator:
         return target_datetime.timestamp()
 
     async def _get_all_data(self) -> dict[str, Any]:
-        """Получает все данные из файла"""
+        """Получает все данные из файла."""
         try:
             async with aiofiles.open(self.filename, "rb") as f:
                 content = await f.read()
@@ -135,12 +137,12 @@ class Generator:
             return {}
 
     async def _get_task_data(self) -> dict[str, Any]:
-        """Получает данные конкретной задачи из файла"""
+        """Получает данные конкретной задачи из файла."""
         all_data = await self._get_all_data()
         return all_data.get(self.key_name, {})
 
     async def _update_task_data(self, last_run_time: float) -> None:
-        """Обновляет время последнего запуска в файле"""
+        """Обновляет время последнего запуска в файле."""
         all_data = await self._get_all_data()
 
         all_data[self.key_name] = {
@@ -183,7 +185,7 @@ class Generator:
         return max(0, time_until_next)
 
     def stop(self) -> None:
-        """Останавливает задачу и сбрасывает внутренние состояния"""
+        """Останавливает задачу и сбрасывает внутренние состояния."""
         if self._task and not self._task.done():
             self._task.cancel()
         self._task = None
@@ -191,7 +193,7 @@ class Generator:
 
     @classmethod
     async def cleanup(cls) -> None:
-        """Останавливает все задачи"""
+        """Останавливает все задачи."""
         for instance in list(cls._instances.values()):
             instance.stop()
             del cls._instances[instance.key_name]

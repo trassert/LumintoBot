@@ -12,7 +12,7 @@ zalgo_pattern = re.compile(
 )
 
 
-def value_to_str(number, noun):
+def value_to_str(number, noun) -> str:
     """Склоняет существительное в соответствии с числом.
 
     Аргументы:

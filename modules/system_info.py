@@ -14,13 +14,13 @@ if platform.system() == "Windows":
 
     logger.info("Система - Windows, использую WinTMP")
 
-    def get_temperature():
+    def get_temperature() -> str:
         temp = WinTmp.CPU_Temps()
         return f"{round(max(temp))} | {round(sum(temp) / len(temp))} | {round(min(temp))}"
 else:
     logger.info("Система - Linux, использую psutil")
 
-    def get_temperature():
+    def get_temperature() -> str | None:
         try:
             temps = psutil.sensors_temperatures()
 
@@ -66,7 +66,7 @@ async def get_current_speed():
     return [round(download_speed_mbps, 2), round(upload_speed_mbps, 2)]
 
 
-async def get_system_info():
+async def get_system_info() -> str:
     boot_time = psutil.boot_time()
     current_time = time()
     uptime_seconds = current_time - boot_time
@@ -107,7 +107,7 @@ async def get_system_info():
 
 if __name__ == "__main__":
 
-    async def main():
-        print(await get_system_info())
+    async def main() -> None:
+        pass
 
     asyncio.run(main())

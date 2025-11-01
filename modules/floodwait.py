@@ -10,7 +10,7 @@ logger.info(f"Загружен модуль {__name__}!")
 class FloodWaitBase:
     def __init__(
         self, name="FloodWaitSys", timer=5, exit_multiplier=3, lasttime=time(),
-    ):
+    ) -> None:
         logger.info(f"ФлудВайт: {name} инициализирован")
         self.time = lasttime
         self.timer = timer

@@ -39,9 +39,10 @@ async def rewards():
                     ),
                 ),
             )
+    return None
 
 
-async def remove_states():
+async def remove_states() -> None:
     logger.info("Проверяем пустые государства..")
     states = db.states.get_all()
     today = datetime.now()
@@ -62,7 +63,7 @@ async def remove_states():
             )
 
 
-async def port_checks():
+async def port_checks() -> None:
     await asyncio.sleep(500)  # Ждать включения сервера
     ip = db.database("host")
     while True:

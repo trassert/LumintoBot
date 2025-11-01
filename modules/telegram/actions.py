@@ -32,3 +32,4 @@ async def chat_action(event: events.ChatAction.Event):
         return await client.send_message(
             config.chats.chat, phrase.chataction.hello.format(user_name),
         )
+    return None

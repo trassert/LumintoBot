@@ -17,7 +17,7 @@ logger.info(f"Загружен модуль {__name__}!")
 
 
 def database(key, value=None, delete=None, log=True):
-    """Изменить/получить ключ из настроек"""
+    """Изменить/получить ключ из настроек."""
     if value is not None:
         if log:
             logger.info(f"Значение {key} теперь {value}")
@@ -81,7 +81,7 @@ async def get_money(id):
 
 
 def get_all_money():
-    """Получить все деньги"""
+    """Получить все деньги."""
     with open(pathes.money, "rb") as f:
         load = orjson.loads(f.read())
         return sum(load.values())
@@ -106,7 +106,7 @@ def add_money(id, count):
 
 
 def update_shop():
-    """Обновляет магазин"""
+    """Обновляет магазин."""
     "Возвращает тему магазина"
     with open(path.join("db", "shop_current.json"), "rb") as f:
         last_theme = orjson.loads(f.read())["theme"]
@@ -135,8 +135,7 @@ def update_shop():
 
 def get_shop():
     with open(path.join("db", "shop_current.json"), "rb") as f:
-        load = orjson.loads(f.read())
-    return load
+        return orjson.loads(f.read())
 
 
 def ready_to_mine(id: str) -> bool:
@@ -163,13 +162,13 @@ class roles:
     OWNER = 5
 
     def get(self, id: str) -> int:
-        """Получить роль пользователя (U0, если не найдено)"""
+        """Получить роль пользователя (U0, если не найдено)."""
         id = str(id)
         with open(pathes.roles, "rb") as f:
             return orjson.loads(f.read()).get(str(id), self.USER)
 
     def set(self, id: str, role: int) -> bool:
-        """Установить роль пользователя"""
+        """Установить роль пользователя."""
         id = str(id)
         role = int(role)
         with open(pathes.roles, "rb") as f:
@@ -185,7 +184,7 @@ class roles:
 
 
 class crocodile_stat:
-    def __init__(self, id=False):
+    def __init__(self, id=False) -> None:
         if id:
             self.id = str(id)
 
@@ -199,7 +198,7 @@ class crocodile_stat:
             f.write(orjson.dumps(load, option=orjson.OPT_SORT_KEYS))
         return 0
 
-    def add(self):
+    def add(self) -> None:
         with open(pathes.crocostat, "rb") as f:
             load = orjson.loads(f.read())
         if self.id in load:
@@ -218,7 +217,7 @@ class crocodile_stat:
 
 
 class nicks:
-    def __init__(self, nick=None, id=None):
+    def __init__(self, nick=None, id=None) -> None:
         self.nick = nick
         self.id = id
 
@@ -239,14 +238,15 @@ class nicks:
                         return key
                 return if_nothing
         else:
-            raise TypeError("Нужен ник или id!")
+            msg = "Нужен ник или id!"
+            raise TypeError(msg)
 
     def get_all(self):
         with open(pathes.nick, "rb") as f:
             load = orjson.loads(f.read())
             return dict(sorted(load.items()))
 
-    def link(self):
+    def link(self) -> bool:
         with open(pathes.nick, "rb") as f:
             load = orjson.loads(f.read())
         for key, value in load.items():
@@ -260,11 +260,11 @@ class nicks:
 
 
 class statistic:
-    def __init__(self, days=1):
+    def __init__(self, days=1) -> None:
         self.days = days
 
     def get(self, nick, all_days=False, data=False):
-        """Выдаст статистику по заданным аргументам"""
+        """Выдаст статистику по заданным аргументам."""
         now = datetime.now().strftime("%Y.%m.%d")
 
         # Если нет файла
@@ -293,41 +293,41 @@ class statistic:
             return sum(filtered_data.values()) or 0
 
     def get_all(self, all_days=False):
-        """Выдаст игрок: сообщения за days дней"""
+        """Выдаст игрок: сообщения за days дней."""
         "Если all_days указан, выдаст все дни"
         data = {}
         for file in listdir(pathes.stats):
             nick = file.replace(".json", "")
-            nick_stat = self.get(nick, True if all_days else False)
+            nick_stat = self.get(nick, bool(all_days))
             if nick_stat > 1:
                 data[nick] = nick_stat
         return sorted(data.items(), key=lambda item: item[1], reverse=True)
 
-    def add(nick, date=None):
-        """+1 в статистику игрока"""
+    def add(self, date=None) -> None:
+        """+1 в статистику игрока."""
         "datе указывать при перерасчёте и т.д."
 
         now = date if date else datetime.now().strftime("%Y.%m.%d")
 
         # Если нет файла
-        if not path.exists(path.join(pathes.stats, f"{nick}.json")):
-            with open(path.join(pathes.stats, f"{nick}.json"), "wb") as f:
+        if not path.exists(path.join(pathes.stats, f"{self}.json")):
+            with open(path.join(pathes.stats, f"{self}.json"), "wb") as f:
                 stats = {}
                 stats[now] = 1
                 f.write(orjson.dumps(stats, option=orjson.OPT_SORT_KEYS))
 
         # Если есть файл
-        with open(path.join(pathes.stats, f"{nick}.json"), "rb") as f:
+        with open(path.join(pathes.stats, f"{self}.json"), "rb") as f:
             stats = orjson.loads(f.read())
             if now in stats:
                 stats[now] = stats[now] + 1
             else:
                 stats[now] = 1
-        with open(path.join(pathes.stats, f"{nick}.json"), "wb") as f:
+        with open(path.join(pathes.stats, f"{self}.json"), "wb") as f:
             f.write(orjson.dumps(stats, option=orjson.OPT_SORT_KEYS))
 
     def get_raw(self) -> dict[str, int]:
-        """Выдаёт {дата: сообщения} от всех"""
+        """Выдаёт {дата: сообщения} от всех."""
         "Если days не указан, выдаст все"
         totals = defaultdict(int)
         for json_file in listdir(pathes.stats):
@@ -350,21 +350,21 @@ class statistic:
 
 
 class ticket:
-    def get(id):
-        id = str(id)
+    def get(self):
+        self = str(self)
         "Получить чек по id"
         if path.exists(pathes.tickets):
             with open(pathes.tickets, "rb") as f:
                 data = orjson.loads(f.read())
-                if id in data:
-                    return data[id]
+                if self in data:
+                    return data[self]
                 return None
         else:
             with open(pathes.tickets, "wb") as f:
                 f.write(orjson.dumps({}))
             return None
 
-    def add(author, value):
+    def add(self, value):
         if path.exists(pathes.tickets):
             with open(pathes.tickets, "rb") as f:
                 data = orjson.loads(f.read())
@@ -373,7 +373,7 @@ class ticket:
                 while random_id in data:
                     random_id = randint(1000, 9999)
                 data[str(random_id)] = {
-                    "author": int(author),
+                    "author": int(self),
                     "value": int(value),
                 }
                 f.write(orjson.dumps(data, option=orjson.OPT_INDENT_2))
@@ -385,7 +385,7 @@ class ticket:
                     orjson.dumps(
                         {
                             random_id: {
-                                "author": int(author),
+                                "author": int(self),
                                 "value": int(value),
                             },
                         },
@@ -394,23 +394,23 @@ class ticket:
                 )
             return random_id
 
-    def delete(id):
+    def delete(self) -> bool | None:
         with open(pathes.tickets, "rb") as f:
             data = orjson.loads(f.read())
-            if id not in data:
+            if self not in data:
                 return None
-            del data[id]
+            del data[self]
         with open(pathes.tickets, "wb") as f:
             f.write(orjson.dumps(data, option=orjson.OPT_INDENT_2))
             return True
 
 
 class state:
-    def __init__(self, name):
+    def __init__(self, name) -> None:
         self.name: str = name
         self._info()
 
-    def _info(self):
+    def _info(self) -> None:
         with open(path.join(pathes.states, f"{self.name}.json"), "rb") as f:
             all = orjson.loads(f.read())
         self.all = all
@@ -424,12 +424,12 @@ class state:
         self.coordinates = all["coordinates"]
         self.money = all["money"]
 
-    def change(self, key, value):
+    def change(self, key, value) -> None:
         with open(path.join(pathes.states, f"{self.name}.json"), "wb") as f:
             self.all[key] = value
             f.write(orjson.dumps(self.all, option=orjson.OPT_INDENT_2))
 
-    def rename(self, new_name: str):
+    def rename(self, new_name: str) -> bool | None:
         if path.exists(path.join(pathes.states, f"{new_name}.json")):
             return False
         replace(
@@ -438,13 +438,14 @@ class state:
         )
         self.name = new_name
         self._info()
+        return None
 
 
 class states:
-    def add(name, author):
-        if path.exists(path.join(pathes.states, f"{name}.json")):
+    def add(self, author) -> bool | None:
+        if path.exists(path.join(pathes.states, f"{self}.json")):
             return None
-        with open(path.join(pathes.states, f"{name}.json"), "wb") as f:
+        with open(path.join(pathes.states, f"{self}.json"), "wb") as f:
             f.write(
                 orjson.dumps(
                     {
@@ -463,13 +464,11 @@ class states:
             )
             return True
 
-    def check(name):
-        if path.exists(path.join(pathes.states, f"{name}.json")):
-            return True
-        return False
+    def check(self) -> bool:
+        return bool(path.exists(path.join(pathes.states, f"{self}.json")))
 
-    def get_all(sortedby="players"):
-        """Выдаёт все государства, сортированные по sortedby
+    def get_all(self="players"):
+        """Выдаёт все государства, сортированные по sortedby.
 
         Аргумент:
             sortedby (str, optional): Автоматическая сортировка. По умолчанию "players",
@@ -484,10 +483,10 @@ class states:
                     all[file.replace(".json", "")] = orjson.loads(f.read())
                 except JSONDecodeError:
                     logger.error(f"Не удалось просмотреть гос-во {file}")
-        if sortedby == "money":
+        if self == "money":
 
             def sort_key(item):
-                return item[1][sortedby]
+                return item[1][self]
         else:  # По умолчанию сортируем по количеству игроков
 
             def sort_key(item):
@@ -495,33 +494,31 @@ class states:
 
         return dict(sorted(all.items(), key=sort_key, reverse=True))
 
-    def if_author(id: int):
+    def if_author(self: int):
         for file in listdir(pathes.states):
             with open(path.join(pathes.states, file), "rb") as f:
-                if orjson.loads(f.read())["author"] == id:
+                if orjson.loads(f.read())["author"] == self:
                     return file.replace(".json", "")
         return False
 
-    def if_player(id: int):
+    def if_player(self: int):
         for file in listdir(pathes.states):
             with open(path.join(pathes.states, file), "rb") as f:
                 for player in orjson.loads(f.read())["players"]:
-                    if player == id:
+                    if player == self:
                         return file.replace(".json", "")
         return False
 
-    def find(name: str) -> bool:
-        if path.exists(path.join(pathes.states, f"{name}.json")):
-            return True
-        return False
+    def find(self: str) -> bool:
+        return bool(path.exists(path.join(pathes.states, f"{self}.json")))
 
-    def remove(name: str) -> bool:
-        state = path.join(pathes.states, f"{name}.json")
+    def remove(self: str) -> bool:
+        state = path.join(pathes.states, f"{self}.json")
         if path.exists(state):
-            pic = path.join(pathes.states_pic, f"{name}.png")
+            pic = path.join(pathes.states_pic, f"{self}.png")
             if path.exists(pic):
-                replace(pic, path.join(pathes.old_states, f"{name}.png"))
-            replace(state, path.join(pathes.old_states, f"{name}.json"))
+                replace(pic, path.join(pathes.old_states, f"{self}.png"))
+            replace(state, path.join(pathes.old_states, f"{self}.json"))
             return True
         return False
 
@@ -537,7 +534,7 @@ class Mysql:
         port: int = 3306,
         minsize: int = 1,
         maxsize: int = 10,
-    ):
+    ) -> None:
         self.host = host
         self.user = user
         self.password = password
@@ -548,7 +545,7 @@ class Mysql:
         self.pool = None
         self.table_name = table_name
 
-    async def initialize(self):
+    async def initialize(self) -> None:
         self.pool = await asyncmy.create_pool(
             host=self.host,
             port=self.port,
@@ -563,8 +560,8 @@ class Mysql:
         async with self.pool.acquire() as conn, conn.cursor() as cur:
             await cur.execute(
                 f"""
-                SELECT wins_casino, lose_moneys_in_casino 
-                FROM {self.table_name} 
+                SELECT wins_casino, lose_moneys_in_casino
+                FROM {self.table_name}
                 WHERE id = %s
                 """,
                 (id,),
@@ -581,7 +578,7 @@ class Mysql:
         async with self.pool.acquire() as conn, conn.cursor() as cur:
             await cur.execute(
                 f"""
-                SELECT id, wins_casino, lose_moneys_in_casino 
+                SELECT id, wins_casino, lose_moneys_in_casino
                 FROM {self.table_name}
                 """,
             )
@@ -594,7 +591,7 @@ class Mysql:
                 for row in results
             }
 
-    async def add_win(self, id: int):
+    async def add_win(self, id: int) -> None:
         async with self.pool.acquire() as conn:
             async with conn.cursor() as cur:
                 await cur.execute(
@@ -607,7 +604,7 @@ class Mysql:
                 )
                 await conn.commit()
 
-    async def add_lose_money(self, id: int, amount: int = 1):
+    async def add_lose_money(self, id: int, amount: int = 1) -> None:
         async with self.pool.acquire() as conn:
             async with conn.cursor() as cur:
                 await cur.execute(
@@ -631,7 +628,7 @@ Users = Mysql(
 
 
 class Notes:
-    def __init__(self, storage_dir=pathes.notes):
+    def __init__(self, storage_dir=pathes.notes) -> None:
         self.storage_dir = storage_dir
         makedirs(storage_dir, exist_ok=True)
 
@@ -647,7 +644,7 @@ class Notes:
         with open(file_path, encoding="utf8") as f:
             return f.read()
 
-    def create(self, name: str, text: str):
+    def create(self, name: str, text: str) -> bool:
         """Создать новую заметку. Возвращает True при успехе, False если уже существует."""
         file_path = self._get_file_path(name.lower())
         if path.exists(file_path):
@@ -656,7 +653,7 @@ class Notes:
             f.write(text)
         return True
 
-    def remove(self, name: str):
+    def remove(self, name: str) -> bool:
         """Удалить заметку. Возвращает True при успехе, False если не существует."""
         file_path = self._get_file_path(name.lower())
         if not path.exists(file_path):
@@ -717,7 +714,7 @@ class RefCodes:
         with open(pathes.ref, "rb") as f:
             return orjson.loads(f.read())
 
-    def _write(self, data):
+    def _write(self, data) -> None:
         with open(pathes.ref, "wb") as f:
             f.write(orjson.dumps(data, option=orjson.OPT_INDENT_2))
 
@@ -727,7 +724,7 @@ class RefCodes:
     def check_used(self, id: int, default=False) -> str:
         return self._read().get(str(id), {}).get("used", default)
 
-    def add_own(self, id: int, name: str):
+    def add_own(self, id: int, name: str) -> bool | None:
         if self.check_ref(name) is not None:
             return False
         load = self._read()
@@ -735,8 +732,9 @@ class RefCodes:
             load[str(id)] = {}
         load[str(id)]["own"] = name
         self._write(load)
+        return None
 
-    def add_used(self, id: int, name: str):
+    def add_used(self, id: int, name: str) -> None:
         load = self._read()
         if str(id) not in load:
             load[str(id)] = {}
@@ -751,15 +749,16 @@ class RefCodes:
                     return id
             except Exception:
                 pass
+        return None
 
 
 class CitiesGame:
-    def __init__(self):
+    def __init__(self) -> None:
         self.data_file = pathes.cities
         self.data = self._load_data()
 
     def _load_data(self) -> dict:
-        """Загружает данные из JSON файла или создаёт новый, если файла нет"""
+        """Загружает данные из JSON файла или создаёт новый, если файла нет."""
         if path.exists(self.data_file):
             with open(self.data_file, "rb") as f:
                 return orjson.loads(f.read())
@@ -774,20 +773,20 @@ class CitiesGame:
             "status": False,
         }
 
-    def logger(self, msg: str):
+    def logger(self, msg: str) -> None:
         logger.info(f"[Города] {msg}")
 
-    def _save_data(self):
-        """Сохраняет данные в JSON файл с помощью orjson"""
+    def _save_data(self) -> None:
+        """Сохраняет данные в JSON файл с помощью orjson."""
         with open(self.data_file, "wb") as f:
             f.write(orjson.dumps(self.data, option=orjson.OPT_INDENT_2))
 
     def get_players(self) -> list[int]:
-        """Возвращает список ID игроков в текущем раунде"""
+        """Возвращает список ID игроков в текущем раунде."""
         return self.data["current_game"]["players"]
 
-    def add_player(self, player_id: int):
-        """Добавляет игрока в текущий раунд"""
+    def add_player(self, player_id: int) -> None:
+        """Добавляет игрока в текущий раунд."""
         if player_id not in self.data["current_game"]["players"]:
             self.data["current_game"]["players"].append(player_id)
             self.data["start_players"] = self.data["start_players"] + 1
@@ -795,7 +794,7 @@ class CitiesGame:
 
     def rem_player(self, player_id: int):
         """Удаляет игрока из текущего раунда
-        Если игрок остался один, то игра завершается
+        Если игрок остался один, то игра завершается.
         """
         self.next_answer()
         self.data["current_game"]["players"].remove(player_id)
@@ -805,15 +804,14 @@ class CitiesGame:
         return self.who_answer()
 
     def who_answer(self) -> int | None:
-        """Возвращает ID игрока, который должен отвечать сейчас"""
+        """Возвращает ID игрока, который должен отвечать сейчас."""
         players = self.get_players()
         if not players:
             return None
-        current_id = self.data["current_game"]["current_player_id"]
-        return current_id
+        return self.data["current_game"]["current_player_id"]
 
-    def next_answer(self):
-        """Переключает очередь на следующего игрока"""
+    def next_answer(self) -> bool | None:
+        """Переключает очередь на следующего игрока."""
         players = self.get_players()
         if not players:
             return False
@@ -832,9 +830,10 @@ class CitiesGame:
             f"Очередь игрока {self.data['current_game']['current_player_id']} отвечать",
         )
         self._save_data()
+        return None
 
     def get_all_stat(self) -> dict[int, int]:
-        """Возвращает отсортированную статистику по убыванию побед"""
+        """Возвращает отсортированную статистику по убыванию побед."""
         return dict(
             sorted(
                 self.data["statistics"].items(),
@@ -843,8 +842,8 @@ class CitiesGame:
             ),
         )
 
-    def end_game(self):
-        """Завершает игру, очищая текущие данные"""
+    def end_game(self) -> None:
+        """Завершает игру, очищая текущие данные."""
         self.data["current_game"] = {
             "players": [],
             "current_player_id": 0,
@@ -859,7 +858,7 @@ class CitiesGame:
         self._save_data()
 
     def start_game(self):
-        """Начинает новую игру, сохраняя начальные данные"""
+        """Начинает новую игру, сохраняя начальные данные."""
         city = choice(open(pathes.chk_city, encoding="utf8").read().split("\n"))
         self.data["id"] = self.data["id"] + 1 if self.data["id"] < 10 else 1
         self.data["status"] = True
@@ -875,7 +874,7 @@ class CitiesGame:
         self._save_data()
         return self.data
 
-    def answer(self, id: str, city: str):
+    def answer(self, id: str, city: str) -> int:
         city = city.strip().lower()
         if id not in self.data["current_game"]["players"]:
             self.logger(f"{id} не в списке игроков")
@@ -908,7 +907,7 @@ class CitiesGame:
         return 0
 
     def get_last_city(self) -> str | None:
-        """Возвращает последний названный город"""
+        """Возвращает последний названный город."""
         return self.data["current_game"]["last_city"]
 
     def get_game_status(self):
@@ -921,10 +920,10 @@ class CitiesGame:
         return self.data["id"]
 
 
-def hellomsg_check(input_id):
+def hellomsg_check(input_id) -> bool:
     """Проверка, приветствовался ли человек ранее."""
     id_str = str(input_id)
-    ids_set = list()
+    ids_set = []
     if path.exists(pathes.hellomsg):
         try:
             with open(pathes.hellomsg, "rb") as f:
@@ -947,7 +946,7 @@ def mailing_get():
         return {"subscribers": []}
 
 
-def mailing_save(data):
-    """Сохранение данных в JSON файл"""
+def mailing_save(data) -> None:
+    """Сохранение данных в JSON файл."""
     with open(pathes.mailing, "wb") as f:
         f.write(orjson.dumps(data))

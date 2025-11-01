@@ -47,7 +47,7 @@ async def casino(event: Message):
 @client.on(events.NewMessage(pattern=r"(?i)^/crocodile$", func=checks))
 @client.on(events.NewMessage(pattern=r"(?i)^старт крокодил$", func=checks))
 async def crocodile(event: Message):
-    if not event.chat_id == config.chats.chat:
+    if event.chat_id != config.chats.chat:
         return await event.reply(phrase.crocodile.chat)
     if (event.reply_to_msg_id != config.chats.topics.games) and (
         getattr(event.reply_to, "reply_to_top_id", None)
@@ -181,7 +181,7 @@ async def crocodile_handler(event: Message):
         bets_str = ""
         topers = []
         n = 1
-        for toper in db.crocodile_stat.get_all().keys():
+        for toper in db.crocodile_stat.get_all():
             if n > config.coofs.TopLowerBets:
                 break
             topers.append(toper)
@@ -244,6 +244,7 @@ async def crocodile_handler(event: Message):
                     "".join(current_mask).replace("_", ".."),
                 ),
             )
+    return None
 
 
 async def crocodile_hint(event: Message):
@@ -356,7 +357,7 @@ async def cities_timeout(current_player: int, last_city: str):
 
 
 @client.on(events.NewMessage(chats=config.chats.chat))
-async def cities_answer(event: Message):
+async def cities_answer(event: Message) -> None:
     if (event.reply_to_msg_id != config.chats.topics.games) and (
         getattr(event.reply_to, "reply_to_top_id", None)
         != config.chats.topics.games
@@ -373,7 +374,7 @@ async def cities_answer(event: Message):
     city = event.text.strip()
     result_code = Cities.answer(event.sender_id, city)
 
-    async def autodelete(text):
+    async def autodelete(text) -> None:
         message: Message = await event.reply(text)
         await asyncio.sleep(config.coofs.CitiesAutodelete)
         await message.delete()
@@ -405,7 +406,7 @@ async def cities_answer(event: Message):
 
 @client.on(events.CallbackQuery(pattern=r"^cities\."))
 async def cities_callback(event: events.CallbackQuery.Event):
-    """Обработчик кнопок игры"""
+    """Обработчик кнопок игры."""
     data = event.data.decode("utf-8").split(".")
     action = data[1]
 
@@ -476,6 +477,7 @@ async def cities_callback(event: events.CallbackQuery.Event):
             return await event.answer(phrase.cities.not_in_players, alert=True)
         Cities.end_game()
         return await event.edit("❌ Игра отменена.")
+    return None
 
 
 @client.on(events.NewMessage(pattern=r"(?i)^/города$", func=checks))
@@ -485,8 +487,8 @@ async def cities_callback(event: events.CallbackQuery.Event):
 @client.on(events.NewMessage(pattern=r"(?i)^/minigame cities$", func=checks))
 @client.on(events.NewMessage(pattern=r"(?i)^/cities$"))
 async def cities_start(event: Message):
-    """Команда запуска игры"""
-    if not event.chat_id == config.chats.chat:
+    """Команда запуска игры."""
+    if event.chat_id != config.chats.chat:
         return await event.reply(phrase.cities.chat)
     if (event.reply_to_msg_id != config.chats.topics.games) and (
         getattr(event.reply_to, "reply_to_top_id", None)
@@ -520,6 +522,7 @@ async def cities_start(event: Message):
     if Cities.get_game_status() is False and Cities.get_id() == id:
         await message.edit(phrase.cities.wait_exceeded, buttons=None)
         Cities.end_game()
+    return None
 
 
 if db.database("current_game") != 0:

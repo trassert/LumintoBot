@@ -142,6 +142,7 @@ async def state_callback(event: events.CallbackQuery.Event):
             ),
             reply_to=config.chats.topics.rp,
         )
+    return None
 
 
 @client.on(events.CallbackQuery(func=checks, pattern=r"^casino"))
@@ -202,6 +203,7 @@ async def casino_callback(event: events.CallbackQuery.Event):
                 value=config.coofs.PriceForCasino,
             ),
         )
+    return None
 
 
 @client.on(events.CallbackQuery(func=checks, pattern=r"^nick"))
@@ -278,6 +280,7 @@ async def word_callback(event: events.CallbackQuery.Event):
         return await client.edit_message(
             event.sender_id, event.message_id, phrase.word.noadd,
         )
+    return None
 
 
 @client.on(events.CallbackQuery(func=checks, pattern=r"^cityadd"))
@@ -317,6 +320,7 @@ async def cityadd_callback(event: events.CallbackQuery.Event):
         return await client.edit_message(
             event.sender_id, event.message_id, phrase.cities.noadd,
         )
+    return None
 
 
 @client.on(events.CallbackQuery(func=checks, pattern=r"^shop"))
@@ -420,3 +424,4 @@ async def crocodile_callback(event: events.CallbackQuery.Event):
                 ),
             )
         return await event.reply(phrase.crocodile.down.format(word))
+    return None

@@ -71,6 +71,7 @@ async def get_note(event: Message):
         return await client.send_message(
             event.chat_id, note_text, reply_to=event.id, link_preview=False,
         )
+    return None
 
 
 @client.on(events.NewMessage(pattern=r"(?i)^/notes$", func=checks))

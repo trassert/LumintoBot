@@ -7,7 +7,7 @@ from . import func
 logger.info(f"Загружен модуль {__name__}!")
 
 
-async def checks(event):
+async def checks(event) -> bool:
     roles = db.roles()
     if event.is_private:
         if not isinstance(event, events.CallbackQuery.Event):

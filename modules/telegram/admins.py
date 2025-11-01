@@ -48,6 +48,7 @@ async def add_balance(event: Message):
     await event.reply(
         phrase.money.add_money.format(name=tag, old=old, new=old + new),
     )
+    return None
 
 
 @client.on(events.NewMessage(pattern=r"(?i)^\+стафф(.*)", func=checks))
@@ -121,10 +122,7 @@ async def vanilla_mcrcon(event: Message):
             ),
         )
     command = event.pattern_match.group(1).strip()
-    if event.text[0] == "o":
-        mode = mcrcon.Oneblock
-    else:
-        mode = mcrcon.Vanilla
+    mode = mcrcon.Oneblock if event.text[0] == "o" else mcrcon.Vanilla
     try:
         async with mode as rcon:
             resp = formatter.rm_colors(await rcon.send(command))
