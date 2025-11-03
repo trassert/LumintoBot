@@ -40,7 +40,6 @@ async def gemini(event: Message):
     )
     await asyncio.sleep(request)
 
-    logger.info(f"[AI] {event.sender_id}: {text}")
     try:
         response = await ai.embedding_request(text, event.sender_id, chat)
     except Exception as e:

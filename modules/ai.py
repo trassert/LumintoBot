@@ -84,8 +84,10 @@ async def get_player_chat(player: str) -> chats.AsyncChat:
 
 
 async def embedding_request(text: str, user: str | int, chat=chat) -> str:
+    context = get_content(text, embeddings_df, embedding_model)
+    logger.info("Embedding request: {text}\nContext: {context}")
     return (
         await chat.send_message(
-            f"{user}: {text}\nКонтекст: {get_content(text, embeddings_df, embedding_model)}",
+            f"{user}: {text}\nКонтекст: {context}",
         )
     ).text
