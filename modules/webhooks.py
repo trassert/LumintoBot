@@ -17,6 +17,7 @@ async def server():
         return aiohttp.web.Response(text="ok")
 
     async def hotmc(request: aiohttp.web.Request):
+        #! Важно - HotMC не работает с HTTPS! Используйте http, если берёте этот модуль.
         load = await request.post()
         nick = load["nick"]
         sign = load["sign"]

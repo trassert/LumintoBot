@@ -116,7 +116,12 @@ def find_most_similar_content(
     return np.argmax(similarities)
 
 
-def get_content(query: str, dataframe: pd.DataFrame, model: str) -> str:
+def get_content(
+    query: str,
+    dataframe: pd.DataFrame,
+    model: str,
+    similarity_threshold: float = config.coofs.AIContentSim,
+) -> str:
     """
     Находит наиболее релевантный контент для запроса.
     Args:
@@ -132,11 +137,19 @@ def get_content(query: str, dataframe: pd.DataFrame, model: str) -> str:
         raise ValueError("DataFrame must contain 'embeddings' column")
     query_embedding = get_query_embedding(query, model)
     document_embeddings = dataframe["embeddings"].tolist()
-    best_match_idx = find_most_similar_content(
-        query_embedding, document_embeddings
-    )
-    logger.info(f"Found best match at index {best_match_idx}")
-    return dataframe["contents"].iloc[best_match_idx]
+    doc_embeddings_array = np.array(document_embeddings)
+
+    query_norm = query_embedding / np.linalg.norm(query_embedding)
+    doc_norms = np.linalg.norm(doc_embeddings_array, axis=1, keepdims=True)
+    doc_embeddings_norm = doc_embeddings_array / doc_norms
+
+    similarities = np.dot(doc_embeddings_norm, query_norm)
+    best_match_idx = np.argmax(similarities)
+    best_similarity = similarities[best_match_idx]
+
+    if best_similarity >= similarity_threshold:
+        return f"Контекст: {dataframe['contents'].iloc[best_match_idx]}"
+    return ""
 
 
 async def get_player_chat(player: str) -> chats.AsyncChat:
@@ -148,13 +161,15 @@ async def get_player_chat(player: str) -> chats.AsyncChat:
     )
     return players[player]
 
+
 embedding_df = compute_document_embeddings(create_embeddings_dataframe())
+
 
 async def embedding_request(text: str, user: str | int, chat=chat) -> str:
     context = get_content(text, embedding_df, embedding_model)
-    logger.info(f"Embedding request: {text}\nContext: {context}")
+    logger.info(f"Embedding request: {text}\n{context}")
     return (
         await chat.send_message(
-            f"{user}: {text}\nКонтекст: {context}",
+            f"{user}: {text}\n{context}",
         )
     ).text
