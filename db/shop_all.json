@@ -218,6 +218,86 @@
             "name": "purple_dye",
             "price": 1,
             "value": 3
+        },
+        "Одуванчик": {
+            "name": "dandelion",
+            "price": 1,
+            "value": 2
+        },
+        "Мак": {
+            "name": "poppy",
+            "price": 1,
+            "value": 2
+        },
+        "Синий орхидея": {
+            "name": "blue_orchid",
+            "price": 3,
+            "value": 1
+        },
+        "Лук": {
+            "name": "allium",
+            "price": 2,
+            "value": 1
+        },
+        "Ромашка": {
+            "name": "oxeye_daisy",
+            "price": 1,
+            "value": 2
+        },
+        "Тюльпан": {
+            "name": "orange_tulip",
+            "price": 2,
+            "value": 1
+        },
+        "Красный тюльпан": {
+            "name": "red_tulip",
+            "price": 2,
+            "value": 1
+        },
+        "Белый тюльпан": {
+            "name": "white_tulip",
+            "price": 2,
+            "value": 1
+        },
+        "Розовый тюльпан": {
+            "name": "pink_tulip",
+            "price": 2,
+            "value": 1
+        },
+        "Ландыш": {
+            "name": "lily_of_the_valley",
+            "price": 3,
+            "value": 1
+        },
+        "Лазурит": {
+            "name": "cornflower",
+            "price": 2,
+            "value": 1
+        },
+        "Подсолнух": {
+            "name": "sunflower",
+            "price": 4,
+            "value": 1
+        },
+        "Сиреневый куст": {
+            "name": "lilac",
+            "price": 3,
+            "value": 1
+        },
+        "Розовый куст": {
+            "name": "rose_bush",
+            "price": 3,
+            "value": 1
+        },
+        "Пион": {
+            "name": "peony",
+            "price": 3,
+            "value": 1
+        },
+        "Роза иссушения": {
+            "name": "wither_rose",
+            "price": 22,
+            "value": 1
         }
     },
     "heads": {
