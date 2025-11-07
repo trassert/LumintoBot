@@ -29,8 +29,10 @@ async def host(event: Message):
     return await event.reply(
         phrase.server.host.format(
             v4=db.database("host"),
-            v6=db.database("try_host"),
+            v6=db.database("ipv6_host"),
+            hint="https://trassert.ru/wiki/info/ipv6"
         ),
+        link_preview=False
     )
 
 
