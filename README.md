@@ -8,6 +8,8 @@
 
 # Luminto - бот сервера
 
+[**Чат сервера**](https://t.me/lumintomc) | [**Канал сервера**](https://t.me/lumintoch)
+
 ## Установка на LINUX:
 
 ### С помощью pyenv:
@@ -30,5 +32,6 @@
 
 Устанавливаем пакеты:  
 `pip install -r requirements.txt`  
+> Важно! В файле requirements.txt следует убрать комментарий на WinTMP.  
 Запуск:  
 `bot.cmd`  
