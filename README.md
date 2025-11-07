@@ -33,5 +33,6 @@
 Устанавливаем пакеты:  
 `pip install -r requirements.txt`  
 > Важно! В файле requirements.txt следует убрать комментарий на WinTMP.  
+
 Запуск:  
 `bot.cmd`  
