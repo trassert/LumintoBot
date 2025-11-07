@@ -14,17 +14,21 @@
 
 ### С помощью pyenv:
 Устанавливаем пакеты:  
-    `pip install -r requirements.txt`  
+    `pip install -r requirements.txt`
+
 Запуск:  
-    `./bot.sh`  
+    `./bot.sh`
 
 ### С помощью venv:
 Делаем установщик исполняемым:  
     `chmod +x install.sh`
+
 Запускаем установщик:  
-    `./install.sh`  
+    `./install.sh`
+
 Если всё успешно установлено:  
-    `chmod +x bot.sh`  
+    `chmod +x bot.sh`
+
 Запуск:  
     `./bot.sh`  
   
@@ -40,3 +44,7 @@
 # Функционал бота
 
 [**Команды описаны тут**](https://t.me/trassert_help)
+
+# При копировании модулей бота или бота целиком, указывайте авторство, см. лицензию. 
+
+Автор проекта: @trassert
