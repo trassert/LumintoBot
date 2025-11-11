@@ -18,38 +18,51 @@ logger.info(f"Загружен модуль {__name__}!")
 @client.on(events.NewMessage(pattern=r"(?i)^/мстат(.*)", func=checks))
 async def active_check(event: Message):
     arg: str = event.pattern_match.group(1).strip()
+
     if arg in phrase.all_arg:
         text = phrase.stat.chat.format("всё время")
         all_data = db.statistic().get_all(all_days=True)
         chart.create_plot(db.statistic().get_raw())
-    else:
-        try:
-            days = int(arg)
-            text = phrase.stat.chat.format(formatter.value_to_str(days, "день"))
-            all_data = db.statistic(days=days).get_all()
-        except ValueError:
-            text = phrase.stat.chat.format("день")
-            all_data = db.statistic().get_all()
+        n = 1
+        for data in all_data:
+            if n > config.coofs.MaxStatPlayers:
+                break
+            text += f"{n}. {data[0]} - {data[1]}\n"
+            n += 1
+        return await client.send_file(event.chat_id, pathes.chart, caption=text)
 
-    if not all_data:
+    try:
+        days = int(arg)
+        text = phrase.stat.chat.format(formatter.value_to_str(days, "день"))
+        all_data = db.statistic(days=days).get_all()
+        if days >= 7:
+            chart.create_plot(db.statistic(days=days).get_raw())
+            n = 1
+            for data in all_data:
+                if n > config.coofs.MaxStatPlayers:
+                    break
+                text += f"{n}. {data[0]} - {data[1]}\n"
+                n += 1
+            return await client.send_file(
+                event.chat_id,
+                pathes.chart,
+                caption=text,
+            )
+    except ValueError:
+        text = phrase.stat.chat.format("день")
+        all_data = db.statistic().get_all()
+
+    if all_data == []:
         return await event.reply(phrase.stat.empty)
 
-    if (arg in phrase.all_arg) or (arg.isdigit() and int(arg) >= 7):
-        chart.create_plot(
-            db.statistic(days=days if arg.isdigit() else None).get_raw()
-        )
+    n = 1
+    for data in all_data:
+        if n > config.coofs.MaxStatPlayers:
+            break
+        text += f"{n}. {data[0]} - {data[1]}\n"
+        n += 1
 
-    result_text = text + "\n".join(
-        f"{n}. {data[0]} - {data[1]}"
-        for n, data in enumerate(all_data[: config.coofs.MaxStatPlayers], 1)
-    )
-
-    if (arg in phrase.all_arg) or (arg.isdigit() and int(arg) >= 7):
-        return await client.send_file(
-            event.chat_id, pathes.chart, caption=result_text
-        )
-
-    return await event.reply(result_text)
+    return await event.reply(text)
 
 
 @client.on(events.NewMessage(pattern=r"(?i)^/топ крокодил$", func=checks))
