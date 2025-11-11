@@ -111,20 +111,26 @@ async def state_make_empty(event: Message):
 @client.on(events.NewMessage(pattern=r"(?i)^/г войти(.*)", func=checks))
 async def state_enter(event: Message):
     arg: str = event.pattern_match.group(1).strip()
-    if arg == "":
+    if not arg:
         return await event.reply(phrase.state.no_name)
-    if db.states.find(arg) is False:
+
+    if not db.states.find(arg):
         return await event.reply(phrase.state.not_find)
+
     nick = db.nicks(id=event.sender_id).get()
     if nick is None:
         return await event.reply(phrase.state.not_connected)
+
     if db.states.if_player(event.sender_id) is not False:
         return await event.reply(phrase.state.already_player)
+
     if db.states.if_author(event.sender_id) is not False:
         return await event.reply(phrase.state.already_author)
+
     state = db.state(arg)
     if not state.enter:
         return await event.reply(phrase.state.enter_exit)
+
     if state.price != 0:
         return await event.reply(
             phrase.state.pay_to_enter,
@@ -136,34 +142,38 @@ async def state_enter(event: Message):
                                 text=f"✅ Оплатить вход ({state.price})",
                                 data=f"state.pay.{state.name}".encode(),
                             ),
-                        ],
+                        ]
                     ),
-                ],
+                ]
             ),
         )
+
     players = state.players
     players.append(event.sender_id)
     state.change("players", players)
+
     state_name = state.name.capitalize()
     await client.send_message(
         entity=config.chats.chat,
         message=phrase.state.new_player.format(state=state_name, player=nick),
         reply_to=config.chats.topics.rp,
     )
-    if (state.type == 0) and (len(players) >= config.coofs.Type1Players):
+
+    if state.type == 0 and len(players) >= config.coofs.Type1Players:
         await client.send_message(
             entity=config.chats.chat,
             message=phrase.state.up.format(name=state_name, type="Государство"),
             reply_to=config.chats.topics.rp,
         )
         state.change("type", 1)
-    if (state.type == 1) and (len(players) >= config.coofs.Type2Players):
+    elif state.type == 1 and len(players) >= config.coofs.Type2Players:
         await client.send_message(
             entity=config.chats.chat,
             message=phrase.state.up.format(name=state_name, type="Империя"),
             reply_to=config.chats.topics.rp,
         )
         state.change("type", 2)
+
     return await event.reply(phrase.state.admit.format(state_name))
 
 
@@ -233,7 +243,8 @@ async def state_leave(event: Message):
     await client.send_message(
         entity=config.chats.chat,
         message=phrase.state.leave_player.format(
-            state=state_name, player=db.nicks(id=event.sender_id).get(),
+            state=state_name,
+            player=db.nicks(id=event.sender_id).get(),
         ),
         reply_to=config.chats.topics.rp,
     )
@@ -241,7 +252,8 @@ async def state_leave(event: Message):
         await client.send_message(
             entity=config.chats.chat,
             message=phrase.state.down.format(
-                name=state.name, type="Государство",
+                name=state.name,
+                type="Государство",
             ),
             reply_to=config.chats.topics.rp,
         )
@@ -285,7 +297,8 @@ async def state_rem(event: Message):
         ],
     )
     return await event.reply(
-        phrase.state.rem_message.format(name=state_name), buttons=keyboard,
+        phrase.state.rem_message.format(name=state_name),
+        buttons=keyboard,
     )
 
 
@@ -433,7 +446,9 @@ async def state_add_money(event: Message):
     state.change("money", state.money + arg)
     logger.info(f"Казна {state_name} пополнена на {arg}")
     return await event.reply(
-        phrase.state.add_treasury.format(formatter.value_to_str(arg, "изумруд")),
+        phrase.state.add_treasury.format(
+            formatter.value_to_str(arg, "изумруд")
+        ),
     )
 
 
@@ -472,7 +487,9 @@ async def state_rem_money(event: Message):
     state.change("money", state.money - arg)
     db.add_money(event.sender_id, arg)
     return await event.reply(
-        phrase.state.rem_treasury.format(formatter.value_to_str(arg, "изумруд")),
+        phrase.state.rem_treasury.format(
+            formatter.value_to_str(arg, "изумруд")
+        ),
     )
 
 
@@ -504,7 +521,8 @@ async def state_kick_user(event: Message):
         await client.send_message(
             entity=config.chats.chat,
             message=phrase.state.down.format(
-                name=state.name, type="Государство",
+                name=state.name,
+                type="Государство",
             ),
             reply_to=config.chats.topics.rp,
         )
@@ -519,7 +537,8 @@ async def state_kick_user(event: Message):
     await client.send_message(
         entity=config.chats.chat,
         message=choice(phrase.state.kicked_rp).format(
-            state=state_name, player=await get_name(user, minecraft=True),
+            state=state_name,
+            player=await get_name(user, minecraft=True),
         ),
         reply_to=config.chats.topics.rp,
     )
@@ -549,7 +568,8 @@ async def state_kick_user_empty(event: Message):
         await client.send_message(
             entity=config.chats.chat,
             message=phrase.state.down.format(
-                name=state.name, type="Государство",
+                name=state.name,
+                type="Государство",
             ),
             reply_to=config.chats.topics.rp,
         )
@@ -564,7 +584,8 @@ async def state_kick_user_empty(event: Message):
     await client.send_message(
         entity=config.chats.chat,
         message=choice(phrase.state.kicked_rp).format(
-            state=state_name, player=db.nicks(id=event.sender_id).get(),
+            state=state_name,
+            player=db.nicks(id=event.sender_id).get(),
         ),
         reply_to=config.chats.topics.rp,
     )

@@ -62,4 +62,6 @@ CitiesBet: 5
 # Время, которое нужно ждать до удаления игрока
 CitiesTimeout: 50
 
-AIContentSim: 0.7
+AI:
+  MaxTokens: 1500
+  ContentSim: 0.7

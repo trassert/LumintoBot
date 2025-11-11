@@ -120,7 +120,7 @@ def get_content(
     query: str,
     dataframe: pd.DataFrame,
     model: str,
-    similarity_threshold: float = config.coofs.AIContentSim,
+    similarity_threshold: float = config.coofs.AI.ContentSim,
 ) -> str:
     """
     Находит наиболее релевантный контент для запроса.
@@ -171,5 +171,8 @@ async def embedding_request(text: str, user: str | int, chat=chat) -> str:
     return (
         await chat.send_message(
             f"{user}: {text}\n{context}",
+            config=types.GenerateContentConfig(
+                max_output_tokens=config.coofs.AI.MaxTokens,
+            ),
         )
     ).text
