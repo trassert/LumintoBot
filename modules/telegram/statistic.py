@@ -71,14 +71,14 @@ async def active_check(event: Message):
 @client.on(events.NewMessage(pattern=r"(?i)^/стат слова$", func=checks))
 @client.on(events.NewMessage(pattern=r"(?i)^топ крокодила$", func=checks))
 async def crocodile_wins(event: Message):
-    all_stats = db.crocodile_stat.get_all()
-    top_10 = list(all_stats.items())[:10]
-
-    text = "\n".join(
-        f"{n}. **{await get_name(id)}**: {wins} побед"
-        for n, (id, wins) in enumerate(top_10, 1)
-    )
-
+    all = db.crocodile_stat.get_all()
+    text = ""
+    n = 1
+    for id in all:
+        if n > 10:
+            break
+        text += f"{n}. **{await get_name(id)}**: {all[id]} побед\n"
+        n += 1
     return await event.reply(phrase.crocodile.stat.format(text), silent=True)
 
 
