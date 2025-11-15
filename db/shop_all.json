@@ -1652,9 +1652,9 @@
             "price": 24,
             "value": 1
         },
-        "Книга «Тягун III»": {
-            "name": "enchanted_book[enchantments={riptide:3}]",
-            "price": 30,
+        "Книга «Тягун I»": {
+            "name": "enchanted_book[enchantments={riptide:1}]",
+            "price": 21,
             "value": 1
         },
         "Книга «Острота V»": {
@@ -1692,13 +1692,18 @@
             "price": 41,
             "value": 1
         },
-        "Книга «Прочность III»": {
-            "name": "enchanted_book[enchantments={unbreaking:3}]",
-            "price": 32,
+        "Книга «Прочность II»": {
+            "name": "enchanted_book[enchantments={unbreaking:2}]",
+            "price": 25,
             "value": 1
         },
         "Книга «Порыв ветра III»": {
             "name": "enchanted_book[enchantments={wind_burst:3}]",
+            "price": 45,
+            "value": 1
+        },
+        "Книга «Аккуратный I»": {
+            "name": "enchanted_book[enchantments={\"excellentenchants:thrifty\":1}]",
             "price": 45,
             "value": 1
         }
