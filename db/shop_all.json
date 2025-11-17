@@ -330,16 +330,6 @@
             "name": "wither_skeleton_skull",
             "price": 52,
             "value": 1
-        },
-        "Сундук с изумрудной рудой": {
-            "name": "player_head[profile={properties:[{name:\"textures\",value:\"eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvMTdkYTdiYzJlN2Q0YjNkYjhiMzg4MTg3YWY2ODNmNTZhMTIxYzk2MWQ3ODdjNmY4NTFiYmI5Njc0YzkzNzQ2YiJ9fX0=\"}]}]",
-            "price": 43,
-            "value": 1
-        },
-        "Пляжный мяч": {
-            "name": "player_head[profile={properties:[{name:\"textures\",value:\"eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvODkzNmJjNzIxNDNlNjcyOTAxZjY5ZTJhNmI1ZWMzOTMyOGU1MWYxMGIzY2MyNTJjMTJmM2Y4ZjUzZTQ3NmZhYiJ9fX0=\"}]}]",
-            "price": 25,
-            "value": 1
         }
     },
     "mine": {
@@ -1704,7 +1694,109 @@
         },
         "Книга «Аккуратный I»": {
             "name": "enchanted_book[enchantments={\"excellentenchants:thrifty\":1}]",
-            "price": 45,
+            "price": 74,
+            "value": 1
+        }
+    },
+    "decorations": {
+        "Сундук с изумрудной рудой": {
+            "name": "player_head[profile={properties:[{name:\"textures\",value:\"eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvMTdkYTdiYzJlN2Q0YjNkYjhiMzg4MTg3YWY2ODNmNTZhMTIxYzk2MWQ3ODdjNmY4NTFiYmI5Njc0YzkzNzQ2YiJ9fX0=\"}]}]",
+            "price": 24,
+            "value": 1
+        },
+        "Пляжный мяч": {
+            "name": "player_head[profile={properties:[{name:\"textures\",value:\"eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvODkzNmJjNzIxNDNlNjcyOTAxZjY5ZTJhNmI1ZWMzOTMyOGU1MWYxMGIzY2MyNTJjMTJmM2Y4ZjUzZTQ3NmZhYiJ9fX0=\"}]}]",
+            "price": 23,
+            "value": 1
+        },
+        "Мини ТНТ": {
+            "name": "player_head[profile={properties:[{name:\"textures\",value:\"eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvYjg4ZmI2YjJiM2VmYTZhYjI5OWY5ZjRlN2Q4YzFhMWQ3MzM4NzUzYmRmOGZlZjgxMDc1ZjIxNTU5NDNiYzY5In19fQ==\"}]}]",
+            "price": 30,
+            "value": 1
+        },
+        "Мешок риса": {
+            "name": "player_head[minecraft:custom_name={text:\"Мешок\\u0020риса\",italic:false},profile={properties:[{name:\"textures\",value:\"eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvY2I3MGYyZmI1ZWJmNDlmNzlmZjNlODczNjE2ODYzYWU1ZDM2MmZiYmZjMzFhZWYyZGZiOTNkNmUxN2RiZjIifX19\"}]}]",
+            "price": 13,
+            "value": 1
+        },
+        "Пустая кружка пива": {
+            "name": "player_head[minecraft:custom_name={text:\"Пустая\\u0020кружка\\u0020пива\",italic:false},profile={properties:[{name:\"textures\",value:\"eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvNDExNTRkNzU2NDZiMzlkMDRjNWI4NzZkNjVlYTdjZDU2ODU4NjY2OGYzMTM4YmQwNWViZjM1MTFjNGI4NmQifX19\"}]}]",
+            "price": 12,
+            "value": 1
+        },
+        "Котел с томатным супом": {
+            "name": "player_head[minecraft:custom_name={text:\"Котел\\u0020с\\u0020томатным\\u0020супом\",italic:false},profile={properties:[{name:\"textures\",value:\"eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvZGVhYTNhM2E2MmMzYjdmZDE2MzZhMTg1YzRjMzFmNWQ3NmIyZDM2NTNjNWFkMzA4ZTg4MTllMmU2MTAxOSJ9fX0=\"}]}]",
+            "price": 17,
+            "value": 1
+        },
+        "Тортик": {
+            "name": "player_head[minecraft:custom_name={text:\"Тортик\",italic:false},profile={properties:[{name:\"textures\",value:\"eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvMTIxZDhkOWFlNTI3OGUyNmJjNDM5OTkyM2QyNWNjYjkxNzNlODM3NDhlOWJhZDZkZjc2MzE0YmE5NDM2OWUifX19\"}]}]",
+            "price": 15,
+            "value": 1
+        },
+        "Тыквенный пирог": {
+            "name": "player_head[minecraft:custom_name={text:\"Тыквенный\\u0020пирог\",italic:false},profile={properties:[{name:\"textures\",value:\"eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvMzhhOTcxZGY1MWU5Y2E5YTViOTJlNDVkM2ZhNTQ3ZGQzMTkxODc3OTI5YTQzN2Q1MDE1Mzg5MmU1ODVhIn19fQ==\"}]}]",
+            "price": 13,
+            "value": 1
+        },
+        "Суши красной рыбой": {
+            "name": "player_head[minecraft:custom_name={text:\"Суши\\u0020красной\\u0020рыбой\",italic:false},profile={properties:[{name:\"textures\",value:\"eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvYjE3ZWRhMWY2NWJkYzhlZDQxYWFhNGNjYWE0ZTJiZWQ2OTQ3MTRlMzI4NjdlZTE2YWYzMWY0YzQyZWYxZjI4In19fQ==\"}]}]",
+            "price": 20,
+            "value": 1
+        },
+        "Пломбир": {
+            "name": "player_head[minecraft:custom_name={text:\"Пломбир\",italic:false},profile={properties:[{name:\"textures\",value:\"eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvMTBjODcxOWI2YjFmZGFlZTU5YTc4OTU1NTI2N2FkY2ZhMWU0MjYwODg5ZmRmNzA4ZTdjYTg3M2MwNTUxZDkifX19\"}]}]",
+            "price": 20,
+            "value": 1
+        },
+        "Суши с креветкой": {
+            "name": "player_head[minecraft:custom_name={text:\"Суши\\u0020с\\u0020креветкой\",italic:false},profile={properties:[{name:\"textures\",value:\"eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvYWU5ZDIyZDlhZGE2M2UyODE0MjBhZTMzNjkxODgwODY5ZmExYTE0YmZkZjg3ZDhlNTM4ZTk5OGE4ZjI5NTk1YiJ9fX0=\"}]}]",
+            "price": 18,
+            "value": 1
+        },
+        "Пломбир с вишней": {
+            "name": "player_head[minecraft:custom_name={text:\"Пломбир\\u0020с\\u0020вишней\",italic:false},profile={properties:[{name:\"textures\",value:\"eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvOTUzNjZjYTE3OTc0ODkyZTRmZDRjN2I5YjE4ZmViMTFmMDViYTJlYzQ3YWE1MDM1YzgxYTk1MzNiMjgifX19\"}]}]",
+            "price": 26,
+            "value": 1
+        },
+        "Ржаной хлеб": {
+            "name": "player_head[minecraft:custom_name={text:\"Ржаной\\u0020хлеб\",italic:false},profile={properties:[{name:\"textures\",value:\"eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvZTRjYzg3YWZkMWMyZGEyNTNjM2RlMGJmZmEyNjNkNGRlNmYyZDI2NjI1NTQ1ZDI1ZjQ2Y2UyYzY0ZDRiNSJ9fX0=\"}]}]",
+            "price": 20,
+            "value": 1
+        },
+        "Дрожжевой хлеб": {
+            "name": "player_head[minecraft:custom_name={text:\"Дрожжевой\\u0020хлеб\",italic:false},profile={properties:[{name:\"textures\",value:\"eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvY2RiZWEzODI3MTA3NTczNmU0ZDZhOThiYTRjNzg0YmJlN2MyZDFkNjk3ZmNiMmNmZjhhNzRjZGQ5ZWM4ZCJ9fX0=\"}]}]",
+            "price": 19,
+            "value": 1
+        },
+        "Мешок муки": {
+            "name": "player_head[minecraft:custom_name={text:\"Мешок\\u0020муки\",italic:false},profile={properties:[{name:\"textures\",value:\"eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvNjA2YmUyZGYyMTIyMzQ0YmRhNDc5ZmVlY2UzNjVlZTBlOWQ1ZGEyNzZhZmEwZThjZThkODQ4ZjM3M2RkMTMxIn19fQ==\"}]}]",
+            "price": 12,
+            "value": 1
+        },
+        "Земной шар": {
+            "name": "player_head[minecraft:custom_name={text:\"Земной\\u0020шар\",italic:false},profile={properties:[{name:\"textures\",value:\"eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvMmUyY2M0MjAxNWU2Njc4ZjhmZDQ5Y2NjMDFmYmY3ODdmMWJhMmMzMmJjZjU1OWEwMTUzMzJmYzVkYjUwIn19fQ==\"}]}]",
+            "price": 32,
+            "value": 1
+        },
+        "Сундук": {
+            "name": "player_head[minecraft:custom_name={text:\"Сундук\",italic:false},profile={properties:[{name:\"textures\",value:\"eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvZDVjNmRjMmJiZjUxYzM2Y2ZjNzcxNDU4NWE2YTU2ODNlZjJiMTRkNDdkOGZmNzE0NjU0YTg5M2Y1ZGE2MjIifX19\"}]}]",
+            "price": 15,
+            "value": 1
+        },
+        "Тюк сена": {
+            "name": "player_head[minecraft:custom_name={text:\"Тюк\\u0020сена\",italic:false},profile={properties:[{name:\"textures\",value:\"eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvYWVhMjMxNjhjNmM5NDk5ZDI2ZDM0MTZlNzVjNDFiNTZkNjY5YTcyMGQ1ZWViYTdlNTJhYjJiNDViMjRhOCJ9fX0=\"}]}]",
+            "price": 18,
+            "value": 1
+        },
+        "Ломтики хлеба": {
+            "name": "player_head[minecraft:custom_name={text:\"Ломтики\\u0020хлеба\",italic:false},profile={properties:[{name:\"textures\",value:\"eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvNTE5OTdkYTY0MDQzYjI4NDgyMjExNTY0M2E2NTRmZGM0ZThhNzIyNjY2NGI0OGE0ZTFkYmI1NTdiNWMwZmUxNCJ9fX0=\"}]}]",
+            "price": 20,
+            "value": 1
+        },
+        "Книги в стопке": {
+            "name": "player_head[minecraft:custom_name={text:\"Книги\\u0020в\\u0020стопке\",italic:false},profile={properties:[{name:\"textures\",value:\"eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvYmJjNjE2OGJjODlmNjIzYjIwNDg4MjgxMzU1MWIwODY3MDVkODRkMjgyMjUxZWVlY2Q4OWIzODQ3NGZlYzAifX19\"}]}]",
+            "price": 27,
             "value": 1
         }
     }
