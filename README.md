@@ -1,4 +1,5 @@
 [![Ruff](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/astral-sh/ruff/main/assets/badge/v2.json)](https://github.com/astral-sh/ruff)
+[![uv](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/astral-sh/uv/main/assets/badge/v0.json)](https://github.com/astral-sh/uv)
 
 ![Issues](https://img.shields.io/github/issues-raw/trassert/LumintoBot?color=c78aff&label=issues&style=for-the-badge)
 ![Contributors](https://img.shields.io/github/contributors/trassert/LumintoBot?color=c78aff&label=contributors&style=for-the-badge)
@@ -9,37 +10,6 @@
 # Luminto - бот сервера
 
 [**Чат сервера**](https://t.me/lumintomc) | [**Канал сервера**](https://t.me/lumintoch)
-
-## Установка на LINUX:
-
-### С помощью pyenv:
-Устанавливаем пакеты:  
-    `pip install -r requirements.txt`
-
-Запуск:  
-    `./bot.sh`
-
-### С помощью venv:
-Делаем установщик исполняемым:  
-    `chmod +x install.sh`
-
-Запускаем установщик:  
-    `./install.sh`
-
-Если всё успешно установлено:  
-    `chmod +x bot.sh`
-
-Запуск:  
-    `./bot.sh`  
-  
-## Установка на WINDOWS:
-
-Устанавливаем пакеты:  
-`pip install -r requirements.txt`  
-> Важно! В файле requirements.txt следует убрать комментарий на WinTMP.  
-
-Запуск:  
-`bot.cmd`  
 
 ## Функционал бота
 

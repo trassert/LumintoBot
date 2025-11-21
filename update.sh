@@ -1,1 +1,0 @@
-./venv/bin/pip-review --local --auto

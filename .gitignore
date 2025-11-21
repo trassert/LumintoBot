@@ -12,11 +12,10 @@ test.*
 venv
 .env
 .vscode
+uv.lock
 
 map.html
 
 tokens.yml
 chats.yml
 vars.yml
-
-ruff.toml
