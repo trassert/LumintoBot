@@ -58,7 +58,7 @@ async def main():
     await task_gen.RewardsTask.create(tasks.rewards, "19:00")
     await task_gen.RemoveStatesTask.create(tasks.remove_states, "17:00")
     await asyncio.gather(
-        tg.run_until_disconnected(), vk.start(), tasks.port_checks(),
+        tg.run_until_disconnected(), vk.start(), #tasks.port_checks(),
     )
 
 
