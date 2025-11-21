@@ -64,8 +64,13 @@ async def main():
 
 if __name__ == "__main__":
     try:
-        import uvloop
-
-        uvloop.run(main())
+        try:
+            import uvloop
+            uvloop.run(main())
+        except ModuleNotFoundError:
+            logger.warning(
+                "Uvloop не найден! Установите его для большей производительности",
+            )
+            asyncio.run(main())
     except (KeyboardInterrupt, asyncio.CancelledError):
         logger.warning("Закрываю бота!")
