@@ -165,7 +165,7 @@ embedding_df = compute_document_embeddings(create_embeddings_dataframe())
 
 
 async def embedding_request(text: str, user: str | int, chat=chat) -> str:
-    context = get_content(text, embedding_df, embedding_model)
+    context = get_content(text, embedding_df, config.vars.AiEmbeddings)
     logger.info(f"Embedding request: {text}\n{context}")
     return (
         await chat.send_message(
