@@ -8,8 +8,7 @@ from loguru import logger
 from . import config, pathes, phrase
 
 logger.info(f"Загружен модуль {__name__}!")
-model = config.vars.ai_model
-embedding_model = "gemini-embedding-001"
+
 soc_client = genai.Client(
     api_key=config.tokens.ai.social,
     http_options=types.HttpOptions(
@@ -24,9 +23,9 @@ mc_client = genai.Client(
     ),
 )
 
-chat = soc_client.aio.chats.create(model=model)
-crocodile = soc_client.aio.chats.create(model=model)
-staff = soc_client.aio.chats.create(model=model)
+chat = soc_client.aio.chats.create(model=config.vars.AiModel)
+crocodile = soc_client.aio.chats.create(model=config.vars.AiModel)
+staff = soc_client.aio.chats.create(model=config.vars.AiModel)
 players = {}
 
 
@@ -59,7 +58,7 @@ def compute_document_embeddings(
         batch_contents = batch["contents"].tolist()
         try:
             batch_response = soc_client.models.embed_content(
-                model=embedding_model,
+                model=config.vars.AiEmbeddings,
                 contents=batch_contents,
                 config=types.EmbedContentConfig(
                     task_type="RETRIEVAL_DOCUMENT",
@@ -155,7 +154,7 @@ def get_content(
 async def get_player_chat(player: str) -> chats.AsyncChat:
     if player in players:
         return players[player]
-    players[player] = mc_client.aio.chats.create(model=model)
+    players[player] = mc_client.aio.chats.create(model=config.vars.AiModel)
     await players[player].send_message(
         phrase.ai.minecraft_prompt.format(player=player),
     )

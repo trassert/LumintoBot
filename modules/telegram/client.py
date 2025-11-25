@@ -12,7 +12,7 @@ client = TelegramClient(
     system_version="4.16.30-vxCUSTOM",
     lang_code="ru",
     system_lang_code="ru",
-    use_ipv6=False,
+    use_ipv6=config.vars.UseIPv6,
     connection_retries=-1,
     retry_delay=2,
 )
