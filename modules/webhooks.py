@@ -29,7 +29,8 @@ async def server():
             logger.warning(f"Должен быть: {sign}")
             logger.warning(f"Имеется: {hash}")
             return aiohttp.web.Response(
-                text="Переданные данные не прошли проверку.", status=401,
+                text="Переданные данные не прошли проверку.",
+                status=401,
             )
         tg_id = db.nicks(nick=nick).get()
         if tg_id is not None:
@@ -60,7 +61,8 @@ async def server():
             logger.warning(f"Должен быть: {sign}")
             logger.warning(f"Имеется: {hash}")
             return aiohttp.web.Response(
-                text="Переданные данные не прошли проверку.", status=401,
+                text="Переданные данные не прошли проверку.",
+                status=401,
             )
         tg_id = db.nicks(nick=username).get()
         if tg_id is not None:
@@ -129,7 +131,9 @@ async def server():
                 phrase.github.update.format(
                     author=f"[{head['author']['name']}](https://github.com/{head['author']['name']})",
                     message=head["message"],
-                    link=head["url"],
+                    changes=f"**[Что изменилось?]({head['url']})**"
+                    if load["repository"]["private"] is False
+                    else "",
                     repo=f"[{load['repository']['name']}](https://github.com/{load['repository']['full_name']})",
                 ),
                 link_preview=False,
