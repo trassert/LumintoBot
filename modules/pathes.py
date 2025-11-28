@@ -21,6 +21,9 @@ tickets = path.join("db", "tickets.json")
 mailing = path.join("db", "mailing.json")
 tasks = path.join("db", "tasks.json")
 embeddings = path.join("db", "embeddings.json")
+data = path.join("db", "data.json")
+shopc = path.join("db", "shop_current.json")
+shop = path.join("db", "shop_all.json")
 
 cities = path.join("db", "cities", "game.json")
 chk_city = path.join("db", "cities", "cities.txt")
@@ -38,7 +41,6 @@ font = path.join("fonts", "minecraft.ttf")
 
 chart = path.join("charts", "chart.png")
 
-data = path.join("db", "data.json")
+states_pic = path.join("images", "states")
 
 pic = "images"
-states_pic = path.join("images", "states")

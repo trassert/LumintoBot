@@ -106,31 +106,50 @@ def add_money(id, count):
 
 
 def update_shop():
-    """Обновляет магазин"""
-    "Возвращает тему магазина"
-    with open(path.join("db", "shop_current.json"), "rb") as f:
-        last_theme = orjson.loads(f.read())["theme"]
-    current_shop = {}
-    with open(path.join("db", "shop_all.json"), "rb") as f:
-        load = orjson.loads(f.read())
-    themes = []
-    for theme in load:
-        themes.append(theme)
-    current_shop["theme"] = weighted_choice(themes, database("shop_weight"))
-    while current_shop["theme"] is last_theme:
-        current_shop["theme"] = weighted_choice(themes, database("shop_weight"))
-    current_items = []
-    all_items = list(load[current_shop["theme"]].keys())
-    while (
-        len(set(current_items)) != len(current_items) or len(current_items) < 5
-    ):
-        current_items = list(set(current_items))
-        current_items.append(choice(all_items))
-    for item in current_items:
-        current_shop[item] = load[current_shop["theme"]][item]
-    with open(path.join("db", "shop_current.json"), "wb") as f:
+    """Обновляет магазин, возвращая новую тему."""
+    if pathes.shopc.exists():
+        with open(pathes.shopc, "rb") as f:
+            last_theme = orjson.loads(f.read()).get("theme")
+    else:
+        last_theme = None
+    with open(pathes.shop, "rb") as f:
+        all_themes = orjson.loads(f.read())
+    if not all_themes:
+        raise ValueError("Файл shop_all.json пуст или не содержит тем.")
+    theme_names = list(all_themes.keys())
+    if not theme_names:
+        raise ValueError("Нет доступных тем в shop_all.json")
+    new_theme = last_theme
+    while new_theme == last_theme:
+        new_theme = weighted_choice(theme_names, database("shop_weight"))
+    theme_items = all_themes[new_theme]
+    item_names = list(theme_items.keys())
+    if len(item_names) < 5:
+        raise ValueError(
+            f"В теме '{new_theme}' недостаточно предметов (минимум 5, найдено {len(item_names)})"
+        )
+    selected_items = []
+    while len(selected_items) < 5:
+        item = choice(item_names)
+        if item not in selected_items:
+            selected_items.append(item)
+    current_shop = {"theme": new_theme}
+    for item in selected_items:
+        item_data = theme_items[item].copy()
+        price = item_data.get("price")
+        if isinstance(price, list) and len(price) == 2:
+            min_p, max_p = price
+            item_data["price"] = randint(min_p, max_p)
+        elif isinstance(price, (int, float)):
+            pass
+        else:
+            raise ValueError(
+                f"Некорректный формат цены для предмета '{item}': {price}"
+            )
+        current_shop[item] = item_data
+    with open(pathes.shopc, "wb") as f:
         f.write(orjson.dumps(current_shop, option=orjson.OPT_INDENT_2))
-    return current_shop["theme"]
+    return new_theme
 
 
 def get_shop():
@@ -690,7 +709,8 @@ def check_withdraw_limit(id: int, amount: int) -> int | bool:
                 data = {}
     if str(id) in data:
         record_date = datetime.strptime(
-            data[str(id)]["date"], "%Y-%m-%d",
+            data[str(id)]["date"],
+            "%Y-%m-%d",
         ).date()
         if record_date == today:
             already_withdrawn = data[str(id)]["withdrawn"]

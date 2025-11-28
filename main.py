@@ -7,12 +7,13 @@ from loguru import logger
 logger.remove()
 logger.add(
     stderr,
-    format="<blue>{time:HH:mm:ss}</blue>"
-    " <bold>|</bold> <level>{level}</level>"
-    " <bold>|</bold> <green>{file}:{function}</green>"
-    " <cyan><bold>></bold></cyan> {message}",
+    format="[{time:HH:mm:ss} <level>{level}</level>]:"
+    " <green>{file}:{function}</green>"
+    " <cyan>></cyan> {message}",
     level="INFO",
     colorize=True,
+    backtrace=False,
+    diagnose=False
 )
 
 
