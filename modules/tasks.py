@@ -11,15 +11,19 @@ logger.info(f"Загружен модуль {__name__}!")
 
 async def update_shop():
     logger.info("Обновление магазина..")
-    theme = db.update_shop()
-    logger.info("Изменена тема магазина")
-    return await client.send_message(
-        config.chats.chat,
-        phrase.shop.update.format(
-            emo=phrase.shop_quotes[theme]["emo"],
-            theme=phrase.shop_quotes[theme]["translate"],
-        ),
-    )
+    try:
+        theme = db.update_shop()
+
+        await client.send_message(
+            config.chats.chat,
+            phrase.shop.update.format(
+                emo=phrase.shop_quotes[theme]["emo"],
+                theme=phrase.shop_quotes[theme]["translate"],
+            ),
+        )
+        logger.info("Изменена тема магазина")
+    except Exception:
+        logger.exception("Ошибка при обновлении шопа")
 
 
 async def rewards():
@@ -35,7 +39,8 @@ async def rewards():
                 phrase.stat.gift.format(
                     user=top[0],
                     gift=formatter.value_to_str(
-                        config.coofs.ActiveGift, "изумруд",
+                        config.coofs.ActiveGift,
+                        "изумруд",
                     ),
                 ),
             )
@@ -81,6 +86,7 @@ async def port_checks() -> None:
         except Exception as e:
             logger.error(f"Ошибка при проверке порта: {e}")
             await client.send_message(
-                entity=config.chats.staff, message=phrase.port.false,
+                entity=config.chats.staff,
+                message=phrase.port.false,
             )
             await asyncio.sleep(60)

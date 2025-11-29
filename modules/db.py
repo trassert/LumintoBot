@@ -107,25 +107,22 @@ def add_money(id, count):
 
 def update_shop():
     """Обновляет магазин, возвращая новую тему."""
-    if pathes.shopc.exists():
-        with open(pathes.shopc, "rb") as f:
-            last_theme = orjson.loads(f.read()).get("theme")
-    else:
-        last_theme = None
+    with open(pathes.shopc, "rb") as f:
+        last_theme = orjson.loads(f.read()).get("theme")
     with open(pathes.shop, "rb") as f:
         all_themes = orjson.loads(f.read())
     if not all_themes:
-        raise ValueError("Файл shop_all.json пуст или не содержит тем.")
+        logger.exception("Файл shop_all.json пуст или не содержит тем.")
     theme_names = list(all_themes.keys())
     if not theme_names:
-        raise ValueError("Нет доступных тем в shop_all.json")
+        logger.exception("Нет доступных тем в shop_all.json")
     new_theme = last_theme
     while new_theme == last_theme:
         new_theme = weighted_choice(theme_names, database("shop_weight"))
     theme_items = all_themes[new_theme]
     item_names = list(theme_items.keys())
     if len(item_names) < 5:
-        raise ValueError(
+        logger.exception(
             f"В теме '{new_theme}' недостаточно предметов (минимум 5, найдено {len(item_names)})"
         )
     selected_items = []
@@ -143,7 +140,7 @@ def update_shop():
         elif isinstance(price, (int, float)):
             pass
         else:
-            raise ValueError(
+            logger.exception(
                 f"Некорректный формат цены для предмета '{item}': {price}"
             )
         current_shop[item] = item_data
