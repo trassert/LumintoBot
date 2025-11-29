@@ -303,32 +303,50 @@
     "heads": {
         "Голова дракона": {
             "name": "dragon_head",
-            "price": 71,
+            "price": [
+                71,
+                80
+            ],
             "value": 1
         },
         "Голова зомби": {
             "name": "zombie_head",
-            "price": 23,
+            "price": [
+                23,
+                26
+            ],
             "value": 1
         },
         "Голова крипера": {
             "name": "creeper_head",
-            "price": 24,
+            "price": [
+                24,
+                27
+            ],
             "value": 1
         },
         "Голова пиглина": {
             "name": "piglin_head",
-            "price": 22,
+            "price": [
+                22,
+                25
+            ],
             "value": 1
         },
         "Череп": {
             "name": "skeleton_skull",
-            "price": 25,
+            "price": [
+                25,
+                28
+            ],
             "value": 1
         },
         "Череп визер-скелета": {
             "name": "wither_skeleton_skull",
-            "price": 52,
+            "price": [
+                52,
+                59
+            ],
             "value": 1
         }
     },
@@ -392,87 +410,138 @@
     "music": {
         "11-я пластинка": {
             "name": "music_disc_11",
-            "price": 22,
+            "price": [
+                22,
+                25
+            ],
             "value": 1
         },
         "13-я пластинка": {
             "name": "music_disc_13",
-            "price": 21,
+            "price": [
+                21,
+                24
+            ],
             "value": 1
         },
         "5-я пластинка": {
             "name": "music_disc_5",
-            "price": 15,
+            "price": [
+                15,
+                17
+            ],
             "value": 1
         },
         "Пластинка «Blocks»": {
             "name": "music_disc_blocks",
-            "price": 32,
+            "price": [
+                32,
+                36
+            ],
             "value": 1
         },
         "Пластинка «Cat»": {
             "name": "music_disc_cat",
-            "price": 15,
+            "price": [
+                15,
+                17
+            ],
             "value": 1
         },
         "Пластинка «Chirp»": {
             "name": "music_disc_chirp",
-            "price": 17,
+            "price": [
+                17,
+                20
+            ],
             "value": 1
         },
         "Пластинка «Far»": {
             "name": "music_disc_far",
-            "price": 20,
+            "price": [
+                20,
+                23
+            ],
             "value": 1
         },
         "Пластинка «Mall»": {
             "name": "music_disc_mall",
-            "price": 21,
+            "price": [
+                21,
+                24
+            ],
             "value": 1
         },
         "Пластинка «Mellohi»": {
             "name": "music_disc_mellohi",
-            "price": 12,
+            "price": [
+                12,
+                14
+            ],
             "value": 1
         },
         "Пластинка «Otherside»": {
             "name": "music_disc_otherside",
-            "price": 40,
+            "price": [
+                40,
+                45
+            ],
             "value": 1
         },
         "Пластинка «Pigstep»": {
             "name": "music_disc_pigstep",
-            "price": 28,
+            "price": [
+                28,
+                32
+            ],
             "value": 1
         },
         "Пластинка «Precipice»": {
             "name": "music_disc_precipice",
-            "price": 19,
+            "price": [
+                19,
+                22
+            ],
             "value": 1
         },
         "Пластинка «Relic»": {
             "name": "music_disc_relic",
-            "price": 14,
+            "price": [
+                14,
+                16
+            ],
             "value": 1
         },
         "Пластинка «Stal»": {
             "name": "music_disc_stal",
-            "price": 20,
+            "price": [
+                20,
+                23
+            ],
             "value": 1
         },
         "Пластинка «Strad»": {
             "name": "music_disc_strad",
-            "price": 20,
+            "price": [
+                20,
+                23
+            ],
             "value": 1
         },
         "Пластинка «Wait»": {
             "name": "music_disc_wait",
-            "price": 19,
+            "price": [
+                19,
+                22
+            ],
             "value": 1
         },
         "Пластинка «Ward»": {
             "name": "music_disc_ward",
-            "price": 18,
+            "price": [
+                18,
+                21
+            ],
             "value": 1
         }
     },
@@ -633,147 +702,234 @@
     "remains": {
         "Глиняный черепок «Вихрь»": {
             "name": "guster_pottery_sherd",
-            "price": 16,
+            "price": [
+                16,
+                18
+            ],
             "value": 1
         },
         "Глиняный черепок «Друг»": {
             "name": "friend_pottery_sherd",
-            "price": 14,
+            "price": [
+                14,
+                16
+            ],
             "value": 1
         },
         "Глиняный черепок «Зельевар»": {
             "name": "brewer_pottery_sherd",
-            "price": 18,
+            "price": [
+                18,
+                21
+            ],
             "value": 1
         },
         "Глиняный черепок «Зов»": {
             "name": "howl_pottery_sherd",
-            "price": 12,
+            "price": [
+                12,
+                14
+            ],
             "value": 1
         },
         "Глиняный черепок «Изобилие»": {
             "name": "plenty_pottery_sherd",
-            "price": 22,
+            "price": [
+                22,
+                25
+            ],
             "value": 1
         },
         "Глиняный черепок «Исследователь»": {
             "name": "explorer_pottery_sherd",
-            "price": 20,
+            "price": [
+                20,
+                23
+            ],
             "value": 1
         },
         "Глиняный черепок «Клинок»": {
             "name": "blade_pottery_sherd",
-            "price": 15,
+            "price": [
+                15,
+                17
+            ],
             "value": 1
         },
         "Глиняный черепок «Лучник»": {
             "name": "archer_pottery_sherd",
-            "price": 16,
+            "price": [
+                16,
+                18
+            ],
             "value": 1
         },
         "Глиняный черепок «Награда»": {
             "name": "prize_pottery_sherd",
-            "price": 24,
+            "price": [
+                24,
+                27
+            ],
             "value": 1
         },
         "Глиняный черепок «Нюхач»": {
             "name": "snort_pottery_sherd",
-            "price": 10,
+            "price": [
+                10,
+                12
+            ],
             "value": 1
         },
         "Глиняный черепок «Обтёсывание»": {
             "name": "scrape_pottery_sherd",
-            "price": 12,
+            "price": [
+                12,
+                14
+            ],
             "value": 1
         },
         "Глиняный черепок «Пламя»": {
             "name": "burn_pottery_sherd",
-            "price": 18,
+            "price": [
+                18,
+                21
+            ],
             "value": 1
         },
         "Глиняный черепок «Поток»": {
             "name": "flow_pottery_sherd",
-            "price": 14,
+            "price": [
+                14,
+                16
+            ],
             "value": 1
         },
         "Глиняный черепок «Разбитое сердце»": {
             "name": "heartbreak_pottery_sherd",
-            "price": 20,
+            "price": [
+                20,
+                23
+            ],
             "value": 1
         },
         "Глиняный черепок «Руки вверх»": {
             "name": "arms_up_pottery_sherd",
-            "price": 16,
+            "price": [
+                16,
+                18
+            ],
             "value": 1
         },
         "Глиняный черепок «Рыбак»": {
             "name": "angler_pottery_sherd",
-            "price": 15,
+            "price": [
+                15,
+                17
+            ],
             "value": 1
         },
         "Глиняный черепок «Сердце»": {
             "name": "heart_pottery_sherd",
-            "price": 22,
+            "price": [
+                22,
+                25
+            ],
             "value": 1
         },
         "Глиняный черепок «Скорбь»": {
             "name": "mourner_pottery_sherd",
-            "price": 18,
+            "price": [
+                18,
+                21
+            ],
             "value": 1
         },
         "Глиняный черепок «Сноп»": {
             "name": "sheaf_pottery_sherd",
-            "price": 14,
+            "price": [
+                14,
+                16
+            ],
             "value": 1
         },
         "Глиняный черепок «Убежище»": {
             "name": "shelter_pottery_sherd",
-            "price": 16,
+            "price": [
+                16,
+                18
+            ],
             "value": 1
         },
         "Глиняный черепок «Угроза»": {
             "name": "danger_pottery_sherd",
-            "price": 12,
+            "price": [
+                12,
+                14
+            ],
             "value": 1
         },
         "Глиняный черепок «Череп»": {
             "name": "skull_pottery_sherd",
-            "price": 20,
+            "price": [
+                20,
+                23
+            ],
             "value": 1
         },
         "Глиняный черепок «Шахтёр»": {
             "name": "miner_pottery_sherd",
-            "price": 18,
+            "price": [
+                18,
+                21
+            ],
             "value": 1
         },
         "Кость": {
             "name": "bone",
-            "price": 3,
+            "price": [
+                3,
+                4
+            ],
             "value": 8
         },
         "Костяной блок": {
             "name": "bone_block",
-            "price": 5,
+            "price": [
+                5,
+                6
+            ],
             "value": 1
         },
         "Глиняный кирпич": {
             "name": "brick",
-            "price": 5,
+            "price": [
+                5,
+                6
+            ],
             "value": 4
         },
         "Декоративный горшок": {
             "name": "decorated_pot",
-            "price": 40,
+            "price": [
+                40,
+                45
+            ],
             "value": 1
         },
         "Кисть": {
             "name": "brush",
-            "price": 5,
+            "price": [
+                5,
+                6
+            ],
             "value": 1
         },
         "Уголь": {
             "name": "coal",
-            "price": 4,
+            "price": [
+                4,
+                5
+            ],
             "value": 16
         }
     },
@@ -1118,37 +1274,58 @@
     "end": {
         "Стержень Энда": {
             "name": "end_rod",
-            "price": 13,
+            "price": [
+                13,
+                15
+            ],
             "value": 1
         },
         "Голова дракона": {
             "name": "dragon_head",
-            "price": 36,
+            "price": [
+                36,
+                41
+            ],
             "value": 1
         },
         "Элитры": {
             "name": "elytra",
-            "price": 176,
+            "price": [
+                176,
+                198
+            ],
             "value": 1
         },
         "Кристалл Энда": {
             "name": "end_crystal",
-            "price": 32,
+            "price": [
+                32,
+                36
+            ],
             "value": 2
         },
         "Драконье дыхание": {
             "name": "dragon_breath",
-            "price": 20,
+            "price": [
+                20,
+                23
+            ],
             "value": 1
         },
         "Плод хоруса": {
             "name": "chorus_fruit",
-            "price": 16,
+            "price": [
+                16,
+                18
+            ],
             "value": 3
         },
         "Книга «Мягкое падение IV»": {
             "name": "enchanted_book[stored_enchantments={feather_falling:4}]",
-            "price": 25,
+            "price": [
+                25,
+                28
+            ],
             "value": 1
         }
     },
@@ -1277,424 +1454,676 @@
     "potions": {
         "Зелье огнестойкости": {
             "name": "potion[potion_contents={potion:\"fire_resistance\"}]",
-            "price": 15,
+            "price": [
+                15,
+                18
+            ],
             "value": 1
         },
         "Зелье огнестойкости (усиленное)": {
             "name": "potion[potion_contents={potion:\"long_fire_resistance\"}]",
-            "price": 25,
+            "price": [
+                25,
+                29
+            ],
             "value": 1
         },
         "Зелье урона": {
             "name": "potion[potion_contents={potion:\"harming\"}]",
-            "price": 20,
+            "price": [
+                20,
+                23
+            ],
             "value": 1
         },
-        "Зелье урона II": {
+        "Зелье урода II": {
             "name": "potion[potion_contents={potion:\"strong_harming\"}]",
-            "price": 35,
+            "price": [
+                35,
+                41
+            ],
             "value": 1
         },
         "Зелье лечения": {
             "name": "potion[potion_contents={potion:\"healing\"}]",
-            "price": 18,
+            "price": [
+                18,
+                21
+            ],
             "value": 1
         },
         "Зелье лечения II": {
             "name": "potion[potion_contents={potion:\"strong_healing\"}]",
-            "price": 32,
+            "price": [
+                32,
+                37
+            ],
             "value": 1
         },
         "Зелье заражения": {
             "name": "potion[potion_contents={potion:\"infested\"}]",
-            "price": 45,
+            "price": [
+                45,
+                52
+            ],
             "value": 1
         },
         "Зелье невидимости": {
             "name": "potion[potion_contents={potion:\"invisibility\"}]",
-            "price": 28,
+            "price": [
+                28,
+                33
+            ],
             "value": 1
         },
         "Зелье невидимости (усиленное)": {
             "name": "potion[potion_contents={potion:\"long_invisibility\"}]",
-            "price": 42,
+            "price": [
+                42,
+                49
+            ],
             "value": 1
         },
         "Зелье прыгучести": {
             "name": "potion[potion_contents={potion:\"leaping\"}]",
-            "price": 16,
+            "price": [
+                16,
+                19
+            ],
             "value": 1
         },
         "Зелье прыгучести (усиленное)": {
             "name": "potion[potion_contents={potion:\"long_leaping\"}]",
-            "price": 26,
+            "price": [
+                26,
+                30
+            ],
             "value": 1
         },
         "Зелье прыгучести II": {
             "name": "potion[potion_contents={potion:\"strong_leaping\"}]",
-            "price": 38,
+            "price": [
+                38,
+                44
+            ],
             "value": 1
         },
         "Зелье удачи": {
             "name": "potion[potion_contents={potion:\"luck\"}]",
-            "price": 50,
+            "price": [
+                50,
+                58
+            ],
             "value": 1
         },
         "Зелье ночного зрения": {
             "name": "potion[potion_contents={potion:\"night_vision\"}]",
-            "price": 14,
+            "price": [
+                14,
+                17
+            ],
             "value": 1
         },
         "Зелье слизи": {
             "name": "potion[potion_contents={potion:\"oozing\"}]",
-            "price": 40,
+            "price": [
+                40,
+                46
+            ],
             "value": 1
         },
         "Зелье отравления": {
             "name": "potion[potion_contents={potion:\"poison\"}]",
-            "price": 17,
+            "price": [
+                17,
+                20
+            ],
             "value": 1
         },
         "Зелье отравления (усиленное)": {
             "name": "potion[potion_contents={potion:\"long_poison\"}]",
-            "price": 27,
+            "price": [
+                27,
+                32
+            ],
             "value": 1
         },
         "Зелье отравления II": {
             "name": "potion[potion_contents={potion:\"strong_poison\"}]",
-            "price": 36,
+            "price": [
+                36,
+                42
+            ],
             "value": 1
         },
         "Зелье регенерации": {
             "name": "potion[potion_contents={potion:\"regeneration\"}]",
-            "price": 22,
+            "price": [
+                22,
+                26
+            ],
             "value": 1
         },
         "Зелье регенерации (усиленное)": {
             "name": "potion[potion_contents={potion:\"long_regeneration\"}]",
-            "price": 34,
+            "price": [
+                34,
+                40
+            ],
             "value": 1
         },
         "Зелье регенерации II": {
             "name": "potion[potion_contents={potion:\"strong_regeneration\"}]",
-            "price": 45,
+            "price": [
+                45,
+                52
+            ],
             "value": 1
         },
         "Зелье медленного падения": {
             "name": "potion[potion_contents={potion:\"slow_falling\"}]",
-            "price": 19,
+            "price": [
+                19,
+                23
+            ],
             "value": 1
         },
         "Зелье медленного падения (усиленное)": {
             "name": "potion[potion_contents={potion:\"long_slow_falling\"}]",
-            "price": 29,
+            "price": [
+                29,
+                34
+            ],
             "value": 1
         },
         "Зелье медлительности": {
             "name": "potion[potion_contents={potion:\"slowness\"}]",
-            "price": 16,
+            "price": [
+                16,
+                19
+            ],
             "value": 1
         },
         "Зелье медлительности (усиленное)": {
             "name": "potion[potion_contents={potion:\"long_slowness\"}]",
-            "price": 24,
+            "price": [
+                24,
+                28
+            ],
             "value": 1
         },
         "Зелье медлительности II": {
             "name": "potion[potion_contents={potion:\"strong_slowness\"}]",
-            "price": 32,
+            "price": [
+                32,
+                37
+            ],
             "value": 1
         },
         "Зелье силы": {
             "name": "potion[potion_contents={potion:\"strength\"}]",
-            "price": 24,
+            "price": [
+                24,
+                28
+            ],
             "value": 1
         },
         "Зелье силы (усиленное)": {
             "name": "potion[potion_contents={potion:\"long_strength\"}]",
-            "price": 38,
+            "price": [
+                38,
+                44
+            ],
             "value": 1
         },
         "Зелье силы II": {
             "name": "potion[potion_contents={potion:\"strong_strength\"}]",
-            "price": 48,
+            "price": [
+                48,
+                56
+            ],
             "value": 1
         },
         "Зелье скорости": {
             "name": "potion[potion_contents={potion:\"swiftness\"}]",
-            "price": 20,
+            "price": [
+                20,
+                23
+            ],
             "value": 1
         },
         "Зелье скорости (усиленное)": {
             "name": "potion[potion_contents={potion:\"long_swiftness\"}]",
-            "price": 32,
+            "price": [
+                32,
+                37
+            ],
             "value": 1
         },
         "Зелье скорости II": {
             "name": "potion[potion_contents={potion:\"strong_swiftness\"}]",
-            "price": 42,
+            "price": [
+                42,
+                49
+            ],
             "value": 1
         },
         "Зелье черепашьей мощи": {
             "name": "potion[potion_contents={potion:\"turtle_master\"}]",
-            "price": 30,
+            "price": [
+                30,
+                35
+            ],
             "value": 1
         },
         "Зелье черепашьей мощи (усиленное)": {
             "name": "potion[potion_contents={potion:\"long_turtle_master\"}]",
-            "price": 45,
+            "price": [
+                45,
+                52
+            ],
             "value": 1
         },
         "Зелье черепашьей мощи II": {
             "name": "potion[potion_contents={potion:\"strong_turtle_master\"}]",
-            "price": 55,
+            "price": [
+                55,
+                64
+            ],
             "value": 1
         },
         "Зелье подводного дыхания": {
             "name": "potion[potion_contents={potion:\"water_breathing\"}]",
-            "price": 18,
+            "price": [
+                18,
+                21
+            ],
             "value": 1
         },
         "Зелье подводного дыхания (усиленное)": {
             "name": "potion[potion_contents={potion:\"long_water_breathing\"}]",
-            "price": 28,
+            "price": [
+                28,
+                33
+            ],
             "value": 1
         },
         "Зелье слабости": {
             "name": "potion[potion_contents={potion:\"weakness\"}]",
-            "price": 12,
+            "price": [
+                12,
+                14
+            ],
             "value": 1
         },
         "Зелье слабости (усиленное)": {
             "name": "potion[potion_contents={potion:\"long_weakness\"}]",
-            "price": 18,
+            "price": [
+                18,
+                21
+            ],
             "value": 1
         },
         "Зелье плетения": {
             "name": "potion[potion_contents={potion:\"weaving\"}]",
-            "price": 35,
+            "price": [
+                35,
+                41
+            ],
             "value": 1
         },
         "Зелье ветряного заряда": {
             "name": "potion[potion_contents={potion:\"wind_charged\"}]",
-            "price": 40,
+            "price": [
+                40,
+                46
+            ],
             "value": 1
         }
     },
     "books": {
         "Книга «Подводник»": {
             "name": "enchanted_book[stored_enchantments={aqua_affinity:1}]",
-            "price": 20,
+            "price": [
+                20,
+                23
+            ],
             "value": 1
         },
         "Книга «Бич членистоногих V»": {
             "name": "enchanted_book[stored_enchantments={bane_of_arthropods:5}]",
-            "price": 30,
+            "price": [
+                30,
+                34
+            ],
             "value": 1
         },
         "Книга «Взрывоустойчивость IV»": {
             "name": "enchanted_book[stored_enchantments={blast_protection:4}]",
-            "price": 40,
+            "price": [
+                40,
+                45
+            ],
             "value": 1
         },
         "Книга «Пробитие IV»": {
             "name": "enchanted_book[stored_enchantments={breach:4}]",
-            "price": 56,
+            "price": [
+                56,
+                63
+            ],
             "value": 1
         },
         "Книга «Громовержец»": {
             "name": "enchanted_book[stored_enchantments={channeling:1}]",
-            "price": 30,
+            "price": [
+                30,
+                34
+            ],
             "value": 1
         },
         "Книга «Проклятие несъемности»": {
             "name": "enchanted_book[stored_enchantments={binding_curse:1}]",
-            "price": 10,
+            "price": [
+                10,
+                12
+            ],
             "value": 1
         },
         "Книга «Проклятие исчезновения»": {
             "name": "enchanted_book[stored_enchantments={vanishing_curse:1}]",
-            "price": 10,
+            "price": [
+                10,
+                12
+            ],
             "value": 1
         },
         "Книга «Плотность V»": {
             "name": "enchanted_book[stored_enchantments={density:5}]",
-            "price": 30,
+            "price": [
+                30,
+                34
+            ],
             "value": 1
         },
         "Книга «Подводная ходьба III»": {
             "name": "enchanted_book[stored_enchantments={depth_strider:3}]",
-            "price": 20,
+            "price": [
+                20,
+                23
+            ],
             "value": 1
         },
         "Книга «Эффективность V»": {
             "name": "enchanted_book[stored_enchantments={efficiency:5}]",
-            "price": 48,
+            "price": [
+                48,
+                54
+            ],
             "value": 1
         },
         "Книга «Невесомость IV»": {
             "name": "enchanted_book[stored_enchantments={feather_falling:4}]",
-            "price": 24,
+            "price": [
+                24,
+                27
+            ],
             "value": 1
         },
         "Книга «Заговор огня II»": {
             "name": "enchanted_book[stored_enchantments={fire_aspect:2}]",
-            "price": 26,
+            "price": [
+                26,
+                30
+            ],
             "value": 1
         },
         "Книга «Огнеупорность IV»": {
             "name": "enchanted_book[stored_enchantments={fire_protection:4}]",
-            "price": 30,
+            "price": [
+                30,
+                34
+            ],
             "value": 1
         },
         "Книга «Воспламенение»": {
             "name": "enchanted_book[stored_enchantments={flame:1}]",
-            "price": 31,
+            "price": [
+                31,
+                35
+            ],
             "value": 1
         },
         "Книга «Удача III»": {
             "name": "enchanted_book[stored_enchantments={fortune:3}]",
-            "price": 53,
+            "price": [
+                53,
+                60
+            ],
             "value": 1
         },
         "Книга «Ледоход II»": {
             "name": "enchanted_book[stored_enchantments={frost_walker:2}]",
-            "price": 22,
+            "price": [
+                22,
+                25
+            ],
             "value": 1
         },
         "Книга «Пронзатель V»": {
             "name": "enchanted_book[stored_enchantments={impaling:5}]",
-            "price": 30,
+            "price": [
+                30,
+                34
+            ],
             "value": 1
         },
         "Книга «Бесконечность»": {
             "name": "enchanted_book[stored_enchantments={infinity:1}]",
-            "price": 60,
+            "price": [
+                60,
+                68
+            ],
             "value": 1
         },
         "Книга «Отдача II»": {
             "name": "enchanted_book[stored_enchantments={knockback:2}]",
-            "price": 27,
+            "price": [
+                27,
+                31
+            ],
             "value": 1
         },
         "Книга «Добыча III»": {
             "name": "enchanted_book[stored_enchantments={looting:3}]",
-            "price": 50,
+            "price": [
+                50,
+                56
+            ],
             "value": 1
         },
         "Книга «Верность III»": {
             "name": "enchanted_book[stored_enchantments={loyalty:3}]",
-            "price": 23,
+            "price": [
+                23,
+                26
+            ],
             "value": 1
         },
         "Книга «Везучий рыбак III»": {
             "name": "enchanted_book[stored_enchantments={luck_of_the_sea:3}]",
-            "price": 21,
+            "price": [
+                21,
+                24
+            ],
             "value": 1
         },
         "Книга «Приманка III»": {
             "name": "enchanted_book[stored_enchantments={lure:3}]",
-            "price": 20,
+            "price": [
+                20,
+                23
+            ],
             "value": 1
         },
         "Книга «Починка»": {
             "name": "enchanted_book[stored_enchantments={mending:1}]",
-            "price": 70,
+            "price": [
+                70,
+                79
+            ],
             "value": 1
         },
         "Книга «Тройной выстрел»": {
             "name": "enchanted_book[stored_enchantments={multishot:1}]",
-            "price": 32,
+            "price": [
+                32,
+                36
+            ],
             "value": 1
         },
         "Книга «Пронзающий выстрел IV»": {
             "name": "enchanted_book[stored_enchantments={piercing:4}]",
-            "price": 31,
+            "price": [
+                31,
+                35
+            ],
             "value": 1
         },
         "Книга «Сила V»": {
             "name": "enchanted_book[stored_enchantments={power:5}]",
-            "price": 48,
+            "price": [
+                48,
+                54
+            ],
             "value": 1
         },
         "Книга «Защита от снарядов IV»": {
             "name": "enchanted_book[stored_enchantments={projectile_protection:4}]",
-            "price": 32,
+            "price": [
+                32,
+                36
+            ],
             "value": 1
         },
         "Книга «Защита IV»": {
             "name": "enchanted_book[stored_enchantments={protection:4}]",
-            "price": 36,
+            "price": [
+                36,
+                41
+            ],
             "value": 1
         },
         "Книга «Отбрасывание II»": {
             "name": "enchanted_book[stored_enchantments={punch:2}]",
-            "price": 30,
+            "price": [
+                30,
+                34
+            ],
             "value": 1
         },
         "Книга «Быстрая перезарядка III»": {
             "name": "enchanted_book[stored_enchantments={quick_charge:3}]",
-            "price": 28,
+            "price": [
+                28,
+                32
+            ],
             "value": 1
         },
         "Книга «Подводное дыхание III»": {
             "name": "enchanted_book[stored_enchantments={respiration:3}]",
-            "price": 24,
+            "price": [
+                24,
+                27
+            ],
             "value": 1
         },
         "Книга «Тягун I»": {
             "name": "enchanted_book[stored_enchantments={riptide:1}]",
-            "price": 21,
+            "price": [
+                21,
+                24
+            ],
             "value": 1
         },
         "Книга «Острота V»": {
             "name": "enchanted_book[stored_enchantments={sharpness:5}]",
-            "price": 43,
+            "price": [
+                43,
+                49
+            ],
             "value": 1
         },
         "Книга «Шёлковое касание»": {
             "name": "enchanted_book[stored_enchantments={silk_touch:1}]",
-            "price": 61,
+            "price": [
+                61,
+                69
+            ],
             "value": 1
         },
         "Книга «Небесная кара V»": {
             "name": "enchanted_book[stored_enchantments={smite:5}]",
-            "price": 34,
+            "price": [
+                34,
+                39
+            ],
             "value": 1
         },
         "Книга «Скорость души III»": {
             "name": "enchanted_book[stored_enchantments={soul_speed:3}]",
-            "price": 32,
+            "price": [
+                32,
+                36
+            ],
             "value": 1
         },
         "Книга «Разящий клинок III»": {
             "name": "enchanted_book[stored_enchantments={sweeping_edge:3}]",
-            "price": 49,
+            "price": [
+                49,
+                55
+            ],
             "value": 1
         },
         "Книга «Проворство III»": {
             "name": "enchanted_book[stored_enchantments={swift_sneak:3}]",
-            "price": 28,
+            "price": [
+                28,
+                32
+            ],
             "value": 1
         },
         "Книга «Шипы III»": {
             "name": "enchanted_book[stored_enchantments={thorns:3}]",
-            "price": 41,
+            "price": [
+                41,
+                46
+            ],
             "value": 1
         },
         "Книга «Прочность II»": {
             "name": "enchanted_book[stored_enchantments={unbreaking:2}]",
-            "price": 25,
+            "price": [
+                25,
+                28
+            ],
             "value": 1
         },
         "Книга «Порыв ветра III»": {
             "name": "enchanted_book[stored_enchantments={wind_burst:3}]",
-            "price": 45,
+            "price": [
+                45,
+                51
+            ],
             "value": 1
         },
         "Книга «Аккуратный I»": {
             "name": "enchanted_book[stored_enchantments={\"excellentenchants:thrifty\":1}]",
-            "price": 74,
+            "price": [
+                74,
+                83
+            ],
             "value": 1
         }
     },
