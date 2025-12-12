@@ -65,3 +65,5 @@ CitiesTimeout: 50
 AI:
   MaxTokens: 1500
   ContentSim: 0.7
+  Try: 3
+  FloodSleepTime: 10

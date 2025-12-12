@@ -261,7 +261,7 @@ async def crocodile_hint(event: Message):
     game["hints"] = hint
     db.database("current_game", game)
     word = game["word"]
-    if (random() < config.coofs.PercentForRandomLetter) and (len(hint) > 1):
+    async def letter_hint():
         n = 1
         for letter in list(game["unsec"]):
             if letter == "_":
@@ -269,7 +269,16 @@ async def crocodile_hint(event: Message):
                     f"{n} буква в слове - **{game['word'][n - 1]}**",
                 )
             n += 1
-    return await event.reply((await ai.crocodile.send_message(word)).text)
+    if (random() < config.coofs.PercentForRandomLetter) and (len(hint) > 1):
+        return await letter_hint()
+    limit = 1
+    while limit <= config.coofs.AI.Try:
+        try:
+            return await event.reply((await ai.crocodile.send_message(word)).text)
+        except Exception:
+            limit += 1
+            await asyncio.sleep(config.coofs.AI.FloodSleepTime)
+    return await letter_hint()
 
 
 @logger.catch
