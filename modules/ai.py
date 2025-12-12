@@ -9,8 +9,8 @@ from . import config, pathes, phrase
 
 logger.info(f"Загружен модуль {__name__}!")
 
-soc_client = genai.Client(
-    api_key=config.tokens.ai.social,
+chat_client = genai.Client(
+    api_key=config.tokens.ai.chat,
     http_options=types.HttpOptions(
         async_client_args={"proxy": config.tokens.proxy},
         client_args={"proxy": config.tokens.proxy},
@@ -22,8 +22,15 @@ mc_client = genai.Client(
         async_client_args={"proxy": config.tokens.proxy},
     ),
 )
+soc_client = genai.Client(
+    api_key=config.tokens.ai.social,
+    http_options=types.HttpOptions(
+        async_client_args={"proxy": config.tokens.proxy},
+        client_args={"proxy": config.tokens.proxy},
+    ),
+)
 
-chat = soc_client.aio.chats.create(model=config.vars.AiModel)
+chat = chat_client.aio.chats.create(model=config.vars.AiModel)
 crocodile = soc_client.aio.chats.create(model=config.vars.AiModel)
 staff = soc_client.aio.chats.create(model=config.vars.AiModel)
 players = {}
