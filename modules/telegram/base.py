@@ -157,9 +157,6 @@ async def msktime(event: Message):
 )
 @client.on(events.NewMessage(pattern=r"(?i)^/mine$", func=checks))
 @client.on(
-    events.NewMessage(pattern=r"(?i)^(шахта|майнить|копать)$", func=checks)
-)
-@client.on(
     events.NewMessage(pattern=r"(?i)^/(шахта|майнить|копать)$", func=checks)
 )
 async def mine_start(event: Message):
