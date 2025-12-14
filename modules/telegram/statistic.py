@@ -20,49 +20,55 @@ async def active_check(event: Message):
     arg: str = event.pattern_match.group(1).strip()
 
     if arg in phrase.all_arg:
-        text = phrase.stat.chat.format("всё время")
         all_data = db.statistic().get_all(all_days=True)
         chart.create_plot(db.statistic().get_raw())
         n = 1
+        players = ""
         for data in all_data:
             if n > config.coofs.MaxStatPlayers:
                 break
-            text += f"{n}. {data[0]} - {data[1]}\n"
+            players += f"{n}. {data[0]} - {data[1]}\n"
             n += 1
-        return await client.send_file(event.chat_id, pathes.chart, caption=text)
+        text = phrase.stat.chat.format(time="всё время", text=players)
+        return await client.send_file(
+            event.chat_id, pathes.chart, caption=text, parse_mode="html"
+        )
 
     try:
         days = int(arg)
-        text = phrase.stat.chat.format(formatter.value_to_str(days, "день"))
         all_data = db.statistic(days=days).get_all()
         if days >= 7:
             chart.create_plot(db.statistic(days=days).get_raw())
             n = 1
+            players = ""
             for data in all_data:
                 if n > config.coofs.MaxStatPlayers:
                     break
-                text += f"{n}. {data[0]} - {data[1]}\n"
+                players += f"{n}. {data[0]} - {data[1]}\n"
                 n += 1
+            text = phrase.stat.chat.format(
+                time=formatter.value_to_str(days, "день"), text=players
+            )
             return await client.send_file(
-                event.chat_id,
-                pathes.chart,
-                caption=text,
+                event.chat_id, pathes.chart, caption=text, parse_mode="html"
             )
     except ValueError:
-        text = phrase.stat.chat.format("день")
         all_data = db.statistic().get_all()
 
     if all_data == []:
         return await event.reply(phrase.stat.empty)
 
     n = 1
+    players = ""
     for data in all_data:
         if n > config.coofs.MaxStatPlayers:
             break
-        text += f"{n}. {data[0]} - {data[1]}\n"
+        players += f"{n}. {data[0]} - {data[1]}\n"
         n += 1
 
-    return await event.reply(text)
+    return await event.respond(
+        phrase.stat.chat.format(time="день", text=players), parse_mode="html"
+    )
 
 
 @client.on(events.NewMessage(pattern=r"(?i)^/топ крокодил$", func=checks))
