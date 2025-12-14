@@ -1,6 +1,6 @@
 [project]
 name = "lumintobot"
-version = "1.0"
+version = "1.1"
 description = "Бот люминта с клёвыми функциями!"
 readme = "README.md"
 requires-python = ">=3.14"
@@ -29,7 +29,7 @@ dependencies = [
 unsafe-fixes = true
 line-length = 88
 indent-width = 4
-target-version = "py313"
+target-version = "py314"
 
 [tool.ruff.lint]
 select = ["E4", "E7", "E9", "F"]

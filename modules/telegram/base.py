@@ -1,7 +1,7 @@
 import asyncio
 import re
 from datetime import datetime
-from random import choice, randint, random
+from random import randint, choice
 from time import time
 
 import aioping
@@ -11,8 +11,9 @@ from telethon import events
 from telethon.tl import types
 from telethon.tl.custom import Message
 from telethon.tl.functions.users import GetFullUserRequest
+from telethon import Button
 
-from .. import ai, config, db, formatter, mcrcon, pathes, phrase, pic
+from .. import ai, config, db, formatter, mcrcon, pathes, phrase, pic, mining
 from ..system_info import get_system_info
 from .client import client
 from .func import get_name
@@ -30,9 +31,9 @@ async def host(event: Message):
         phrase.server.host.format(
             v4=db.database("host"),
             v6=db.database("ipv6_host"),
-            hint="https://trassert.ru/wiki/info/ipv6"
+            hint="https://trassert.ru/wiki/info/ipv6",
         ),
-        link_preview=False
+        link_preview=False,
     )
 
 
@@ -131,7 +132,8 @@ async def profile(event: Message):
             m_month=m_month,
             m_all=m_all,
             balance=formatter.value_to_str(
-                await db.get_money(event.sender_id), "изумруд",
+                await db.get_money(event.sender_id),
+                "изумруд",
             ),
             time=time,
         ),
@@ -148,45 +150,48 @@ async def msktime(event: Message):
     )
 
 
-@client.on(events.NewMessage(pattern=r"(?i)^/г шахта$", func=checks))
-@client.on(events.NewMessage(pattern=r"(?i)^/г майнить$", func=checks))
-@client.on(events.NewMessage(pattern=r"(?i)^/г копать$, func=checks"))
-@client.on(events.NewMessage(pattern=r"(?i)^/шахта$", func=checks))
-@client.on(events.NewMessage(pattern=r"(?i)^/майнить$", func=checks))
-@client.on(events.NewMessage(pattern=r"(?i)^/копать$", func=checks))
-@client.on(events.NewMessage(pattern=r"(?i)^шахта$", func=checks))
-@client.on(events.NewMessage(pattern=r"(?i)^майнить$", func=checks))
-@client.on(events.NewMessage(pattern=r"(?i)^копать$", func=checks))
-@client.on(events.NewMessage(pattern=r"(?i)^/mine", func=checks))
-async def mine(event: Message):
-    if (db.states.if_player(event.sender_id) is False) and (
-        db.states.if_author(event.sender_id) is False
+@client.on(
+    events.NewMessage(
+        pattern=r"(?i)^(/г )?(шахта|майнить|копать)$", func=checks
+    )
+)
+@client.on(events.NewMessage(pattern=r"(?i)^/mine$", func=checks))
+@client.on(
+    events.NewMessage(pattern=r"(?i)^(шахта|майнить|копать)$", func=checks)
+)
+@client.on(
+    events.NewMessage(pattern=r"(?i)^/(шахта|майнить|копать)$", func=checks)
+)
+async def mine_start(event: Message):
+    if not (
+        db.states.if_player(event.sender_id)
+        or db.states.if_author(event.sender_id)
     ):
         return await event.reply(phrase.mine.not_in_state)
+
     if db.ready_to_mine(event.sender_id) is False:
         return await event.reply(choice(phrase.mine.not_ready))
 
-    rand = random()
-    if rand < config.coofs.ChanceToDie:
-        added = randint(1, config.coofs.MineMaxGems)
-        balance = await db.get_money(event.sender_id)
-        added = min(added, balance)
-        text = choice(phrase.mine.die).format(
-            killer=choice(phrase.mine.killers),
-            value=formatter.value_to_str(added, "изумруд"),
-        )
-        db.add_money(event.sender_id, -added)
-    elif rand > 1 - config.coofs.ChanceToBoost:
-        added = randint(config.coofs.MineMaxGems, config.coofs.MineMaxBoost)
-        text = choice(phrase.mine.boost).format(
-            formatter.value_to_str(added, "изумруд"),
-        )
-        db.add_money(event.sender_id, added)
-    else:
-        added = randint(1, config.coofs.MineMaxGems)
-        text = phrase.mine.done.format(formatter.value_to_str(added, "изумруд"))
-        db.add_money(event.sender_id, added)
-    return await event.reply(text)
+    if event.sender_id in mining.sessions:
+        return await event.reply(phrase.mine.already)
+
+    initial = randint(1, config.coofs.Mining.InitialGems)
+    mining.sessions[event.sender_id] = {
+        "gems": initial,
+        "death_chance": config.coofs.Mining.BaseDeathChance,
+        "step": 1,
+    }
+    asyncio.create_task(mining.cleanup_session(event.sender_id))
+
+    buttons = [
+        [Button.inline(phrase.mine.button_yes, f"mine.yes.{event.sender_id}")],
+        [Button.inline(phrase.mine.button_no, f"mine.no.{event.sender_id}")],
+    ]
+    return await event.reply(
+        phrase.mine.done.format(formatter.value_to_str(initial, "изумруд"))
+        + phrase.mine.q,
+        buttons=buttons,
+    )
 
 
 @client.on(events.NewMessage(pattern=r"(?i)^/слово (.+)", func=checks))
@@ -311,7 +316,8 @@ async def word_remove_empty(event: Message):
     if roles.get(event.sender_id) < roles.ADMIN:
         return await event.reply(
             phrase.roles.no_perms.format(
-                level=roles.ADMIN, name=phrase.roles.admin,
+                level=roles.ADMIN,
+                name=phrase.roles.admin,
             ),
         )
     return await event.reply(phrase.word.rem_empty)
@@ -323,7 +329,8 @@ async def word_remove(event: Message):
     if roles.get(event.sender_id) < roles.ADMIN:
         return await event.reply(
             phrase.roles.no_perms.format(
-                level=roles.ADMIN, name=phrase.roles.admin,
+                level=roles.ADMIN,
+                name=phrase.roles.admin,
             ),
         )
     word = event.pattern_match.group(1).strip().lower()
@@ -414,7 +421,9 @@ async def swap_money(event: Message):
     db.add_money(event.sender_id, -count)
     db.add_money(user, count)
     return await event.reply(
-        phrase.money.swap_money.format(formatter.value_to_str(count, "изумруд")),
+        phrase.money.swap_money.format(
+            formatter.value_to_str(count, "изумруд")
+        ),
     )
 
 
@@ -484,7 +493,8 @@ async def get_balance(event: Message):
     return await event.reply(
         phrase.money.wallet.format(
             formatter.value_to_str(
-                await db.get_money(event.sender_id), "изумруд",
+                await db.get_money(event.sender_id),
+                "изумруд",
             ),
         ),
     )
@@ -536,7 +546,8 @@ async def link_nick(event: Message):
         return await event.reply(
             phrase.nick.already_have.format(
                 price=formatter.value_to_str(
-                    config.coofs.PriceForChangeNick, "изумруд",
+                    config.coofs.PriceForChangeNick,
+                    "изумруд",
                 ),
             ),
             buttons=keyboard,
@@ -610,7 +621,8 @@ async def randompic(event: Message):
 @client.on(events.NewMessage(pattern=r"(?i)^/карта$", func=checks))
 async def getmap(event: Message):
     return await event.reply(
-        phrase.get_map.format(db.database("host")), link_preview=False,
+        phrase.get_map.format(db.database("host")),
+        link_preview=False,
     )
 
 
@@ -790,7 +802,8 @@ async def cities_remove_empty(event: Message):
     if roles.get(event.sender_id) < roles.ADMIN:
         return await event.reply(
             phrase.roles.no_perms.format(
-                level=roles.ADMIN, name=phrase.roles.admin,
+                level=roles.ADMIN,
+                name=phrase.roles.admin,
             ),
         )
     return await event.reply(phrase.cities.rem_empty)
@@ -802,7 +815,8 @@ async def cities_remove(event: Message):
     if roles.get(event.sender_id) < roles.ADMIN:
         return await event.reply(
             phrase.roles.no_perms.format(
-                level=roles.ADMIN, name=phrase.roles.admin,
+                level=roles.ADMIN,
+                name=phrase.roles.admin,
             ),
         )
     word = event.pattern_match.group(1).strip().lower()
@@ -830,7 +844,8 @@ async def cities_remove(event: Message):
 @client.on(events.NewMessage(pattern=r"(?i)^правила чата$", func=checks))
 async def rules(event: Message):
     return await event.reply(
-        phrase.rules.base.format(db.database("host")), link_preview=False,
+        phrase.rules.base.format(db.database("host")),
+        link_preview=False,
     )
 
 

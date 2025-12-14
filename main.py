@@ -13,7 +13,7 @@ logger.add(
     level="INFO",
     colorize=True,
     backtrace=False,
-    diagnose=False
+    diagnose=False,
 )
 
 
@@ -21,7 +21,8 @@ class InterceptHandler(logging.Handler):
     def emit(self, record):
         level = "TRACE" if record.levelno == 5 else record.levelname
         logger.opt(depth=6, exception=record.exc_info).log(
-            level, record.getMessage(),
+            level,
+            record.getMessage(),
         )
 
 
@@ -59,7 +60,8 @@ async def main():
     await task_gen.RewardsTask.create(tasks.rewards, "19:00")
     await task_gen.RemoveStatesTask.create(tasks.remove_states, "17:00")
     await asyncio.gather(
-        tg.run_until_disconnected(), vk.start(), #tasks.port_checks(),
+        tg.run_until_disconnected(),
+        vk.start(),  # tasks.port_checks(),
     )
 
 
@@ -67,6 +69,7 @@ if __name__ == "__main__":
     try:
         try:
             import uvloop
+
             uvloop.run(main())
         except ModuleNotFoundError:
             logger.warning(

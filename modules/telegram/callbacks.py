@@ -1,10 +1,21 @@
 import asyncio
-from random import choice
+from random import choice, random, randint
 
 from loguru import logger
 from telethon import events, types
+from telethon import Button
 
-from .. import config, db, dice, floodwait, formatter, mcrcon, pathes, phrase
+from .. import (
+    config,
+    db,
+    dice,
+    floodwait,
+    formatter,
+    mcrcon,
+    pathes,
+    phrase,
+    mining,
+)
 from .client import client
 from .func import get_name
 from .games import crocodile_handler, crocodile_hint
@@ -42,7 +53,8 @@ async def state_callback(event: events.CallbackQuery.Event):
         await client.send_message(
             entity=config.chats.chat,
             message=phrase.state.new_player.format(
-                state=state.name, player=nick,
+                state=state.name,
+                player=nick,
             ),
             reply_to=config.chats.topics.rp,
         )
@@ -50,7 +62,8 @@ async def state_callback(event: events.CallbackQuery.Event):
             await client.send_message(
                 entity=config.chats.chat,
                 message=phrase.state.up.format(
-                    name=state.name, type="Государство",
+                    name=state.name,
+                    type="Государство",
                 ),
                 reply_to=config.chats.topics.rp,
             )
@@ -63,7 +76,8 @@ async def state_callback(event: events.CallbackQuery.Event):
             )
             state.change("type", 2)
         return await event.answer(
-            phrase.state.admit.format(state.name), alert=True,
+            phrase.state.admit.format(state.name),
+            alert=True,
         )
     if data[1] == "remove":
         try:
@@ -103,7 +117,8 @@ async def state_callback(event: events.CallbackQuery.Event):
         db.states.add(state_name, event.sender_id)
         await event.reply(
             phrase.state.make_by_callback.format(
-                author=await get_name(event.sender_id), state_name=state_name,
+                author=await get_name(event.sender_id),
+                state_name=state_name,
             ),
         )
         return await client.send_message(
@@ -132,13 +147,15 @@ async def state_callback(event: events.CallbackQuery.Event):
         db.add_money(event.sender_id, -config.coofs.PriceForChangeStateNick)
         await event.reply(
             phrase.state.renamed.format(
-                old=state_name.capitalize(), new=data[2].capitalize(),
+                old=state_name.capitalize(),
+                new=data[2].capitalize(),
             ),
         )
         return await client.send_message(
             entity=config.chats.chat,
             message=phrase.state.renamed.format(
-                old=state_name.capitalize(), new=data[2].capitalize(),
+                old=state_name.capitalize(),
+                new=data[2].capitalize(),
             ),
             reply_to=config.chats.topics.rp,
         )
@@ -193,7 +210,8 @@ async def casino_callback(event: events.CallbackQuery.Event):
                 ),
             )
         await db.Users.add_lose_money(
-            event.sender_id, config.coofs.PriceForCasino,
+            event.sender_id,
+            config.coofs.PriceForCasino,
         )
         logger.info(f"{event.sender_id} проиграл в казино")
         await asyncio.sleep(2)
@@ -237,7 +255,8 @@ async def nick_callback(event: events.CallbackQuery.Event):
         phrase.nick.buy_nick.format(
             user=user_name,
             price=formatter.value_to_str(
-                config.coofs.PriceForChangeNick, "изумруд",
+                config.coofs.PriceForChangeNick,
+                "изумруд",
             ),
         ),
     )
@@ -252,7 +271,9 @@ async def word_callback(event: events.CallbackQuery.Event):
         with open(pathes.crocoall, encoding="utf-8") as f:
             if data[2] in f.read().split("\n"):
                 return await client.edit_message(
-                    event.sender_id, event.message_id, phrase.word.exists,
+                    event.sender_id,
+                    event.message_id,
+                    phrase.word.exists,
                 )
         with open(pathes.crocoall, "a", encoding="utf-8") as f:
             f.write(f"\n{data[2]}")
@@ -263,12 +284,15 @@ async def word_callback(event: events.CallbackQuery.Event):
                 word=data[2],
                 user=user_name,
                 money=formatter.value_to_str(
-                    config.coofs.WordRequest, "изумруд",
+                    config.coofs.WordRequest,
+                    "изумруд",
                 ),
             ),
         )
         return await client.edit_message(
-            event.sender_id, event.message_id, phrase.word.add,
+            event.sender_id,
+            event.message_id,
+            phrase.word.add,
         )
     if data[1] == "no":
         with open(pathes.crocobl, "a", encoding="utf-8") as f:
@@ -278,7 +302,9 @@ async def word_callback(event: events.CallbackQuery.Event):
             phrase.word.no.format(word=data[2], user=user_name),
         )
         return await client.edit_message(
-            event.sender_id, event.message_id, phrase.word.noadd,
+            event.sender_id,
+            event.message_id,
+            phrase.word.noadd,
         )
     return None
 
@@ -292,7 +318,9 @@ async def cityadd_callback(event: events.CallbackQuery.Event):
         with open(pathes.chk_city, encoding="utf-8") as f:
             if data[2] in f.read().split("\n"):
                 return await client.edit_message(
-                    event.sender_id, event.message_id, phrase.cities.exists,
+                    event.sender_id,
+                    event.message_id,
+                    phrase.cities.exists,
                 )
         with open(pathes.chk_city, "a", encoding="utf-8") as f:
             f.write(f"\n{data[2]}")
@@ -303,12 +331,15 @@ async def cityadd_callback(event: events.CallbackQuery.Event):
                 word=data[2].title(),
                 user=user_name,
                 money=formatter.value_to_str(
-                    config.coofs.WordRequest, "изумруд",
+                    config.coofs.WordRequest,
+                    "изумруд",
                 ),
             ),
         )
         return await client.edit_message(
-            event.sender_id, event.message_id, phrase.cities.add,
+            event.sender_id,
+            event.message_id,
+            phrase.cities.add,
         )
     if data[1] == "no":
         with open(pathes.bl_city, "a", encoding="utf-8") as f:
@@ -318,7 +349,9 @@ async def cityadd_callback(event: events.CallbackQuery.Event):
             phrase.cities.no.format(word=data[2].title(), user=user_name),
         )
         return await client.edit_message(
-            event.sender_id, event.message_id, phrase.cities.noadd,
+            event.sender_id,
+            event.message_id,
+            phrase.cities.noadd,
         )
     return None
 
@@ -353,7 +386,8 @@ async def shop_callback(event: events.CallbackQuery.Event):
         return await event.answer(phrase.shop.timeout, alert=True)
     db.add_money(event.sender_id, -item["price"])
     return await event.answer(
-        phrase.shop.buy.format(items[int(data[1])]), alert=True,
+        phrase.shop.buy.format(items[int(data[1])]),
+        alert=True,
     )
 
 
@@ -364,7 +398,8 @@ async def crocodile_callback(event: events.CallbackQuery.Event):
     if data[1] == "start":
         if db.database("crocodile_super_game") == 1:
             return await event.answer(
-                phrase.crocodile.super_game_here, alert=True,
+                phrase.crocodile.super_game_here,
+                alert=True,
             )
         if db.database("current_game") != 0:
             return await event.answer(phrase.crocodile.no, alert=True)
@@ -378,10 +413,12 @@ async def crocodile_callback(event: events.CallbackQuery.Event):
                 unsec += x
         db.database("current_game", {"hints": [], "word": word, "unsec": unsec})
         client.add_event_handler(
-            crocodile_hint, events.NewMessage(pattern=r"(?i)^/подсказка"),
+            crocodile_hint,
+            events.NewMessage(pattern=r"(?i)^/подсказка"),
         )
         client.add_event_handler(
-            crocodile_handler, events.NewMessage(chats=event.chat_id),
+            crocodile_handler,
+            events.NewMessage(chats=event.chat_id),
         )
         return await event.reply(phrase.crocodile.up)
     if data[1] == "stop":
@@ -395,7 +432,8 @@ async def crocodile_callback(event: events.CallbackQuery.Event):
             return await event.answer(phrase.crocodile.already_down, alert=True)
         if db.database("crocodile_super_game") == 1:
             return await event.answer(
-                phrase.crocodile.super_game_here, alert=True,
+                phrase.crocodile.super_game_here,
+                alert=True,
             )
         bets_json = db.database("crocodile_bets")
         if bets_json != {}:
@@ -425,3 +463,75 @@ async def crocodile_callback(event: events.CallbackQuery.Event):
             )
         return await event.reply(phrase.crocodile.down.format(word))
     return None
+
+
+@client.on(events.CallbackQuery(func=checks, pattern=r"^mine"))
+async def mine_callback(event: events.CallbackQuery.Event):
+    data = event.data.decode("utf-8").split(".")
+    action = data[1]
+    user_id = int(data[2])
+    sender_id = event.sender_id
+
+    if sender_id != user_id:
+        return await event.answer(choice(phrase.mine.not_for_you))
+
+    session = mining.sessions.get(user_id)
+    if not session:
+        return await event.edit(phrase.mine.closed)
+
+    if action == "no":
+        total = session["gems"]
+        db.add_money(user_id, total)
+        del mining.sessions[user_id]
+        return await event.edit(
+            phrase.mine.quited.format(formatter.value_to_str(total, "изумруд")),
+            buttons=None,
+        )
+
+    death_chance = session["death_chance"]
+    rand = random()
+
+    if rand < death_chance:
+        balance = await db.get_money(user_id)
+        penalty = min(session["gems"], balance)
+        if penalty > 0:
+            db.add_money(user_id, -penalty)
+        del mining.sessions[user_id]
+        return await event.edit(
+            choice(phrase.mine.die).format(
+                killer=choice(phrase.mine.killers),
+                value=formatter.value_to_str(penalty, "изумруд"),
+            ),
+            buttons=None,
+        )
+
+    if rand < death_chance + config.coofs.Mining.BoostChance:
+        extra = randint(
+            config.coofs.Mining.BoostGemsMin, config.coofs.Mining.BoostGemsMax
+        )
+        note = choice(phrase.mine.boost).format(
+            formatter.value_to_str(extra, "изумруд")
+        )
+    else:
+        extra = randint(1, config.coofs.Mining.DefaultGems)
+        note = phrase.mine.base.format(formatter.value_to_str(extra, "изумруд"))
+
+    session["gems"] += extra
+    session["step"] += 1
+    session["death_chance"] = min(
+        config.coofs.Mining.MaxDeathChance,
+        config.coofs.Mining.BaseDeathChance
+        + (session["step"] - 1) * config.coofs.Mining.IncDeathChance,
+    )
+
+    await event.edit(
+        note
+        + phrase.mine.sessionall.format(
+            formatter.value_to_str(session["gems"], "изумруд")
+        )
+        + phrase.mine.q,
+        buttons=[
+            [Button.inline(phrase.mine.button_yes, f"mine.yes.{user_id}")],
+            [Button.inline(phrase.mine.button_no, f"mine.no.{user_id}")],
+        ],
+    )

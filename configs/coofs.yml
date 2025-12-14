@@ -67,3 +67,14 @@ AI:
   ContentSim: 0.7
   Try: 3
   FloodSleepTime: 10
+
+Mining:
+  Timeout: 300
+  InitialGems: 5
+  DefaultGems: 5
+  BaseDeathChance: 0.05
+  MaxDeathChance: 0.95
+  IncDeathChance: 0.06
+  BoostChance: 0.01
+  BoostGemsMax: 30
+  BoostGemsMin: 10
