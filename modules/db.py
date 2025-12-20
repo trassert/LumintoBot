@@ -968,3 +968,22 @@ def mailing_save(data):
     """Сохранение данных в JSON файл"""
     with open(pathes.mailing, "wb") as f:
         f.write(orjson.dumps(data))
+
+
+async def get_votes(player: str) -> int:
+    if not pathes.votes.exists():
+        return 0
+    async with aiofiles.open(pathes.votes, "rb") as f:
+        data = orjson.loads(await f.read())
+    return data.get(player, 0)
+
+
+async def add_votes(player: str, count: int = 1) -> None:
+    if pathes.votes.exists():
+        async with aiofiles.open(pathes.votes, "rb") as f:
+            data = orjson.loads(await f.read())
+    else:
+        data = {}
+    data[player] = data.get(player, 0) + count
+    async with aiofiles.open(pathes.votes, "wb") as f:
+        await f.write(orjson.dumps(data))

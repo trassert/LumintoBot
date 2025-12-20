@@ -16,6 +16,7 @@ wdraw = path.join("db", "users", "withdraws.json")
 ref = path.join("db", "users", "ref.json")
 crocostat = path.join("db", "users", "crocodile_stat.json")
 hellomsg = path.join("db", "users", "hellomsg.json")
+votes = path.join("db", "users", "votes.json")
 
 tickets = path.join("db", "tickets.json")
 mailing = path.join("db", "mailing.json")

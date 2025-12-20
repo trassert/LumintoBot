@@ -35,6 +35,7 @@ async def server():
         tg_id = db.nicks(nick=nick).get()
         if tg_id is not None:
             db.add_money(tg_id, 10)
+            await db.add_votes(tg_id, 1)
             give = phrase.vote_money.format(
                 formatter.value_to_str(10, "изумруд"),
             )
@@ -67,6 +68,7 @@ async def server():
         tg_id = db.nicks(nick=username).get()
         if tg_id is not None:
             db.add_money(tg_id, 10)
+            await db.add_votes(tg_id, 1)
             give = phrase.vote_money.format(
                 formatter.value_to_str(10, "изумруд"),
             )

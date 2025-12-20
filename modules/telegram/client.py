@@ -33,5 +33,6 @@ from . import (  # noqa: E402, F401
     states,
     statistic,
     tickets,
-    forum
+    forum,
+    advancements,
 )
