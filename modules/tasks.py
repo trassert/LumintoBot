@@ -1,9 +1,8 @@
-import asyncio
 from datetime import datetime, timedelta
 
 from loguru import logger
 
-from . import config, db, formatter, phrase, ports
+from . import config, db, formatter, phrase
 from .telegram.client import client
 
 logger.info(f"Загружен модуль {__name__}!")
@@ -66,27 +65,3 @@ async def remove_states() -> None:
                 message=phrase.state.end.format(state),
                 reply_to=config.chats.topics.rp,
             )
-
-
-async def port_checks() -> None:
-    await asyncio.sleep(500)  # Ждать включения сервера
-    ip = db.database("host")
-    while True:
-        try:
-            if await ports.check_port(ip, 25565) is False:
-                logger.warning("Все ноды ответили о закрытом порту!")
-                await client.send_message(
-                    entity=config.chats.staff,
-                    message=phrase.port.false,
-                )
-                await asyncio.sleep(900)
-            else:
-                logger.info("Сервер работает стабильно.")
-                await asyncio.sleep(1800)
-        except Exception as e:
-            logger.error(f"Ошибка при проверке порта: {e}")
-            await client.send_message(
-                entity=config.chats.staff,
-                message=phrase.port.false,
-            )
-            await asyncio.sleep(60)
