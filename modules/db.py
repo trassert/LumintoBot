@@ -971,6 +971,7 @@ def mailing_save(data):
 
 
 async def get_votes(player: str) -> int:
+    player = str(player)
     try:
         async with aiofiles.open(pathes.votes, "rb") as f:
             data = orjson.loads(await f.read())
@@ -981,6 +982,7 @@ async def get_votes(player: str) -> int:
 
 
 async def add_votes(player: str, count: int = 1) -> None:
+    player = str(player)
     try:
         async with aiofiles.open(pathes.votes, "rb") as f:
             data = orjson.loads(await f.read())
@@ -988,5 +990,7 @@ async def add_votes(player: str, count: int = 1) -> None:
         logger.exception("Ошибка получения votes")
         data = {}
     data[player] = data.get(player, 0) + count
+    if data[player] == config.coofs.Advancements.Votes:
+        pass
     async with aiofiles.open(pathes.votes, "wb") as f:
         await f.write(orjson.dumps(data))

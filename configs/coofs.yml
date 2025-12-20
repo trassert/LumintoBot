@@ -78,3 +78,6 @@ Mining:
   BoostChance: 0.01
   BoostGemsMax: 30
   BoostGemsMin: 10
+
+Advancements:
+  Votes: 50
