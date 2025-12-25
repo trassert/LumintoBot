@@ -179,6 +179,7 @@ class Chat:
         self.client = client
         self.model = model if model is not None else config.vars.AiModel
         self.chat: chats.AsyncChat = self.client.aio.chats.create(model=self.model)
+        self.chat.record_history
         self.initializated = False if base_prompt is not None else True
 
     async def get_chat(self):
