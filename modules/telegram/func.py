@@ -90,5 +90,4 @@ async def get_author_by_msgid(chat_id: int, msg_id: int) -> int | None:
     if not msg_id or msg_id <= 0:
         return None
     msg = await client.get_messages(chat_id, ids=msg_id)
-    print(msg)
     return msg.sender_id if msg else None
