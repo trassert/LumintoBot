@@ -571,14 +571,17 @@ async def link_nick(event: Message):
         ),
     )
     if len(reftext) > 0:
-        await event.reply(reftext)
-        await client.send_message(
-            int(author),
-            phrase.ref.used.format(
-                user=await get_name(event.sender_id, minecraft=True),
-                amount=config.coofs.RefGift,
-            ),
-        )
+        try:
+            await event.reply(reftext)
+            await client.send_message(
+                int(author),
+                phrase.ref.used.format(
+                    user=await get_name(event.sender_id, minecraft=True),
+                    amount=config.coofs.RefGift,
+                ),
+            )
+        except Exception:
+            logger.info(f"Ref {author} is active, but private is closed. Skipping mention.")
     return None
 
 

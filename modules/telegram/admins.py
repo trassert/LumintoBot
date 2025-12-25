@@ -111,8 +111,7 @@ async def del_staff(event: Message):
     )
 
 
-@client.on(events.NewMessage(pattern=r"o/(.+)", func=checks))
-@client.on(events.NewMessage(pattern=r"v/(.+)", func=checks))
+@client.on(events.NewMessage(pattern=r"//(.+)", func=checks))
 async def vanilla_mcrcon(event: Message):
     roles = db.roles()
     if roles.get(event.sender_id) < roles.ADMIN:
@@ -122,9 +121,8 @@ async def vanilla_mcrcon(event: Message):
             ),
         )
     command = event.pattern_match.group(1).strip()
-    mode = mcrcon.Oneblock if event.text[0] == "o" else mcrcon.Vanilla
     try:
-        async with mode as rcon:
+        async with mcrcon.Vanilla as rcon:
             resp = formatter.rm_colors(await rcon.send(command))
             if len(resp) == 0:
                 logger.info("Пустой ответ")

@@ -111,11 +111,7 @@ async def server_top_list(event: Message):
 
     try:
         text = [phrase.stat.server]
-        async with mcrcon.MinecraftClient(
-            host=config.tokens.rcon.host,
-            port=config.tokens.rcon.port,
-            password=config.tokens.rcon.password,
-        ) as rcon:
+        async with mcrcon.Vanilla as rcon:
             for number in range(1, n + 1):
                 nickname = (
                     await rcon.send(

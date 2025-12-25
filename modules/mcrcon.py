@@ -114,8 +114,3 @@ Vanilla = MinecraftClient(
     port=config.tokens.modes.vanilla.port,
     password=config.tokens.modes.vanilla.password,
 )
-Oneblock = MinecraftClient(
-    host=config.tokens.modes.oneblock.host,
-    port=config.tokens.modes.oneblock.port,
-    password=config.tokens.modes.oneblock.password,
-)
