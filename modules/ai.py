@@ -178,10 +178,15 @@ class Chat:
         self.prompt = base_prompt
         self.client = client
         self.model = model if model is not None else config.vars.AiModel
-        self.chat: chats.AsyncChat = client.aio.chats.create(self.model)
+        self.chat: chats.AsyncChat = self.client.aio.chats.create(model=self.model)
         self.initializated = False if base_prompt is not None else True
 
-    def get_chat(self):
+    async def get_chat(self):
+        if self.initializated is False:
+            logger.info(
+                f"ИИ клиент инициализирован. Ответ: {(await self.chat.send_message(self.prompt)).text}"
+            )
+            self.initializated = True
         return self.chat
 
     async def send_message(self, request: str) -> str:
@@ -193,9 +198,9 @@ class Chat:
         return (await self.chat.send_message(request)).text
 
 
-MainChat = Chat(chat_client, phrase.ai.main_prompt)
-StaffChat = Chat(chat_client, phrase.ai.staff_prompt)
-CrocodileChat = Chat(soc_client, phrase.ai.crocodile_prompt)
+MainChat = Chat(client=chat_client, base_prompt=phrase.ai.main_prompt)
+StaffChat = Chat(client=chat_client, base_prompt=phrase.ai.staff_prompt)
+CrocodileChat = Chat(client=soc_client, base_prompt=phrase.ai.crocodile_prompt)
 
 
 async def embedding_request(text: str, user: str | int, chat=MainChat) -> str:

@@ -25,7 +25,7 @@ async def gemini(event: Message):
         chat = ai.MainChat
         request = WaitAI.request()
     elif event.chat_id == config.chats.staff:
-        chat = ai.staff
+        chat = ai.StaffChat
         request = 0
     else:
         return await event.reply(phrase.ai.only_chat)
@@ -41,7 +41,7 @@ async def gemini(event: Message):
     await asyncio.sleep(request)
 
     try:
-        response = await ai.embedding_request(text, event.sender_id, chat.get_chat())
+        response = await ai.embedding_request(text, event.sender_id, await chat.get_chat())
     except Exception as e:
         await default.edit(phrase.ai.error)
         return logger.error(f"Не удалось получить ответ ИИ: {e}")
