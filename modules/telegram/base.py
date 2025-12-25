@@ -344,18 +344,36 @@ async def word_remove(event: Message):
 @client.on(events.NewMessage(pattern=r"(?i)^/nick(.*)", func=checks))
 @client.on(events.NewMessage(pattern=r"(?i)^/ник(.*)", func=checks))
 async def check_nick(event: Message):
-    try:
-        user = await client(
-            GetFullUserRequest(event.pattern_match.group(1).strip()),
-        )
-        user = user.full_user.id
-    except (TypeError, ValueError, IndexError):
-        reply_message = await event.get_reply_message()
-        user = reply_message.sender_id if reply_message is not None else event.sender_id
+    user = None
+
+    arg = event.pattern_match.group(1).strip()
+    if arg:
+        try:
+            user = (await client(GetFullUserRequest(arg))).full_user.id
+        except (TypeError, ValueError, IndexError):
+            pass
+
+    if user is None:
+        reply = event.message.reply_to
+        if (
+            reply
+            and reply.reply_to_msg_id
+            and not (
+                reply.forum_topic
+                and reply.reply_to_msg_id == reply.reply_to_top_id
+            )
+        ):
+            msg = await event.get_reply_message()
+            user = msg.sender_id if msg and msg.sender_id else None
+
+        user = user or event.sender_id
+
     nick = db.nicks(id=user).get()
-    if nick is None:
-        return await event.reply(phrase.nick.no_nick)
-    return await event.reply(phrase.nick.usernick.format(nick))
+    await event.reply(
+        phrase.nick.no_nick
+        if nick is None
+        else phrase.nick.usernick.format(nick)
+    )
 
 
 @client.on(events.NewMessage(pattern=r"(?i)^/скинуть(.*)", func=checks))
@@ -577,7 +595,9 @@ async def link_nick(event: Message):
                 ),
             )
         except Exception:
-            logger.info(f"Ref {author} is active, but private is closed. Skipping mention.")
+            logger.info(
+                f"Ref {author} is active, but private is closed. Skipping mention."
+            )
     return None
 
 
@@ -862,7 +882,6 @@ async def online(event: Message):
         )
     return await event.reply(
         phrase.online.format(
-            list=", ".join(vanilla_list),
-            count=len(vanilla_list)
+            list=", ".join(vanilla_list), count=len(vanilla_list)
         ),
     )
