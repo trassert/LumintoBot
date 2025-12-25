@@ -358,13 +358,9 @@ async def check_nick(event: Message):
         if (
             reply
             and reply.reply_to_msg_id
-            and not (
-                reply.forum_topic
-                and reply.reply_to_msg_id == reply.reply_to_top_id
-            )
+            and not reply.reply_to_msg_id == reply.reply_to_top_id
         ):
-            msg = await event.get_reply_message()
-            user = msg.sender_id if msg and msg.sender_id else None
+            user = reply.reply_to_msg_id.sender_id
 
         user = user or event.sender_id
 
