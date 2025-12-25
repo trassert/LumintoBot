@@ -224,7 +224,7 @@ async def word_request(event: Message):
             phrase.word.request.format(
                 user=entity,
                 word=word,
-                hint=(await ai.crocodile.send_message(word)).text,
+                hint=await ai.CrocodileChat.send_message(word),
             ),
             buttons=keyboard,
         )
@@ -285,7 +285,7 @@ async def word_requests(event: Message) -> None:
                 phrase.word.request.format(
                     user=entity,
                     word=word,
-                    hint=(await ai.crocodile.send_message(word)).text,
+                    hint=await ai.CrocodileChat.send_message(word),
                 ),
                 buttons=keyboard,
             )
@@ -344,25 +344,24 @@ async def word_remove(event: Message):
 @client.on(events.NewMessage(pattern=r"(?i)^/nick(.*)", func=checks))
 @client.on(events.NewMessage(pattern=r"(?i)^/ник(.*)", func=checks))
 async def check_nick(event: Message):
-    user = None
-
     arg = event.pattern_match.group(1).strip()
     if arg:
         try:
             user = (await client(GetFullUserRequest(arg))).full_user.id
         except (TypeError, ValueError, IndexError):
-            pass
+            user = await func.get_author_by_msgid(
+                event.chat_id, func.get_reply_message_id(event)
+            )
+    else:
+        user = await func.get_author_by_msgid(
+            event.chat_id, func.get_reply_message_id(event)
+        )
 
     if user is None:
-        reply = event.message.reply_to
-        if (
-            reply
-            and reply.reply_to_msg_id
-            and not reply.reply_to_msg_id == reply.reply_to_top_id
-        ):
-            user = reply.reply_to_msg_id.sender_id
-
-        user = user or event.sender_id
+        author_nick = db.nicks(id=event.sender_id).get()
+        if author_nick is None:
+            return await event.reply(phrase.nick.who)
+        return await event.reply(phrase.nick.urnick.format(author_nick))
 
     nick = db.nicks(id=user).get()
     await event.reply(

@@ -74,3 +74,21 @@ async def make_quiz_poll(answers: list, correct_answer_id: int, question: str) -
             ),
         ),
     )
+
+
+def get_reply_message_id(event):
+    if event.reply_to is None:
+        return None
+    if not event.reply_to.forum_topic:
+        return event.reply_to.reply_to_msg_id
+    if event.reply_to.reply_to_top_id is None:
+        return None
+    return event.reply_to.reply_to_msg_id
+
+
+async def get_author_by_msgid(chat_id: int, msg_id: int) -> int | None:
+    if not msg_id or msg_id <= 0:
+        return None
+    msg = await client.get_messages(chat_id, ids=msg_id)
+    print(msg)
+    return msg.sender_id if msg else None

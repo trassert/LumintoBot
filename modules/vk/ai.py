@@ -20,9 +20,9 @@ async def ai_message(message: Message, prompt: str | None = None):
         return await message.reply(phrase.wait.ai)
     await asyncio.sleep(request)
     logger.info(f"Запрос {prompt}")
-    chat = ai.chat
+    chat = ai.MainChat
     try:
-        response = (await chat.send_message(prompt)).text
+        response = await chat.send_message(prompt)
     except Exception:
         return logger.error("Не удалось получить ответ ИИ")
     try:

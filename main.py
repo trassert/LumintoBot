@@ -31,10 +31,8 @@ logging.basicConfig(handlers=[InterceptHandler()], level=0)
 
 async def main():
     from modules import (
-        ai,
         config,
         db,
-        phrase,
         task_gen,
         tasks,
         webhooks,
@@ -45,15 +43,6 @@ async def main():
     if sum(db.database("shop_weight").values()) != 100:
         logger.error("Сумма процентов в магазине не равна 100!")
     await db.Users.initialize()
-    logger.info(
-        f"Ответ ИИ - {(await ai.chat.send_message(phrase.ai.main_prompt)).text.replace('\n', '')}",
-    )
-    logger.info(
-        f"Крокодил - {(await ai.crocodile.send_message(phrase.ai.crocodile_prompt)).text.replace('\n', '')}",
-    )
-    logger.info(
-        f"Стафф - {(await ai.staff.send_message(phrase.ai.staff_prompt)).text.replace('\n', '')}",
-    )
     await tg.start(bot_token=config.tokens.bot.token)
     await webhooks.server()
     await task_gen.UpdateShopTask.create(tasks.update_shop, 2)

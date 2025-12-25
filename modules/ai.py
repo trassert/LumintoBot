@@ -30,9 +30,9 @@ soc_client = genai.Client(
     ),
 )
 
-chat = chat_client.aio.chats.create(model=config.vars.AiModel)
-crocodile = soc_client.aio.chats.create(model=config.vars.AiModel)
-staff = soc_client.aio.chats.create(model=config.vars.AiModel)
+# chat = chat_client.aio.chats.create(model=config.vars.AiModel)
+# crocodile = soc_client.aio.chats.create(model=config.vars.AiModel)
+# staff = soc_client.aio.chats.create(model=config.vars.AiModel)
 players = {}
 
 
@@ -158,6 +158,9 @@ def get_content(
     return ""
 
 
+embedding_df = compute_document_embeddings(create_embeddings_dataframe())
+
+
 async def get_player_chat(player: str) -> chats.AsyncChat:
     if player in players:
         return players[player]
@@ -168,10 +171,34 @@ async def get_player_chat(player: str) -> chats.AsyncChat:
     return players[player]
 
 
-embedding_df = compute_document_embeddings(create_embeddings_dataframe())
+class Chat:
+    def __init__(
+        self, client: genai.Client, base_prompt: str = None, model: str = None
+    ):
+        self.prompt = base_prompt
+        self.client = client
+        self.model = model if model is not None else config.vars.AiModel
+        self.chat: chats.AsyncChat = client.aio.chats.create(self.model)
+        self.initializated = False if base_prompt is not None else True
+
+    def get_chat(self):
+        return self.chat
+
+    async def send_message(self, request: str) -> str:
+        if self.initializated is False:
+            logger.info(
+                f"ИИ клиент инициализирован. Ответ: {(await self.chat.send_message(self.prompt)).text}"
+            )
+            self.initializated = True
+        return (await self.chat.send_message(request)).text
 
 
-async def embedding_request(text: str, user: str | int, chat=chat) -> str:
+MainChat = Chat(chat_client, phrase.ai.main_prompt)
+StaffChat = Chat(chat_client, phrase.ai.staff_prompt)
+CrocodileChat = Chat(soc_client, phrase.ai.crocodile_prompt)
+
+
+async def embedding_request(text: str, user: str | int, chat=MainChat) -> str:
     context = get_content(text, embedding_df, config.vars.AiEmbeddings)
     logger.info(f"Embedding request: {text}\n{context}")
     return (
