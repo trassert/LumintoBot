@@ -350,12 +350,8 @@ async def check_nick(event: Message):
         )
         user = user.full_user.id
     except (TypeError, ValueError, IndexError):
-        reply_to_msg = event.reply_to_msg_id
-        if reply_to_msg:
-            reply_message = await event.get_reply_message()
-            user = reply_message.sender_id
-        else:
-            user = event.sender_id
+        reply_message = await event.get_reply_message()
+        user = reply_message.sender_id if reply_message is not None else event.sender_id
     nick = db.nicks(id=user).get()
     if nick is None:
         return await event.reply(phrase.nick.no_nick)
@@ -864,19 +860,9 @@ async def online(event: Message):
             if vanilla_response.strip()
             else []
         )
-
-    async with mcrcon.Oneblock as rcon:
-        oneblock_response = (await rcon.send("list")).split(":")[1]
-        oneblock_list = (
-            list(map(strip, oneblock_response.split(",")))
-            if oneblock_response.strip()
-            else []
-        )
     return await event.reply(
         phrase.online.format(
-            vanilla_list=", ".join(vanilla_list),
-            oneblock_list=", ".join(oneblock_list),
-            vanilla_count=len(vanilla_list),
-            oneblock_count=len(oneblock_list),
+            list=", ".join(vanilla_list),
+            count=len(vanilla_list)
         ),
     )
