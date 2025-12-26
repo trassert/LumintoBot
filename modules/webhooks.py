@@ -19,7 +19,7 @@ class AccessLogger(AbstractAccessLogger):
         self.logger.info(
             f"{request.remote} - "
             f'{request.method} "{request.path}": '
-            f"{response.status}, Time: {round(time, 2)}s"
+            f"{response.status}, | {round(time, 2)}s"
         )
 
     @property
