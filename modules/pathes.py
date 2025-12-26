@@ -35,6 +35,7 @@ states = path.join("db", "states")
 times = path.join("db", "time")
 notes = path.join("db", "notes")
 stats = path.join("db", "chat_stats")
+shop_log = path.join("log", "shop")
 
 old_states = path.join("backup", "states")
 

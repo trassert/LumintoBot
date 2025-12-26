@@ -14,6 +14,7 @@ from .. import (
     pathes,
     phrase,
     mining,
+    log_shop
 )
 from .client import client
 from .func import get_name
@@ -401,8 +402,8 @@ async def shop_callback(event: events.CallbackQuery.Event):
 
     try:
         async with mcrcon.Vanilla as rcon:
+            await log_shop.buy(nick, item["name"], item['value'])
             command = f"invgive {nick} {item['name']} {item['value']}"
-            logger.info(f"Выполняется команда: {command}")
             await rcon.send(command)
     except TimeoutError:
         return await event.answer(phrase.shop.timeout, alert=True)
