@@ -19,7 +19,7 @@ class AccessLogger(AbstractAccessLogger):
         self.logger.info(
             f"{request.remote} - "
             f'{request.method} "{request.path}": '
-            f"{response.status}, Time: {time}s"
+            f"{response.status}, Time: {round(time, 2)}s"
         )
 
     @property
@@ -173,7 +173,7 @@ async def server():
     runner = aiohttp.web.AppRunner(app, access_log_class=AccessLogger)
     try:
         await runner.setup()
-        ipv4 = aiohttp.web.TCPSite(runner, "0.0.0.0", 5000)
+        ipv4 = aiohttp.web.TCPSite(runner, "127.0.0.1", 5000)
         ipv6 = aiohttp.web.TCPSite(runner, "::1", 5000)
         await ipv4.start()
         await ipv6.start()
