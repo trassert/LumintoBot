@@ -1,4 +1,5 @@
 import asyncio
+import logging
 from hashlib import md5, sha1
 
 import aiohttp
@@ -8,8 +9,22 @@ from loguru import logger
 from . import ai, config, db, formatter, phrase
 from .telegram import func
 from .telegram.client import client
+from aiohttp.abc import AbstractAccessLogger
 
 logger.info(f"Загружен модуль {__name__}!")
+
+
+class AccessLogger(AbstractAccessLogger):
+    def log(self, request, response, time):
+        self.logger.info(
+            f"{request.remote} - "
+            f'{request.method} "{request.path}": '
+            f"{response.status}, Time: {time}s"
+        )
+
+    @property
+    def enabled(self):
+        return self.logger.isEnabledFor(logging.INFO)
 
 
 async def server():
@@ -155,7 +170,7 @@ async def server():
             aiohttp.web.get("/", status),
         ],
     )
-    runner = aiohttp.web.AppRunner(app)
+    runner = aiohttp.web.AppRunner(app, access_log_class=AccessLogger)
     try:
         await runner.setup()
         ipv4 = aiohttp.web.TCPSite(runner, "0.0.0.0", 5000)
