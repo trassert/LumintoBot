@@ -4,6 +4,7 @@ backup/states/*
 
 images/*
 charts/*
+log/*
 
 test.*
 

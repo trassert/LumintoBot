@@ -17,4 +17,4 @@ async def buy(nick: str, item: str, value: str):
         ),
         "a",
     ) as f:
-        f.write(f"{nick}|{item}-{value}\n")
+        await f.write(f"{nick}|{item}-{value}\n")
