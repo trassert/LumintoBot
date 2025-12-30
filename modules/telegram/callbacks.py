@@ -1,4 +1,5 @@
 import asyncio
+import orjson
 from random import choice, random, randint
 
 from loguru import logger
@@ -14,7 +15,7 @@ from .. import (
     pathes,
     phrase,
     mining,
-    log_shop
+    log_shop,
 )
 from .client import client
 from .func import get_name
@@ -402,7 +403,7 @@ async def shop_callback(event: events.CallbackQuery.Event):
 
     try:
         async with mcrcon.Vanilla as rcon:
-            await log_shop.buy(nick, item["name"], item['value'])
+            await log_shop.buy(nick, item["name"], item["value"])
             command = f"invgive {nick} {item['name']} {item['value']}"
             await rcon.send(command)
     except TimeoutError:
@@ -428,8 +429,8 @@ async def crocodile_callback(event: events.CallbackQuery.Event):
             if db.database("current_game") != 0:
                 return await event.answer(phrase.crocodile.no, alert=True)
 
-            with open(pathes.crocoall, encoding="utf8") as f:
-                word = choice(f.read().split("\n"))
+            with open(pathes.crocomap, "rb") as f:
+                word = choice(list(orjson.loads(f.read())))
 
             unsec = "".join("_" if x.isalpha() else x for x in word)
             db.database(

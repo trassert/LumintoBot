@@ -1,5 +1,6 @@
 import asyncio
-from random import randint, random
+import orjson
+from random import randint, random, choice
 
 from loguru import logger
 from telethon import events
@@ -10,7 +11,7 @@ from telethon.tl.types import (
     ReplyInlineMarkup,
 )
 
-from .. import ai, config, db, formatter, phrase
+from .. import config, db, formatter, phrase, pathes
 from . import func
 from .client import client
 from .global_checks import checks
@@ -33,7 +34,8 @@ async def casino(event: Message):
     keyboard = [
         [
             KeyboardButtonCallback(
-                text="🎰 Автоматическая прокрутка", data=b"casino.auto",
+                text="🎰 Автоматическая прокрутка",
+                data=b"casino.auto",
             ),
         ],
     ]
@@ -60,10 +62,12 @@ async def crocodile(event: Message):
                 KeyboardButtonRow(
                     [
                         KeyboardButtonCallback(
-                            text="✅ Играть", data=b"crocodile.start",
+                            text="✅ Играть",
+                            data=b"crocodile.start",
                         ),
                         KeyboardButtonCallback(
-                            text="❌ Остановить игру", data=b"crocodile.stop",
+                            text="❌ Остановить игру",
+                            data=b"crocodile.stop",
                         ),
                     ],
                 ),
@@ -75,7 +79,8 @@ async def crocodile(event: Message):
             KeyboardButtonRow(
                 [
                     KeyboardButtonCallback(
-                        text="❌ Остановить игру", data=b"crocodile.stop",
+                        text="❌ Остановить игру",
+                        data=b"crocodile.stop",
                     ),
                 ],
             ),
@@ -136,7 +141,8 @@ async def super_game(event: Message):
     if roles.get(event.sender_id) < roles.ADMIN:
         return await event.reply(
             phrase.roles.no_perms.format(
-                level=roles.ADMIN, name=phrase.roles.admin,
+                level=roles.ADMIN,
+                name=phrase.roles.admin,
             ),
         )
     arg = event.pattern_match.group(1).strip()
@@ -147,20 +153,25 @@ async def super_game(event: Message):
     db.database("max_bet", 100)
     db.database("min_bet", 50)
     await client.send_message(
-        config.chats.chat, phrase.crocodile.super_game_wait,
+        config.chats.chat,
+        phrase.crocodile.super_game_wait,
     )
     await asyncio.sleep(60)
     db.database(
-        "current_game", {"hints": [], "unsec": "_" * len(arg), "word": arg},
+        "current_game",
+        {"hints": [], "unsec": "_" * len(arg), "word": arg},
     )
     client.add_event_handler(
-        crocodile_hint, events.NewMessage(pattern=r"(?i)^/подсказка"),
+        crocodile_hint,
+        events.NewMessage(pattern=r"(?i)^/подсказка"),
     )
     client.add_event_handler(
-        crocodile_handler, events.NewMessage(chats=config.chats.chat),
+        crocodile_handler,
+        events.NewMessage(chats=config.chats.chat),
     )
     return await client.send_message(
-        config.chats.chat, phrase.crocodile.super_game,
+        config.chats.chat,
+        phrase.crocodile.super_game,
     )
 
 
@@ -261,6 +272,7 @@ async def crocodile_hint(event: Message):
     game["hints"] = hint
     db.database("current_game", game)
     word = game["word"]
+
     async def letter_hint():
         n = 1
         for letter in list(game["unsec"]):
@@ -269,16 +281,11 @@ async def crocodile_hint(event: Message):
                     f"{n} буква в слове - **{game['word'][n - 1]}**",
                 )
             n += 1
+
     if (random() < config.coofs.PercentForRandomLetter) and (len(hint) > 1):
         return await letter_hint()
-    limit = 1
-    while limit <= config.coofs.AI.Try:
-        try:
-            return await event.reply(await ai.CrocodileChat.send_message(word))
-        except Exception:
-            limit += 1
-            await asyncio.sleep(config.coofs.AI.FloodSleepTime)
-    return await letter_hint()
+    with open(pathes.crocomap, "rb") as f:
+        return await event.reply(choice(orjson.loads(f.read())[word]))
 
 
 @logger.catch
@@ -321,7 +328,8 @@ async def cities_timeout(current_player: int, last_city: str):
                                 players_list[0],
                             ),
                             formatter.value_to_str(
-                                win_money - config.coofs.CitiesBet, "изумруд",
+                                win_money - config.coofs.CitiesBet,
+                                "изумруд",
                             ),
                             statistic,
                         ),
@@ -345,14 +353,16 @@ async def cities_timeout(current_player: int, last_city: str):
                 if message:
                     await message.edit(
                         phrase.cities.timeout.format(
-                            player=player_name, time=second,
+                            player=player_name,
+                            time=second,
                         ),
                     )
                 else:
                     message: Message = await client.send_message(
                         config.chats.chat,
                         phrase.cities.timeout.format(
-                            player=player_name, time=second,
+                            player=player_name,
+                            time=second,
                         ),
                         reply_to=config.chats.topics.games,
                     )
@@ -448,12 +458,14 @@ async def cities_callback(event: events.CallbackQuery.Event):
         keyboard = [
             [
                 KeyboardButtonCallback(
-                    text="➕ Присоединиться", data="cities.join",
+                    text="➕ Присоединиться",
+                    data="cities.join",
                 ),
             ],
             [
                 KeyboardButtonCallback(
-                    text="🎮 Начать игру", data="cities.start",
+                    text="🎮 Начать игру",
+                    data="cities.start",
                 ),
             ],
             [KeyboardButtonCallback(text="❌ Отменить", data="cities.cancel")],
@@ -509,7 +521,8 @@ async def cities_start(event: Message):
             [KeyboardButtonCallback(text="❌ Отменить", data="cities.cancel")],
         ]
         return await event.reply(
-            phrase.cities.already_started, buttons=keyboard,
+            phrase.cities.already_started,
+            buttons=keyboard,
         )
 
     # Очищаем предыдущую игру
@@ -524,7 +537,8 @@ async def cities_start(event: Message):
 
     user_name = await func.get_name(event.sender_id)
     message: Message = await event.reply(
-        phrase.cities.start.format(user_name), buttons=keyboard,
+        phrase.cities.start.format(user_name),
+        buttons=keyboard,
     )
     id = Cities.get_id()
     await asyncio.sleep(300)
@@ -536,7 +550,8 @@ async def cities_start(event: Message):
 
 if db.database("current_game") != 0:
     client.add_event_handler(
-        crocodile_handler, events.NewMessage(chats=config.chats.chat),
+        crocodile_handler,
+        events.NewMessage(chats=config.chats.chat),
     )
     client.add_event_handler(
         crocodile_hint,

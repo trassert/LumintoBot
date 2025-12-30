@@ -6,6 +6,8 @@ images/*
 charts/*
 log/*
 
+mappings
+
 test.*
 
 **/__pycache__/

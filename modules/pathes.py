@@ -6,6 +6,7 @@ logger.info(f"Загружен модуль {__name__}!")
 
 crocoall = path.join("db", "crocodile", "all.txt")
 crocobl = path.join("db", "crocodile", "blacklist.txt")
+crocomap = path.join("db", "crocodile", "mappings.json")
 
 mine = path.join("db", "timings", "mine.json")
 
