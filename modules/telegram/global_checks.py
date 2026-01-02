@@ -1,5 +1,6 @@
 from loguru import logger
 from telethon import events
+from telethon.tl.custom import Message
 
 from .. import db, phrase
 from . import func
@@ -7,7 +8,7 @@ from . import func
 logger.info(f"Загружен модуль {__name__}!")
 
 
-async def checks(event) -> bool:
+async def checks(event: Message | events.CallbackQuery.Event) -> bool:
     roles = db.roles()
     if event.is_private:
         if not isinstance(event, events.CallbackQuery.Event):
