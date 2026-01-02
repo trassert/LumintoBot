@@ -23,74 +23,40 @@ logger.info(f"Загружен модуль {__name__}!")
 @client.on(events.NewMessage(pattern=r"(?i)^shop$", func=checks))
 @client.on(events.NewMessage(pattern=r"(?i)^шоп$", func=checks))
 async def shop(event: Message):
+    shop_data = db.get_shop()
     version = db.database("shop_version")
-    keyboard = ReplyInlineMarkup(
-        [
-            KeyboardButtonRow(
-                [
-                    KeyboardButtonCallback(
-                        text="1️⃣", data=f"shop.0.{version}".encode(),
-                    ),
-                    KeyboardButtonCallback(
-                        text="2️⃣", data=f"shop.1.{version}".encode(),
-                    ),
-                    KeyboardButtonCallback(
-                        text="3️⃣", data=f"shop.2.{version}".encode(),
-                    ),
-                    KeyboardButtonCallback(
-                        text="4️⃣", data=f"shop.3.{version}".encode(),
-                    ),
-                    KeyboardButtonCallback(
-                        text="5️⃣", data=f"shop.4.{version}".encode(),
-                    ),
-                ],
-            ),
-        ],
-    )
-    shop = db.get_shop()
-    theme = shop["theme"]
-    del shop["theme"]
-    items = list(shop.keys())
+    theme = shop_data.pop("theme")
+    theme_data = phrase.shop_quotes[theme]
+
+    items_lines = []
+    button_callbacks = []
+
+    for idx, (item_name, item_info) in enumerate(list(shop_data.items())[:5]):
+        value = item_info["value"]
+        price = formatter.value_to_str(item_info["price"], "изумруд")
+        value_str = f" ({value})" if value != 1 else ""
+        items_lines.append(f"{idx + 1}. {item_name}{value_str} - {price}")
+
+        button_callbacks.append(
+            KeyboardButtonCallback(
+                text=f"{idx + 1}\u20e3",
+                data=f"shop.{idx}.{version}".encode(),
+            )
+        )
+
+    keyboard = ReplyInlineMarkup([KeyboardButtonRow(button_callbacks)])
+
+    formatted_items = "\n".join(items_lines)
+    quote = choice(theme_data["quotes"])
+    emo = theme_data["emo"]
+    clock = formatter.fmtime(await task_gen.UpdateShopTask.info())
+
     return await event.reply(
         phrase.shop.shop.format(
-            trade_1=items[0],
-            value_1=(
-                f" ({shop[items[0]]['value']})"
-                if shop[items[0]]["value"] != 1
-                else ""
-            ),
-            price_1=formatter.value_to_str(shop[items[0]]["price"], "изумруд"),
-            trade_2=items[1],
-            value_2=(
-                f" ({shop[items[1]]['value']})"
-                if shop[items[1]]["value"] != 1
-                else ""
-            ),
-            price_2=formatter.value_to_str(shop[items[1]]["price"], "изумруд"),
-            trade_3=items[2],
-            value_3=(
-                f" ({shop[items[2]]['value']})"
-                if shop[items[2]]["value"] != 1
-                else ""
-            ),
-            price_3=formatter.value_to_str(shop[items[2]]["price"], "изумруд"),
-            trade_4=items[3],
-            value_4=(
-                f" ({shop[items[3]]['value']})"
-                if shop[items[3]]["value"] != 1
-                else ""
-            ),
-            price_4=formatter.value_to_str(shop[items[3]]["price"], "изумруд"),
-            trade_5=items[4],
-            value_5=(
-                f" ({shop[items[4]]['value']})"
-                if shop[items[4]]["value"] != 1
-                else ""
-            ),
-            price_5=formatter.value_to_str(shop[items[4]]["price"], "изумруд"),
-            quote=choice(phrase.shop_quotes[theme]["quotes"]),
-            emo=phrase.shop_quotes[theme]["emo"],
-            clock=formatter.fmtime(await task_gen.UpdateShopTask.info()),
+            quote=quote,
+            emo=emo,
+            items=formatted_items,
+            clock=clock,
         ),
         buttons=keyboard,
         parse_mode="html",

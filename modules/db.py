@@ -149,7 +149,7 @@ def update_shop():
     return new_theme
 
 
-def get_shop():
+def get_shop() -> dict:
     with open(path.join("db", "shop_current.json"), "rb") as f:
         load = orjson.loads(f.read())
     return load
