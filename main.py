@@ -48,10 +48,7 @@ async def main():
     await task_gen.UpdateShopTask.create(tasks.update_shop, 2)
     await task_gen.RewardsTask.create(tasks.rewards, "19:00")
     await task_gen.RemoveStatesTask.create(tasks.remove_states, "17:00")
-    await asyncio.gather(
-        tg.run_until_disconnected(),
-        vk.start()
-    )
+    await asyncio.gather(tg.run_until_disconnected(), vk.start())
 
 
 if __name__ == "__main__":
