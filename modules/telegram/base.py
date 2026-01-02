@@ -366,40 +366,47 @@ async def swap_money(event: Message):
         return await event.reply(
             phrase.money.no_count + phrase.money.swap_balance_use
         )
-    try:
-        count = int(args[0])
-        if count <= 0:
-            return await event.reply(phrase.money.negative_count)
-    except ValueError:
-        if args[0].lower() not in {"все", "всё", "all", "весь"}:
+
+    if args[0].lower() in {"все", "всё", "all", "весь"}:
+        count = await db.get_money(event.sender_id)
+    else:
+        try:
+            count = int(args[0])
+        except ValueError:
             return await event.reply(
                 phrase.money.nan_count + phrase.money.swap_balance_use
             )
-        count = await db.get_money(event.sender_id)
-        if count == 0:
-            return await event.reply(phrase.money.empty)
-    try:
-        tag = args[1]
-        user = (await client(GetFullUserRequest(tag))).full_user.id
-    except (TypeError, ValueError, IndexError):
-        if event.reply_to_msg_id:
-            user = (await event.get_reply_message()).sender_id
-        else:
-            return await event.reply(
-                phrase.money.no_people + phrase.money.swap_balance_use
-            )
-    entity = await client.get_entity(user)
-    if entity.bot:
-        return await event.reply(phrase.money.bot)
-    if event.sender_id == user:
-        return await event.reply(phrase.money.selfbyself)
+
+    if count <= 0:
+        return await event.reply(phrase.money.negative_count)
+
     sender_balance = await db.get_money(event.sender_id)
+
     if sender_balance < count:
         return await event.reply(
             phrase.money.not_enough.format(
                 formatter.value_to_str(sender_balance, "изумруд")
             )
         )
+
+    user = await func.swap_resolve_recipient(event, args)
+    if user is None:
+        return await event.reply(
+            phrase.money.no_people + phrase.money.swap_balance_use
+        )
+
+    if event.sender_id == user:
+        return await event.reply(phrase.money.selfbyself)
+
+    try:
+        entity = await client.get_entity(user)
+        if entity.bot:
+            return await event.reply(phrase.money.bot)
+    except Exception:
+        return await event.reply(
+            phrase.money.no_people + phrase.money.swap_balance_use
+        )
+
     db.add_money(event.sender_id, -count)
     db.add_money(user, count)
     return await event.reply(

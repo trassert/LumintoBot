@@ -18,7 +18,8 @@ async def add_balance(event: Message):
     if roles.get(event.sender_id) < roles.ADMIN:
         return await event.reply(
             phrase.roles.no_perms.format(
-                level=roles.ADMIN, name=phrase.roles.admin,
+                level=roles.ADMIN,
+                name=phrase.roles.admin,
             ),
         )
     args = event.pattern_match.group(1).strip().split()
@@ -58,7 +59,8 @@ async def add_staff(event: Message):
     if roles.get(event.sender_id) < roles.OWNER:
         return await event.reply(
             phrase.roles.no_perms.format(
-                level=roles.OWNER, name=phrase.roles.owner,
+                level=roles.OWNER,
+                name=phrase.roles.owner,
             ),
         )
     arg = event.pattern_match.group(1).strip()
@@ -88,7 +90,8 @@ async def del_staff(event: Message):
     if roles.get(event.sender_id) < roles.OWNER:
         return await event.reply(
             phrase.roles.no_perms.format(
-                level=roles.OWNER, name=phrase.roles.owner,
+                level=roles.OWNER,
+                name=phrase.roles.owner,
             ),
         )
     arg = event.pattern_match.group(1).strip()
@@ -117,7 +120,8 @@ async def vanilla_mcrcon(event: Message):
     if roles.get(event.sender_id) < roles.ADMIN:
         return await event.reply(
             phrase.roles.no_perms.format(
-                level=roles.ADMIN, name=phrase.roles.admin,
+                level=roles.ADMIN,
+                name=phrase.roles.admin,
             ),
         )
     command = event.pattern_match.group(1).strip()
@@ -145,7 +149,9 @@ async def whitelist(event: Message):
     roles = db.roles()
     if roles.get(event.sender_id) < roles.VIP:
         return await event.reply(
-            phrase.roles.no_perms.format(level=roles.VIP, name=phrase.roles.vip),
+            phrase.roles.no_perms.format(
+                level=roles.VIP, name=phrase.roles.vip
+            ),
         )
     if event.text[0] == "-":
         command = f"nwl remove name {event.pattern_match.group(1).strip()}"
@@ -161,3 +167,50 @@ async def whitelist(event: Message):
             )
     except TimeoutError:
         return await event.reply(phrase.server.stopped)
+
+
+@client.on(events.NewMessage(pattern=r"(?i)^/выдать(.*)", func=checks))
+async def give_money(event: Message):
+    roles = db.roles()
+    if roles.get(event.sender_id) < roles.ADMIN:
+        return await event.reply(
+            phrase.roles.no_perms.format(
+                level=roles.ADMIN,
+                name=phrase.roles.admin,
+            ),
+        )
+    args = event.pattern_match.group(1).strip().split()
+    if not args:
+        return await event.reply(
+            phrase.money.no_count + phrase.money.give_money_use
+        )
+
+    try:
+        count = int(args[0])
+    except ValueError:
+        return await event.reply(
+            phrase.money.nan_count + phrase.money.give_money_use
+        )
+
+    if count <= 0:
+        return await event.reply(phrase.money.negative_count)
+
+    user = await func.swap_resolve_recipient(event, args)
+    if user is None:
+        return await event.reply(
+            phrase.money.no_people + phrase.money.give_money_use
+        )
+
+    try:
+        entity = await client.get_entity(user)
+        if entity.bot:
+            return await event.reply(phrase.money.bot)
+    except Exception:
+        return await event.reply(
+            phrase.money.no_people + phrase.money.swap_balance_use
+        )
+
+    db.add_money(user, count)
+    return await event.reply(
+        phrase.money.give_money.format(formatter.value_to_str(count, "изумруд"))
+    )

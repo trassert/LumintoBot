@@ -4,6 +4,8 @@ import re
 from loguru import logger
 from telethon.tl import types
 from telethon.tl.functions.users import GetFullUserRequest
+from telethon.tl.custom import Message
+from telethon import errors as TGErrors
 
 from .. import db
 from .client import client
@@ -46,13 +48,16 @@ async def get_id(str: str) -> int:
     return user.full_user.id
 
 
-async def make_quiz_poll(answers: list, correct_answer_id: int, question: str) -> types.MessageMediaPoll:
+async def make_quiz_poll(
+    answers: list, correct_answer_id: int, question: str
+) -> types.MessageMediaPoll:
     return (
         types.MessageMediaPoll(
             poll=types.Poll(
                 id=random.randint(1, 100000),
                 question=types.TextWithEntities(
-                    text=question, entities=[],
+                    text=question,
+                    entities=[],
                 ),
                 answers=[
                     types.PollAnswer(
@@ -91,3 +96,18 @@ async def get_author_by_msgid(chat_id: int, msg_id: int) -> int | None:
         return None
     msg = await client.get_messages(chat_id, ids=msg_id)
     return msg.sender_id if msg else None
+
+
+async def swap_resolve_recipient(event: Message, args: list[str]) -> int | None:
+    """Возвращает ID получателя или None."""
+    if len(args) > 1:
+        try:
+            user = await client(GetFullUserRequest(args[1]))
+            return user.full_user.id
+        except (TypeError, ValueError, TGErrors.UserError):
+            pass
+
+    msg_id = get_reply_message_id(event)
+    if msg_id:
+        return await get_author_by_msgid(event.chat_id, msg_id)
+    return None

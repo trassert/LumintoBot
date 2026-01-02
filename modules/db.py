@@ -67,7 +67,7 @@ def database(key, value=None, delete=None, log=True):
             return None
 
 
-async def get_money(id):
+async def get_money(id) -> int:
     id = str(id)
     async with aiofiles.open(pathes.money, "rb") as f:
         load = orjson.loads(await f.read())
