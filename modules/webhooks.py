@@ -6,7 +6,7 @@ import aiohttp
 import aiohttp.web
 from loguru import logger
 
-from . import ai, config, db, formatter, phrase
+from . import config, db, formatter, phrase
 from .telegram import func
 from .telegram.client import client
 from aiohttp.abc import AbstractAccessLogger
@@ -129,12 +129,12 @@ async def server():
         logger.info(f"[Bank] Переведено {amount} изумрудов на счет {playerid}")
         return aiohttp.web.Response(text="ok")
 
-    async def genai(request: aiohttp.web.Request):
-        player = request.query.get("player")
-        text = request.query.get("text")
-        logger.info(f"[AI] {player} > {text}")
-        chat = await ai.get_player_chat(player)
-        return aiohttp.web.Response(text=(await chat.send_message(text)).text)
+    # async def genai(request: aiohttp.web.Request):
+    #     player = request.query.get("player")
+    #     text = request.query.get("text")
+    #     logger.info(f"[AI] {player} > {text}")
+    #     chat = await ai.get_player_chat(player)
+    #     return aiohttp.web.Response(text=(await chat.send_message(text)).text)
 
     async def github(request: aiohttp.web.Request):
         load: dict = await request.json()
@@ -166,7 +166,7 @@ async def server():
             aiohttp.web.post("/github", github),
             aiohttp.web.get("/minecraft", minecraft),
             aiohttp.web.get("/bank", bank),
-            aiohttp.web.get("/genai", genai),
+            # aiohttp.web.get("/genai", genai),
             aiohttp.web.get("/", status),
         ],
     )
