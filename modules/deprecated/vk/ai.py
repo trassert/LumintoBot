@@ -1,10 +1,11 @@
-import asyncio
 
-from loguru import logger
-from vkbottle.bot import Message
+import asyncio# noqa: E402# type: ignore 
 
-from .. import ai, config, floodwait, formatter, phrase
-from .client import bot
+from loguru import logger# noqa: E402# type: ignore 
+from vkbottle.bot import Message# noqa: E402# type: ignore 
+
+from .. import ai, config, floodwait, formatter, phrase# noqa: E402# type: ignore 
+from .client import bot# noqa: E402# type: ignore 
 
 logger.info(f"Загружен модуль {__name__}!")
 

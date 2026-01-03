@@ -38,7 +38,6 @@ async def main():
         webhooks,
     )
     from modules.telegram.client import client as tg
-    from modules.vk import client as vk
 
     if sum(db.database("shop_weight").values()) != 100:
         logger.error("Сумма процентов в магазине не равна 100!")
@@ -48,7 +47,7 @@ async def main():
     await task_gen.UpdateShopTask.create(tasks.update_shop, 2)
     await task_gen.RewardsTask.create(tasks.rewards, "19:00")
     await task_gen.RemoveStatesTask.create(tasks.remove_states, "17:00")
-    await asyncio.gather(tg.run_until_disconnected(), vk.start())
+    await tg.run_until_disconnected()
 
 
 if __name__ == "__main__":

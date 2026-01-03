@@ -1,5 +1,5 @@
 from loguru import logger
-from telethon.sync import TelegramClient
+from telethon import TelegramClient
 
 from .. import config, pathes
 
@@ -20,7 +20,6 @@ client = TelegramClient(
 from . import (  # noqa: E402, F401
     actions,
     admins,
-    ai,
     base,
     callbacks,
     func,
@@ -34,5 +33,4 @@ from . import (  # noqa: E402, F401
     statistic,
     tickets,
     forum,
-    advancements,
 )
