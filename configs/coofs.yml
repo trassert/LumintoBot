@@ -71,12 +71,12 @@ AI:
 Mining:
   Timeout: 300
   InitialGems: 5
-  DefaultGems: 5
-  BaseDeathChance: 0.05
+  DefaultGems: 3
+  BaseDeathChance: 0.01
   MaxDeathChance: 0.95
-  IncDeathChance: 0.06
+  IncDeathChance: 0.04
   BoostChance: 0.01
-  BoostGemsMax: 30
+  BoostGemsMax: 50
   BoostGemsMin: 10
 
 Advancements:
