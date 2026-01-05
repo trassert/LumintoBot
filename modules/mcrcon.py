@@ -18,7 +18,7 @@ class InvalidPassword(Exception):
 
 
 class MinecraftClient:
-    def __init__(self, host, port, password) -> None:
+    def __init__(self, host: str, port: int, password) -> None:
         self.host = host
         self.port = port
         self.password = password

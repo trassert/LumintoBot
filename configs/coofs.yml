@@ -74,7 +74,7 @@ Mining:
   DefaultGems: 3
   BaseDeathChance: 0.01
   MaxDeathChance: 0.95
-  IncDeathChance: 0.04
+  IncDeathChance: 0.05
   BoostChance: 0.01
   BoostGemsMax: 50
   BoostGemsMin: 10
