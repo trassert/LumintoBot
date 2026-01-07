@@ -576,9 +576,48 @@ async def mine_callback(event: events.CallbackQuery.Event):
 async def hint_callback(event: events.CallbackQuery.Event):
     data = event.data.decode("utf-8").split(".")
     logger.info(f"КБ кнопка (Mine), дата: {data}")
-    sender_id = event.sender_id
+    roles = db.roles()
+    if roles.get(event.sender_id) < roles.ADMIN:
+        return
+    hint_data = await db.get_hint_byid(data[2])
+    if hint_data is None:
+        await event.answer(phrase.newhints.not_found)
+        return await event.delete()
     match data[1]:
         case "accept":
-            pass
+            remove_data = await db.remove_pending_hint(data[2])
+            if remove_data is None:
+                await event.answer(phrase.newhints.not_found)
+                return await event.delete()
+            await db.append_hint(word=hint_data["word"], hint=hint_data["hint"])
+            db.add_money(hint_data["user"], config.coofs.HintGift)
+            await client.send_message(
+                int(hint_data["user"]),
+                phrase.newhints.accept.format(
+                    word=hint_data["word"],
+                    get=formatter.value_to_str(
+                        config.coofs.HintGift, "изумруд"
+                    ),
+                ),
+            )
+            return await event.edit(
+                phrase.newhints.accept_edit.format(
+                    word=hint_data["word"], hint=hint_data["hint"]
+                ),
+                buttons=None,
+            )
         case "reject":
-            pass
+            remove_data = await db.remove_pending_hint(data[2])
+            if remove_data is None:
+                await event.answer(phrase.newhints.not_found)
+                return await event.delete()
+            await client.send_message(
+                int(hint_data["user"]),
+                phrase.newhints.reject.format(word=hint_data["word"]),
+            )
+            return await event.edit(
+                phrase.newhints.reject_edit.format(
+                    word=hint_data["word"], hint=hint_data["hint"]
+                ),
+                buttons=None,
+            )

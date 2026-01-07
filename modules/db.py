@@ -1001,7 +1001,9 @@ async def get_crocodile_word() -> str:
         return choice(list(orjson.loads(await f.read())))
 
 
-async def add_pending_hint(user_id: int | str, hint_string: str, word: str) -> int:
+async def add_pending_hint(
+    user_id: int | str, hint_string: str, word: str
+) -> int:
     "Добавляет запрос на подсказку в json. Выдаёт int - id запроса."
     async with aiofiles.open(pathes.pending_hints, "rb") as f:
         data = orjson.loads(await f.read())
@@ -1010,7 +1012,32 @@ async def add_pending_hint(user_id: int | str, hint_string: str, word: str) -> i
         data[str(pending_id)] = {
             "user": str(user_id),
             "hint": str(hint_string),
-            "word": str(word)
+            "word": str(word),
         }
         await f.write(orjson.dumps(data, option=orjson.OPT_INDENT_2))
     return pending_id
+
+
+async def remove_pending_hint(id: int | str):
+    async with aiofiles.open(pathes.pending_hints, "rb") as f:
+        data: dict = orjson.loads(await f.read())
+    if data.pop(str(id), None) is None:
+        return
+    async with aiofiles.open(pathes.pending_hints, "wb") as f:
+        await f.write(orjson.dumps(data, option=orjson.OPT_INDENT_2))
+    return True
+
+
+async def get_hint_byid(id: str | int) -> dict:
+    async with aiofiles.open(pathes.pending_hints, "rb") as f:
+        return orjson.loads(await f.read()).get(str(id), None)
+
+
+async def append_hint(word: str, hint: str):
+    async with aiofiles.open(pathes.crocomap, "rb") as f:
+        data: dict = orjson.loads(await f.read())
+    word_hints = data.get(word, [])
+    word_hints.append(hint)
+    data[word] = word_hints
+    async with aiofiles.open(pathes.crocomap, "wb") as f:
+        await f.write(orjson.dumps(data, option=orjson.OPT_INDENT_2))
