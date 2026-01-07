@@ -1,5 +1,4 @@
 import asyncio
-import orjson
 from random import choice, random, randint
 
 from loguru import logger
@@ -429,8 +428,7 @@ async def crocodile_callback(event: events.CallbackQuery.Event):
             if db.database("current_game") != 0:
                 return await event.answer(phrase.crocodile.no, alert=True)
 
-            with open(pathes.crocomap, "rb") as f:
-                word = choice(list(orjson.loads(f.read())))
+            word = await db.get_crocodile_word()
 
             unsec = "".join("_" if x.isalpha() else x for x in word)
             db.database(

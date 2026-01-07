@@ -8,6 +8,8 @@ crocoall = path.join("db", "crocodile", "all.txt")
 crocobl = path.join("db", "crocodile", "blacklist.txt")
 crocomap = path.join("db", "crocodile", "mappings.json")
 
+pending_hints = path.join("db", "crocodile", "pending_hints.json")
+
 mine = path.join("db", "timings", "mine.json")
 
 roles = path.join("db", "users", "roles.json")

@@ -839,3 +839,47 @@ async def online(event: Message):
             list=", ".join(player_list), count=len(player_list)
         )
     )
+
+
+@client.on(events.NewMessage(pattern=r"(?i)^/newhint", func=checks))
+@client.on(events.NewMessage(pattern=r"(?i)^/addhint", func=checks))
+async def add_new_hint(event: Message):
+    if not event.is_private:
+        return await event.reply(phrase.newhints.private)
+    word = await db.get_crocodile_word()
+    async with client.conversation(event.sender_id, timeout=300) as conv:
+        await conv.send_message(phrase.newhints.ask_hint.format(word=word))
+
+        while True:
+            try:
+                response = await conv.get_response()
+            except TimeoutError:
+                return await event.reply(phrase.newhints.timeout)
+            text: str = response.raw_text.strip()
+
+            if text == "/стоп":
+                await conv.send_message(phrase.newhints.cancel)
+                return
+
+            if text.startswith("/"):
+                continue
+
+            pending_id = await db.add_pending_hint(event.sender_id, text)
+
+            await client.send_message(
+                config.tokens.bot.creator,
+                phrase.newhints.admin_alert.format(
+                    word=word,
+                    hint=text,
+                    user=await func.get_name(event.sender_id),
+                ),
+                buttons=[
+                    [
+                        Button.inline("✅", f"hint.accept.{pending_id}"),
+                        Button.inline("❌", f"hint.reject.{pending_id}"),
+                    ]
+                ],
+            )
+            return await conv.send_message(
+                phrase.newhints.sent.format(pending_id)
+            )
