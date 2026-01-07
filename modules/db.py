@@ -1001,7 +1001,7 @@ async def get_crocodile_word() -> str:
         return choice(list(orjson.loads(await f.read())))
 
 
-async def add_pending_hint(user_id: int | str, hint_string: str) -> int:
+async def add_pending_hint(user_id: int | str, hint_string: str, word: str) -> int:
     "Добавляет запрос на подсказку в json. Выдаёт int - id запроса."
     async with aiofiles.open(pathes.pending_hints, "rb") as f:
         data = orjson.loads(await f.read())
@@ -1010,6 +1010,7 @@ async def add_pending_hint(user_id: int | str, hint_string: str) -> int:
         data[str(pending_id)] = {
             "user": str(user_id),
             "hint": str(hint_string),
+            "word": str(word)
         }
         await f.write(orjson.dumps(data, option=orjson.OPT_INDENT_2))
     return pending_id

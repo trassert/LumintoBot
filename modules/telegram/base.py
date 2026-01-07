@@ -864,7 +864,7 @@ async def add_new_hint(event: Message):
             if text.startswith("/"):
                 continue
 
-            pending_id = await db.add_pending_hint(event.sender_id, text)
+            pending_id = await db.add_pending_hint(event.sender_id, text, word)
 
             await client.send_message(
                 config.tokens.bot.creator,
