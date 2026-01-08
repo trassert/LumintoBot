@@ -384,7 +384,7 @@ async def shop_callback(event: events.CallbackQuery.Event):
     logger.info(f"КБ кнопка (Shop), дата: {data}")
     sender_id = event.sender_id
 
-    if int(data[-1]) != db.database("shop_version"):
+    if int(data[-1]) != await db.database("shop_version"):
         return await event.answer(phrase.shop.old, alert=True)
 
     nick = db.nicks(id=sender_id).get()
@@ -421,17 +421,17 @@ async def crocodile_callback(event: events.CallbackQuery.Event):
 
     match data[1]:
         case "start":
-            if db.database("crocodile_super_game") == 1:
+            if await db.database("crocodile_super_game") == 1:
                 return await event.answer(
                     phrase.crocodile.super_game_here, alert=True
                 )
-            if db.database("current_game") != 0:
+            if await db.database("current_game") != 0:
                 return await event.answer(phrase.crocodile.no, alert=True)
 
             word = await db.get_crocodile_word()
 
             unsec = "".join("_" if x.isalpha() else x for x in word)
-            db.database(
+            await db.database(
                 "current_game", {"hints": [], "word": word, "unsec": unsec}
             )
 
@@ -451,16 +451,16 @@ async def crocodile_callback(event: events.CallbackQuery.Event):
                 else f"{entity.first_name} {entity.last_name}".strip()
             )
 
-            if db.database("current_game") == 0:
+            if await db.database("current_game") == 0:
                 return await event.answer(
                     phrase.crocodile.already_down, alert=True
                 )
-            if db.database("crocodile_super_game") == 1:
+            if await db.database("crocodile_super_game") == 1:
                 return await event.answer(
                     phrase.crocodile.super_game_here, alert=True
                 )
 
-            bets_json = db.database("crocodile_bets")
+            bets_json = await db.database("crocodile_bets")
             bets = 0
             if bets_json:
                 bets = max(round(sum(bets_json.values()) / 2), 1)
@@ -468,9 +468,9 @@ async def crocodile_callback(event: events.CallbackQuery.Event):
                 if balance_check is not True:
                     return await event.answer(balance_check, alert=True)
 
-            word = db.database("current_game")["word"]
-            db.database("current_game", 0)
-            db.database("crocodile_last_hint", 0)
+            word = (await db.database("current_game"))["word"]
+            await db.database("current_game", 0)
+            await db.database("crocodile_last_hint", 0)
 
             client.remove_event_handler(crocodile_hint)
             client.remove_event_handler(crocodile_handler)

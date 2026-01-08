@@ -16,55 +16,59 @@ from .get_theme import weighted_choice
 logger.info(f"Загружен модуль {__name__}!")
 
 
-def database(key, value=None, delete=None, log=True):
+async def database(key, value=None, delete=None, log=True):
     """Изменить/получить ключ из настроек"""
     if value is not None:
         if log:
             logger.info(f"Значение {key} теперь {value}")
         try:
-            with open(pathes.data, "rb") as f:
-                load = orjson.loads(f.read())
-            with open(pathes.data, "wb") as f:
+            async with aiofiles.open(pathes.data, "rb") as f:
+                load = orjson.loads(await f.read())
+            async with aiofiles.open(pathes.data, "wb") as f:
                 load[key] = value
                 load = dict(sorted(load.items()))
-                return f.write(orjson.dumps(load, option=orjson.OPT_INDENT_2))
+                return await f.write(
+                    orjson.dumps(load, option=orjson.OPT_INDENT_2)
+                )
         except FileNotFoundError:
             logger.error("Файл не найден")
-            with open(pathes.data, "wb") as f:
+            async with aiofiles.open(pathes.data, "wb") as f:
                 load = {}
                 load[key] = value
                 return f.write(orjson.dumps(load, option=orjson.OPT_INDENT_2))
         except JSONDecodeError:
             logger.error("Ошибка при чтении файла")
-            with open(pathes.data, "wb") as f:
-                f.write(orjson.loads({}, option=orjson.OPT_INDENT_2))
+            async with aiofiles.open(pathes.data, "wb") as f:
+                await f.write(orjson.loads({}, option=orjson.OPT_INDENT_2))
             return None
     elif delete is not None:
         if log:
             logger.info(f"Удаляю ключ: {key}")
-        with open(pathes.data, "rb") as f:
-            load = orjson.loads(f.read())
-        with open(pathes.data, "wb") as f:
+        async with aiofiles.open(pathes.data, "rb") as f:
+            load = orjson.loads(await f.read())
+        async with aiofiles.open(pathes.data, "wb") as f:
             if key in load:
                 del load[key]
-            return f.write(orjson.dumps(load, option=orjson.OPT_INDENT_2))
+            return await f.write(orjson.dumps(load, option=orjson.OPT_INDENT_2))
     else:
         if log:
             logger.info(f"Получаю ключ: {key}")
         try:
-            with open(pathes.data, "rb") as f:
-                load = orjson.loads(f.read())
+            async with aiofiles.open(pathes.data, "rb") as f:
+                load = orjson.loads(await f.read())
                 return load.get(key)
         except JSONDecodeError:
             logger.error("Ошибка при чтении файла")
-            with open(pathes.data, "wb") as f:
-                f.write(orjson.loads({}, option=orjson.OPT_INDENT_2))
-            return None
+            async with aiofiles.open(pathes.data, "wb") as f:
+                return await f.write(
+                    orjson.loads({}, option=orjson.OPT_INDENT_2)
+                )
         except FileNotFoundError:
             logger.error("Файл не найден")
-            with open(pathes.data, "wb") as f:
-                f.write(orjson.loads({}, option=orjson.OPT_INDENT_2))
-            return None
+            async with aiofiles.open(pathes.data, "wb") as f:
+                return await f.write(
+                    orjson.loads({}, option=orjson.OPT_INDENT_2)
+                )
 
 
 async def get_money(id) -> int:
@@ -80,10 +84,10 @@ async def get_money(id) -> int:
         return 0
 
 
-def get_all_money():
+async def get_all_money():
     """Получить все деньги"""
-    with open(pathes.money, "rb") as f:
-        load = orjson.loads(f.read())
+    async with aiofiles.open(pathes.money, "rb") as f:
+        load = orjson.loads(await f.read())
         return sum(load.values())
 
 
@@ -235,25 +239,25 @@ class crocodile_stat:
 
 class nicks:
     def __init__(self, nick=None, id=None):
-        self.nick = nick
+        self.nick: str = nick
         self.id = id
 
     def get(self, if_nothing=None) -> str:
         if self.nick:
-            "Получить id игрока по нику"
             with open(pathes.nick, "rb") as f:
                 load = orjson.loads(f.read())
-                if self.nick in load:
-                    return load[self.nick]
-                return if_nothing
+            nick_lower = self.nick.lower()
+            for key, value in load.items():
+                if key.lower() == nick_lower:
+                    return value
+            return if_nothing
         elif self.id:
-            "Получить ник по id"
             with open(pathes.nick, "rb") as f:
                 load = orjson.loads(f.read())
-                for key, value in load.items():
-                    if value == self.id:
-                        return key
-                return if_nothing
+            for key, value in load.items():
+                if value == self.id:
+                    return key
+            return if_nothing
         else:
             raise TypeError("Нужен ник или id!")
 

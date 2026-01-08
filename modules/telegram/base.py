@@ -26,8 +26,8 @@ logger.info(f"Загружен модуль {__name__}!")
 async def host(event: Message):
     return await event.reply(
         phrase.server.host.format(
-            v4=db.database("host"),
-            v6=db.database("ipv6_host"),
+            v4=await db.database("host"),
+            v6=await db.database("ipv6_host"),
             hint="https://trassert.ru/wiki/info/ipv6",
         ),
         link_preview=False,
@@ -606,7 +606,7 @@ async def randompic(event: Message):
 @client.on(events.NewMessage(pattern=r"(?i)^/карта$", func=checks))
 async def getmap(event: Message):
     return await event.reply(
-        phrase.get_map.format(db.database("host")),
+        phrase.get_map.format(await db.database("host")),
         link_preview=False,
     )
 
@@ -819,7 +819,7 @@ async def cities_remove(event: Message):
 @client.on(events.NewMessage(pattern=r"(?i)^правила$", func=checks))
 async def rules(event: Message):
     return await event.reply(
-        phrase.rules.base.format(db.database("host")),
+        phrase.rules.base.format(await db.database("host")),
         link_preview=False,
     )
 

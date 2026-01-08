@@ -56,7 +56,7 @@ async def crocodile(event: Message):
         != config.chats.topics.games
     ):
         return await event.reply(phrase.game_topic_warning)
-    if db.database("current_game") == 0:
+    if await db.database("current_game") == 0:
         keyboard = ReplyInlineMarkup(
             [
                 KeyboardButtonRow(
@@ -99,20 +99,20 @@ async def crocodile_bet(event: Message):
         return await event.reply(phrase.game_topic_warning)
     try:
         bet = int(event.pattern_match.group(1).strip())
-        if bet < db.database("min_bet"):
+        if bet < await db.database("min_bet"):
             return await event.reply(
                 phrase.money.min_count.format(
-                    formatter.value_to_str(db.database("min_bet"), "изумруд"),
+                    formatter.value_to_str(await db.database("min_bet"), "изумруд"),
                 ),
             )
-        if bet > db.database("max_bet"):
+        if bet > await db.database("max_bet"):
             return await event.reply(
                 phrase.money.max_count.format(
-                    formatter.value_to_str(db.database("max_bet"), "изумруд"),
+                    formatter.value_to_str(await db.database("max_bet"), "изумруд"),
                 ),
             )
     except IndexError:
-        bet = db.database("min_bet")
+        bet = await db.database("min_bet")
     except ValueError:
         return await event.reply(phrase.money.nan_count)
     sender_balance = await db.get_money(event.sender_id)
@@ -122,14 +122,14 @@ async def crocodile_bet(event: Message):
                 formatter.value_to_str(sender_balance, "изумруд"),
             ),
         )
-    if db.database("current_game") != 0:
+    if await db.database("current_game") != 0:
         return await event.reply(phrase.crocodile.no)
-    all_bets = db.database("crocodile_bets")
+    all_bets = await db.database("crocodile_bets")
     if str(event.sender_id) in all_bets:
         return await event.reply(phrase.crocodile.bet_already)
     db.add_money(event.sender_id, -bet)
     all_bets[str(event.sender_id)] = bet
-    db.database("crocodile_bets", all_bets)
+    await db.database("crocodile_bets", all_bets)
     return await event.reply(
         phrase.crocodile.bet.format(formatter.value_to_str(bet, "изумруд")),
     )
@@ -146,18 +146,18 @@ async def super_game(event: Message):
             ),
         )
     arg = event.pattern_match.group(1).strip()
-    bets = db.database("crocodile_bets")
+    bets = await db.database("crocodile_bets")
     bets[str(config.tokens.bot.creator)] = 50
-    db.database("crocodile_bets", bets)
-    db.database("crocodile_super_game", 1)
-    db.database("max_bet", 100)
-    db.database("min_bet", 50)
+    await db.database("crocodile_bets", bets)
+    await db.database("crocodile_super_game", 1)
+    await db.database("max_bet", 100)
+    await db.database("min_bet", 50)
     await client.send_message(
         config.chats.chat,
         phrase.crocodile.super_game_wait,
     )
     await asyncio.sleep(60)
-    db.database(
+    await db.database(
         "current_game",
         {"hints": [], "unsec": "_" * len(arg), "word": arg},
     )
@@ -184,10 +184,10 @@ async def crocodile_handler(event: Message):
     text = event.text.strip().lower()
     if not len(text) > 0:
         return None
-    current_word = db.database("current_game")["word"]
-    current_mask = list(db.database("current_game")["unsec"])
+    current_word = (await db.database("current_game"))["word"]
+    current_mask = list((await db.database("current_game"))["unsec"])
     if text == current_word:
-        bets = db.database("crocodile_bets")
+        bets = await db.database("crocodile_bets")
         all = 0
         bets_str = ""
         topers = []
@@ -210,13 +210,13 @@ async def crocodile_handler(event: Message):
             bets_str = phrase.crocodile.bet_win.format(
                 formatter.value_to_str(all, "изумруд"),
             )
-        db.database("current_game", 0)
-        db.database("crocodile_bets", {})
-        db.database("crocodile_last_hint", 0)
-        if db.database("crocodile_super_game") == 1:
-            db.database("crocodile_super_game", 0)
-            db.database("max_bet", config.coofs.CrocodileDefaultMaxBet)
-            db.database("min_bet", config.coofs.CrocodileDefaultMinBet)
+        await db.database("current_game", 0)
+        await db.database("crocodile_bets", {})
+        await db.database("crocodile_last_hint", 0)
+        if await db.database("crocodile_super_game") == 1:
+            await db.database("crocodile_super_game", 0)
+            await db.database("max_bet", config.coofs.CrocodileDefaultMaxBet)
+            await db.database("min_bet", config.coofs.CrocodileDefaultMinBet)
         client.remove_event_handler(crocodile_hint)
         client.remove_event_handler(crocodile_handler)
         db.crocodile_stat(event.sender_id).add()
@@ -238,18 +238,18 @@ async def crocodile_handler(event: Message):
                 n = n + 1
         if "".join(current_mask) == current_word:
             current_mask[randint(0, len(current_mask) - 1)] = "_"
-            cgame = db.database("current_game")
+            cgame = await db.database("current_game")
             cgame["unsec"] = "".join(current_mask)
-            db.database("current_game", cgame)
+            await db.database("current_game", cgame)
             return await event.reply(
                 phrase.crocodile.new.format(
                     "".join(current_mask).replace("_", ".."),
                 ),
             )
-        if list(db.database("current_game")["unsec"]) != current_mask:
-            cgame = db.database("current_game")
+        if list((await db.database("current_game"))["unsec"]) != current_mask:
+            cgame = await db.database("current_game")
             cgame["unsec"] = "".join(current_mask)
-            db.database("current_game", cgame)
+            await db.database("current_game", cgame)
             return await event.reply(
                 phrase.crocodile.new.format(
                     "".join(current_mask).replace("_", ".."),
@@ -264,13 +264,13 @@ async def crocodile_hint(event: Message):
         != config.chats.topics.games
     ):
         return await event.reply(phrase.game_topic_warning)
-    game = db.database("current_game")
+    game = await db.database("current_game")
     hint = game["hints"]
     if event.sender_id in hint:
         return await event.reply(phrase.crocodile.hints_all)
     hint.append(event.sender_id)
     game["hints"] = hint
-    db.database("current_game", game)
+    await db.database("current_game", game)
     word = game["word"]
 
     async def letter_hint():
@@ -548,7 +548,9 @@ async def cities_start(event: Message):
     return None
 
 
-if db.database("current_game") != 0:
+async def crocodile_onboot():
+    if await db.database("current_game") == 0:
+        return
     client.add_event_handler(
         crocodile_handler,
         events.NewMessage(chats=config.chats.chat),
@@ -557,3 +559,4 @@ if db.database("current_game") != 0:
         crocodile_hint,
         events.NewMessage(pattern=r"(?i)^/подсказка$", func=checks),
     )
+
