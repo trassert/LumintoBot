@@ -855,7 +855,7 @@ async def add_new_hint(event: Message):
                 response = await conv.get_response()
             except TimeoutError:
                 return await event.reply(phrase.newhints.timeout)
-            text: str = response.raw_text.strip()
+            text: str = response.raw_text.strip().capitalize()
 
             if text == "/стоп":
                 await conv.send_message(phrase.newhints.cancel)
