@@ -109,7 +109,7 @@ def add_money(id, count):
         return load[id]
 
 
-def update_shop():
+async def update_shop():
     """Обновляет магазин, возвращая новую тему."""
     with open(pathes.shopc, "rb") as f:
         last_theme = orjson.loads(f.read()).get("theme")
@@ -122,7 +122,7 @@ def update_shop():
         logger.exception("Нет доступных тем в shop_all.json")
     new_theme = last_theme
     while new_theme == last_theme:
-        new_theme = weighted_choice(theme_names, database("shop_weight"))
+        new_theme = weighted_choice(theme_names, await database("shop_weight"))
     theme_items = all_themes[new_theme]
     item_names = list(theme_items.keys())
     if len(item_names) < 5:
