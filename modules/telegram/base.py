@@ -28,7 +28,7 @@ async def host(event: Message):
         phrase.server.host.format(
             v4=await db.database("host"),
             v6=await db.database("ipv6_host"),
-            hint="https://trassert.ru/wiki/info/ipv6",
+            hint="https://lumintomc.ru/wiki/info/ipv6",
         ),
         link_preview=False,
     )
