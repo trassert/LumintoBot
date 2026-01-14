@@ -659,6 +659,16 @@ class RefCodes:
                 pass
         return None
 
+    async def delete(self, id) -> bool:
+        "Удаляет реф. код, return bool True/False (есть рефка или нет)"
+        load = await self._read()
+        try:
+            del load[str(id)]["own"]
+        except KeyError:
+            return False
+        await self._write(load)
+        return True
+
 
 class CitiesGame:
     def __init__(self):

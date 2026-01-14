@@ -57,4 +57,6 @@ async def add_refcode_empty(event: Message):
 @client.on(events.NewMessage(pattern=r"(?i)^/удалить рефку$", func=checks))
 @client.on(events.NewMessage(pattern=r"(?i)^удалить рефку$", func=checks))
 async def del_refcode(event: Message):
-    pass
+    if await db.RefCodes().delete(event.sender_id) is False:
+        return await event.reply(phrase.ref.not_found)
+    return await event.reply(phrase.ref.deleted)
