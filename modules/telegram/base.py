@@ -454,7 +454,7 @@ async def money_to_server(event: Message):
     db.add_money(event.sender_id, -amount)
     try:
         async with mcrcon.Vanilla as rcon:
-            await rcon.send(f"invgive {nick} emerald {amount}")
+            await rcon.send(f"invgive {nick} amethyst_shard {amount}")
     except Exception:
         db.add_money(event.sender_id, amount)
         db.check_withdraw_limit(event.sender_id, -amount)
