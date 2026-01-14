@@ -123,7 +123,7 @@ async def profile(event: Message):
             m_month=m_month,
             m_all=m_all,
             balance=formatter.value_to_str(
-                await db.get_money(user_id), "изумруд"
+                await db.get_money(user_id), phrase.currency
             ),
             time=time_played,
         ),
@@ -169,7 +169,9 @@ async def mine_start(event: Message):
         [Button.inline(phrase.mine.button_no, f"mine.no.{user_id}")],
     ]
     return await event.reply(
-        phrase.mine.done.format(formatter.value_to_str(initial, "изумруд"))
+        phrase.mine.done.format(
+            formatter.value_to_str(initial, phrase.currency)
+        )
         + phrase.mine.q,
         buttons=buttons,
     )
@@ -385,7 +387,7 @@ async def swap_money(event: Message):
     if sender_balance < count:
         return await event.reply(
             phrase.money.not_enough.format(
-                formatter.value_to_str(sender_balance, "изумруд")
+                formatter.value_to_str(sender_balance, phrase.currency)
             )
         )
 
@@ -410,7 +412,9 @@ async def swap_money(event: Message):
     db.add_money(event.sender_id, -count)
     db.add_money(user, count)
     return await event.reply(
-        phrase.money.swap_money.format(formatter.value_to_str(count, "изумруд"))
+        phrase.money.swap_money.format(
+            formatter.value_to_str(count, phrase.currency)
+        )
     )
 
 
@@ -436,13 +440,15 @@ async def money_to_server(event: Message):
     if not db.check_withdraw_limit(event.sender_id, amount):
         limit = db.check_withdraw_limit(event.sender_id, 0)
         return await event.reply(
-            phrase.bank.limit.format(formatter.value_to_str(limit, "изумруд"))
+            phrase.bank.limit.format(
+                formatter.value_to_str(limit, phrase.currency)
+            )
         )
     balance = await db.get_money(event.sender_id)
     if balance < amount:
         return await event.reply(
             phrase.money.not_enough.format(
-                formatter.value_to_str(balance, "изумруд")
+                formatter.value_to_str(balance, phrase.currency)
             )
         )
     db.add_money(event.sender_id, -amount)
@@ -454,7 +460,9 @@ async def money_to_server(event: Message):
         db.check_withdraw_limit(event.sender_id, -amount)
         return await event.reply(phrase.bank.error)
     return await event.reply(
-        phrase.bank.withdraw.format(formatter.value_to_str(amount, "изумруд"))
+        phrase.bank.withdraw.format(
+            formatter.value_to_str(amount, phrase.currency)
+        )
     )
 
 
@@ -469,7 +477,7 @@ async def money_to_server_empty(event: Message):
     return await event.reply(phrase.money.no_count)
 
 
-@client.on(events.NewMessage(pattern=r"(?i)^/изумруды$", func=checks))
+@client.on(events.NewMessage(pattern=r"(?i)^/аметисты$", func=checks))
 @client.on(events.NewMessage(pattern=r"(?i)^/баланс$", func=checks))
 @client.on(events.NewMessage(pattern=r"(?i)^баланс$", func=checks))
 @client.on(events.NewMessage(pattern=r"(?i)^/wallet", func=checks))
@@ -479,7 +487,9 @@ async def money_to_server_empty(event: Message):
 async def get_balance(event: Message):
     balance = await db.get_money(event.sender_id)
     return await event.reply(
-        phrase.money.wallet.format(formatter.value_to_str(balance, "изумруд"))
+        phrase.money.wallet.format(
+            formatter.value_to_str(balance, phrase.currency)
+        )
     )
 
 
@@ -527,14 +537,14 @@ async def link_nick(event: Message):
             ]
         )
         price = formatter.value_to_str(
-            config.coofs.PriceForChangeNick, "изумруд"
+            config.coofs.PriceForChangeNick, phrase.currency
         )
         return await event.reply(
             phrase.nick.already_have.format(price=price), buttons=keyboard
         )
     reftext = ""
     if refcode:
-        author = db.RefCodes().check_ref(refcode)
+        author = await db.RefCodes().check_ref(refcode)
         if author is None:
             return await event.reply(phrase.ref.invalid)
         db.add_money(author, config.coofs.RefGift)
@@ -550,7 +560,7 @@ async def link_nick(event: Message):
     db.nicks(nick, event.sender_id).link()
     await event.reply(
         phrase.nick.success.format(
-            formatter.value_to_str(config.coofs.LinkGift, "изумруд")
+            formatter.value_to_str(config.coofs.LinkGift, phrase.currency)
         )
     )
     if reftext:

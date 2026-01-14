@@ -621,36 +621,36 @@ def check_withdraw_limit(id: int, amount: int) -> int | bool:
 
 
 class RefCodes:
-    def _read(self) -> dict:
-        return _load_json_sync(pathes.ref)
+    async def _read(self) -> dict:
+        return await _load_json_async(pathes.ref)
 
-    def _write(self, data):
-        _save_json_sync(pathes.ref, data, indent=True)
+    async def _write(self, data):
+        return await _save_json_async(pathes.ref, data, indent=True)
 
-    def get_own(self, id: int, default=None) -> str:
-        return self._read().get(str(id), {}).get("own", default)
+    async def get_own(self, id: int, default=None) -> str:
+        return (await self._read()).get(str(id), {}).get("own", default)
 
-    def check_used(self, id: int, default=False) -> str:
-        return self._read().get(str(id), {}).get("used", default)
+    async def check_used(self, id: int, default=False) -> str:
+        return (await self._read()).get(str(id), {}).get("used", default)
 
-    def add_own(self, id: int, name: str):
-        if self.check_ref(name) is not None:
+    async def add_own(self, id: int, name: str):
+        if await self.check_ref(name) is not None:
             return False
-        load = self._read()
+        load = await self._read()
         if str(id) not in load:
             load[str(id)] = {}
         load[str(id)]["own"] = name
-        self._write(load)
+        await self._write(load)
 
-    def add_used(self, id: int, name: str):
-        load = self._read()
+    async def add_used(self, id: int, name: str):
+        load = await self._read()
         if str(id) not in load:
             load[str(id)] = {}
         load[str(id)]["used"] = name
-        self._write(load)
+        await self._write(load)
 
-    def check_ref(self, name) -> str:
-        load = self._read()
+    async def check_ref(self, name) -> str:
+        load = await self._read()
         for user_id, data in load.items():
             try:
                 if data.get("own", "").lower() == name.lower():

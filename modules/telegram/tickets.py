@@ -28,14 +28,16 @@ async def do_ticket(event: Message):
     if balance < arg:
         return await event.reply(
             phrase.money.not_enough.format(
-                formatter.value_to_str(balance, "изумруд"),
+                formatter.value_to_str(balance, phrase.currency),
             ),
         )
     db.add_money(event.sender_id, -arg)
     ticket_id = db.ticket.add(event.sender_id, arg)
     return await event.reply(
         phrase.ticket.added.format(
-            value=arg, author=await get_name(event.sender_id), id=ticket_id,
+            value=arg,
+            author=await get_name(event.sender_id),
+            id=ticket_id,
         ),
     )
 
@@ -57,6 +59,6 @@ async def get_ticket(event: Message):
     return await event.reply(
         phrase.ticket.got.format(
             author=await get_name(ticket_info["author"]),
-            value=formatter.value_to_str(ticket_info["value"], "изумруд"),
+            value=formatter.value_to_str(ticket_info["value"], phrase.currency),
         ),
     )

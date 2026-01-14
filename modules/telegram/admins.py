@@ -212,5 +212,7 @@ async def give_money(event: Message):
 
     db.add_money(user, count)
     return await event.reply(
-        phrase.money.give_money.format(formatter.value_to_str(count, "изумруд"))
+        phrase.money.give_money.format(
+            formatter.value_to_str(count, phrase.currency)
+        )
     )

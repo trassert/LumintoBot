@@ -25,7 +25,7 @@ logger.info(f"Загружен модуль {__name__}!")
 
 
 async def _check_and_deduct_balance(
-    user_id: int, price: int, currency: str = "изумруд"
+    user_id: int, price: int, currency: str = phrase.currency
 ) -> bool | str:
     """Проверяет баланс и списывает сумму при успехе. Возвращает True или сообщение об ошибке."""
     balance = await db.get_money(user_id)
@@ -76,7 +76,7 @@ async def _handle_suggestion(
                     word=word,
                     user=user_name,
                     money=formatter.value_to_str(
-                        config.coofs.WordRequest, "изумруд"
+                        config.coofs.WordRequest, phrase.currency
                     ),
                 ),
             )
@@ -338,7 +338,7 @@ async def nick_callback(event: events.CallbackQuery.Event):
         phrase.nick.buy_nick.format(
             user=user_name,
             price=formatter.value_to_str(
-                config.coofs.PriceForChangeNick, "изумруд"
+                config.coofs.PriceForChangeNick, phrase.currency
             ),
         )
     )
@@ -479,7 +479,7 @@ async def crocodile_callback(event: events.CallbackQuery.Event):
                 return await event.reply(
                     phrase.crocodile.down_payed.format(
                         user=user,
-                        money=formatter.value_to_str(bets, "изумруд"),
+                        money=formatter.value_to_str(bets, phrase.currency),
                         word=word,
                     )
                 )
@@ -506,7 +506,7 @@ async def mine_callback(event: events.CallbackQuery.Event):
             del mining.sessions[sender_id]
             return await event.edit(
                 phrase.mine.quited.format(
-                    formatter.value_to_str(total, "изумруд")
+                    formatter.value_to_str(total, phrase.currency)
                 ),
                 buttons=None,
             )
@@ -524,7 +524,7 @@ async def mine_callback(event: events.CallbackQuery.Event):
                 return await event.edit(
                     choice(phrase.mine.die).format(
                         killer=choice(phrase.mine.killers),
-                        value=formatter.value_to_str(penalty, "изумруд"),
+                        value=formatter.value_to_str(penalty, phrase.currency),
                     ),
                     buttons=None,
                 )
@@ -535,12 +535,12 @@ async def mine_callback(event: events.CallbackQuery.Event):
                     config.coofs.Mining.BoostGemsMax,
                 )
                 note = choice(phrase.mine.boost).format(
-                    formatter.value_to_str(extra, "изумруд")
+                    formatter.value_to_str(extra, phrase.currency)
                 )
             else:
                 extra = randint(1, config.coofs.Mining.DefaultGems)
                 note = phrase.mine.base.format(
-                    formatter.value_to_str(extra, "изумруд")
+                    formatter.value_to_str(extra, phrase.currency)
                 )
 
             session["gems"] += extra
@@ -554,7 +554,7 @@ async def mine_callback(event: events.CallbackQuery.Event):
             await event.edit(
                 note
                 + phrase.mine.sessionall.format(
-                    formatter.value_to_str(session["gems"], "изумруд")
+                    formatter.value_to_str(session["gems"], phrase.currency)
                 )
                 + phrase.mine.q,
                 buttons=[
@@ -596,7 +596,7 @@ async def hint_callback(event: events.CallbackQuery.Event):
                 phrase.newhints.accept.format(
                     word=hint_data["word"],
                     get=formatter.value_to_str(
-                        config.coofs.HintGift, "изумруд"
+                        config.coofs.HintGift, phrase.currency
                     ),
                 ),
             )

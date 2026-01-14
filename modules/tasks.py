@@ -39,7 +39,7 @@ async def rewards():
                     user=top[0],
                     gift=formatter.value_to_str(
                         config.coofs.ActiveGift,
-                        "изумруд",
+                        phrase.currency,
                     ),
                 ),
             )

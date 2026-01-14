@@ -36,7 +36,7 @@ DaysToStatesRemove: 7
 ChanceToDie: 0.011
 ChanceToBoost: 0.009
 
-# Количество изумрудов
+# Количество валюты
 MineMaxGems: 10
 MineMaxBoost: 50
 

@@ -25,12 +25,12 @@ async def add_refcode(event: Message):
     if not re.match("^[A-Za-z0-9_]*$", arg):
         return await event.reply(phrase.ref.not_regex)
     ref = db.RefCodes()
-    if ref.check_ref(arg) is not None:
+    if await ref.check_ref(arg) is not None:
         return await event.reply(phrase.ref.already_exists)
-    if ref.get_own(event.sender_id) is not None:
-        ref.add_own(event.sender_id, arg)
+    if await ref.get_own(event.sender_id) is not None:
+        await ref.add_own(event.sender_id, arg)
         return await event.reply(phrase.ref.edited.format(arg))
-    ref.add_own(event.sender_id, arg)
+    await ref.add_own(event.sender_id, arg)
     return await event.reply(phrase.ref.added.format(arg))
 
 

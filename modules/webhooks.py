@@ -52,7 +52,7 @@ async def server():
             db.add_money(tg_id, 10)
             await db.add_votes(tg_id, 1)
             give = phrase.vote_money.format(
-                formatter.value_to_str(10, "изумруд"),
+                formatter.value_to_str(10, phrase.currency),
             )
         else:
             give = ""
@@ -85,7 +85,7 @@ async def server():
             db.add_money(tg_id, 10)
             await db.add_votes(tg_id, 1)
             give = phrase.vote_money.format(
-                formatter.value_to_str(10, "изумруд"),
+                formatter.value_to_str(10, phrase.currency),
             )
         else:
             give = ""
@@ -122,11 +122,11 @@ async def server():
             config.chats.chat,
             phrase.mcadd_money.format(
                 player=await func.get_name(playerid, minecraft=True),
-                amount=formatter.value_to_str(amount, "изумруд"),
+                amount=formatter.value_to_str(amount, phrase.currency),
             ),
         )
         db.add_money(playerid, amount)
-        logger.info(f"[Bank] Переведено {amount} изумрудов на счет {playerid}")
+        logger.info(f"[Bank] Переведено {amount} на счет {playerid}")
         return aiohttp.web.Response(text="ok")
 
     # async def genai(request: aiohttp.web.Request):

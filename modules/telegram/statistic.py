@@ -92,7 +92,7 @@ async def crocodile_wins(event: Message):
 async def all_money(event: Message):
     return await event.reply(
         phrase.money.all_money.format(
-            formatter.value_to_str(await db.get_all_money(), "изумруд"),
+            formatter.value_to_str(await db.get_all_money(), phrase.currency),
         ),
     )
 

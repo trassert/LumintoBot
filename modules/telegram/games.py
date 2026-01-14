@@ -102,13 +102,17 @@ async def crocodile_bet(event: Message):
         if bet < await db.database("min_bet"):
             return await event.reply(
                 phrase.money.min_count.format(
-                    formatter.value_to_str(await db.database("min_bet"), "изумруд"),
+                    formatter.value_to_str(
+                        await db.database("min_bet"), phrase.currency
+                    ),
                 ),
             )
         if bet > await db.database("max_bet"):
             return await event.reply(
                 phrase.money.max_count.format(
-                    formatter.value_to_str(await db.database("max_bet"), "изумруд"),
+                    formatter.value_to_str(
+                        await db.database("max_bet"), phrase.currency
+                    ),
                 ),
             )
     except IndexError:
@@ -119,7 +123,7 @@ async def crocodile_bet(event: Message):
     if sender_balance < bet:
         return await event.reply(
             phrase.money.not_enough.format(
-                formatter.value_to_str(sender_balance, "изумруд"),
+                formatter.value_to_str(sender_balance, phrase.currency),
             ),
         )
     if await db.database("current_game") != 0:
@@ -131,7 +135,9 @@ async def crocodile_bet(event: Message):
     all_bets[str(event.sender_id)] = bet
     await db.database("crocodile_bets", all_bets)
     return await event.reply(
-        phrase.crocodile.bet.format(formatter.value_to_str(bet, "изумруд")),
+        phrase.crocodile.bet.format(
+            formatter.value_to_str(bet, phrase.currency)
+        ),
     )
 
 
@@ -208,7 +214,7 @@ async def crocodile_handler(event: Message):
                     all += bets[key]
             db.add_money(event.sender_id, all)
             bets_str = phrase.crocodile.bet_win.format(
-                formatter.value_to_str(all, "изумруд"),
+                formatter.value_to_str(all, phrase.currency),
             )
         await db.database("current_game", 0)
         await db.database("crocodile_bets", {})
@@ -329,7 +335,7 @@ async def cities_timeout(current_player: int, last_city: str):
                             ),
                             formatter.value_to_str(
                                 win_money - config.coofs.CitiesBet,
-                                "изумруд",
+                                phrase.currency,
                             ),
                             statistic,
                         ),
@@ -437,13 +443,15 @@ async def cities_callback(event: events.CallbackQuery.Event):
         if config.coofs.PriceForCities > balance:
             return await event.answer(
                 phrase.money.not_enough.format(
-                    formatter.value_to_str(balance, "изумруд"),
+                    formatter.value_to_str(balance, phrase.currency),
                 ),
             )
         db.add_money(event.sender_id, -config.coofs.PriceForCities)
         await event.answer(
             phrase.cities.set_ingame.format(
-                formatter.value_to_str(config.coofs.PriceForCities, "изумруд"),
+                formatter.value_to_str(
+                    config.coofs.PriceForCities, phrase.currency
+                ),
             ),
         )
 
@@ -559,4 +567,3 @@ async def crocodile_onboot():
         crocodile_hint,
         events.NewMessage(pattern=r"(?i)^/подсказка$", func=checks),
     )
-
