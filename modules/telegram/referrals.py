@@ -44,7 +44,7 @@ async def add_refcode(event: Message):
 @client.on(events.NewMessage(pattern=r"(?i)^/добавить рефку$", func=checks))
 @client.on(events.NewMessage(pattern=r"(?i)^добавить рефку$", func=checks))
 async def add_refcode_empty(event: Message):
-    pass
+    return await event.reply(phrase.ref.notext)
 
 
 @client.on(events.NewMessage(pattern=r"(?i)^/delrefcode$", func=checks))

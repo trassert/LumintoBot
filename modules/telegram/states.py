@@ -56,7 +56,7 @@ async def states_all_top(event: Message):
     n = 1
     for state in data:
         if data[state]["money"] > 0:
-            text += f"{n}. **{state}** - {data[state]['money']} изм.\n"
+            text += f"{n}. **{state}** - {data[state]['money']} амт.\n"
             n += 1
     return await event.reply(text)
 
