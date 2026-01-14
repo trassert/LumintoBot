@@ -630,7 +630,7 @@ class RefCodes:
     async def get_own(self, id: int, default=None) -> str:
         return (await self._read()).get(str(id), {}).get("own", default)
 
-    async def check_used(self, id: int, default=False) -> str:
+    async def check_uses(self, id: int, default=[]) -> list[str]:
         return (await self._read()).get(str(id), {}).get("used", default)
 
     async def add_own(self, id: int, name: str):
@@ -642,11 +642,9 @@ class RefCodes:
         load[str(id)]["own"] = name
         await self._write(load)
 
-    async def add_used(self, id: int, name: str):
+    async def add_uses(self, id: int, who_used: int):
         load = await self._read()
-        if str(id) not in load:
-            load[str(id)] = {}
-        load[str(id)]["used"] = name
+        load[str(id)]["used"] = load.get(str(id), {}).get("used", []).append(str(who_used))
         await self._write(load)
 
     async def check_ref(self, name) -> str:
@@ -668,6 +666,14 @@ class RefCodes:
             return False
         await self._write(load)
         return True
+
+    async def get_top_uses(self) -> list[list[str, int]]:
+        result = []
+        for user_id, info in (await self._read()).items():
+            used = info.get("used", None)
+            if used:  # не None и не пустой список
+                result.append([user_id, len(used)])
+        return sorted(result, key=lambda x: x[1], reverse=True)
 
 
 class CitiesGame:

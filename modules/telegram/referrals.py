@@ -5,6 +5,7 @@ from telethon import events
 from telethon.tl.custom import Message
 
 from .. import db, phrase
+from . import func
 from .client import client
 from .global_checks import checks
 
@@ -60,3 +61,26 @@ async def del_refcode(event: Message):
     if await db.RefCodes().delete(event.sender_id) is False:
         return await event.reply(phrase.ref.not_found)
     return await event.reply(phrase.ref.deleted)
+
+
+@client.on(events.NewMessage(pattern=r"(?i)^/топреф$", func=checks))
+@client.on(events.NewMessage(pattern=r"(?i)^/топрефералов$", func=checks))
+@client.on(events.NewMessage(pattern=r"(?i)^/топрефералы$", func=checks))
+@client.on(events.NewMessage(pattern=r"(?i)^/топ рефералы$", func=checks))
+@client.on(events.NewMessage(pattern=r"(?i)^/топ реф$", func=checks))
+@client.on(events.NewMessage(pattern=r"(?i)^/топ рефералов$", func=checks))
+@client.on(events.NewMessage(pattern=r"(?i)^/рефералы топ$", func=checks))
+async def top_ref(event: Message):
+    text = [phrase.ref.top]
+    info = await db.RefCodes().get_top_uses()
+    n = 1
+    for chunk in info:
+        text.append(
+            f"{n}. **{await func.get_name(int(chunk[0]))}** - {chunk[1]}"
+        )
+        n += 1
+        if n > 10:
+            break
+    if n == 1:
+        return await event.reply(phrase.ref.top_empty)
+    return await event.reply("\n".join(text))

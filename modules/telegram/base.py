@@ -542,20 +542,21 @@ async def link_nick(event: Message):
         return await event.reply(
             phrase.nick.already_have.format(price=price), buttons=keyboard
         )
-    reftext = ""
-    if refcode:
-        author = await db.RefCodes().check_ref(refcode)
-        if author is None:
-            return await event.reply(phrase.ref.invalid)
-        db.add_money(author, config.coofs.RefGift)
-        db.add_money(event.sender_id, config.coofs.RefGift)
-        reftext = phrase.ref.gift.format(config.coofs.RefGift)
     try:
         async with mcrcon.Vanilla as rcon:
             await rcon.send(f"nwl add name {nick}")
     except Exception:
         logger.error("Внутренняя ошибка при добавлении в белый список")
         return await event.reply(phrase.nick.error)
+    reftext = ""
+    if refcode:
+        author = await db.RefCodes().check_ref(refcode)
+        if author is None:
+            return await event.reply(phrase.ref.invalid)
+        db.RefCodes().add_uses(author, event.sender_id)
+        db.add_money(author, config.coofs.RefGift)
+        db.add_money(event.sender_id, config.coofs.RefGift)
+        reftext = phrase.ref.gift.format(config.coofs.RefGift)
     db.add_money(event.sender_id, config.coofs.LinkGift)
     db.nicks(nick, event.sender_id).link()
     await event.reply(
@@ -577,7 +578,6 @@ async def link_nick(event: Message):
             logger.info(
                 f"Ref {author} is active, but private is closed. Skipping mention."
             )
-    return None
 
 
 @client.on(events.NewMessage(pattern=r"(?i)^/linknick$", func=checks))
