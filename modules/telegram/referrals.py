@@ -84,3 +84,26 @@ async def top_ref(event: Message):
     if n == 1:
         return await event.reply(phrase.ref.top_empty)
     return await event.reply("\n".join(text))
+
+
+@client.on(events.NewMessage(pattern=r"(?i)^/рефка$", func=checks))
+@client.on(events.NewMessage(pattern=r"(?i)^/рефкод$", func=checks))
+@client.on(events.NewMessage(pattern=r"(?i)^/моярефка$", func=checks))
+@client.on(events.NewMessage(pattern=r"(?i)^/мойрефкод$", func=checks))
+@client.on(events.NewMessage(pattern=r"(?i)^/реферальныйкод$", func=checks))
+@client.on(events.NewMessage(pattern=r"(?i)^/реферальный код$", func=checks))
+@client.on(events.NewMessage(pattern=r"(?i)^/refcode", func=checks))
+async def my_ref(event: Message):
+    ref = db.RefCodes()
+    name = await ref.get_own(event.sender_id)
+    if name is None:
+        return await event.reply(phrase.ref.not_found)
+    uses = await ref.check_uses(event.sender_id)
+    if len(uses) == 0:
+        uses = "0"
+    else:
+        players = []
+        for player in uses:
+            players.append(await func.get_name(player, minecraft=True))
+        uses = f"{len(uses)}: {','.join(players)}"
+    return await event.reply(phrase.ref.my.format(name=name, uses=uses))

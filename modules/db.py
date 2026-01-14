@@ -671,7 +671,7 @@ class RefCodes:
         result = []
         for user_id, info in (await self._read()).items():
             used = info.get("used", None)
-            if used:  # не None и не пустой список
+            if used:
                 result.append([user_id, len(used)])
         return sorted(result, key=lambda x: x[1], reverse=True)
 
