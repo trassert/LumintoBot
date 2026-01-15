@@ -553,7 +553,7 @@ async def link_nick(event: Message):
         author = await db.RefCodes().check_ref(refcode)
         if author is None:
             return await event.reply(phrase.ref.invalid)
-        db.RefCodes().add_uses(author, event.sender_id)
+        await db.RefCodes().add_uses(author, event.sender_id)
         db.add_money(author, config.coofs.RefGift)
         db.add_money(event.sender_id, config.coofs.RefGift)
         reftext = phrase.ref.gift.format(config.coofs.RefGift)
