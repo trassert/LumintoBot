@@ -366,11 +366,6 @@
             "price": 4,
             "value": 2
         },
-        "Осколок аметиста": {
-            "name": "amethyst_shard",
-            "price": 3,
-            "value": 1
-        },
         "Рудная медь": {
             "name": "raw_copper",
             "price": 3,
