@@ -157,10 +157,10 @@ async def mine_start(event: Message):
         return await event.reply(choice(phrase.mine.not_ready))
     if user_id in mining.sessions:
         return await event.reply(phrase.mine.already)
-    initial = randint(1, config.coofs.Mining.InitialGems)
+    initial = randint(1, config.cfg.Mining.InitialGems)
     mining.sessions[user_id] = {
         "gems": initial,
-        "death_chance": config.coofs.Mining.BaseDeathChance,
+        "death_chance": config.cfg.Mining.BaseDeathChance,
         "step": 1,
     }
     asyncio.create_task(mining.cleanup_session(user_id))
@@ -435,7 +435,7 @@ async def money_to_server(event: Message):
         return await event.reply(phrase.money.nan_count)
     if amount < 1:
         return await event.reply(phrase.money.negative_count)
-    if amount > config.coofs.WithdrawDailyLimit:
+    if amount > config.cfg.WithdrawDailyLimit:
         return await event.reply(phrase.bank.daily_limit)
     if not db.check_withdraw_limit(event.sender_id, amount):
         limit = db.check_withdraw_limit(event.sender_id, 0)
@@ -537,7 +537,7 @@ async def link_nick(event: Message):
             ]
         )
         price = formatter.value_to_str(
-            config.coofs.PriceForChangeNick, phrase.currency
+            config.cfg.PriceForChangeNick, phrase.currency
         )
         return await event.reply(
             phrase.nick.already_have.format(price=price), buttons=keyboard
@@ -554,14 +554,14 @@ async def link_nick(event: Message):
         if author is None:
             return await event.reply(phrase.ref.invalid)
         await db.RefCodes().add_uses(author, event.sender_id)
-        db.add_money(author, config.coofs.RefGift)
-        db.add_money(event.sender_id, config.coofs.RefGift)
-        reftext = phrase.ref.gift.format(config.coofs.RefGift)
-    db.add_money(event.sender_id, config.coofs.LinkGift)
+        db.add_money(author, config.cfg.RefGift)
+        db.add_money(event.sender_id, config.cfg.RefGift)
+        reftext = phrase.ref.gift.format(config.cfg.RefGift)
+    db.add_money(event.sender_id, config.cfg.LinkGift)
     db.nicks(nick, event.sender_id).link()
     await event.reply(
         phrase.nick.success.format(
-            formatter.value_to_str(config.coofs.LinkGift, phrase.currency)
+            formatter.value_to_str(config.cfg.LinkGift, phrase.currency)
         )
     )
     if reftext:
@@ -571,7 +571,7 @@ async def link_nick(event: Message):
                 int(author),
                 phrase.ref.used.format(
                     user=await get_name(event.sender_id, minecraft=True),
-                    amount=config.coofs.RefGift,
+                    amount=config.cfg.RefGift,
                 ),
             )
         except Exception:

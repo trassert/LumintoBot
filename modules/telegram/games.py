@@ -40,7 +40,7 @@ async def casino(event: Message):
         ],
     ]
     return await event.reply(
-        phrase.casino.start.format(config.coofs.PriceForCasino),
+        phrase.casino.start.format(config.cfg.PriceForCasino),
         buttons=keyboard,
     )
 
@@ -199,7 +199,7 @@ async def crocodile_handler(event: Message):
         topers = []
         n = 1
         for toper in db.crocodile_stat.get_all():
-            if n > config.coofs.TopLowerBets:
+            if n > config.cfg.TopLowerBets:
                 break
             topers.append(toper)
             n += 1
@@ -207,9 +207,9 @@ async def crocodile_handler(event: Message):
             for key in list(bets.keys()):
                 if str(event.sender_id) == key:
                     if str(event.sender_id) in topers:
-                        all += round(bets[key] * config.coofs.TopBets)
+                        all += round(bets[key] * config.cfg.TopBets)
                     else:
-                        all += round(bets[key] * config.coofs.CrocodileBetCoo)
+                        all += round(bets[key] * config.cfg.CrocodileBetCoo)
                 else:
                     all += bets[key]
             db.add_money(event.sender_id, all)
@@ -221,8 +221,8 @@ async def crocodile_handler(event: Message):
         await db.database("crocodile_last_hint", 0)
         if await db.database("crocodile_super_game") == 1:
             await db.database("crocodile_super_game", 0)
-            await db.database("max_bet", config.coofs.CrocodileDefaultMaxBet)
-            await db.database("min_bet", config.coofs.CrocodileDefaultMinBet)
+            await db.database("max_bet", config.cfg.CrocodileDefaultMaxBet)
+            await db.database("min_bet", config.cfg.CrocodileDefaultMinBet)
         client.remove_event_handler(crocodile_hint)
         client.remove_event_handler(crocodile_handler)
         db.crocodile_stat(event.sender_id).add()
@@ -288,7 +288,7 @@ async def crocodile_hint(event: Message):
                 )
             n += 1
 
-    if (random() < config.coofs.PercentForRandomLetter) and (len(hint) > 1):
+    if (random() < config.cfg.PercentForRandomLetter) and (len(hint) > 1):
         return await letter_hint()
     with open(pathes.crocomap, "rb") as f:
         return await event.reply(choice(orjson.loads(f.read())[word]))
@@ -299,7 +299,7 @@ async def cities_timeout(current_player: int, last_city: str):
     try:
         player_name = await func.get_name(current_player)
         message: Message = None
-        for second in range(config.coofs.CitiesTimeout, 0, -1):
+        for second in range(config.cfg.CitiesTimeout, 0, -1):
             if not Cities.get_game_status():
                 return None
             who_answer = Cities.who_answer()
@@ -316,7 +316,7 @@ async def cities_timeout(current_player: int, last_city: str):
                 Cities.logger(f"Удаляем игрока {current_player}...")
                 if rem_data is False:
                     Cities.logger("Игра завершена")
-                    win_money = count * config.coofs.CitiesBet
+                    win_money = count * config.cfg.CitiesBet
                     db.add_money(players_list[0], win_money)
                     Cities.logger(
                         f"Победитель {players_list[0]} получает {win_money}",
@@ -334,7 +334,7 @@ async def cities_timeout(current_player: int, last_city: str):
                                 players_list[0],
                             ),
                             formatter.value_to_str(
-                                win_money - config.coofs.CitiesBet,
+                                win_money - config.cfg.CitiesBet,
                                 phrase.currency,
                             ),
                             statistic,
@@ -355,7 +355,7 @@ async def cities_timeout(current_player: int, last_city: str):
                     ),
                     reply_to=config.chats.topics.games,
                 )
-            if second % 5 == 0 and config.coofs.CitiesTimeout / 2 >= second:
+            if second % 5 == 0 and config.cfg.CitiesTimeout / 2 >= second:
                 if message:
                     await message.edit(
                         phrase.cities.timeout.format(
@@ -401,7 +401,7 @@ async def cities_answer(event: Message) -> None:
 
     async def autodelete(text) -> None:
         message: Message = await event.reply(text)
-        await asyncio.sleep(config.coofs.CitiesAutodelete)
+        await asyncio.sleep(config.cfg.CitiesAutodelete)
         await message.delete()
 
     if result_code == 0:  # Успех
@@ -440,17 +440,17 @@ async def cities_callback(event: events.CallbackQuery.Event):
             return await event.answer(phrase.cities.already_ingame, alert=True)
 
         balance = await db.get_money(event.sender_id)
-        if config.coofs.PriceForCities > balance:
+        if config.cfg.PriceForCities > balance:
             return await event.answer(
                 phrase.money.not_enough.format(
                     formatter.value_to_str(balance, phrase.currency),
                 ),
             )
-        db.add_money(event.sender_id, -config.coofs.PriceForCities)
+        db.add_money(event.sender_id, -config.cfg.PriceForCities)
         await event.answer(
             phrase.cities.set_ingame.format(
                 formatter.value_to_str(
-                    config.coofs.PriceForCities, phrase.currency
+                    config.cfg.PriceForCities, phrase.currency
                 ),
             ),
         )

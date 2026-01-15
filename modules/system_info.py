@@ -100,5 +100,5 @@ async def get_system_info() -> str:
     Сеть:
         Загрузка: {network[0]} Мбит/с
         Выгрузка: {network[1]} Мбит/с
-        ↳ Нагрузка: ≈{round(((network[0] + network[1]) / config.coofs.EthernetChannel) * 100, 1)} %
+        ↳ Нагрузка: ≈{round(((network[0] + network[1]) / config.cfg.EthernetChannel) * 100, 1)} %
     """

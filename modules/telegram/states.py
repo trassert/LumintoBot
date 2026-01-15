@@ -80,7 +80,7 @@ async def state_make(event: Message):
         return await event.reply(phrase.state.already_player)
     if db.states.check(arg.capitalize()) is True:
         return await event.reply(phrase.state.already_here)
-    if await db.get_money(event.sender_id) < config.coofs.PriceForNewState:
+    if await db.get_money(event.sender_id) < config.cfg.PriceForNewState:
         return await event.reply(phrase.state.require_emerald)
     try:
         return await event.reply(
@@ -159,14 +159,14 @@ async def state_enter(event: Message):
         reply_to=config.chats.topics.rp,
     )
 
-    if state.type == 0 and len(players) >= config.coofs.Type1Players:
+    if state.type == 0 and len(players) >= config.cfg.Type1Players:
         await client.send_message(
             entity=config.chats.chat,
             message=phrase.state.up.format(name=state_name, type="Государство"),
             reply_to=config.chats.topics.rp,
         )
         state.change("type", 1)
-    elif state.type == 1 and len(players) >= config.coofs.Type2Players:
+    elif state.type == 1 and len(players) >= config.cfg.Type2Players:
         await client.send_message(
             entity=config.chats.chat,
             message=phrase.state.up.format(name=state_name, type="Империя"),
@@ -248,7 +248,7 @@ async def state_leave(event: Message):
         ),
         reply_to=config.chats.topics.rp,
     )
-    if (state.type == 2) and (len(state.players) < config.coofs.Type2Players):
+    if (state.type == 2) and (len(state.players) < config.cfg.Type2Players):
         await client.send_message(
             entity=config.chats.chat,
             message=phrase.state.down.format(
@@ -258,7 +258,7 @@ async def state_leave(event: Message):
             reply_to=config.chats.topics.rp,
         )
         state.change("type", 1)
-    if (state.type == 1) and (len(state.players) < config.coofs.Type1Players):
+    if (state.type == 1) and (len(state.players) < config.cfg.Type1Players):
         await client.send_message(
             entity=config.chats.chat,
             message=phrase.state.down.format(name=state_name, type="Княжество"),
@@ -321,9 +321,9 @@ async def state_desc(event: Message):
     if state_name is False:
         return await event.reply(phrase.state.not_a_author)
     new_desc = event.pattern_match.group(1).strip()
-    if len(new_desc) > config.coofs.DescriptionsMaxLen:
+    if len(new_desc) > config.cfg.DescriptionsMaxLen:
         return await event.reply(
-            phrase.state.max_len.format(config.coofs.DescriptionsMaxLen),
+            phrase.state.max_len.format(config.cfg.DescriptionsMaxLen),
         )
     db.state(state_name).change("desc", new_desc)
     return await event.reply(phrase.state.change_desc)
@@ -517,7 +517,7 @@ async def state_kick_user(event: Message):
         return await event.reply(phrase.state.player_not_in)
     state.players.remove(user)
     state.change("players", state.players)
-    if (state.type == 2) and (len(state.players) < config.coofs.Type2Players):
+    if (state.type == 2) and (len(state.players) < config.cfg.Type2Players):
         await client.send_message(
             entity=config.chats.chat,
             message=phrase.state.down.format(
@@ -527,7 +527,7 @@ async def state_kick_user(event: Message):
             reply_to=config.chats.topics.rp,
         )
         state.change("type", 1)
-    if (state.type == 1) and (len(state.players) < config.coofs.Type1Players):
+    if (state.type == 1) and (len(state.players) < config.cfg.Type1Players):
         await client.send_message(
             entity=config.chats.chat,
             message=phrase.state.down.format(name=state_name, type="Княжество"),
@@ -564,7 +564,7 @@ async def state_kick_user_empty(event: Message):
         return await event.reply(phrase.state.player_not_in)
     state.players.remove(user)
     state.change("players", state.players)
-    if (state.type == 2) and (len(state.players) < config.coofs.Type2Players):
+    if (state.type == 2) and (len(state.players) < config.cfg.Type2Players):
         await client.send_message(
             entity=config.chats.chat,
             message=phrase.state.down.format(
@@ -574,7 +574,7 @@ async def state_kick_user_empty(event: Message):
             reply_to=config.chats.topics.rp,
         )
         state.change("type", 1)
-    if (state.type == 1) and (len(state.players) < config.coofs.Type1Players):
+    if (state.type == 1) and (len(state.players) < config.cfg.Type1Players):
         await client.send_message(
             entity=config.chats.chat,
             message=phrase.state.down.format(name=state_name, type="Княжество"),

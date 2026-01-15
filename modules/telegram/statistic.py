@@ -25,7 +25,7 @@ async def active_check(event: Message):
         n = 1
         players = ""
         for data in all_data:
-            if n > config.coofs.MaxStatPlayers:
+            if n > config.cfg.MaxStatPlayers:
                 break
             players += f"{n}. {data[0]} - {data[1]}\n"
             n += 1
@@ -42,7 +42,7 @@ async def active_check(event: Message):
             n = 1
             players = ""
             for data in all_data:
-                if n > config.coofs.MaxStatPlayers:
+                if n > config.cfg.MaxStatPlayers:
                     break
                 players += f"{n}. {data[0]} - {data[1]}\n"
                 n += 1
@@ -61,7 +61,7 @@ async def active_check(event: Message):
     n = 1
     players = ""
     for data in all_data:
-        if n > config.coofs.MaxStatPlayers:
+        if n > config.cfg.MaxStatPlayers:
             break
         players += f"{n}. {data[0]} - {data[1]}\n"
         n += 1
@@ -81,7 +81,7 @@ async def crocodile_wins(event: Message):
     text = ""
     n = 1
     for id in all:
-        if n > 10:
+        if n > config.cfg.MaxStatPlayers:
             break
         text += f"{n}. **{await get_name(id)}**: {all[id]} побед\n"
         n += 1
@@ -105,7 +105,7 @@ async def all_money(event: Message):
 @client.on(events.NewMessage(pattern=r"(?i)^/toppt(.*)", func=checks))
 async def server_top_list(event: Message):
     arg: str = event.pattern_match.group(1).strip()
-    n = 10
+    n = config.cfg.MaxStatPlayers
     if arg.isdigit():
         n = max(3, min(30, int(arg)))
 

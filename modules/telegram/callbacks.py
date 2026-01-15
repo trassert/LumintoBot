@@ -69,14 +69,14 @@ async def _handle_suggestion(
             with open(accept_file, "a", encoding="utf-8") as f:
                 f.write(f"\n{word}")
 
-            db.add_money(sender_id, config.coofs.WordRequest)
+            db.add_money(sender_id, config.cfg.WordRequest)
             await client.send_message(
                 config.chats.chat,
                 success_phrase.format(
                     word=word,
                     user=user_name,
                     money=formatter.value_to_str(
-                        config.coofs.WordRequest, phrase.currency
+                        config.cfg.WordRequest, phrase.currency
                     ),
                 ),
             )
@@ -137,7 +137,7 @@ async def state_callback(event: events.CallbackQuery.Event):
                 reply_to=config.chats.topics.rp,
             )
 
-            if state.type == 0 and len(players) >= config.coofs.Type1Players:
+            if state.type == 0 and len(players) >= config.cfg.Type1Players:
                 await client.send_message(
                     entity=config.chats.chat,
                     message=phrase.state.up.format(
@@ -147,7 +147,7 @@ async def state_callback(event: events.CallbackQuery.Event):
                 )
                 state.change("type", 1)
 
-            elif state.type == 1 and len(players) >= config.coofs.Type2Players:
+            elif state.type == 1 and len(players) >= config.cfg.Type2Players:
                 await client.send_message(
                     entity=config.chats.chat,
                     message=phrase.state.up.format(
@@ -193,7 +193,7 @@ async def state_callback(event: events.CallbackQuery.Event):
 
             state_name = data[3].capitalize()
             balance_check = await _check_and_deduct_balance(
-                sender_id, config.coofs.PriceForNewState
+                sender_id, config.cfg.PriceForNewState
             )
             if balance_check is not True:
                 return await event.answer(balance_check, alert=True)
@@ -226,7 +226,7 @@ async def state_callback(event: events.CallbackQuery.Event):
                 return await event.answer(phrase.state.not_a_author, alert=True)
 
             balance_check = await _check_and_deduct_balance(
-                sender_id, config.coofs.PriceForChangeStateNick
+                sender_id, config.cfg.PriceForChangeStateNick
             )
             if balance_check is not True:
                 return await event.answer(balance_check, alert=True)
@@ -262,7 +262,7 @@ async def casino_callback(event: events.CallbackQuery.Event):
         return
 
     balance_check = await _check_and_deduct_balance(
-        sender_id, config.coofs.PriceForCasino
+        sender_id, config.cfg.PriceForCasino
     )
     if balance_check is not True:
         return await event.answer(balance_check, alert=True)
@@ -278,7 +278,7 @@ async def casino_callback(event: events.CallbackQuery.Event):
     if pos[0] == pos[1] == pos[2]:
         await db.Users.add_win(sender_id)
         logger.info(f"{sender_id} - победил в казино")
-        win_amount = config.coofs.PriceForCasino * config.coofs.CasinoWinRatio
+        win_amount = config.cfg.PriceForCasino * config.cfg.CasinoWinRatio
         db.add_money(sender_id, win_amount)
         await asyncio.sleep(2)
         return await fm.edit(
@@ -288,19 +288,19 @@ async def casino_callback(event: events.CallbackQuery.Event):
         )
 
     if pos[0] == pos[1] or pos[1] == pos[2]:
-        db.add_money(sender_id, config.coofs.PriceForCasino)
+        db.add_money(sender_id, config.cfg.PriceForCasino)
         await asyncio.sleep(2)
         return await fm.edit(
             phrase.casino.partially_auto.format(await get_name(sender_id))
         )
 
-    await db.Users.add_lose_money(sender_id, config.coofs.PriceForCasino)
+    await db.Users.add_lose_money(sender_id, config.cfg.PriceForCasino)
     logger.info(f"{sender_id} проиграл в казино")
     await asyncio.sleep(2)
     return await fm.edit(
         phrase.casino.lose_auto.format(
             name=await get_name(sender_id),
-            value=config.coofs.PriceForCasino,
+            value=config.cfg.PriceForCasino,
         )
     )
 
@@ -319,7 +319,7 @@ async def nick_callback(event: events.CallbackQuery.Event):
         return await event.answer(phrase.nick.already_you, alert=True)
 
     balance_check = await _check_and_deduct_balance(
-        sender_id, config.coofs.PriceForChangeNick
+        sender_id, config.cfg.PriceForChangeNick
     )
     if balance_check is not True:
         return await event.answer(balance_check, alert=True)
@@ -338,7 +338,7 @@ async def nick_callback(event: events.CallbackQuery.Event):
         phrase.nick.buy_nick.format(
             user=user_name,
             price=formatter.value_to_str(
-                config.coofs.PriceForChangeNick, phrase.currency
+                config.cfg.PriceForChangeNick, phrase.currency
             ),
         )
     )
@@ -529,16 +529,16 @@ async def mine_callback(event: events.CallbackQuery.Event):
                     buttons=None,
                 )
 
-            if rand < death_chance + config.coofs.Mining.BoostChance:
+            if rand < death_chance + config.cfg.Mining.BoostChance:
                 extra = randint(
-                    config.coofs.Mining.BoostGemsMin,
-                    config.coofs.Mining.BoostGemsMax,
+                    config.cfg.Mining.BoostGemsMin,
+                    config.cfg.Mining.BoostGemsMax,
                 )
                 note = choice(phrase.mine.boost).format(
                     formatter.value_to_str(extra, phrase.currency)
                 )
             else:
-                extra = randint(1, config.coofs.Mining.DefaultGems)
+                extra = randint(1, config.cfg.Mining.DefaultGems)
                 note = phrase.mine.base.format(
                     formatter.value_to_str(extra, phrase.currency)
                 )
@@ -546,9 +546,9 @@ async def mine_callback(event: events.CallbackQuery.Event):
             session["gems"] += extra
             session["step"] += 1
             session["death_chance"] = min(
-                config.coofs.Mining.MaxDeathChance,
-                config.coofs.Mining.BaseDeathChance
-                + (session["step"] - 1) * config.coofs.Mining.IncDeathChance,
+                config.cfg.Mining.MaxDeathChance,
+                config.cfg.Mining.BaseDeathChance
+                + (session["step"] - 1) * config.cfg.Mining.IncDeathChance,
             )
 
             await event.edit(
@@ -590,13 +590,13 @@ async def hint_callback(event: events.CallbackQuery.Event):
                 await event.answer(phrase.newhints.not_found)
                 return await event.delete()
             await db.append_hint(word=hint_data["word"], hint=hint_data["hint"])
-            db.add_money(hint_data["user"], config.coofs.HintGift)
+            db.add_money(hint_data["user"], config.cfg.HintGift)
             await client.send_message(
                 int(hint_data["user"]),
                 phrase.newhints.accept.format(
                     word=hint_data["word"],
                     get=formatter.value_to_str(
-                        config.coofs.HintGift, phrase.currency
+                        config.cfg.HintGift, phrase.currency
                     ),
                 ),
             )

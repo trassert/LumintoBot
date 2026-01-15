@@ -1,14 +1,13 @@
+UseIPv6: false
 EthernetChannel: 60 #Mbit/s
 
 TopLowerBets: 5
 TopBets: 1.5
 WordRequest: 2
-IPSleepTime: 3600
 LinkGift: 5
 ActiveGift: 15
 PercentForRandomLetter: 0.3
 
-CasinoSleepTime: 150
 CasinoWinRatio: 8
 
 CrocodileBetCoo: 2
@@ -32,16 +31,8 @@ DescriptionsMaxLen: 300
 # Дней, после которых гос-ва удаляются
 DaysToStatesRemove: 7
 
-# Шанс быть убитым в шахте | найти залежи
-ChanceToDie: 0.011
-ChanceToBoost: 0.009
-
-# Количество валюты
-MineMaxGems: 10
-MineMaxBoost: 50
-
 # Цены
-PriceForChangeNick: 5
+PriceForChangeNick: 25
 PriceForCasino: 5
 PriceForCities: 5
 PriceForNewState: 25
@@ -62,12 +53,6 @@ CitiesBet: 5
 # Время, которое нужно ждать до удаления игрока
 CitiesTimeout: 50
 
-AI:
-  MaxTokens: 1500
-  ContentSim: 0.7
-  Try: 3
-  FloodSleepTime: 10
-
 Mining:
   Timeout: 300
   InitialGems: 5
@@ -83,3 +68,6 @@ Advancements:
   Votes: 50
 
 HintGift: 3
+
+Flood:
+  Casino: 10

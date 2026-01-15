@@ -1,4 +1,0 @@
-AiModel: "gemini-flash-lite-latest"
-AiEmbeddings: "gemini-embedding-001"
-
-UseIPv6: false

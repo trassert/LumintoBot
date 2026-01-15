@@ -79,7 +79,7 @@ async def top_ref(event: Message):
             f"{n}. **{await func.get_name(int(chunk[0]))}** - {chunk[1]}"
         )
         n += 1
-        if n > 10:
+        if n > config.cfg.MaxStatPlayers:
             break
     if n == 1:
         return await event.reply(phrase.ref.top_empty)

@@ -174,7 +174,7 @@ def ready_to_mine(id: str) -> bool:
     data = _load_json_sync(pathes.mine)
     now = int(time())
     last = data.get(id, 0)
-    if now - last > config.coofs.MineWait:
+    if now - last > config.cfg.MineWait:
         data[id] = now
         _save_json_sync(pathes.mine, data, indent=True)
         return True
@@ -644,7 +644,9 @@ class RefCodes:
 
     async def add_uses(self, id: int, who_used: int):
         load = await self._read()
-        load[str(id)]["used"] = load.get(str(id), {}).get("used", []).append(str(who_used))
+        load[str(id)]["used"] = (
+            load.get(str(id), {}).get("used", []).append(str(who_used))
+        )
         await self._write(load)
 
     async def check_ref(self, name) -> str:
@@ -863,7 +865,7 @@ async def add_votes(player: str, count: int = 1) -> None:
     player = str(player)
     data = await _load_json_async(pathes.votes)
     data[player] = data.get(player, 0) + count
-    if data[player] == config.coofs.Advancements.Votes:
+    if data[player] == config.cfg.Advancements.Votes:
         pass
     await _save_json_async(pathes.votes, data)
 
