@@ -27,6 +27,9 @@ class AccessLogger(AbstractAccessLogger):
         return self.logger.isEnabledFor(logging.INFO)
 
 
+repos = {"LumintoGold": {"chat": -1003408993511, "topic": 72}}
+
+
 async def server():
     async def status(request: aiohttp.web.Request):
         return aiohttp.web.Response(text="ok")
@@ -144,7 +147,10 @@ async def server():
         for head in commits:
             logger.info(f"Обновление! Репо {load['repository']['name']}")
             await client.send_message(
-                config.chats.chat,
+                repos.get(load["repository"]["name"], {}).get(
+                    "chat",
+                    config.chats.chat,
+                ),
                 phrase.github.update.format(
                     author=f"[{head['author']['name']}](https://github.com/{head['author']['name']})",
                     message=head["message"],
@@ -154,7 +160,10 @@ async def server():
                     repo=f"[{load['repository']['name']}](https://github.com/{load['repository']['full_name']})",
                 ),
                 link_preview=False,
-                reply_to=config.chats.topics.updates,
+                reply_to=repos.get(load["repository"]["name"], {}).get(
+                    "topic",
+                    config.chats.topics.updates,
+                ),
             )
         return aiohttp.web.Response(text="ok")
 
