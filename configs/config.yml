@@ -1,4 +1,4 @@
-UseIPv6: true
+UseIPv6: false
 EthernetChannel: 60 #Mbit/s
 
 TopLowerBets: 5
