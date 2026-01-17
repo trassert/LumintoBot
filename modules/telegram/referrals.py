@@ -4,7 +4,7 @@ from loguru import logger
 from telethon import events
 from telethon.tl.custom import Message
 
-from .. import db, phrase
+from .. import db, phrase, config
 from . import func
 from .client import client
 from .global_checks import checks
