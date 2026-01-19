@@ -646,4 +646,5 @@ async def simple_antibot(event: events.CallbackQuery.Event):
         phrase.chataction.hello.format(
             await get_name(event.sender_id, push=False)
         ),
+        link_preview=False,
     )
