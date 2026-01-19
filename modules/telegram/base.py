@@ -10,7 +10,7 @@ from telethon import events, Button
 from telethon.tl import types
 from telethon.tl.custom import Message
 from telethon.tl.functions.users import GetFullUserRequest
-from .. import config, db, formatter, mcrcon, pathes, phrase, pic, mining
+from .. import config, db, formatter, mcrcon, pathes, phrase, pic, mining, floodwait
 from ..system_info import get_system_info
 from .client import client
 from .func import get_name
@@ -603,6 +603,10 @@ async def sysinfo(event: Message):
 @client.on(events.NewMessage(pattern=r"(?i)^/картинка$", func=checks))
 async def randompic(event: Message):
     logger.info(f"Запрошена случайная картинка (id {event.sender_id})")
+    request = floodwait.WaitPic.request()
+    if request is False:
+        return await event.reply(phrase.pic.wait)
+    await asyncio.sleep(request)
     return await client.send_file(
         entity=event.chat_id,
         file=pic.get_random(),

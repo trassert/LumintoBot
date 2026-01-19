@@ -254,6 +254,7 @@ async def casino_callback(event: events.CallbackQuery.Event):
     request = floodwait.WaitCasino.request()
     if request is False:
         return await event.answer(phrase.casino.full_floodwait.format(request))
+    await asyncio.sleep(request)
 
     logger.info(f"КБ кнопка (Casino), дата: {data}")
     sender_id = event.sender_id

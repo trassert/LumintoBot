@@ -36,3 +36,4 @@ class FloodWaitBase:
 
 
 WaitCasino = FloodWaitBase("WaitCasino", config.cfg.Flood.Casino)
+WaitPic = FloodWaitBase("WaitPic", config.cfg.Flood.Pic, exit_multiplier=1)
