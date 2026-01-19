@@ -910,3 +910,16 @@ async def append_hint(word: str, hint: str):
         word_hints.append(hint)
     data[word] = word_hints
     await _save_json_async(pathes.crocomap, data, indent=True)
+
+
+async def add_mine_top(id: int | str, count: int):
+    id = str(id)
+    data = await _load_json_async(pathes.mine_stat)
+    data[id] = data.get(id, 0) + int(count)
+    await _save_json_async(pathes.mine_stat, data, indent=True)
+
+
+async def get_mine_top() -> list[list[str, int]]:
+    return sorted(
+        (await _load_json_async(pathes.mine_stat)).items(), key=lambda x: -x[1]
+    )

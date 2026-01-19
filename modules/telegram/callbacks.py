@@ -504,6 +504,7 @@ async def mine_callback(event: events.CallbackQuery.Event):
         case "no":
             total = session["gems"]
             db.add_money(sender_id, total)
+            await db.add_mine_top(sender_id, total)
             del mining.sessions[sender_id]
             return await event.edit(
                 phrase.mine.quited.format(

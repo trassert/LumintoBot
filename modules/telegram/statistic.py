@@ -127,3 +127,22 @@ async def server_top_list(event: Message):
         return await event.reply("\n".join(text))
     except TimeoutError:
         return await event.reply(phrase.server.stopped)
+
+
+@func.new_command(r"/топ шахтёров")
+@func.new_command(r"/топ шахтеров")
+@func.new_command(r"/топ шахта")
+@func.new_command(r"/topmine")
+@func.new_command(r"/minetop")
+@func.new_command(r"/bestminers")
+async def server_top_mine(event: Message):
+    text = []
+    n = 1
+    for player in await db.get_mine_top():
+        if n > config.cfg.MaxStatPlayers:
+            break
+        text.append(
+            f"{n}. {await func.get_name(player[0])} - {formatter.value_to_str(player[1], 'аметист')}"
+        )
+        n += 1
+    return await event.reply(phrase.stat.mine.format("\n".join(text)))

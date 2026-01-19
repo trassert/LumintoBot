@@ -5,16 +5,11 @@ from telethon.tl.custom import Message
 from loguru import logger
 from .client import client
 from .. import config, phrase
-from . import func
 
 logger.info(f"Загружен модуль {__name__}!")
 
 
-@client.on(
-    events.NewMessage(
-        pattern=r"\+топик (.+)", chats=config.chats.forum, func=func.checks
-    )
-)
+@client.on(events.NewMessage(pattern=r"\+топик (.+)", chats=config.chats.forum))
 async def create_topic(event: Message):
     title: str = event.pattern_match.group(1).strip()
     if not title:

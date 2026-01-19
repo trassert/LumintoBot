@@ -6,7 +6,7 @@ from time import time
 import aioping
 from loguru import logger
 from telethon import errors as TGErrors
-from telethon import events, Button
+from telethon import Button
 from telethon.tl import types
 from telethon.tl.custom import Message
 from telethon.tl.functions.users import GetFullUserRequest
@@ -55,7 +55,6 @@ async def help(event: Message):
 
 @func.new_command(r"/пинг(.*)")
 @func.new_command(r"/ping(.*)")
-# @func.new_command(r"пинг(.*)")
 @func.new_command(r"пинг(.*)")
 async def ping(event: Message):
     arg = event.pattern_match.group(1).strip()
@@ -150,17 +149,9 @@ async def msktime(event: Message):
     )
 
 
-@client.on(
-    events.NewMessage(
-        pattern=r"(?i)^(/г )?(шахта|майнить|копать)$", func=func.checks
-    )
-)
+@func.new_command(r"(/г )?(шахта|майнить|копать)$")
 @func.new_command(r"/mine")
-@client.on(
-    events.NewMessage(
-        pattern=r"(?i)^/(шахта|майнить|копать)$", func=func.checks
-    )
-)
+@func.new_command(r"/(шахта|майнить|копать)$")
 async def mine_start(event: Message):
     user_id = event.sender_id
     if not (db.states.if_player(user_id) or db.states.if_author(user_id)):
@@ -505,26 +496,10 @@ async def get_balance(event: Message):
     )
 
 
-@client.on(
-    events.NewMessage(
-        pattern=r"(?i)^/linknick (\S+)\s*(\S*)$", func=func.checks
-    )
-)
-@client.on(
-    events.NewMessage(
-        pattern=r"(?i)^/привязать (\S+)\s*(\S*)$", func=func.checks
-    )
-)
-@client.on(
-    events.NewMessage(
-        pattern=r"(?i)^привязать (\S+)\s*(\S*)$", func=func.checks
-    )
-)
-@client.on(
-    events.NewMessage(
-        pattern=r"(?i)^/новый ник (\S+)\s*(\S*)$", func=func.checks
-    )
-)
+@func.new_command(r"/linknick (\S+)\s*(\S*)$")
+@func.new_command(r"/привязать (\S+)\s*(\S*)$")
+@func.new_command(r"привязать (\S+)\s*(\S*)$")
+@func.new_command(r"/новый ник (\S+)\s*(\S*)$")
 @func.new_command(r"/линкник (\S+)\s*(\S*)$")
 async def link_nick(event: Message):
     if event.chat_id != config.chats.chat:

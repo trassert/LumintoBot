@@ -40,7 +40,8 @@ def value_to_str(number, noun) -> str:
 def rm_badtext(text):
     text = re.sub(r"\\boxed\{.*?\}", "", text)
     return text.replace("$", "**").replace(
-        "\\cdot", "×",
+        "\\cdot",
+        "×",
     )  # ! Экранизация необходима
 
 

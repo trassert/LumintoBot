@@ -20,6 +20,7 @@ ref = path.join("db", "users", "ref.json")
 crocostat = path.join("db", "users", "crocodile_stat.json")
 hellomsg = path.join("db", "users", "hellomsg.json")
 votes = path.join("db", "users", "votes.json")
+mine_stat = path.join("db", "users", "mine.json")
 
 tickets = path.join("db", "tickets.json")
 mailing = path.join("db", "mailing.json")
