@@ -10,19 +10,28 @@ from telethon import events, Button
 from telethon.tl import types
 from telethon.tl.custom import Message
 from telethon.tl.functions.users import GetFullUserRequest
-from .. import config, db, formatter, mcrcon, pathes, phrase, pic, mining, floodwait
+from .. import (
+    config,
+    db,
+    formatter,
+    mcrcon,
+    pathes,
+    phrase,
+    pic,
+    mining,
+    floodwait,
+)
 from ..system_info import get_system_info
 from .client import client
-from .func import get_name
-from .global_checks import checks, func
+from . import func
 
 logger.info(f"Загружен модуль {__name__}!")
 
 
-@client.on(events.NewMessage(pattern=r"(?i)^/хост$", func=checks))
-@client.on(events.NewMessage(pattern=r"(?i)^/host$", func=checks))
-@client.on(events.NewMessage(pattern=r"(?i)^/айпи$", func=checks))
-@client.on(events.NewMessage(pattern=r"(?i)^/ip", func=checks))
+@func.new_command(r"/хост$")
+@func.new_command(r"/host$")
+@func.new_command(r"/айпи$")
+@func.new_command(r"/ip")
 async def host(event: Message):
     return await event.reply(
         phrase.server.host.format(
@@ -34,19 +43,20 @@ async def host(event: Message):
     )
 
 
-@client.on(events.NewMessage(pattern=r"(?i)^/помощь$", func=checks))
-@client.on(events.NewMessage(pattern=r"(?i)^/help", func=checks))
-@client.on(events.NewMessage(pattern=r"(?i)^/команды$", func=checks))
-@client.on(events.NewMessage(pattern=r"(?i)^/commands$", func=checks))
-@client.on(events.NewMessage(pattern=r"(?i)^команды$", func=checks))
-@client.on(events.NewMessage(pattern=r"(?i)^бот помощь$", func=checks))
+@func.new_command(r"/помощь$")
+@func.new_command(r"/help")
+@func.new_command(r"/команды$")
+@func.new_command(r"/commands$")
+@func.new_command(r"команды$")
+@func.new_command(r"бот помощь$")
 async def help(event: Message):
     return await event.reply(phrase.help.comm, link_preview=True)
 
 
-@client.on(events.NewMessage(pattern=r"(?i)^/пинг(.*)", func=checks))
-@client.on(events.NewMessage(pattern=r"(?i)^/ping(.*)", func=checks))
-@client.on(events.NewMessage(pattern=r"(?i)^пинг(.*)", func=checks))
+@func.new_command(r"/пинг(.*)")
+@func.new_command(r"/ping(.*)")
+# @func.new_command(r"пинг(.*)")
+@func.new_command(r"пинг(.*)")
 async def ping(event: Message):
     arg = event.pattern_match.group(1).strip()
     latency = round(time() - event.date.timestamp(), 2)
@@ -68,21 +78,21 @@ async def ping(event: Message):
     return await event.reply(text)
 
 
-@client.on(events.NewMessage(pattern=r"(?i)^/start$", func=checks))
-@client.on(events.NewMessage(pattern=r"(?i)^/старт$", func=checks))
+@func.new_command(r"/start$")
+@func.new_command(r"/старт$")
 async def start(event: Message):
     return await event.reply(
-        phrase.start.format(await get_name(event.sender_id, push=False)),
+        phrase.start.format(await func.get_name(event.sender_id, push=False)),
         silent=True,
     )
 
 
-@client.on(events.NewMessage(pattern=r"(?i)^/обо мне$", func=checks))
-@client.on(events.NewMessage(pattern=r"(?i)^/я$", func=checks))
-@client.on(events.NewMessage(pattern=r"(?i)^/i$", func=checks))
-@client.on(events.NewMessage(pattern=r"(?i)^/profile", func=checks))
-@client.on(events.NewMessage(pattern=r"(?i)^/профиль$", func=checks))
-@client.on(events.NewMessage(pattern=r"(?i)^/myprofile", func=checks))
+@func.new_command(r"/обо мне$")
+@func.new_command(r"/я$")
+@func.new_command(r"/i$")
+@func.new_command(r"/profile")
+@func.new_command(r"/профиль$")
+@func.new_command(r"/myprofile")
 async def profile(event: Message):
     user_id = event.sender_id
     role = db.roles().get(user_id)
@@ -113,7 +123,7 @@ async def profile(event: Message):
         time_played = "-"
     return await event.reply(
         phrase.profile.full.format(
-            name=await get_name(user_id, push=False),
+            name=await func.get_name(user_id, push=False),
             minecraft=nick,
             role_name=phrase.roles.types[role],
             role_number=role,
@@ -130,10 +140,10 @@ async def profile(event: Message):
     )
 
 
-@client.on(events.NewMessage(pattern=r"(?i)^/time", func=checks))
-@client.on(events.NewMessage(pattern=r"(?i)^/время$", func=checks))
-@client.on(events.NewMessage(pattern=r"(?i)^/мск$", func=checks))
-@client.on(events.NewMessage(pattern=r"(?i)^/msk$", func=checks))
+@func.new_command(r"/time")
+@func.new_command(r"/время$")
+@func.new_command(r"/мск$")
+@func.new_command(r"/msk$")
 async def msktime(event: Message):
     return await event.reply(
         phrase.time.format(datetime.now().strftime("%H:%M:%S")),
@@ -142,12 +152,14 @@ async def msktime(event: Message):
 
 @client.on(
     events.NewMessage(
-        pattern=r"(?i)^(/г )?(шахта|майнить|копать)$", func=checks
+        pattern=r"(?i)^(/г )?(шахта|майнить|копать)$", func=func.checks
     )
 )
-@client.on(events.NewMessage(pattern=r"(?i)^/mine", func=checks))
+@func.new_command(r"/mine")
 @client.on(
-    events.NewMessage(pattern=r"(?i)^/(шахта|майнить|копать)$", func=checks)
+    events.NewMessage(
+        pattern=r"(?i)^/(шахта|майнить|копать)$", func=func.checks
+    )
 )
 async def mine_start(event: Message):
     user_id = event.sender_id
@@ -177,7 +189,7 @@ async def mine_start(event: Message):
     )
 
 
-# @client.on(events.NewMessage(pattern=r"(?i)^/слово (.+)", func=checks))
+# @func.new_command(r"/слово (.+)")
 # async def word_request(event: Message):
 #     word = event.pattern_match.group(1).strip().lower()
 #     with open(pathes.crocoall, encoding="utf-8") as f:
@@ -186,7 +198,7 @@ async def mine_start(event: Message):
 #     with open(pathes.crocobl, encoding="utf-8") as f:
 #         if word in f.read().split("\n"):
 #             return await event.reply(phrase.word.in_blacklist)
-#     entity = await get_name(event.sender_id)
+#     entity = await func.get_name(event.sender_id)
 #     logger.info(f'Пользователь {event.sender_id} хочет добавить слово "{word}"')
 #     keyboard = types.ReplyInlineMarkup(
 #         [
@@ -219,7 +231,7 @@ async def mine_start(event: Message):
 #     return await event.reply(phrase.word.set.format(word=word))
 
 
-# @client.on(events.NewMessage(pattern=r"(?i)^/слова\s([\s\S]+)", func=checks))
+# @func.new_command(r"/слова\s([\s\S]+)")
 # async def word_requests(event: Message):
 #     words = [
 #         w.strip()
@@ -249,7 +261,7 @@ async def mine_start(event: Message):
 #         await asyncio.sleep(0.5)
 #     if not pending:
 #         return
-#     entity = await get_name(event.sender_id)
+#     entity = await func.get_name(event.sender_id)
 #     for word in pending:
 #         logger.info(
 #             f'Пользователь {event.sender_id} хочет добавить слово "{word}"'
@@ -287,17 +299,17 @@ async def mine_start(event: Message):
 #         await asyncio.sleep(0.5)
 
 
-# @client.on(events.NewMessage(pattern=r"(?i)^/слова$", func=checks))
+# @func.new_command(r"/слова$")
 # async def word_requests_empty(event: Message):
 #     return await event.reply(phrase.word.empty_long)
 
 
-# @client.on(events.NewMessage(pattern=r"(?i)^/слово$", func=checks))
+# @func.new_command(r"/слово$")
 # async def word_request_empty(event: Message):
 #     return await event.reply(phrase.word.empty)
 
 
-# @client.on(events.NewMessage(pattern=r"(?i)^\-слово$", func=checks))
+# @func.new_command(r"\-слово$")
 # async def word_remove_empty(event: Message):
 #     roles = db.roles()
 #     if roles.get(event.sender_id) < roles.ADMIN:
@@ -309,7 +321,7 @@ async def mine_start(event: Message):
 #     return await event.reply(phrase.word.rem_empty)
 
 
-# @client.on(events.NewMessage(pattern=r"(?i)^\-слово\s(.+)", func=checks))
+# @func.new_command(r"\-слово\s(.+)")
 # async def word_remove(event: Message):
 #     roles = db.roles()
 #     if roles.get(event.sender_id) < roles.ADMIN:
@@ -329,8 +341,8 @@ async def mine_start(event: Message):
 #     return await event.reply(phrase.word.deleted.format(word))
 
 
-@client.on(events.NewMessage(pattern=r"(?i)^/nick(.*)", func=checks))
-@client.on(events.NewMessage(pattern=r"(?i)^/ник(.*)", func=checks))
+@func.new_command(r"/nick(.*)")
+@func.new_command(r"/ник(.*)")
 async def check_nick(event: Message):
     arg = event.pattern_match.group(1).strip()
     if arg:
@@ -357,11 +369,11 @@ async def check_nick(event: Message):
     )
 
 
-@client.on(events.NewMessage(pattern=r"(?i)^/скинуть(.*)", func=checks))
-@client.on(events.NewMessage(pattern=r"(?i)^/кинуть(.*)", func=checks))
-@client.on(events.NewMessage(pattern=r"(?i)^/дать(.*)", func=checks))
-@client.on(events.NewMessage(pattern=r"(?i)^/перевести(.*)", func=checks))
-@client.on(events.NewMessage(pattern=r"(?i)^перевести(.*)", func=checks))
+@func.new_command(r"/скинуть(.*)")
+@func.new_command(r"/кинуть(.*)")
+@func.new_command(r"/дать(.*)")
+@func.new_command(r"/перевести(.*)")
+@func.new_command(r"перевести(.*)")
 async def swap_money(event: Message):
     args = event.pattern_match.group(1).strip().split()
     if not args:
@@ -418,13 +430,13 @@ async def swap_money(event: Message):
     )
 
 
-@client.on(events.NewMessage(pattern=r"(?i)^/вывести (.+)", func=checks))
-@client.on(events.NewMessage(pattern=r"(?i)^/вывод (.+)", func=checks))
-@client.on(events.NewMessage(pattern=r"(?i)^/вмайн (.+)", func=checks))
-@client.on(events.NewMessage(pattern=r"(?i)^/в майн (.+)", func=checks))
-@client.on(events.NewMessage(pattern=r"(?i)^/вмаин (.+)", func=checks))
-@client.on(events.NewMessage(pattern=r"(?i)^/в маин (.+)", func=checks))
-@client.on(events.NewMessage(pattern=r"(?i)^вывести (.+)", func=checks))
+@func.new_command(r"/вывести (.+)")
+@func.new_command(r"/вывод (.+)")
+@func.new_command(r"/вмайн (.+)")
+@func.new_command(r"/в майн (.+)")
+@func.new_command(r"/вмаин (.+)")
+@func.new_command(r"/в маин (.+)")
+@func.new_command(r"вывести (.+)")
 async def money_to_server(event: Message):
     nick = db.nicks(id=event.sender_id).get()
     if nick is None:
@@ -466,24 +478,24 @@ async def money_to_server(event: Message):
     )
 
 
-@client.on(events.NewMessage(pattern=r"(?i)^/вывести$", func=checks))
-@client.on(events.NewMessage(pattern=r"(?i)^/вывод$", func=checks))
-@client.on(events.NewMessage(pattern=r"(?i)^/вмайн$", func=checks))
-@client.on(events.NewMessage(pattern=r"(?i)^/в майн$", func=checks))
-@client.on(events.NewMessage(pattern=r"(?i)^/вмаин$", func=checks))
-@client.on(events.NewMessage(pattern=r"(?i)^/в маин$", func=checks))
-@client.on(events.NewMessage(pattern=r"(?i)^вывести$", func=checks))
+@func.new_command(r"/вывести$")
+@func.new_command(r"/вывод$")
+@func.new_command(r"/вмайн$")
+@func.new_command(r"/в майн$")
+@func.new_command(r"/вмаин$")
+@func.new_command(r"/в маин$")
+@func.new_command(r"вывести$")
 async def money_to_server_empty(event: Message):
     return await event.reply(phrase.money.no_count)
 
 
-@client.on(events.NewMessage(pattern=r"(?i)^/аметисты$", func=checks))
-@client.on(events.NewMessage(pattern=r"(?i)^/баланс$", func=checks))
-@client.on(events.NewMessage(pattern=r"(?i)^баланс$", func=checks))
-@client.on(events.NewMessage(pattern=r"(?i)^/wallet", func=checks))
-@client.on(events.NewMessage(pattern=r"(?i)^wallet$", func=checks))
-@client.on(events.NewMessage(pattern=r"(?i)^/мой баланс$", func=checks))
-@client.on(events.NewMessage(pattern=r"(?i)^мой баланс$", func=checks))
+@func.new_command(r"/аметисты$")
+@func.new_command(r"/баланс$")
+@func.new_command(r"баланс$")
+@func.new_command(r"/wallet")
+@func.new_command(r"wallet$")
+@func.new_command(r"/мой баланс$")
+@func.new_command(r"мой баланс$")
 async def get_balance(event: Message):
     balance = await db.get_money(event.sender_id)
     return await event.reply(
@@ -494,20 +506,26 @@ async def get_balance(event: Message):
 
 
 @client.on(
-    events.NewMessage(pattern=r"(?i)^/linknick (\S+)\s*(\S*)$", func=checks)
+    events.NewMessage(
+        pattern=r"(?i)^/linknick (\S+)\s*(\S*)$", func=func.checks
+    )
 )
 @client.on(
-    events.NewMessage(pattern=r"(?i)^/привязать (\S+)\s*(\S*)$", func=checks)
+    events.NewMessage(
+        pattern=r"(?i)^/привязать (\S+)\s*(\S*)$", func=func.checks
+    )
 )
 @client.on(
-    events.NewMessage(pattern=r"(?i)^привязать (\S+)\s*(\S*)$", func=checks)
+    events.NewMessage(
+        pattern=r"(?i)^привязать (\S+)\s*(\S*)$", func=func.checks
+    )
 )
 @client.on(
-    events.NewMessage(pattern=r"(?i)^/новый ник (\S+)\s*(\S*)$", func=checks)
+    events.NewMessage(
+        pattern=r"(?i)^/новый ник (\S+)\s*(\S*)$", func=func.checks
+    )
 )
-@client.on(
-    events.NewMessage(pattern=r"(?i)^/линкник (\S+)\s*(\S*)$", func=checks)
-)
+@func.new_command(r"/линкник (\S+)\s*(\S*)$")
 async def link_nick(event: Message):
     if event.chat_id != config.chats.chat:
         return await event.reply(phrase.nick.chat)
@@ -570,7 +588,7 @@ async def link_nick(event: Message):
             await client.send_message(
                 int(author),
                 phrase.ref.used.format(
-                    user=await get_name(event.sender_id, minecraft=True),
+                    user=await func.get_name(event.sender_id, minecraft=True),
                     amount=config.cfg.RefGift,
                 ),
             )
@@ -580,27 +598,27 @@ async def link_nick(event: Message):
             )
 
 
-@client.on(events.NewMessage(pattern=r"(?i)^/linknick$", func=checks))
-@client.on(events.NewMessage(pattern=r"(?i)^/привязать$", func=checks))
-@client.on(events.NewMessage(pattern=r"(?i)^привязать$", func=checks))
-@client.on(events.NewMessage(pattern=r"(?i)^/новый ник$", func=checks))
-@client.on(events.NewMessage(pattern=r"(?i)^/линкник$", func=checks))
+@func.new_command(r"/linknick$")
+@func.new_command(r"/привязать$")
+@func.new_command(r"привязать$")
+@func.new_command(r"/новый ник$")
+@func.new_command(r"/линкник$")
 async def link_nick_empty(event: Message):
     if event.chat_id != config.chats.chat:
         return await event.reply(phrase.nick.chat)
     return await event.reply(phrase.nick.not_select)
 
 
-@client.on(events.NewMessage(pattern=r"(?i)^/серв$", func=checks))
-@client.on(events.NewMessage(pattern=r"(?i)^/сервер", func=checks))
-@client.on(events.NewMessage(pattern=r"(?i)^/server", func=checks))
+@func.new_command(r"/серв$")
+@func.new_command(r"/сервер")
+@func.new_command(r"/server")
 async def sysinfo(event: Message):
     await event.reply(await get_system_info())
 
 
-@client.on(events.NewMessage(pattern=r"(?i)^/randompic", func=checks))
-@client.on(events.NewMessage(pattern=r"(?i)^/рандомпик$", func=checks))
-@client.on(events.NewMessage(pattern=r"(?i)^/картинка$", func=checks))
+@func.new_command(r"/randompic")
+@func.new_command(r"/рандомпик$")
+@func.new_command(r"/картинка$")
 async def randompic(event: Message):
     logger.info(f"Запрошена случайная картинка (id {event.sender_id})")
     request = floodwait.WaitPic.request()
@@ -615,9 +633,9 @@ async def randompic(event: Message):
     )
 
 
-@client.on(events.NewMessage(pattern=r"(?i)^/map", func=checks))
-@client.on(events.NewMessage(pattern=r"(?i)^/мап$", func=checks))
-@client.on(events.NewMessage(pattern=r"(?i)^/карта$", func=checks))
+@func.new_command(r"/map")
+@func.new_command(r"/мап$")
+@func.new_command(r"/карта$")
 async def getmap(event: Message):
     return await event.reply(
         phrase.get_map.format(await db.database("host")),
@@ -625,11 +643,11 @@ async def getmap(event: Message):
     )
 
 
-@client.on(events.NewMessage(pattern=r"(?i)^/vote@", func=checks))
-@client.on(events.NewMessage(pattern=r"(?i)^/vote$", func=checks))
-@client.on(events.NewMessage(pattern=r"(?i)^/голос$", func=checks))
-@client.on(events.NewMessage(pattern=r"(?i)^/голосование$", func=checks))
-@client.on(events.NewMessage(pattern=r"(?i)^/проголосовать$", func=checks))
+@func.new_command(r"/vote@")
+@func.new_command(r"/vote$")
+@func.new_command(r"/голос$")
+@func.new_command(r"/голосование$")
+@func.new_command(r"/проголосовать$")
 async def vote(event: Message):
     return await client.send_message(
         event.chat_id,
@@ -639,13 +657,13 @@ async def vote(event: Message):
     )
 
 
-@client.on(events.NewMessage(pattern=r"(?i)^/нпоиск (.+)", func=checks))
-@client.on(events.NewMessage(pattern=r"(?i)^/пник (.+)", func=checks))
-@client.on(events.NewMessage(pattern=r"(?i)^/игрок (.+)", func=checks))
-@client.on(events.NewMessage(pattern=r"(?i)^/поискпонику (.+)", func=checks))
-@client.on(events.NewMessage(pattern=r"(?i)^игрок (.+)", func=checks))
-@client.on(events.NewMessage(pattern=r"(?i)^нпоиск (.+)", func=checks))
-@client.on(events.NewMessage(pattern=r"(?i)^пник (.+)", func=checks))
+@func.new_command(r"/нпоиск (.+)")
+@func.new_command(r"/пник (.+)")
+@func.new_command(r"/игрок (.+)")
+@func.new_command(r"/поискпонику (.+)")
+@func.new_command(r"игрок (.+)")
+@func.new_command(r"нпоиск (.+)")
+@func.new_command(r"пник (.+)")
 async def check_info_by_nick(event: Message):
     nick = event.pattern_match.group(1).strip()
     userid = db.nicks(nick=nick).get()
@@ -664,18 +682,18 @@ async def check_info_by_nick(event: Message):
     )
 
 
-@client.on(events.NewMessage(pattern=r"(?i)^/нпоиск$", func=checks))
-@client.on(events.NewMessage(pattern=r"(?i)^/пник$", func=checks))
-@client.on(events.NewMessage(pattern=r"(?i)^/игрок$", func=checks))
-@client.on(events.NewMessage(pattern=r"(?i)^/поискпонику$", func=checks))
-@client.on(events.NewMessage(pattern=r"(?i)^игрок$", func=checks))
-@client.on(events.NewMessage(pattern=r"(?i)^нпоиск$", func=checks))
-@client.on(events.NewMessage(pattern=r"(?i)^пник$", func=checks))
+@func.new_command(r"/нпоиск$")
+@func.new_command(r"/пник$")
+@func.new_command(r"/игрок$")
+@func.new_command(r"/поискпонику$")
+@func.new_command(r"игрок$")
+@func.new_command(r"нпоиск$")
+@func.new_command(r"пник$")
 async def check_info_by_nick_empty(event: Message):
     return await event.reply(phrase.nick.empty)
 
 
-@client.on(events.NewMessage(pattern=r"(?i)^\+город (.+)", func=checks))
+@func.new_command(r"\+город (.+)")
 async def cities_request(event: Message):
     word = event.pattern_match.group(1).strip().lower()
     with open(pathes.chk_city, encoding="utf-8") as f:
@@ -684,7 +702,7 @@ async def cities_request(event: Message):
     with open(pathes.bl_city, encoding="utf-8") as f:
         if word in f.read().split("\n"):
             return await event.reply(phrase.cities.in_blacklist)
-    entity = await get_name(event.sender_id)
+    entity = await func.get_name(event.sender_id)
     logger.info(f'Пользователь {event.sender_id} хочет добавить город "{word}"')
     keyboard = types.ReplyInlineMarkup(
         [
@@ -713,7 +731,7 @@ async def cities_request(event: Message):
     return await event.reply(phrase.cities.set.format(word=word))
 
 
-@client.on(events.NewMessage(pattern=r"(?i)^\+города\s([\s\S]+)", func=checks))
+@func.new_command(r"\+города\s([\s\S]+)")
 async def cities_requests(event: Message):
     words = [
         w.strip()
@@ -746,7 +764,7 @@ async def cities_requests(event: Message):
         await asyncio.sleep(0.5)
     if not pending:
         return
-    entity = await get_name(event.sender_id)
+    entity = await func.get_name(event.sender_id)
     for word in pending:
         logger.info(
             f'Пользователь {event.sender_id} хочет добавить город "{word}"'
@@ -783,17 +801,17 @@ async def cities_requests(event: Message):
         await asyncio.sleep(0.5)
 
 
-@client.on(events.NewMessage(pattern=r"(?i)^\+города$", func=checks))
+@func.new_command(r"\+города$")
 async def cities_requests_empty(event: Message):
     return await event.reply(phrase.cities.empty_long)
 
 
-@client.on(events.NewMessage(pattern=r"(?i)^\+город$", func=checks))
+@func.new_command(r"\+город$")
 async def cities_request_empty(event: Message):
     return await event.reply(phrase.cities.empty)
 
 
-@client.on(events.NewMessage(pattern=r"(?i)^\-город$", func=checks))
+@func.new_command(r"\-город$")
 async def cities_remove_empty(event: Message):
     roles = db.roles()
     if roles.get(event.sender_id) < roles.ADMIN:
@@ -805,7 +823,7 @@ async def cities_remove_empty(event: Message):
     return await event.reply(phrase.cities.rem_empty)
 
 
-@client.on(events.NewMessage(pattern=r"(?i)^\-город\s(.+)", func=checks))
+@func.new_command(r"\-город\s(.+)")
 async def cities_remove(event: Message):
     roles = db.roles()
     if roles.get(event.sender_id) < roles.ADMIN:
@@ -825,12 +843,12 @@ async def cities_remove(event: Message):
     return await event.reply(phrase.cities.deleted.format(word))
 
 
-@client.on(events.NewMessage(pattern=r"(?i)^/rules", func=checks))
-@client.on(events.NewMessage(pattern=r"(?i)^/правила$", func=checks))
-@client.on(events.NewMessage(pattern=r"(?i)^/правилачата$", func=checks))
-@client.on(events.NewMessage(pattern=r"(?i)^/правила сервера$", func=checks))
-@client.on(events.NewMessage(pattern=r"(?i)^rules", func=checks))
-@client.on(events.NewMessage(pattern=r"(?i)^правила$", func=checks))
+@func.new_command(r"/rules")
+@func.new_command(r"/правила$")
+@func.new_command(r"/правилачата$")
+@func.new_command(r"/правила сервера$")
+@func.new_command(r"rules")
+@func.new_command(r"правила$")
 async def rules(event: Message):
     return await event.reply(
         phrase.rules.base.format(await db.database("host")),
@@ -838,10 +856,10 @@ async def rules(event: Message):
     )
 
 
-@client.on(events.NewMessage(pattern=r"(?i)^онлайн$", func=checks))
-@client.on(events.NewMessage(pattern=r"(?i)^/онлайн$", func=checks))
-@client.on(events.NewMessage(pattern=r"(?i)^online$", func=checks))
-@client.on(events.NewMessage(pattern=r"(?i)^/online", func=checks))
+@func.new_command(r"онлайн$")
+@func.new_command(r"/онлайн$")
+@func.new_command(r"online$")
+@func.new_command(r"/online")
 async def online(event: Message):
     async with mcrcon.Vanilla as rcon:
         response = await rcon.send("list")
@@ -855,8 +873,8 @@ async def online(event: Message):
     )
 
 
-@client.on(events.NewMessage(pattern=r"(?i)^/newhint", func=checks))
-@client.on(events.NewMessage(pattern=r"(?i)^/addhint", func=checks))
+@func.new_command(r"/newhint")
+@func.new_command(r"/addhint")
 async def add_new_hint(event: Message):
     if not event.is_private:
         return await event.reply(phrase.newhints.private)

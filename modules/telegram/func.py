@@ -3,35 +3,44 @@ import re
 
 from loguru import logger
 from telethon.tl import types
+from telethon import events
 from telethon.tl.functions.users import GetFullUserRequest
 from telethon.tl.custom import Message
 from telethon import errors as TGErrors
 
-from .. import db
+from .. import db, phrase
 from .client import client
 
 logger.info(f"Загружен модуль {__name__}!")
 
 
-async def get_name(id, push=False, minecraft=False) -> str | None:
-    """Выдает имя + фамилия, либо @пуш."""
+async def get_name(id, push=False, minecraft=False, log=False) -> str | None:
+    """Возвращает имя пользователя в формате: имя+фамилия, @username или Minecraft-ник."""
+
+    id = int(id)
+
+    if minecraft:
+        nick = db.nicks(id=id).get()
+        if nick:
+            return f"[{nick}](tg://user?id={id})"
+
     try:
-        if minecraft is True:
-            nick = db.nicks(id=int(id)).get()
-            if nick is not None:
-                return f"[{nick}](tg://user?id={id})"
-        user_name = await client.get_entity(int(id))
-        if user_name.username is not None and push:
-            return f"@{user_name.username}"
-        if user_name.username is None or not push:
-            fn = user_name.first_name.replace("[", "(").replace("]", ")")
-            if user_name.last_name is None:
-                return f"[{fn}](tg://user?id={id})"
-            ln = user_name.last_name.replace("[", "(").replace("]", ")")
-            return f"[{fn} {ln}](tg://user?id={id})"
-        return f"@{user_name.username}"
+        user = await client.get_entity(id)
     except Exception:
         return "Неопознанный персонаж"
+
+    first = (user.first_name or "").replace("[", "(").replace("]", ")")
+    last = (user.last_name or "").replace("[", "(").replace("]", ")")
+    full_name = f"{first} {last}".strip()
+
+    if log:
+        return f"@{id} ({full_name or 'Без имени'})"
+
+    if push and user.username:
+        return f"@{user.username}"
+
+    display = full_name or first or "Без имени"
+    return f"[{display}](tg://user?id={id})"
 
 
 async def get_id(str: str) -> int:
@@ -111,3 +120,34 @@ async def swap_resolve_recipient(event: Message, args: list[str]) -> int | None:
     if msg_id:
         return await get_author_by_msgid(event.chat_id, msg_id)
     return None
+
+
+async def checks(event: Message | events.CallbackQuery.Event) -> bool:
+    roles = db.roles()
+    if event.is_private:
+        if not isinstance(event, events.CallbackQuery.Event):
+            name = await get_name(event.sender_id, log=True)
+            (
+                logger.info(f"ЛС - {name} > {event.text}")
+                if len(event.text) < 100
+                else logger.info(f"ЛС - {name} > {event.text[:100]}...")
+            )
+    if roles.get(event.sender_id) != roles.BLACKLIST:
+        return True
+    if isinstance(event, events.CallbackQuery.Event):
+        await event.answer(phrase.blacklisted, alert=True)
+        return False
+    await event.reply(phrase.blacklisted)
+    return False
+
+
+def new_command(command: str, checks=checks):
+    pattern = rf"(?i)^{command}"
+
+    def decorator(func):
+        client.add_event_handler(
+            func, events.NewMessage(pattern=pattern, func=checks)
+        )
+        return func
+
+    return decorator

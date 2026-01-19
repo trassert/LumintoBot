@@ -1,11 +1,11 @@
 import asyncio
 
 from loguru import logger
-from telethon import events
 from telethon.tl.custom import Message
 
 from .. import db, phrase
 from .client import client
+from . import func
 
 logger.info(f"Загружен модуль {__name__}!")
 
@@ -33,13 +33,14 @@ async def send_to_subscribers(message_text):
     return successful_sends
 
 
-@client.on(events.NewMessage(pattern=r"(?i)^\+обновление ([\s\S]+)"))
+@func.new_command(r"\+обновление ([\s\S]+)")
 async def admin_broadcast(event: Message):
     roles = db.roles()
     if roles.get(event.sender_id) < roles.ADMIN:
         return await event.reply(
             phrase.roles.no_perms.format(
-                level=roles.ADMIN, name=phrase.roles.admin,
+                level=roles.ADMIN,
+                name=phrase.roles.admin,
             ),
         )
     await event.reply(
@@ -50,7 +51,7 @@ async def admin_broadcast(event: Message):
     return None
 
 
-@client.on(events.NewMessage(pattern=r"(?i)^\+обновления"))
+@func.new_command(r"\+обновления")
 async def subscribe_command(event: Message):
     """Обработчик команды подписки."""
     data = db.mailing_get()
@@ -64,7 +65,7 @@ async def subscribe_command(event: Message):
     return await event.reply(phrase.mailing.subscribe)
 
 
-@client.on(events.NewMessage(pattern=r"(?i)^\/отписаться$"))
+@func.new_command(r"/отписаться$")
 async def unsubscribe_command(event: Message):
     """Обработчик команды отписки."""
     data = db.mailing_get()

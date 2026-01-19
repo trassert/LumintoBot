@@ -1,25 +1,22 @@
 from loguru import logger
-from telethon import events
 from telethon.tl.custom import Message
 
 from .. import db, phrase
 from .client import client
-from .global_checks import checks
+from . import func
 
 logger.info(f"Загружен модуль {__name__}!")
 
 
-@client.on(
-    events.NewMessage(pattern=r"(?i)^\+нот (.+)\n([\s\S]+)", func=checks),
-)
-@client.on(
-    events.NewMessage(pattern=r"(?i)^\+note (.+)\n([\s\S]+)", func=checks),
-)
+@func.new_command(r"\+нот (.+)\n([\s\S]+)")
+@func.new_command(r"\+note (.+)\n([\s\S]+)")
 async def add_note(event: Message):
     roles = db.roles()
     if roles.get(event.sender_id) < roles.VIP:
         return await event.reply(
-            phrase.roles.no_perms.format(level=roles.VIP, name=phrase.roles.vip),
+            phrase.roles.no_perms.format(
+                level=roles.VIP, name=phrase.roles.vip
+            ),
         )
     if (
         db.Notes().create(
@@ -34,29 +31,33 @@ async def add_note(event: Message):
     return await event.reply(phrase.notes.already_added)
 
 
-@client.on(events.NewMessage(pattern=r"(?i)^\+нот (.+)$", func=checks))
-@client.on(events.NewMessage(pattern=r"(?i)^\+note (.+)$", func=checks))
+@func.new_command(r"\+нот (.+)$")
+@func.new_command(r"\+note (.+)$")
 async def add_note_notext(event: Message):
     roles = db.roles()
     if roles.get(event.sender_id) < roles.VIP:
         return await event.reply(
-            phrase.roles.no_perms.format(level=roles.VIP, name=phrase.roles.vip),
+            phrase.roles.no_perms.format(
+                level=roles.VIP, name=phrase.roles.vip
+            ),
         )
     return await event.reply(phrase.notes.notext)
 
 
-@client.on(events.NewMessage(pattern=r"(?i)^\+нот\n([\s\S]+)", func=checks))
-@client.on(events.NewMessage(pattern=r"(?i)^\+note\n([\s\S]+)", func=checks))
+@func.new_command(r"\+нот\n([\s\S]+)")
+@func.new_command(r"\+note\n([\s\S]+)")
 async def add_note_noname(event: Message):
     roles = db.roles()
     if roles.get(event.sender_id) < roles.VIP:
         return await event.reply(
-            phrase.roles.no_perms.format(level=roles.VIP, name=phrase.roles.vip),
+            phrase.roles.no_perms.format(
+                level=roles.VIP, name=phrase.roles.vip
+            ),
         )
     return await event.reply(phrase.notes.noname)
 
 
-@client.on(events.NewMessage(pattern=r"(?i)^\.(.+)", func=checks))
+@func.new_command(r"\.(.+)")
 async def get_note(event: Message):
     note_text = db.Notes().get(event.pattern_match.group(1).strip().lower())
     if note_text is not None:
@@ -69,13 +70,16 @@ async def get_note(event: Message):
                 link_preview=False,
             )
         return await client.send_message(
-            event.chat_id, note_text, reply_to=event.id, link_preview=False,
+            event.chat_id,
+            note_text,
+            reply_to=event.id,
+            link_preview=False,
         )
     return None
 
 
-@client.on(events.NewMessage(pattern=r"(?i)^/notes$", func=checks))
-@client.on(events.NewMessage(pattern=r"(?i)^/ноты$", func=checks))
+@func.new_command(r"/notes$")
+@func.new_command(r"/ноты$")
 async def get_all_notes(event: Message):
     text = ""
     n = 1
@@ -85,22 +89,24 @@ async def get_all_notes(event: Message):
     return await event.reply(phrase.notes.alltext.format(text))
 
 
-@client.on(events.NewMessage(pattern=r"(?i)^\-нот (.+)$", func=checks))
-@client.on(events.NewMessage(pattern=r"(?i)^\-note (.+)$", func=checks))
-@client.on(events.NewMessage(pattern=r"(?i)^\-text (.+)$", func=checks))
+@func.new_command(r"\-нот (.+)$")
+@func.new_command(r"\-note (.+)$")
+@func.new_command(r"\-text (.+)$")
 async def del_note(event: Message):
     roles = db.roles()
     if roles.get(event.sender_id) < roles.VIP:
         return await event.reply(
-            phrase.roles.no_perms.format(level=roles.VIP, name=phrase.roles.vip),
+            phrase.roles.no_perms.format(
+                level=roles.VIP, name=phrase.roles.vip
+            ),
         )
     if not db.Notes().remove(event.pattern_match.group(1).strip()):
         return await event.reply(phrase.notes.not_found)
     return await event.reply(phrase.notes.deleted)
 
 
-@client.on(events.NewMessage(pattern=r"(?i)^\-нот$", func=checks))
-@client.on(events.NewMessage(pattern=r"(?i)^\-note$", func=checks))
-@client.on(events.NewMessage(pattern=r"(?i)^\-text$", func=checks))
+@func.new_command(r"\-нот$")
+@func.new_command(r"\-note$")
+@func.new_command(r"\-text$")
 async def del_note_notext(event: Message):
     return await event.reply(phrase.note.noname)

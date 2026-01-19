@@ -17,9 +17,9 @@ from .. import (
     log_shop,
 )
 from .client import client
-from .func import get_name
+from . import func
 from .games import crocodile_handler, crocodile_hint
-from .global_checks import checks
+
 
 logger.info(f"Загружен модуль {__name__}!")
 
@@ -55,7 +55,7 @@ async def _handle_suggestion(
 ):
     """Унифицированная обработка предложений (слова/города)."""
     data = event.data.decode("utf-8").split(".")
-    user_name = await get_name(data[3])
+    user_name = await func.get_name(data[3])
     sender_id = event.sender_id
 
     match data[1]:
@@ -96,7 +96,7 @@ async def _handle_suggestion(
             )
 
 
-@client.on(events.CallbackQuery(func=checks, pattern=r"^state"))
+@client.on(events.CallbackQuery(func=func.checks, pattern=r"^state"))
 async def state_callback(event: events.CallbackQuery.Event):
     data = event.data.decode("utf-8").split(".")
     logger.info(f"КБ кнопка (States), дата: {data}")
@@ -183,7 +183,7 @@ async def state_callback(event: events.CallbackQuery.Event):
             )
             return await event.reply(
                 phrase.state.removed.format(
-                    author=await get_name(state.author, push=False)
+                    author=await func.get_name(state.author, push=False)
                 ),
             )
 
@@ -204,7 +204,7 @@ async def state_callback(event: events.CallbackQuery.Event):
             db.states.add(state_name, sender_id)
             await event.reply(
                 phrase.state.make_by_callback.format(
-                    author=await get_name(sender_id), state_name=state_name
+                    author=await func.get_name(sender_id), state_name=state_name
                 )
             )
             return await client.send_message(
@@ -248,7 +248,7 @@ async def state_callback(event: events.CallbackQuery.Event):
             )
 
 
-@client.on(events.CallbackQuery(func=checks, pattern=r"^casino"))
+@client.on(events.CallbackQuery(func=func.checks, pattern=r"^casino"))
 async def casino_callback(event: events.CallbackQuery.Event):
     data = event.data.decode("utf-8").split(".")
     request = floodwait.WaitCasino.request()
@@ -284,7 +284,7 @@ async def casino_callback(event: events.CallbackQuery.Event):
         await asyncio.sleep(2)
         return await fm.edit(
             phrase.casino.win_auto.format(
-                value=win_amount, name=await get_name(sender_id)
+                value=win_amount, name=await func.get_name(sender_id)
             )
         )
 
@@ -292,7 +292,7 @@ async def casino_callback(event: events.CallbackQuery.Event):
         db.add_money(sender_id, config.cfg.PriceForCasino)
         await asyncio.sleep(2)
         return await fm.edit(
-            phrase.casino.partially_auto.format(await get_name(sender_id))
+            phrase.casino.partially_auto.format(await func.get_name(sender_id))
         )
 
     await db.Users.add_lose_money(sender_id, config.cfg.PriceForCasino)
@@ -300,13 +300,13 @@ async def casino_callback(event: events.CallbackQuery.Event):
     await asyncio.sleep(2)
     return await fm.edit(
         phrase.casino.lose_auto.format(
-            name=await get_name(sender_id),
+            name=await func.get_name(sender_id),
             value=config.cfg.PriceForCasino,
         )
     )
 
 
-@client.on(events.CallbackQuery(func=checks, pattern=r"^nick"))
+@client.on(events.CallbackQuery(func=func.checks, pattern=r"^nick"))
 async def nick_callback(event: events.CallbackQuery.Event):
     data = event.data.decode("utf-8").split(".")
     logger.info(f"КБ кнопка (Nick), дата: {data}")
@@ -334,7 +334,7 @@ async def nick_callback(event: events.CallbackQuery.Event):
         return await event.answer(phrase.nick.error, alert=True)
 
     db.nicks(data[1], sender_id).link()
-    user_name = await get_name(sender_id)
+    user_name = await func.get_name(sender_id)
     return await event.reply(
         phrase.nick.buy_nick.format(
             user=user_name,
@@ -345,7 +345,7 @@ async def nick_callback(event: events.CallbackQuery.Event):
     )
 
 
-# @client.on(events.CallbackQuery(func=checks, pattern=r"^word"))
+# @client.on(events.CallbackQuery(func=func.checks, pattern=r"^word"))
 # async def word_callback(event: events.CallbackQuery.Event):
 #     data = event.data.decode("utf-8").split(".")
 #     logger.info(f"КБ кнопка (Word), дата: {data}")
@@ -362,7 +362,7 @@ async def nick_callback(event: events.CallbackQuery.Event):
 #     )
 
 
-@client.on(events.CallbackQuery(func=checks, pattern=r"^cityadd"))
+@client.on(events.CallbackQuery(func=func.checks, pattern=r"^cityadd"))
 async def cityadd_callback(event: events.CallbackQuery.Event):
     data = event.data.decode("utf-8").split(".")
     logger.info(f"КБ кнопка (Cityadd), дата: {data}")
@@ -379,7 +379,7 @@ async def cityadd_callback(event: events.CallbackQuery.Event):
     )
 
 
-@client.on(events.CallbackQuery(func=checks, pattern=r"^shop"))
+@client.on(events.CallbackQuery(func=func.checks, pattern=r"^shop"))
 async def shop_callback(event: events.CallbackQuery.Event):
     data = event.data.decode("utf-8").split(".")
     logger.info(f"КБ кнопка (Shop), дата: {data}")
@@ -414,7 +414,7 @@ async def shop_callback(event: events.CallbackQuery.Event):
     )
 
 
-@client.on(events.CallbackQuery(func=checks, pattern=r"^crocodile"))
+@client.on(events.CallbackQuery(func=func.checks, pattern=r"^crocodile"))
 async def crocodile_callback(event: events.CallbackQuery.Event):
     data = event.data.decode("utf-8").split(".")
     logger.info(f"КБ кнопка (Crocodile), дата: {data}")
@@ -487,7 +487,7 @@ async def crocodile_callback(event: events.CallbackQuery.Event):
             return await event.reply(phrase.crocodile.down.format(word))
 
 
-@client.on(events.CallbackQuery(func=checks, pattern=r"^mine"))
+@client.on(events.CallbackQuery(func=func.checks, pattern=r"^mine"))
 async def mine_callback(event: events.CallbackQuery.Event):
     data = event.data.decode("utf-8").split(".")
     logger.info(f"КБ кнопка (Mine), дата: {data}")
@@ -573,7 +573,7 @@ async def mine_callback(event: events.CallbackQuery.Event):
             )
 
 
-@client.on(events.CallbackQuery(func=checks, pattern=r"^hint"))
+@client.on(events.CallbackQuery(func=func.checks, pattern=r"^hint"))
 async def hint_callback(event: events.CallbackQuery.Event):
     data = event.data.decode("utf-8").split(".")
     logger.info(f"КБ кнопка (Mine), дата: {data}")
@@ -624,7 +624,7 @@ async def hint_callback(event: events.CallbackQuery.Event):
             )
 
 
-@client.on(events.CallbackQuery(func=checks, pattern=r"^test"))
+@client.on(events.CallbackQuery(func=func.checks, pattern=r"^test"))
 async def simple_antibot(event: events.CallbackQuery.Event):
     data = event.data.decode("utf-8").split(".")
     if str(event.sender_id) != data[1]:
@@ -644,7 +644,7 @@ async def simple_antibot(event: events.CallbackQuery.Event):
     return await client.send_message(
         config.chats.chat,
         phrase.chataction.hello.format(
-            await get_name(event.sender_id, push=False)
+            await func.get_name(event.sender_id, push=False)
         ),
         link_preview=False,
     )

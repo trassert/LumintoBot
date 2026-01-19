@@ -3,14 +3,14 @@ from telethon import events, Button
 
 from .. import config, formatter, phrase
 from .client import client
-from .func import get_name
+from . import func
 
 logger.info(f"Загружен модуль {__name__}!")
 
 
 @client.on(events.ChatAction(chats=config.chats.chat))
 async def chat_action(event: events.ChatAction.Event):
-    user_name = await get_name(event.user_id, push=False)
+    user_name = await func.get_name(event.user_id, push=False)
 
     if event.user_left:
         return await client.send_message(

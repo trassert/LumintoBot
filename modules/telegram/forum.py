@@ -1,17 +1,18 @@
 from telethon.tl import functions
 from telethon import events
 from telethon.tl.custom import Message
-from .global_checks import checks
+
 from loguru import logger
 from .client import client
 from .. import config, phrase
+from . import func
 
 logger.info(f"Загружен модуль {__name__}!")
 
 
 @client.on(
     events.NewMessage(
-        pattern=r"\+топик (.+)", chats=config.chats.forum, func=checks
+        pattern=r"\+топик (.+)", chats=config.chats.forum, func=func.checks
     )
 )
 async def create_topic(event: Message):
@@ -34,4 +35,3 @@ async def create_topic(event: Message):
         )
     except Exception:
         logger.exception("Ошибка создания топика")
-

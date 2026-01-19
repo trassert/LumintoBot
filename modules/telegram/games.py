@@ -14,7 +14,7 @@ from telethon.tl.types import (
 from .. import config, db, formatter, phrase, pathes
 from . import func
 from .client import client
-from .global_checks import checks
+
 
 logger.info(f"Загружен модуль {__name__}!")
 
@@ -23,7 +23,9 @@ CitiesTimerTask: asyncio.Task = None
 
 
 @client.on(
-    events.NewMessage(config.chats.chat, pattern=r"(?i)^/казино$", func=checks),
+    events.NewMessage(
+        config.chats.chat, pattern=r"(?i)^/казино$", func=func.checks
+    ),
 )
 async def casino(event: Message):
     if (event.reply_to_msg_id != config.chats.topics.games) and (
@@ -45,9 +47,9 @@ async def casino(event: Message):
     )
 
 
-@client.on(events.NewMessage(pattern=r"(?i)^/крокодил$", func=checks))
-@client.on(events.NewMessage(pattern=r"(?i)^/crocodile$", func=checks))
-@client.on(events.NewMessage(pattern=r"(?i)^старт крокодил$", func=checks))
+@func.new_command(r"/крокодил$")
+@func.new_command(r"/crocodile$")
+@func.new_command(r"старт крокодил$")
 async def crocodile(event: Message):
     if event.chat_id != config.chats.chat:
         return await event.reply(phrase.crocodile.chat)
@@ -89,8 +91,8 @@ async def crocodile(event: Message):
     return await event.reply(phrase.crocodile.no, buttons=keyboard)
 
 
-@client.on(events.NewMessage(pattern=r"(?i)^/ставка(.*)", func=checks))
-@client.on(events.NewMessage(pattern=r"(?i)^/крокоставка(.*)", func=checks))
+@func.new_command(r"/ставка(.*)")
+@func.new_command(r"/крокоставка(.*)")
 async def crocodile_bet(event: Message):
     if (event.reply_to_msg_id != config.chats.topics.games) and (
         getattr(event.reply_to, "reply_to_top_id", None)
@@ -141,7 +143,7 @@ async def crocodile_bet(event: Message):
     )
 
 
-@client.on(events.NewMessage(pattern=r"(?i)^/суперигра(.*)", func=checks))
+@func.new_command(r"/суперигра(.*)")
 async def super_game(event: Message):
     roles = db.roles()
     if roles.get(event.sender_id) < roles.ADMIN:
@@ -509,12 +511,12 @@ async def cities_callback(event: events.CallbackQuery.Event):
     return None
 
 
-@client.on(events.NewMessage(pattern=r"(?i)^/города$", func=checks))
-@client.on(events.NewMessage(pattern=r"(?i)^/города старт$", func=checks))
-@client.on(events.NewMessage(pattern=r"(?i)^/cities start$", func=checks))
-@client.on(events.NewMessage(pattern=r"(?i)^/миниигра города$", func=checks))
-@client.on(events.NewMessage(pattern=r"(?i)^/minigame cities$", func=checks))
-@client.on(events.NewMessage(pattern=r"(?i)^/cities$"))
+@func.new_command(r"/города$")
+@func.new_command(r"/города старт$")
+@func.new_command(r"/cities start$")
+@func.new_command(r"/миниигра города$")
+@func.new_command(r"/minigame cities$")
+@func.new_command(r"/cities$")
 async def cities_start(event: Message):
     """Команда запуска игры."""
     if event.chat_id != config.chats.chat:
@@ -565,5 +567,5 @@ async def crocodile_onboot():
     )
     client.add_event_handler(
         crocodile_hint,
-        events.NewMessage(pattern=r"(?i)^/подсказка$", func=checks),
+        events.NewMessage(pattern=r"(?i)^/подсказка$", func=func.checks),
     )

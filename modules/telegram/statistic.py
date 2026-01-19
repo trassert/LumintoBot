@@ -1,21 +1,20 @@
 from loguru import logger
-from telethon import events
 from telethon.tl.custom import Message
 
 from .. import chart, config, db, formatter, mcrcon, pathes, phrase
 from .client import client
-from .func import get_name
-from .global_checks import checks
+from . import func
+
 
 logger.info(f"Загружен модуль {__name__}!")
 
 
-@client.on(events.NewMessage(pattern=r"(?i)^/топ соо(.*)", func=checks))
-@client.on(events.NewMessage(pattern=r"(?i)^/топ сообщений(.*)", func=checks))
-@client.on(events.NewMessage(pattern=r"(?i)^/топ в чате(.*)", func=checks))
-@client.on(events.NewMessage(pattern=r"(?i)^/актив сервера(.*)", func=checks))
-@client.on(events.NewMessage(pattern=r"(?i)^/мчат(.*)", func=checks))
-@client.on(events.NewMessage(pattern=r"(?i)^/мстат(.*)", func=checks))
+@func.new_command(r"/топ соо(.*)")
+@func.new_command(r"/топ сообщений(.*)")
+@func.new_command(r"/топ в чате(.*)")
+@func.new_command(r"/актив сервера(.*)")
+@func.new_command(r"/мчат(.*)")
+@func.new_command(r"/мстат(.*)")
 async def active_check(event: Message):
     arg: str = event.pattern_match.group(1).strip()
 
@@ -71,11 +70,11 @@ async def active_check(event: Message):
     )
 
 
-@client.on(events.NewMessage(pattern=r"(?i)^/топ крокодил$", func=checks))
-@client.on(events.NewMessage(pattern=r"(?i)^/топ слова$", func=checks))
-@client.on(events.NewMessage(pattern=r"(?i)^/стат крокодил$", func=checks))
-@client.on(events.NewMessage(pattern=r"(?i)^/стат слова$", func=checks))
-@client.on(events.NewMessage(pattern=r"(?i)^топ крокодила$", func=checks))
+@func.new_command(r"/топ крокодил$")
+@func.new_command(r"/топ слова$")
+@func.new_command(r"/стат крокодил$")
+@func.new_command(r"/стат слова$")
+@func.new_command(r"топ крокодила$")
 async def crocodile_wins(event: Message):
     all = db.crocodile_stat.get_all()
     text = ""
@@ -83,12 +82,12 @@ async def crocodile_wins(event: Message):
     for id in all:
         if n > config.cfg.MaxStatPlayers:
             break
-        text += f"{n}. **{await get_name(id)}**: {all[id]} побед\n"
+        text += f"{n}. **{await func.get_name(id)}**: {all[id]} побед\n"
         n += 1
     return await event.reply(phrase.crocodile.stat.format(text), silent=True)
 
 
-@client.on(events.NewMessage(pattern=r"(?i)^/банк$", func=checks))
+@func.new_command(r"/банк$")
 async def all_money(event: Message):
     return await event.reply(
         phrase.money.all_money.format(
@@ -97,12 +96,12 @@ async def all_money(event: Message):
     )
 
 
-@client.on(events.NewMessage(pattern=r"(?i)^/топ игроков(.*)", func=checks))
-@client.on(events.NewMessage(pattern=r"(?i)^/топигроков(.*)", func=checks))
-@client.on(events.NewMessage(pattern=r"(?i)^/topplayers(.*)", func=checks))
-@client.on(events.NewMessage(pattern=r"(?i)^/playtimetop(.*)", func=checks))
-@client.on(events.NewMessage(pattern=r"(?i)^/bestplayers(.*)", func=checks))
-@client.on(events.NewMessage(pattern=r"(?i)^/toppt(.*)", func=checks))
+@func.new_command(r"/топ игроков(.*)")
+@func.new_command(r"/топигроков(.*)")
+@func.new_command(r"/topplayers(.*)")
+@func.new_command(r"/playtimetop(.*)")
+@func.new_command(r"/bestplayers(.*)")
+@func.new_command(r"/toppt(.*)")
 async def server_top_list(event: Message):
     arg: str = event.pattern_match.group(1).strip()
     n = config.cfg.MaxStatPlayers

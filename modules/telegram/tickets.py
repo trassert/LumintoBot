@@ -1,17 +1,15 @@
 from loguru import logger
-from telethon import events
 from telethon.tl.custom import Message
 
 from .. import db, formatter, phrase
-from .client import client
-from .func import get_name
-from .global_checks import checks
+from . import func
+
 
 logger.info(f"Загружен модуль {__name__}!")
 
 
-@client.on(events.NewMessage(pattern=r"(?i)^\+чек(.*)", func=checks))
-@client.on(events.NewMessage(pattern=r"(?i)^\+ticket(.*)", func=checks))
+@func.new_command(r"\+чек(.*)")
+@func.new_command(r"\+ticket(.*)")
 async def do_ticket(event: Message):
     if not event.is_private:
         return await event.reply(phrase.ticket.in_chat)
@@ -36,17 +34,17 @@ async def do_ticket(event: Message):
     return await event.reply(
         phrase.ticket.added.format(
             value=arg,
-            author=await get_name(event.sender_id),
+            author=await func.get_name(event.sender_id),
             id=ticket_id,
         ),
     )
 
 
-@client.on(events.NewMessage(pattern=r"(?i)^/чек(.*)", func=checks))
-@client.on(events.NewMessage(pattern=r"(?i)^/ticket(.*)", func=checks))
-@client.on(events.NewMessage(pattern=r"(?i)^/активировать(.*)", func=checks))
-@client.on(events.NewMessage(pattern=r"(?i)^активировать(.*)", func=checks))
-@client.on(events.NewMessage(pattern=r"(?i)^/activate(.*)", func=checks))
+@func.new_command(r"/чек(.*)")
+@func.new_command(r"/ticket(.*)")
+@func.new_command(r"/активировать(.*)")
+@func.new_command(r"активировать(.*)")
+@func.new_command(r"/activate(.*)")
 async def get_ticket(event: Message):
     arg = event.pattern_match.group(1).strip()
     if arg == "":
@@ -58,7 +56,7 @@ async def get_ticket(event: Message):
     db.ticket.delete(arg)
     return await event.reply(
         phrase.ticket.got.format(
-            author=await get_name(ticket_info["author"]),
+            author=await func.get_name(ticket_info["author"]),
             value=formatter.value_to_str(ticket_info["value"], phrase.currency),
         ),
     )

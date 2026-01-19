@@ -24,7 +24,6 @@ from . import (  # noqa: E402, F401
     callbacks,
     func,
     games,
-    global_checks,
     mailing,
     notes,
     referrals,

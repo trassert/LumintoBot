@@ -1,18 +1,17 @@
 from loguru import logger
-from telethon import events
 from telethon.tl.custom import Message
 from telethon.tl.functions.users import GetFullUserRequest
 
 from .. import db, formatter, mcrcon, phrase
 from . import func
 from .client import client
-from .global_checks import checks
+
 
 logger.info(f"Загружен модуль {__name__}!")
 
 
-@client.on(events.NewMessage(pattern=r"(?i)^/изменить баланс(.*)", func=checks))
-@client.on(events.NewMessage(pattern=r"(?i)^/change balance(.*)", func=checks))
+@func.new_command(r"/изменить баланс(.*)")
+@func.new_command(r"/change balance(.*)")
 async def add_balance(event: Message):
     roles = db.roles()
     if roles.get(event.sender_id) < roles.ADMIN:
@@ -52,8 +51,8 @@ async def add_balance(event: Message):
     return None
 
 
-@client.on(events.NewMessage(pattern=r"(?i)^\+стафф(.*)", func=checks))
-@client.on(events.NewMessage(pattern=r"(?i)^\+staff(.*)", func=checks))
+@func.new_command(r"\+стафф(.*)")
+@func.new_command(r"\+staff(.*)")
 async def add_staff(event: Message):
     roles = db.roles()
     if roles.get(event.sender_id) < roles.OWNER:
@@ -83,8 +82,8 @@ async def add_staff(event: Message):
     )
 
 
-@client.on(events.NewMessage(pattern=r"(?i)^\-staff(.*)", func=checks))
-@client.on(events.NewMessage(pattern=r"(?i)^\-стафф(.*)", func=checks))
+@func.new_command(r"\-staff(.*)")
+@func.new_command(r"\-стафф(.*)")
 async def del_staff(event: Message):
     roles = db.roles()
     if roles.get(event.sender_id) < roles.OWNER:
@@ -114,7 +113,7 @@ async def del_staff(event: Message):
     )
 
 
-@client.on(events.NewMessage(pattern=r"//(.+)", func=checks))
+@func.new_command(r"//(.+)")
 async def vanilla_mcrcon(event: Message):
     roles = db.roles()
     if roles.get(event.sender_id) < roles.ADMIN:
@@ -141,10 +140,10 @@ async def vanilla_mcrcon(event: Message):
         return await event.reply(phrase.server.stopped)
 
 
-@client.on(events.NewMessage(pattern=r"(?i)^\+вт\s(.+)", func=checks))
-@client.on(events.NewMessage(pattern=r"(?i)^\-вт\s(.+)", func=checks))
-@client.on(events.NewMessage(pattern=r"(?i)^\+wl\s(.+)", func=checks))
-@client.on(events.NewMessage(pattern=r"(?i)^\-wl\s(.+)", func=checks))
+@func.new_command(r"\+вт\s(.+)")
+@func.new_command(r"\-вт\s(.+)")
+@func.new_command(r"\+wl\s(.+)")
+@func.new_command(r"\-wl\s(.+)")
 async def whitelist(event: Message):
     roles = db.roles()
     if roles.get(event.sender_id) < roles.VIP:
@@ -169,7 +168,7 @@ async def whitelist(event: Message):
         return await event.reply(phrase.server.stopped)
 
 
-@client.on(events.NewMessage(pattern=r"(?i)^/выдать(.*)", func=checks))
+@func.new_command(r"/выдать(.*)")
 async def give_money(event: Message):
     roles = db.roles()
     if roles.get(event.sender_id) < roles.ADMIN:

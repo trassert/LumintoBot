@@ -1,7 +1,6 @@
 from random import choice
 
 from loguru import logger
-from telethon import events
 from telethon.tl.custom import Message
 from telethon.tl.types import (
     KeyboardButtonCallback,
@@ -10,18 +9,18 @@ from telethon.tl.types import (
 )
 
 from .. import db, formatter, phrase, task_gen
-from .client import client
-from .global_checks import checks
+from . import func
+
 
 logger.info(f"Загружен модуль {__name__}!")
 
 
-@client.on(events.NewMessage(pattern=r"(?i)^/shop", func=checks))
-@client.on(events.NewMessage(pattern=r"(?i)^/шоп$", func=checks))
-@client.on(events.NewMessage(pattern=r"(?i)^/магазин$", func=checks))
-@client.on(events.NewMessage(pattern=r"(?i)^магазин$", func=checks))
-@client.on(events.NewMessage(pattern=r"(?i)^shop$", func=checks))
-@client.on(events.NewMessage(pattern=r"(?i)^шоп$", func=checks))
+@func.new_command(r"/shop")
+@func.new_command(r"/шоп$")
+@func.new_command(r"/магазин$")
+@func.new_command(r"магазин$")
+@func.new_command(r"shop$")
+@func.new_command(r"шоп$")
 async def shop(event: Message):
     shop_data = db.get_shop()
     version = await db.database("shop_version")

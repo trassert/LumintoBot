@@ -1,26 +1,24 @@
 import re
 
 from loguru import logger
-from telethon import events
 from telethon.tl.custom import Message
 
 from .. import db, phrase, config
 from . import func
-from .client import client
-from .global_checks import checks
+
 
 logger.info(f"Загружен модуль {__name__}!")
 
 
-@client.on(events.NewMessage(pattern=r"(?i)^/addrefcode (.+)", func=checks))
-@client.on(events.NewMessage(pattern=r"(?i)^/новыйреф (.+)", func=checks))
-@client.on(events.NewMessage(pattern=r"(?i)^/новаярефка (.+)", func=checks))
-@client.on(events.NewMessage(pattern=r"(?i)^/новый реф (.+)", func=checks))
-@client.on(events.NewMessage(pattern=r"(?i)^\+реф (.+)", func=checks))
-@client.on(events.NewMessage(pattern=r"(?i)^\+рефка (.+)", func=checks))
-@client.on(events.NewMessage(pattern=r"(?i)^\+рефкод (.+)", func=checks))
-@client.on(events.NewMessage(pattern=r"(?i)^/добавить рефку (.+)", func=checks))
-@client.on(events.NewMessage(pattern=r"(?i)^добавить рефку (.+)", func=checks))
+@func.new_command(r"/addrefcode (.+)")
+@func.new_command(r"/новыйреф (.+)")
+@func.new_command(r"/новаярефка (.+)")
+@func.new_command(r"/новый реф (.+)")
+@func.new_command(r"\+реф (.+)")
+@func.new_command(r"\+рефка (.+)")
+@func.new_command(r"\+рефкод (.+)")
+@func.new_command(r"/добавить рефку (.+)")
+@func.new_command(r"добавить рефку (.+)")
 async def add_refcode(event: Message):
     arg = event.pattern_match.group(1).strip().lower()
     if not re.match("^[A-Za-z0-9_]*$", arg):
@@ -35,41 +33,41 @@ async def add_refcode(event: Message):
     return await event.reply(phrase.ref.added.format(arg))
 
 
-@client.on(events.NewMessage(pattern=r"(?i)^/addrefcode$", func=checks))
-@client.on(events.NewMessage(pattern=r"(?i)^/новыйреф$", func=checks))
-@client.on(events.NewMessage(pattern=r"(?i)^/новаярефка$", func=checks))
-@client.on(events.NewMessage(pattern=r"(?i)^/новый реф$", func=checks))
-@client.on(events.NewMessage(pattern=r"(?i)^\+реф$", func=checks))
-@client.on(events.NewMessage(pattern=r"(?i)^\+рефка$", func=checks))
-@client.on(events.NewMessage(pattern=r"(?i)^\+рефкод$", func=checks))
-@client.on(events.NewMessage(pattern=r"(?i)^/добавить рефку$", func=checks))
-@client.on(events.NewMessage(pattern=r"(?i)^добавить рефку$", func=checks))
+@func.new_command(r"/addrefcode$")
+@func.new_command(r"/новыйреф$")
+@func.new_command(r"/новаярефка$")
+@func.new_command(r"/новый реф$")
+@func.new_command(r"\+реф$")
+@func.new_command(r"\+рефка$")
+@func.new_command(r"\+рефкод$")
+@func.new_command(r"/добавить рефку$")
+@func.new_command(r"добавить рефку$")
 async def add_refcode_empty(event: Message):
     return await event.reply(phrase.ref.notext)
 
 
-@client.on(events.NewMessage(pattern=r"(?i)^/delrefcode$", func=checks))
-@client.on(events.NewMessage(pattern=r"(?i)^/удалитьреф$", func=checks))
-@client.on(events.NewMessage(pattern=r"(?i)^/удалитьрефку$", func=checks))
-@client.on(events.NewMessage(pattern=r"(?i)^/удалить реф$", func=checks))
-@client.on(events.NewMessage(pattern=r"(?i)^\-реф$", func=checks))
-@client.on(events.NewMessage(pattern=r"(?i)^\-рефка$", func=checks))
-@client.on(events.NewMessage(pattern=r"(?i)^\-рефкод$", func=checks))
-@client.on(events.NewMessage(pattern=r"(?i)^/удалить рефку$", func=checks))
-@client.on(events.NewMessage(pattern=r"(?i)^удалить рефку$", func=checks))
+@func.new_command(r"/delrefcode$")
+@func.new_command(r"/удалитьреф$")
+@func.new_command(r"/удалитьрефку$")
+@func.new_command(r"/удалить реф$")
+@func.new_command(r"\-реф$")
+@func.new_command(r"\-рефка$")
+@func.new_command(r"\-рефкод$")
+@func.new_command(r"/удалить рефку$")
+@func.new_command(r"удалить рефку$")
 async def del_refcode(event: Message):
     if await db.RefCodes().delete(event.sender_id) is False:
         return await event.reply(phrase.ref.not_found)
     return await event.reply(phrase.ref.deleted)
 
 
-@client.on(events.NewMessage(pattern=r"(?i)^/топреф$", func=checks))
-@client.on(events.NewMessage(pattern=r"(?i)^/топрефералов$", func=checks))
-@client.on(events.NewMessage(pattern=r"(?i)^/топрефералы$", func=checks))
-@client.on(events.NewMessage(pattern=r"(?i)^/топ рефералы$", func=checks))
-@client.on(events.NewMessage(pattern=r"(?i)^/топ реф$", func=checks))
-@client.on(events.NewMessage(pattern=r"(?i)^/топ рефералов$", func=checks))
-@client.on(events.NewMessage(pattern=r"(?i)^/рефералы топ$", func=checks))
+@func.new_command(r"/топреф$")
+@func.new_command(r"/топрефералов$")
+@func.new_command(r"/топрефералы$")
+@func.new_command(r"/топ рефералы$")
+@func.new_command(r"/топ реф$")
+@func.new_command(r"/топ рефералов$")
+@func.new_command(r"/рефералы топ$")
 async def top_ref(event: Message):
     text = [phrase.ref.top]
     info = await db.RefCodes().get_top_uses()
@@ -86,13 +84,13 @@ async def top_ref(event: Message):
     return await event.reply("\n".join(text))
 
 
-@client.on(events.NewMessage(pattern=r"(?i)^/рефка$", func=checks))
-@client.on(events.NewMessage(pattern=r"(?i)^/рефкод$", func=checks))
-@client.on(events.NewMessage(pattern=r"(?i)^/моярефка$", func=checks))
-@client.on(events.NewMessage(pattern=r"(?i)^/мойрефкод$", func=checks))
-@client.on(events.NewMessage(pattern=r"(?i)^/реферальныйкод$", func=checks))
-@client.on(events.NewMessage(pattern=r"(?i)^/реферальный код$", func=checks))
-@client.on(events.NewMessage(pattern=r"(?i)^/refcode", func=checks))
+@func.new_command(r"/рефка$")
+@func.new_command(r"/рефкод$")
+@func.new_command(r"/моярефка$")
+@func.new_command(r"/мойрефкод$")
+@func.new_command(r"/реферальныйкод$")
+@func.new_command(r"/реферальный код$")
+@func.new_command(r"/refcode")
 async def my_ref(event: Message):
     ref = db.RefCodes()
     name = await ref.get_own(event.sender_id)
