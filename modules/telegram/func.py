@@ -1,8 +1,6 @@
-import random
 import re
 
 from loguru import logger
-from telethon.tl import types
 from telethon import events
 from telethon.tl.functions.users import GetFullUserRequest
 from telethon.tl.custom import Message
@@ -57,37 +55,38 @@ async def get_id(str: str) -> int:
     return user.full_user.id
 
 
-async def make_quiz_poll(
-    answers: list, correct_answer_id: int, question: str
-) -> types.MessageMediaPoll:
-    return (
-        types.MessageMediaPoll(
-            poll=types.Poll(
-                id=random.randint(1, 100000),
-                question=types.TextWithEntities(
-                    text=question,
-                    entities=[],
-                ),
-                answers=[
-                    types.PollAnswer(
-                        text=types.TextWithEntities(text=option, entities=[]),
-                        option=bytes([i]),
-                    )
-                    for i, option in enumerate(answers, start=1)
-                ],
-                quiz=True,
-            ),
-            results=types.PollResults(
-                results=[
-                    types.PollAnswerVoters(
-                        option=bytes([correct_answer_id]),
-                        voters=0,
-                        correct=True,
-                    ),
-                ],
-            ),
-        ),
-    )
+# async def make_quiz_poll(
+#     answers: list, correct_answer_id: int, question: str
+# ) -> types.MessageMediaPoll:
+#     return (
+#         types.MessageMediaPoll(
+#             poll=types.Poll(
+#                 id=random.randint(1, 100000),
+#                 question=types.TextWithEntities(
+#                     text=question,
+#                     entities=[],
+#                 ),
+#                 answers=[
+#                     types.PollAnswer(
+#                         text=types.TextWithEntities(text=option, entities=[]),
+#                         option=bytes([i]),
+#                     )
+#                     for i, option in enumerate(answers, start=1)
+#                 ],
+#                 quiz=True,
+#             ),
+#             results=types.PollResults(
+#                 results=[
+#                     types.PollAnswerVoters(
+#                         option=bytes([correct_answer_id]),
+#                         voters=0,
+#                         correct=True,
+#                     ),
+#                 ],
+#             ),
+#         ),
+#     )
+# Why i need ts? Probably unused
 
 
 def get_reply_message_id(event):
@@ -141,12 +140,12 @@ async def checks(event: Message | events.CallbackQuery.Event) -> bool:
     return False
 
 
-def new_command(command: str, checks=checks):
+def new_command(command: str, checks=checks, chats=None):
     pattern = rf"(?i)^{command}"
 
     def decorator(func):
         client.add_event_handler(
-            func, events.NewMessage(pattern=pattern, func=checks)
+            func, events.NewMessage(pattern=pattern, func=checks, chats=chats)
         )
         return func
 

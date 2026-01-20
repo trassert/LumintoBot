@@ -5,7 +5,6 @@ from random import choice
 
 from loguru import logger
 from telethon import errors as TGErrors
-from telethon import events
 from telethon.tl.custom import Message
 from telethon.tl.types import (
     KeyboardButtonCallback,
@@ -268,11 +267,6 @@ async def state_leave(event: Message):
 
 @func.new_command(r"/уничтожить госво")
 @func.new_command(r"/удалить госво")
-@client.on(
-    events.NewMessage(
-        pattern=r"(?i)^/уничтожить государство", func=func.checks
-    ),
-)
 @func.new_command(r"/удалить государство")
 @func.new_command(r"уничтожить государство")
 @func.new_command(r"удалить государство")
@@ -452,14 +446,10 @@ async def state_add_money_empty(event: Message):
     return await event.reply(phrase.state.howto_add_balance)
 
 
-@client.on(
-    events.NewMessage(
-        pattern=r"(?i)^/забрать из казны\s(.+)", func=func.checks
-    ),
-)
-@func.new_command(r"/г снять\s(.+)")
-@func.new_command(r"\-казна\s(.+)")
-@func.new_command(r"г снять\s(.+)")
+@func.new_command(r"/забрать из казны (.+)")
+@func.new_command(r"/г снять (.+)")
+@func.new_command(r"\-казна (.+)")
+@func.new_command(r"г снять (.+)")
 async def state_rem_money(event: Message):
     state_name = db.states.if_author(event.sender_id)
     if state_name is False:

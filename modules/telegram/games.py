@@ -22,11 +22,8 @@ Cities = db.CitiesGame()
 CitiesTimerTask: asyncio.Task = None
 
 
-@client.on(
-    events.NewMessage(
-        config.chats.chat, pattern=r"(?i)^/казино$", func=func.checks
-    ),
-)
+@func.new_command("/казино$", chats=config.chats.chat)
+@func.new_command("/casino", chats=config.chats.chat)
 async def casino(event: Message):
     if (event.reply_to_msg_id != config.chats.topics.games) and (
         getattr(event.reply_to, "reply_to_top_id", None)
@@ -385,6 +382,7 @@ async def cities_timeout(current_player: int, last_city: str):
 
 @client.on(events.NewMessage(chats=config.chats.chat))
 async def cities_answer(event: Message) -> None:
+    # We make deco and it doesn't used probably all the time?
     if (event.reply_to_msg_id != config.chats.topics.games) and (
         getattr(event.reply_to, "reply_to_top_id", None)
         != config.chats.topics.games
@@ -434,6 +432,7 @@ async def cities_answer(event: Message) -> None:
 @client.on(events.CallbackQuery(pattern=r"^cities\."))
 async def cities_callback(event: events.CallbackQuery.Event):
     """Обработчик кнопок игры."""
+    # Probably need to move -> callback.py
     data = event.data.decode("utf-8").split(".")
     action = data[1]
 

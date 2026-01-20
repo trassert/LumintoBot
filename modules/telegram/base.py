@@ -81,7 +81,7 @@ async def ping(event: Message):
 @func.new_command(r"/старт$")
 async def start(event: Message):
     return await event.reply(
-        phrase.start.format(await func.get_name(event.sender_id, push=False)),
+        phrase.start.format(await func.get_name(event.sender_id)),
         silent=True,
     )
 
@@ -122,7 +122,7 @@ async def profile(event: Message):
         time_played = "-"
     return await event.reply(
         phrase.profile.full.format(
-            name=await func.get_name(user_id, push=False),
+            name=await func.get_name(user_id),
             minecraft=nick,
             role_name=phrase.roles.types[role],
             role_number=role,

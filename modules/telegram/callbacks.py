@@ -183,7 +183,7 @@ async def state_callback(event: events.CallbackQuery.Event):
             )
             return await event.reply(
                 phrase.state.removed.format(
-                    author=await func.get_name(state.author, push=False)
+                    author=await func.get_name(state.author)
                 ),
             )
 
@@ -645,7 +645,7 @@ async def simple_antibot(event: events.CallbackQuery.Event):
     return await client.send_message(
         config.chats.chat,
         phrase.chataction.hello.format(
-            await func.get_name(event.sender_id, push=False)
+            await func.get_name(event.sender_id)
         ),
         link_preview=False,
     )
