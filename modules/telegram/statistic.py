@@ -126,7 +126,7 @@ async def server_top_list(event: Message):
 
         return await event.reply("\n".join(text))
     except TimeoutError:
-        return await event.reply(phrase.server.stopped)
+        return await event.reply(phrase.server.stopped, silent=True)
 
 
 @func.new_command(r"/топ шахтёров")
@@ -145,4 +145,6 @@ async def server_top_mine(event: Message):
             f"{n}. {await func.get_name(player[0])} - {formatter.value_to_str(player[1], 'аметист')}"
         )
         n += 1
-    return await event.reply(phrase.stat.mine.format("\n".join(text)))
+    return await event.reply(
+        phrase.stat.mine.format("\n".join(text)), silent=True
+    )
