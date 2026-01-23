@@ -22,6 +22,7 @@ hellomsg = path.join("db", "users", "hellomsg.json")
 votes = path.join("db", "users", "votes.json")
 mine_stat = path.join("db", "users", "mine.json")
 
+items = path.join("db", "items.json")
 tickets = path.join("db", "tickets.json")
 mailing = path.join("db", "mailing.json")
 tasks = path.join("db", "tasks.json")

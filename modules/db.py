@@ -1,5 +1,6 @@
 from collections import defaultdict
 from datetime import datetime, timedelta
+from typing import Optional, TypedDict
 from os import listdir, makedirs, path, remove, replace
 from random import choice, randint
 from time import time
@@ -923,3 +924,44 @@ async def get_mine_top() -> list[list[str, int]]:
     return sorted(
         (await _load_json_async(pathes.mine_stat)).items(), key=lambda x: -x[1]
     )
+
+
+class Item(TypedDict):
+    author_id: int
+    item: str
+    count: int
+    price: int
+
+
+async def add_item(
+    id: str, author_id: int, item: str, count: int, price: int
+) -> None:
+    """Добавляет новый товар по ID. Перезаписывает, если уже существует."""
+    data = await _load_json_async(pathes.items)
+    data[str(id)] = {
+        "author_id": author_id,
+        "item": item,
+        "count": count,
+        "price": price,
+    }
+    await _save_json_async(pathes.items, data, indent=True)
+
+
+async def get_item(id: str) -> Optional[Item]:
+    """Возвращает товар по ID или None, если не найден."""
+    data = await _load_json_async(pathes.items)
+    raw_item = data.get(str(id))
+    if raw_item is None:
+        return None
+    return raw_item
+
+
+async def remove_item(id: str) -> bool:
+    """Удаляет товар по ID. Возвращает True, если существовал и удалён."""
+    data = await _load_json_async(pathes.items)
+    id = str(id)
+    if id not in data:
+        return False
+    del data[id]
+    await _save_json_async(pathes.items, data, indent=True)
+    return True

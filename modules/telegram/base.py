@@ -798,7 +798,7 @@ async def cities_remove_empty(event: Message):
     return await event.reply(phrase.cities.rem_empty)
 
 
-@func.new_command(r"\-город\s(.+)")
+@func.new_command(r"\-город (.+)")
 async def cities_remove(event: Message):
     roles = db.roles()
     if roles.get(event.sender_id) < roles.ADMIN:

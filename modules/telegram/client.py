@@ -32,4 +32,5 @@ from . import (  # noqa: E402, F401
     statistic,
     tickets,
     forum,
+    trading
 )

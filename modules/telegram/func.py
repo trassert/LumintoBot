@@ -12,6 +12,15 @@ from .client import client
 logger.info(f"Загружен модуль {__name__}!")
 
 
+async def get_simple_push(id) -> str | None:
+    try:
+        user = await client.get_entity(id)
+    except Exception:
+        return None
+    if user.username:
+        return user.username
+
+
 async def get_name(id, push=False, minecraft=False, log=False) -> str | None:
     """Возвращает имя пользователя в формате: имя+фамилия, @username или Minecraft-ник."""
 
