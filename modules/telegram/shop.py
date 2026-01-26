@@ -32,7 +32,8 @@ async def shop(event: Message):
 
     for idx, (item_name, item_info) in enumerate(list(shop_data.items())[:5]):
         value = item_info["value"]
-        price = formatter.value_to_str(item_info["price"], phrase.currency)
+        'price = formatter.value_to_str(item_info["price"], phrase.currency)'
+        price = f"{item_info['price']} {phrase.currency_emoji}"
         value_str = f" ({value})" if value != 1 else ""
         items_lines.append(f"{idx + 1}. {item_name}{value_str} - {price}")
 
@@ -58,5 +59,4 @@ async def shop(event: Message):
             clock=clock,
         ),
         buttons=keyboard,
-        parse_mode="html",
     )

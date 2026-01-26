@@ -323,14 +323,16 @@ class statistic:
             except Exception:
                 logger.error(f"Ошибка при чтении файла - {json_file}")
                 continue
-        if self.days != 1:
-            start_date = datetime.now() - timedelta(days=self.days)
-            return {
-                date: value
-                for date, value in totals.items()
-                if datetime.strptime(date, "%Y.%m.%d") >= start_date
-            }
-        return dict(sorted(totals.items(), key=lambda item: item[0]))
+
+        if self.days <= 0:
+            return dict(sorted(totals.items(), key=lambda item: item[0]))
+
+        start_date = datetime.now() - timedelta(days=self.days)
+        return {
+            date: value
+            for date, value in totals.items()
+            if datetime.strptime(date, "%Y.%m.%d") >= start_date
+        }
 
 
 class ticket:

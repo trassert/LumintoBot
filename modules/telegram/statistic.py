@@ -16,58 +16,45 @@ logger.info(f"Загружен модуль {__name__}!")
 @func.new_command(r"/мчат(.*)")
 @func.new_command(r"/мстат(.*)")
 async def active_check(event: Message):
-    arg: str = event.pattern_match.group(1).strip()
+    arg = event.pattern_match.group(1).strip()
 
     if arg in phrase.all_arg:
-        all_data = db.statistic().get_all(all_days=True)
-        chart.create_plot(db.statistic().get_raw())
-        n = 1
-        players = ""
-        for data in all_data:
-            if n > config.cfg.MaxStatPlayers:
-                break
-            players += f"{n}. {data[0]} - {data[1]}\n"
-            n += 1
-        text = phrase.stat.chat.format(time="всё время", text=players)
-        return await client.send_file(
-            event.chat_id, pathes.chart, caption=text, parse_mode="html"
-        )
+        days = 0
+    else:
+        try:
+            days = int(arg)
+        except ValueError:
+            days = 1
 
-    try:
-        days = int(arg)
-        all_data = db.statistic(days=days).get_all()
-        if days >= 7:
-            chart.create_plot(db.statistic(days=days).get_raw())
-            n = 1
-            players = ""
-            for data in all_data:
-                if n > config.cfg.MaxStatPlayers:
-                    break
-                players += f"{n}. {data[0]} - {data[1]}\n"
-                n += 1
-            text = phrase.stat.chat.format(
-                time=formatter.value_to_str(days, "день"), text=players
-            )
-            return await client.send_file(
-                event.chat_id, pathes.chart, caption=text, parse_mode="html"
-            )
-    except ValueError:
-        all_data = db.statistic().get_all()
+    stat = db.statistic(days=days)
+    all_data = stat.get_all(all_days=(days == 0))
 
-    if all_data == []:
+    if not all_data:
         return await event.reply(phrase.stat.empty)
 
-    n = 1
-    players = ""
-    for data in all_data:
-        if n > config.cfg.MaxStatPlayers:
-            break
-        players += f"{n}. {data[0]} - {data[1]}\n"
-        n += 1
-
-    return await event.respond(
-        phrase.stat.chat.format(time="день", text=players), parse_mode="html"
+    players = "\n".join(
+        f"{i}. {name} - {count}"
+        for i, (name, count) in enumerate(all_data, 1)
+        if i <= config.cfg.MaxStatPlayers
     )
+
+    if days == 0:
+        time_str = "всё время"
+    elif days == 1:
+        time_str = "день"
+    else:
+        time_str = formatter.value_to_str(days, "день")
+
+    caption = phrase.stat.chat.format(time=time_str, text=players)
+
+    send_chart = (days == 0) or (days >= 7)
+    if send_chart:
+        chart.create_plot(stat.get_raw())
+        return await client.send_file(
+            event.chat_id, pathes.chart, caption=caption
+        )
+    else:
+        return await event.respond(caption)
 
 
 @func.new_command(r"/топ крокодил$")
