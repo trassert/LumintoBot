@@ -19,10 +19,10 @@ async def create_topic(event: Message):
     try:
         result = await client(
             functions.messages.CreateForumTopicRequest(
-                peer=config.chats.forum, title=title
+                peer=config.chats.forum,
+                title=title,
             )
         )
-
         topic_id = result.updates[0].id
         link = f"https://t.me/c/{str(config.chats.forum)[4:]}/{topic_id}"
         await event.reply(

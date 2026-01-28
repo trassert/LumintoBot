@@ -27,7 +27,10 @@ class AccessLogger(AbstractAccessLogger):
         return self.logger.isEnabledFor(logging.INFO)
 
 
-repos = {"LumintoGold": {"chat": -1003408993511, "topic": 72}}
+repos = {
+    "LumintoGold": {"chat": -1003408993511, "topic": 72},
+    "TrassertTools": {"chat": -1003408993511, "topic": 72},
+}
 
 
 async def server():
