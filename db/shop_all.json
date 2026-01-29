@@ -660,7 +660,7 @@
         },
         "Кузнечный шаблон «Ось»": {
             "name": "bolt_armor_trim_smithing_template",
-            "price": 26,
+            "price": 32,
             "value": 1
         },
         "Пузырёк опыта": {
@@ -1137,92 +1137,92 @@
         },
         "Кузнечный шаблон «Берег»": {
             "name": "coast_armor_trim_smithing_template",
-            "price": 10,
+            "price": 26,
             "value": 1
         },
         "Кузнечный шаблон «Вождь»": {
             "name": "host_armor_trim_smithing_template",
-            "price": 31,
+            "price": 52,
             "value": 1
         },
         "Кузнечный шаблон «Вредина»": {
             "name": "vex_armor_trim_smithing_template",
-            "price": 15,
+            "price": 32,
             "value": 1
         },
         "Кузнечный шаблон «Дебри»": {
             "name": "wild_armor_trim_smithing_template",
-            "price": 12,
+            "price": 24,
             "value": 1
         },
         "Кузнечный шаблон «Дюна»": {
             "name": "dune_armor_trim_smithing_template",
-            "price": 12,
+            "price": 30,
             "value": 1
         },
         "Кузнечный шаблон «Искатель»": {
             "name": "wayfinder_armor_trim_smithing_template",
-            "price": 12,
+            "price": 24,
             "value": 1
         },
         "Кузнечный шаблон «Око»": {
             "name": "eye_armor_trim_smithing_template",
-            "price": 12,
+            "price": 24,
             "value": 1
         },
         "Кузнечный шаблон «Ось»": {
             "name": "bolt_armor_trim_smithing_template",
-            "price": 25,
+            "price": 54,
             "value": 1
         },
         "Кузнечный шаблон «Поток»": {
             "name": "flow_armor_trim_smithing_template",
-            "price": 10,
+            "price": 22,
             "value": 1
         },
         "Кузнечный шаблон «Прилив»": {
             "name": "tide_armor_trim_smithing_template",
-            "price": 10,
+            "price": 20,
             "value": 1
         },
         "Кузнечный шаблон «Ребро»": {
             "name": "rib_armor_trim_smithing_template",
-            "price": 10,
+            "price": 20,
             "value": 1
         },
         "Кузнечный шаблон «Рыло»": {
             "name": "snout_armor_trim_smithing_template",
-            "price": 10,
+            "price": 23,
             "value": 1
         },
         "Кузнечный шаблон «Скульптор»": {
             "name": "shaper_armor_trim_smithing_template",
-            "price": 10,
+            "price": 24,
             "value": 1
         },
         "Кузнечный шаблон «Собиратель»": {
             "name": "raiser_armor_trim_smithing_template",
-            "price": 10,
+            "price": 22,
             "value": 1
         },
         "Кузнечный шаблон «Страж»": {
             "name": "sentry_armor_trim_smithing_template",
-            "price": 10,
+            "price": 61,
             "value": 1
         },
         "Кузнечный шаблон «Тишина»": {
             "name": "silence_armor_trim_smithing_template",
-            "price": 45,
+            "price": 98,
             "value": 1
         },
         "Кузнечный шаблон «Хранитель»": {
             "name": "ward_armor_trim_smithing_template",
-            "price": 30,
+            "price": 79,
             "value": 1
         },
         "Кузнечный шаблон «Шпиль»": {
             "name": "spire_armor_trim_smithing_template",
-            "price": 27,
+            "price": 42,
             "value": 1
         },
         "Наковальня": {
