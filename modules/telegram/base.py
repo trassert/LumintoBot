@@ -20,8 +20,8 @@ from .. import (
     pic,
     mining,
     floodwait,
+    sys,
 )
-from ..system_info import get_system_info
 from .client import client
 from . import func
 
@@ -588,7 +588,7 @@ async def link_nick_empty(event: Message):
 @func.new_command(r"/сервер")
 @func.new_command(r"/server")
 async def sysinfo(event: Message):
-    await event.reply(await get_system_info())
+    await event.reply(await sys.get_info())
 
 
 @func.new_command(r"/randompic")
@@ -890,3 +890,33 @@ async def add_new_hint(event: Message):
             return await conv.send_message(
                 phrase.newhints.sent.format(pending_id)
             )
+
+
+@func.new_command(r"/gethint")
+async def get_last_hint(event: Message):
+    if not event.is_private:
+        return await event.reply(phrase.newhints.private)
+    roles = db.roles()
+    if roles.get(event.sender_id) < roles.ADMIN:
+        return await event.reply(
+            phrase.roles.no_perms.format(
+                level=roles.ADMIN,
+                name=phrase.roles.admin,
+            ),
+        )
+    hint = await db.get_latest_pending_hint()
+    if hint == {}:
+        return await event.reply(phrase.newhints.not_found)
+    return await event.reply(
+        phrase.newhints.admin_alert.format(
+            word=hint.get("word"),
+            hint=hint.get("hint"),
+            user=await func.get_name(hint.get("user")),
+        ),
+        buttons=[
+            [
+                Button.inline("✅", f"hint.accept.{hint.get('id')}"),
+                Button.inline("❌", f"hint.reject.{hint.get('id')}"),
+            ]
+        ],
+    )

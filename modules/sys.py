@@ -65,7 +65,7 @@ async def get_current_speed():
     return [round(download_speed_mbps, 2), round(upload_speed_mbps, 2)]
 
 
-async def get_system_info() -> str:
+async def get_info() -> str:
     boot_time = psutil.boot_time()
     current_time = time()
     uptime_seconds = current_time - boot_time

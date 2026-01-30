@@ -901,6 +901,17 @@ async def remove_pending_hint(id: int | str):
     return True
 
 
+async def get_latest_pending_hint() -> dict:
+    data = await _load_json_async(pathes.pending_hints)
+    try:
+        hint_id = list(data.keys())[-1]
+    except IndexError:
+        return {}
+    hint = data.get(hint_id, {})
+    hint["id"] = hint_id
+    return hint
+
+
 async def get_hint_byid(id: str | int) -> dict | None:
     data = await _load_json_async(pathes.pending_hints)
     return data.get(str(id))
