@@ -31,7 +31,8 @@ class MinecraftClient:
     async def __aenter__(self):
         if not self._connected:
             self._reader, self._writer = await asyncio.open_connection(
-                self.host, self.port,
+                self.host,
+                self.port,
             )
             self._connected = True
             await self._authenticate()

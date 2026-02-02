@@ -1,15 +1,15 @@
 import urllib.parse
 
+from loguru import logger
 from telethon.tl.custom import Message
 from telethon.tl.types import (
     KeyboardButtonRow,
-    ReplyInlineMarkup,
     KeyboardButtonUrl,
+    ReplyInlineMarkup,
 )
 
-from loguru import logger
+from .. import config, db, formatter, phrase
 from . import func
-from .. import phrase, config, db, formatter
 from .client import client
 
 logger.info(f"Загружен модуль {__name__}!")

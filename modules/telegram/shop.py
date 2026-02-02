@@ -11,7 +11,6 @@ from telethon.tl.types import (
 from .. import db, formatter, phrase, task_gen
 from . import func
 
-
 logger.info(f"Загружен модуль {__name__}!")
 
 

@@ -4,7 +4,6 @@ from telethon.tl.custom import Message
 from .. import db, formatter, phrase
 from . import func
 
-
 logger.info(f"Загружен модуль {__name__}!")
 
 

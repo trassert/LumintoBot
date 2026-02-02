@@ -1,6 +1,6 @@
 import asyncio
-import sys
 import os
+import sys
 
 sys.path.append(os.path.join(os.path.dirname(__file__), ".."))
 
@@ -14,10 +14,9 @@ async def main():
         host="127.0.0.1",
         port="25575",
         password="1234",
-    ) as rcon:
-        for player in players:
-            print(f"Ответ команды на игрока {player}:", end=" ")
-            print(await rcon.send(f"nwl add name {player}"))
+    ):
+        for _player in players:
+            pass
 
 
 asyncio.run(main())

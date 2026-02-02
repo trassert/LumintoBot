@@ -1,8 +1,8 @@
 import asyncio
-from random import choice, random, randint
+from random import choice, randint, random
 
 from loguru import logger
-from telethon import events, types, Button
+from telethon import Button, events, types
 
 from .. import (
     config,
@@ -10,16 +10,15 @@ from .. import (
     dice,
     floodwait,
     formatter,
+    log_shop,
     mcrcon,
+    mining,
     pathes,
     phrase,
-    mining,
-    log_shop,
 )
-from .client import client
 from . import func
+from .client import client
 from .games import crocodile_handler, crocodile_hint
-
 
 logger.info(f"Загружен модуль {__name__}!")
 
@@ -27,12 +26,11 @@ logger.info(f"Загружен модуль {__name__}!")
 async def _check_and_deduct_balance(
     user_id: int, price: int, currency: str = phrase.currency
 ) -> bool | str:
-    """Проверяет баланс и списывает сумму при успехе. Возвращает True или сообщение об ошибке."""
+    """Проверяет баланс и списывает сумму при успехе.
+    Возвращает True или сообщение об ошибке."""
     balance = await db.get_money(user_id)
     if balance < price:
-        return phrase.money.not_enough.format(
-            formatter.value_to_str(balance, currency)
-        )
+        return phrase.money.not_enough.format(formatter.value_to_str(balance, currency))
     db.add_money(user_id, -price)
     return True
 
@@ -80,9 +78,7 @@ async def _handle_suggestion(
                     ),
                 ),
             )
-            return await client.edit_message(
-                sender_id, event.message_id, add_phrase
-            )
+            return await client.edit_message(sender_id, event.message_id, add_phrase)
 
         case "no":
             with open(reject_file, "a", encoding="utf-8") as f:
@@ -106,22 +102,14 @@ async def state_callback(event: events.CallbackQuery.Event):
         case "pay":
             nick = db.nicks(id=sender_id).get()
             if nick is None:
-                return await event.answer(
-                    phrase.state.not_connected, alert=True
-                )
+                return await event.answer(phrase.state.not_connected, alert=True)
             if db.states.if_player(sender_id) is not False:
-                return await event.answer(
-                    phrase.state.already_player, alert=True
-                )
+                return await event.answer(phrase.state.already_player, alert=True)
             if db.states.if_author(sender_id) is not False:
-                return await event.answer(
-                    phrase.state.already_author, alert=True
-                )
+                return await event.answer(phrase.state.already_author, alert=True)
 
             state = db.state(data[2])
-            balance_check = await _check_and_deduct_balance(
-                sender_id, state.price
-            )
+            balance_check = await _check_and_deduct_balance(sender_id, state.price)
             if balance_check is not True:
                 return await event.answer(balance_check, alert=True)
 
@@ -131,18 +119,14 @@ async def state_callback(event: events.CallbackQuery.Event):
 
             await client.send_message(
                 entity=config.chats.chat,
-                message=phrase.state.new_player.format(
-                    state=state.name, player=nick
-                ),
+                message=phrase.state.new_player.format(state=state.name, player=nick),
                 reply_to=config.chats.topics.rp,
             )
 
             if state.type == 0 and len(players) >= config.cfg.Type1Players:
                 await client.send_message(
                     entity=config.chats.chat,
-                    message=phrase.state.up.format(
-                        name=state.name, type="Государство"
-                    ),
+                    message=phrase.state.up.format(name=state.name, type="Государство"),
                     reply_to=config.chats.topics.rp,
                 )
                 state.change("type", 1)
@@ -150,24 +134,18 @@ async def state_callback(event: events.CallbackQuery.Event):
             elif state.type == 1 and len(players) >= config.cfg.Type2Players:
                 await client.send_message(
                     entity=config.chats.chat,
-                    message=phrase.state.up.format(
-                        name=state.name, type="Империя"
-                    ),
+                    message=phrase.state.up.format(name=state.name, type="Империя"),
                     reply_to=config.chats.topics.rp,
                 )
                 state.change("type", 2)
 
-            return await event.answer(
-                phrase.state.admit.format(state.name), alert=True
-            )
+            return await event.answer(phrase.state.admit.format(state.name), alert=True)
 
         case "remove":
             try:
                 state = db.state(data[2])
             except FileNotFoundError:
-                return await event.answer(
-                    phrase.state.already_deleted, alert=True
-                )
+                return await event.answer(phrase.state.already_deleted, alert=True)
 
             if not _ensure_owner(sender_id, state.author):
                 return await event.answer(phrase.not_for_you, alert=True)
@@ -182,9 +160,7 @@ async def state_callback(event: events.CallbackQuery.Event):
                 reply_to=config.chats.topics.rp,
             )
             return await event.reply(
-                phrase.state.removed.format(
-                    author=await func.get_name(state.author)
-                ),
+                phrase.state.removed.format(author=await func.get_name(state.author)),
             )
 
         case "m":
@@ -235,9 +211,7 @@ async def state_callback(event: events.CallbackQuery.Event):
                 return await event.answer(phrase.state.already_here, alert=True)
 
             await event.reply(
-                phrase.state.renamed.format(
-                    old=state_name.capitalize(), new=new_name
-                )
+                phrase.state.renamed.format(old=state_name.capitalize(), new=new_name)
             )
             return await client.send_message(
                 entity=config.chats.chat,
@@ -409,9 +383,7 @@ async def shop_callback(event: events.CallbackQuery.Event):
     except TimeoutError:
         return await event.answer(phrase.shop.timeout, alert=True)
 
-    return await event.answer(
-        phrase.shop.buy.format(items[int(data[1])]), alert=True
-    )
+    return await event.answer(phrase.shop.buy.format(items[int(data[1])]), alert=True)
 
 
 @client.on(events.CallbackQuery(func=func.checks, pattern=r"^crocodile"))
@@ -423,9 +395,7 @@ async def crocodile_callback(event: events.CallbackQuery.Event):
     match data[1]:
         case "start":
             if await db.database("crocodile_super_game") == 1:
-                return await event.answer(
-                    phrase.crocodile.super_game_here, alert=True
-                )
+                return await event.answer(phrase.crocodile.super_game_here, alert=True)
             if await db.database("current_game") != 0:
                 return await event.answer(phrase.crocodile.no, alert=True)
 
@@ -453,13 +423,9 @@ async def crocodile_callback(event: events.CallbackQuery.Event):
             )
 
             if await db.database("current_game") == 0:
-                return await event.answer(
-                    phrase.crocodile.already_down, alert=True
-                )
+                return await event.answer(phrase.crocodile.already_down, alert=True)
             if await db.database("crocodile_super_game") == 1:
-                return await event.answer(
-                    phrase.crocodile.super_game_here, alert=True
-                )
+                return await event.answer(phrase.crocodile.super_game_here, alert=True)
 
             bets_json = await db.database("crocodile_bets")
             bets = 0
@@ -560,16 +526,8 @@ async def mine_callback(event: events.CallbackQuery.Event):
                 )
                 + phrase.mine.q,
                 buttons=[
-                    [
-                        Button.inline(
-                            phrase.mine.button_yes, f"mine.yes.{sender_id}"
-                        )
-                    ],
-                    [
-                        Button.inline(
-                            phrase.mine.button_no, f"mine.no.{sender_id}"
-                        )
-                    ],
+                    [Button.inline(phrase.mine.button_yes, f"mine.yes.{sender_id}")],
+                    [Button.inline(phrase.mine.button_no, f"mine.no.{sender_id}")],
                 ],
             )
 
@@ -597,9 +555,7 @@ async def hint_callback(event: events.CallbackQuery.Event):
                 int(hint_data["user"]),
                 phrase.newhints.accept.format(
                     word=hint_data["word"],
-                    get=formatter.value_to_str(
-                        config.cfg.HintGift, phrase.currency
-                    ),
+                    get=formatter.value_to_str(config.cfg.HintGift, phrase.currency),
                 ),
             )
             return await event.edit(
@@ -638,14 +594,10 @@ async def simple_antibot(event: events.CallbackQuery.Event):
     await event.answer(phrase.chataction.test_passed)
     await event.delete()
     if not db.hellomsg_check(event.sender_id):
-        return logger.info(
-            f"{event.sender_id} вступил, но приветствие уже было."
-        )
+        return logger.info(f"{event.sender_id} вступил, но приветствие уже было.")
 
     return await client.send_message(
         config.chats.chat,
-        phrase.chataction.hello.format(
-            await func.get_name(event.sender_id)
-        ),
+        phrase.chataction.hello.format(await func.get_name(event.sender_id)),
         link_preview=False,
     )

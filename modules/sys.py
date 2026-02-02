@@ -4,6 +4,7 @@ from time import time
 
 import psutil
 from loguru import logger
+
 from . import config
 
 logger.info(f"Загружен модуль {__name__}!")
@@ -15,7 +16,9 @@ if platform.system() == "Windows":
 
     def get_temperature() -> str:
         temp = WinTmp.CPU_Temps()
-        return f"{round(max(temp))} | {round(sum(temp) / len(temp))} | {round(min(temp))}"
+        return (
+            f"{round(max(temp))} | {round(sum(temp) / len(temp))} | {round(min(temp))}"
+        )
 else:
     logger.info("Система - Linux, использую psutil")
 
@@ -29,26 +32,38 @@ else:
             core_temps = []
 
             if "coretemp" in temps:
-                for entry in temps["coretemp"]:
-                    if (
-                        "core" in entry.label.lower()
-                        or "package" not in entry.label.lower()
-                    ):
-                        core_temps.append(entry.current)
-
-            for sensor_name in ["k10temp", "zenpower", "amdgpu", "nct"]:
-                if sensor_name in temps and not core_temps:
-                    for entry in temps[sensor_name]:
-                        if hasattr(entry, "current"):
-                            core_temps.append(entry.current)
+                core_temps.extend([
+                    entry.current
+                    for entry in temps["coretemp"]
+                    if "core" in entry.label.lower() or "package" not in entry.label.lower()
+                ])
 
             if not core_temps:
-                for sensor_entries in temps.values():
-                    for entry in sensor_entries:
-                        if hasattr(entry, "current"):
-                            core_temps.append(entry.current)
+                for sensor_name in ["k10temp", "zenpower", "amdgpu", "nct"]:
+                    if sensor_name in temps:
+                        core_temps.extend([
+                            entry.current
+                            for entry in temps[sensor_name]
+                            if hasattr(entry, "current")
+                        ])
+                        if core_temps:
+                            break
 
-            return f"{round(max(core_temps))} | {round(sum(core_temps) / len(core_temps))} | {round(min(core_temps))}"
+            if not core_temps:
+                core_temps.extend([
+                    entry.current
+                    for sensor_entries in temps.values()
+                    for entry in sensor_entries
+                    if hasattr(entry, "current")
+                ])
+
+            if not core_temps:
+                return "N/A | N/A | N/A"
+
+            mx = round(max(core_temps))
+            avg = round(sum(core_temps) / len(core_temps))
+            mn = round(min(core_temps))
+            return f"{mx} | {avg} | {mn}"
 
         except Exception as e:
             return f"Ошибка получения: {e}"

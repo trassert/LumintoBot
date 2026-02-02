@@ -37,8 +37,9 @@ async def main():
         tasks,
         webhooks,
     )
+    from modules.telegram import games
     from modules.telegram.client import client as tg
-    from modules.telegram import games #
+
     if sum((await db.database("shop_weight")).values()) != 100:
         logger.error("Сумма процентов в магазине не равна 100!")
 

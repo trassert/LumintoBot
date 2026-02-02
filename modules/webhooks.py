@@ -4,12 +4,12 @@ from hashlib import md5, sha1
 
 import aiohttp
 import aiohttp.web
+from aiohttp.abc import AbstractAccessLogger
 from loguru import logger
 
 from . import config, db, formatter, phrase
 from .telegram import func
 from .telegram.client import client
-from aiohttp.abc import AbstractAccessLogger
 
 logger.info(f"Загружен модуль {__name__}!")
 

@@ -16,7 +16,7 @@ for x in r:
 
 name = "blacksmith"
 
-with open("press_shop.json", "r", encoding="utf-8") as f:
+with open("press_shop.json", encoding="utf-8") as f:
     data = json.load(f)
     data[name] = {}
 

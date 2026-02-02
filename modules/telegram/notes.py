@@ -2,8 +2,8 @@ from loguru import logger
 from telethon.tl.custom import Message
 
 from .. import db, phrase
-from .client import client
 from . import func
+from .client import client
 
 logger.info(f"Загружен модуль {__name__}!")
 
@@ -14,9 +14,7 @@ async def add_note(event: Message):
     roles = db.roles()
     if roles.get(event.sender_id) < roles.VIP:
         return await event.reply(
-            phrase.roles.no_perms.format(
-                level=roles.VIP, name=phrase.roles.vip
-            ),
+            phrase.roles.no_perms.format(level=roles.VIP, name=phrase.roles.vip),
         )
     if (
         db.Notes().create(
@@ -37,9 +35,7 @@ async def add_note_notext(event: Message):
     roles = db.roles()
     if roles.get(event.sender_id) < roles.VIP:
         return await event.reply(
-            phrase.roles.no_perms.format(
-                level=roles.VIP, name=phrase.roles.vip
-            ),
+            phrase.roles.no_perms.format(level=roles.VIP, name=phrase.roles.vip),
         )
     return await event.reply(phrase.notes.notext)
 
@@ -50,9 +46,7 @@ async def add_note_noname(event: Message):
     roles = db.roles()
     if roles.get(event.sender_id) < roles.VIP:
         return await event.reply(
-            phrase.roles.no_perms.format(
-                level=roles.VIP, name=phrase.roles.vip
-            ),
+            phrase.roles.no_perms.format(level=roles.VIP, name=phrase.roles.vip),
         )
     return await event.reply(phrase.notes.noname)
 
@@ -96,9 +90,7 @@ async def del_note(event: Message):
     roles = db.roles()
     if roles.get(event.sender_id) < roles.VIP:
         return await event.reply(
-            phrase.roles.no_perms.format(
-                level=roles.VIP, name=phrase.roles.vip
-            ),
+            phrase.roles.no_perms.format(level=roles.VIP, name=phrase.roles.vip),
         )
     if not db.Notes().remove(event.pattern_match.group(1).strip()):
         return await event.reply(phrase.notes.not_found)

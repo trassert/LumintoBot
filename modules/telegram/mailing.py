@@ -4,8 +4,8 @@ from loguru import logger
 from telethon.tl.custom import Message
 
 from .. import db, phrase
-from .client import client
 from . import func
+from .client import client
 
 logger.info(f"Загружен модуль {__name__}!")
 

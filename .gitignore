@@ -16,8 +16,7 @@ venv
 .env
 .vscode
 uv.lock
-
-map.html
+.ruff_cache
 
 tokens.yml
 chats.yml

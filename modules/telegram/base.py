@@ -1,29 +1,31 @@
 import asyncio
 import re
 from datetime import datetime
-from random import randint, choice
+from random import choice, randint
 from time import time
+
 import aioping
 from loguru import logger
-from telethon import errors as TGErrors
 from telethon import Button
+from telethon import errors as tgerrors
 from telethon.tl import types
 from telethon.tl.custom import Message
 from telethon.tl.functions.users import GetFullUserRequest
+
 from .. import (
     config,
     db,
+    floodwait,
     formatter,
     mcrcon,
+    mining,
     pathes,
     phrase,
     pic,
-    mining,
-    floodwait,
     sys,
 )
-from .client import client
 from . import func
+from .client import client
 
 logger.info(f"Загружен модуль {__name__}!")
 
@@ -34,11 +36,7 @@ logger.info(f"Загружен модуль {__name__}!")
 @func.new_command(r"/ip")
 async def host(event: Message):
     return await event.reply(
-        phrase.server.host.format(
-            v4=await db.database("host"),
-            v6=await db.database("ipv6_host"),
-            hint="https://lumintomc.ru/wiki/info/ipv6",
-        ),
+        phrase.server.host,
         link_preview=False,
     )
 
@@ -217,7 +215,7 @@ async def mine_start(event: Message):
 #             ),
 #             buttons=keyboard,
 #         )
-#     except TGErrors.ButtonDataInvalidError:
+#     except tgerrors.ButtonDataInvalidError:
 #         return await event.reply(phrase.word.long)
 #     return await event.reply(phrase.word.set.format(word=word))
 
@@ -284,7 +282,7 @@ async def mine_start(event: Message):
 #                 buttons=keyboard,
 #             )
 #             text += f"Слово **{word}** - проверяется\n"
-#         except TGErrors.ButtonDataInvalidError:
+#         except tgerrors.ButtonDataInvalidError:
 #             text += f"Слово **{word}** - слишком длинное\n"
 #         await message.edit(text)
 #         await asyncio.sleep(0.5)
@@ -353,7 +351,7 @@ async def check_nick(event: Message):
             return await event.reply(phrase.nick.who)
         return await event.reply(phrase.nick.urnick.format(author_nick))
     nick = db.nicks(id=user).get()
-    await event.reply(
+    return await event.reply(
         phrase.nick.no_nick
         if nick is None
         else phrase.nick.usernick.format(nick)
@@ -613,7 +611,7 @@ async def randompic(event: Message):
 @func.new_command(r"/карта$")
 async def getmap(event: Message):
     return await event.reply(
-        phrase.get_map.format(await db.database("host")),
+        phrase.get_map,
         link_preview=False,
     )
 
@@ -701,7 +699,7 @@ async def cities_request(event: Message):
             phrase.cities.request.format(user=entity, word=word),
             buttons=keyboard,
         )
-    except TGErrors.ButtonDataInvalidError:
+    except tgerrors.ButtonDataInvalidError:
         return await event.reply(phrase.cities.long)
     return await event.reply(phrase.cities.set.format(word=word))
 
@@ -734,7 +732,7 @@ async def cities_requests(event: Message):
             pending.append(word)
         try:
             await message.edit(text)
-        except TGErrors.MessageTooLongError:
+        except tgerrors.MessageTooLongError:
             message = await event.reply(phrase.cities.checker)
         await asyncio.sleep(0.5)
     if not pending:
@@ -767,11 +765,11 @@ async def cities_requests(event: Message):
                 buttons=keyboard,
             )
             text += f"Город **{word}** - проверяется\n"
-        except TGErrors.ButtonDataInvalidError:
+        except tgerrors.ButtonDataInvalidError:
             text += f"Город **{word}** - слишком длинный\n"
         try:
             await message.edit(text)
-        except TGErrors.MessageTooLongError:
+        except tgerrors.MessageTooLongError:
             message = await event.reply(phrase.cities.checker)
         await asyncio.sleep(0.5)
 
@@ -826,7 +824,7 @@ async def cities_remove(event: Message):
 @func.new_command(r"правила$")
 async def rules(event: Message):
     return await event.reply(
-        phrase.rules.base.format(await db.database("host")),
+        phrase.rules.base,
         link_preview=False,
     )
 

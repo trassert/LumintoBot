@@ -4,7 +4,7 @@ from os import path
 from random import choice
 
 from loguru import logger
-from telethon import errors as TGErrors
+from telethon import errors as tgerrors
 from telethon.tl.custom import Message
 from telethon.tl.types import (
     KeyboardButtonCallback,
@@ -13,9 +13,8 @@ from telethon.tl.types import (
 )
 
 from .. import config, db, formatter, pathes, phrase
-from .client import client
 from . import func
-
+from .client import client
 
 logger.info(f"Загружен модуль {__name__}!")
 
@@ -93,7 +92,7 @@ async def state_make(event: Message):
                 ],
             ],
         )
-    except TGErrors.ButtonDataInvalidError:
+    except tgerrors.ButtonDataInvalidError:
         return await event.reply(phrase.state.too_long)
 
 

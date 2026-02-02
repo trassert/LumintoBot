@@ -3,7 +3,7 @@ import time
 from collections.abc import Callable
 from datetime import datetime, timedelta
 from datetime import time as dt_time
-from typing import Any, Literal, Union
+from typing import Any, Literal
 
 import aiofiles
 import orjson
@@ -14,11 +14,11 @@ from . import pathes
 logger.info(f"Загружен модуль {__name__}!")
 
 TaskType = Literal["interval", "daily"]
-TaskParam = Union[int, str]
+TaskParam = int | str
 
 
 class Generator:
-    _instances: dict[str, "Generator"] = {}
+    _instances: dict[str, Generator] = {}
 
     def __init__(self, key_name: str, filename: str = pathes.tasks) -> None:
         self.key_name = key_name

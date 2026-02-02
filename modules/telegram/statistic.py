@@ -2,9 +2,8 @@ from loguru import logger
 from telethon.tl.custom import Message
 
 from .. import chart, config, db, formatter, mcrcon, pathes, phrase
-from .client import client
 from . import func
-
+from .client import client
 
 logger.info(f"Загружен модуль {__name__}!")
 
@@ -50,9 +49,7 @@ async def active_check(event: Message):
     send_chart = (days == 0) or (days >= 7)
     if send_chart:
         chart.create_plot(stat.get_raw())
-        return await client.send_file(
-            event.chat_id, pathes.chart, caption=caption
-        )
+        return await client.send_file(event.chat_id, pathes.chart, caption=caption)
     else:
         return await event.respond(caption)
 
@@ -100,9 +97,7 @@ async def server_top_list(event: Message):
         async with mcrcon.Vanilla as rcon:
             for number in range(1, n + 1):
                 nickname = (
-                    await rcon.send(
-                        f"papi parse --null %PTM_nickname_top_{number}%"
-                    )
+                    await rcon.send(f"papi parse --null %PTM_nickname_top_{number}%")
                 ).strip()
                 playtime = (
                     await rcon.send(
@@ -132,6 +127,4 @@ async def server_top_mine(event: Message):
             f"{n}. {await func.get_name(player[0])} - {formatter.value_to_str(player[1], 'аметист')}"
         )
         n += 1
-    return await event.reply(
-        phrase.stat.mine.format("\n".join(text)), silent=True
-    )
+    return await event.reply(phrase.stat.mine.format("\n".join(text)), silent=True)

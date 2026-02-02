@@ -1,7 +1,7 @@
 import asyncio
-import orjson
-from random import randint, random, choice
+from random import choice, randint, random
 
+import orjson
 from loguru import logger
 from telethon import events
 from telethon.tl.custom import Message
@@ -11,10 +11,9 @@ from telethon.tl.types import (
     ReplyInlineMarkup,
 )
 
-from .. import config, db, formatter, phrase, pathes
+from .. import config, db, formatter, pathes, phrase
 from . import func
 from .client import client
-
 
 logger.info(f"Загружен модуль {__name__}!")
 
@@ -26,8 +25,7 @@ CitiesTimerTask: asyncio.Task = None
 @func.new_command("/casino", chats=config.chats.chat)
 async def casino(event: Message):
     if (event.reply_to_msg_id != config.chats.topics.games) and (
-        getattr(event.reply_to, "reply_to_top_id", None)
-        != config.chats.topics.games
+        getattr(event.reply_to, "reply_to_top_id", None) != config.chats.topics.games
     ):
         return await event.reply(phrase.game_topic_warning)
     keyboard = [
@@ -51,8 +49,7 @@ async def crocodile(event: Message):
     if event.chat_id != config.chats.chat:
         return await event.reply(phrase.crocodile.chat)
     if (event.reply_to_msg_id != config.chats.topics.games) and (
-        getattr(event.reply_to, "reply_to_top_id", None)
-        != config.chats.topics.games
+        getattr(event.reply_to, "reply_to_top_id", None) != config.chats.topics.games
     ):
         return await event.reply(phrase.game_topic_warning)
     if await db.database("current_game") == 0:
@@ -92,8 +89,7 @@ async def crocodile(event: Message):
 @func.new_command(r"/крокоставка(.*)")
 async def crocodile_bet(event: Message):
     if (event.reply_to_msg_id != config.chats.topics.games) and (
-        getattr(event.reply_to, "reply_to_top_id", None)
-        != config.chats.topics.games
+        getattr(event.reply_to, "reply_to_top_id", None) != config.chats.topics.games
     ):
         return await event.reply(phrase.game_topic_warning)
     try:
@@ -134,9 +130,7 @@ async def crocodile_bet(event: Message):
     all_bets[str(event.sender_id)] = bet
     await db.database("crocodile_bets", all_bets)
     return await event.reply(
-        phrase.crocodile.bet.format(
-            formatter.value_to_str(bet, phrase.currency)
-        ),
+        phrase.crocodile.bet.format(formatter.value_to_str(bet, phrase.currency)),
     )
 
 
@@ -182,8 +176,7 @@ async def super_game(event: Message):
 
 async def crocodile_handler(event: Message):
     if (event.reply_to_msg_id != config.chats.topics.games) and (
-        getattr(event.reply_to, "reply_to_top_id", None)
-        != config.chats.topics.games
+        getattr(event.reply_to, "reply_to_top_id", None) != config.chats.topics.games
     ):
         return None
     text = event.text.strip().lower()
@@ -265,8 +258,7 @@ async def crocodile_handler(event: Message):
 
 async def crocodile_hint(event: Message):
     if (event.reply_to_msg_id != config.chats.topics.games) and (
-        getattr(event.reply_to, "reply_to_top_id", None)
-        != config.chats.topics.games
+        getattr(event.reply_to, "reply_to_top_id", None) != config.chats.topics.games
     ):
         return await event.reply(phrase.game_topic_warning)
     game = await db.database("current_game")
@@ -384,8 +376,7 @@ async def cities_timeout(current_player: int, last_city: str):
 async def cities_answer(event: Message) -> None:
     # We make deco and it doesn't used probably all the time?
     if (event.reply_to_msg_id != config.chats.topics.games) and (
-        getattr(event.reply_to, "reply_to_top_id", None)
-        != config.chats.topics.games
+        getattr(event.reply_to, "reply_to_top_id", None) != config.chats.topics.games
     ):
         return
     if event.text.startswith("/"):
@@ -450,9 +441,7 @@ async def cities_callback(event: events.CallbackQuery.Event):
         db.add_money(event.sender_id, -config.cfg.PriceForCities)
         await event.answer(
             phrase.cities.set_ingame.format(
-                formatter.value_to_str(
-                    config.cfg.PriceForCities, phrase.currency
-                ),
+                formatter.value_to_str(config.cfg.PriceForCities, phrase.currency),
             ),
         )
 
@@ -521,8 +510,7 @@ async def cities_start(event: Message):
     if event.chat_id != config.chats.chat:
         return await event.reply(phrase.cities.chat)
     if (event.reply_to_msg_id != config.chats.topics.games) and (
-        getattr(event.reply_to, "reply_to_top_id", None)
-        != config.chats.topics.games
+        getattr(event.reply_to, "reply_to_top_id", None) != config.chats.topics.games
     ):
         return await event.reply(phrase.game_topic_warning)
     if len(Cities.get_players()) > 0 or Cities.get_game_status():

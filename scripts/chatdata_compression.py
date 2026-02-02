@@ -1,6 +1,7 @@
-import orjson
 import glob
 import os
+
+import orjson
 
 
 def sizeof_fmt(num, suffix="B"):
@@ -23,6 +24,3 @@ for path in glob.glob("/media/server/LumintoBot/db/chat_stats/*.json"):
     total_saved += saved
     with open(path, "wb") as f:
         f.write(compact)
-    print(f"{path} сжат на {saved} байт")
-
-print(f"\nВсего высвобождено: {total_saved} байт ({sizeof_fmt(total_saved)})")

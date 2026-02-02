@@ -1,9 +1,9 @@
 from loguru import logger
-from telethon import events, Button
+from telethon import Button, events
 
 from .. import config, formatter, phrase
-from .client import client
 from . import func
+from .client import client
 
 logger.info(f"Загружен модуль {__name__}!")
 
@@ -36,10 +36,6 @@ async def chat_action(event: events.ChatAction.Event):
             config.chats.chat,
             phrase.chataction.test.format(user_name),
             buttons=[
-                [
-                    Button.inline(
-                        phrase.chataction.test_btn, f"test.{event.user_id}"
-                    )
-                ],
+                [Button.inline(phrase.chataction.test_btn, f"test.{event.user_id}")],
             ],
         )

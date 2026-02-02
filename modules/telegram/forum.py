@@ -1,10 +1,10 @@
+from loguru import logger
 from telethon.tl import functions
 from telethon.tl.custom import Message
 
-from loguru import logger
-from .client import client
 from .. import config, phrase
 from . import func
+from .client import client
 
 logger.info(f"Загружен модуль {__name__}!")
 
@@ -25,8 +25,6 @@ async def create_topic(event: Message):
         )
         topic_id = result.updates[0].id
         link = f"https://t.me/c/{str(config.chats.forum)[4:]}/{topic_id}"
-        await event.reply(
-            phrase.forum.topic_created.format(link=link, title=title)
-        )
+        await event.reply(phrase.forum.topic_created.format(link=link, title=title))
     except Exception:
         logger.exception("Ошибка создания топика")

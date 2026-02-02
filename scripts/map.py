@@ -1,14 +1,13 @@
-import folium
-import aiohttp
-import random
-import asyncmy
-import socket
 import asyncio
 import json
-import sys
 import os
+import random
+import socket
+import sys
 
-
+import aiohttp
+import asyncmy
+import folium  # type: ignore
 from loguru import logger
 
 logger.remove()
@@ -24,7 +23,6 @@ logger.add(
 sys.path.append(os.path.join(os.path.dirname(__file__), ".."))
 
 from modules.config import tokens  # noqa: E402
-
 
 ipinfo = "https://ipinfo.io/{}/json"
 ip_api = "http://ip-api.com/json/{}"
@@ -58,11 +56,10 @@ class MapSQL:
 
     async def get(self):
         query = f"SELECT * FROM {self.table}"
-        async with self.pool.acquire() as conn:
-            async with conn.cursor() as cursor:
-                await cursor.execute(query)
-                result = await cursor.fetchall()
-                return result
+        async with self.pool.acquire() as conn, conn.cursor() as cursor:
+            await cursor.execute(query)
+            result = await cursor.fetchall()
+            return result
 
 
 def randomize_coordinates(data, max_offset=0.02):
@@ -99,9 +96,8 @@ async def get_loc(ip_address: str):
                 async with session.get(ipinfo.format(ip)) as response:
                     info = await response.json()
                     logger.info(info)
-                    if "status" in info:
-                        if info["status"] == 404:
-                            raise ValueError
+                    if "status" in info and info["status"] == 404:
+                        raise ValueError
                     location = info.get("loc")
                     latitude, longitude = location.split(",")
                     return [float(latitude), float(longitude)]

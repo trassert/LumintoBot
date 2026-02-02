@@ -1,10 +1,10 @@
 import re
 
 from loguru import logger
+from telethon import errors as tgerrors
 from telethon import events
-from telethon.tl.functions.users import GetFullUserRequest
 from telethon.tl.custom import Message
-from telethon import errors as TGErrors
+from telethon.tl.functions.users import GetFullUserRequest
 
 from .. import db, phrase
 from .client import client
@@ -117,12 +117,14 @@ async def get_author_by_msgid(chat_id: int, msg_id: int) -> int | None:
 
 async def swap_resolve_recipient(event: Message, args: list[str]) -> int | None:
     """Возвращает ID получателя или None."""
-    if len(args) > 1:
-        try:
-            user = await client(GetFullUserRequest(args[1]))
-            return user.full_user.id
-        except (TypeError, ValueError, TGErrors.UserError):
-            pass
+    if not len(args) > 1:
+        return None
+    try:
+        user = await client(GetFullUserRequest(args[1]))
+    except (TypeError, ValueError, tgerrors.UserError):
+        pass
+    else:
+        return user.full_user.id
 
     msg_id = get_reply_message_id(event)
     if msg_id:
@@ -132,14 +134,13 @@ async def swap_resolve_recipient(event: Message, args: list[str]) -> int | None:
 
 async def checks(event: Message | events.CallbackQuery.Event) -> bool:
     roles = db.roles()
-    if event.is_private:
-        if not isinstance(event, events.CallbackQuery.Event):
-            name = await get_name(event.sender_id, log=True)
-            (
-                logger.info(f"ЛС - {name} > {event.text}")
-                if len(event.text) < 100
-                else logger.info(f"ЛС - {name} > {event.text[:100]}...")
-            )
+    if event.is_private and not isinstance(event, events.CallbackQuery.Event):
+        name = await get_name(event.sender_id, log=True)
+        (
+            logger.info(f"ЛС - {name} > {event.text}")
+            if len(event.text) < 100
+            else logger.info(f"ЛС - {name} > {event.text[:100]}...")
+        )
     if roles.get(event.sender_id) != roles.BLACKLIST:
         return True
     if isinstance(event, events.CallbackQuery.Event):
