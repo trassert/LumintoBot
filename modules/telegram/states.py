@@ -1,6 +1,5 @@
 import asyncio
 import re
-from os import path
 from random import choice
 
 from loguru import logger
@@ -199,7 +198,7 @@ async def state_get(event: Message):
         enter = formatter.value_to_str(state.price, phrase.currency)
     tasks = [func.get_name(player, minecraft=True) for player in state.players]
     idented_players = await asyncio.gather(*tasks)
-    pic_path = path.join(pathes.states_pic, f"{state_name}.png")
+    pic_path = pathes.states_pic / f"{state_name}.png"
     return await client.send_message(
         event.chat_id,
         phrase.state.get.format(
@@ -217,7 +216,7 @@ async def state_get(event: Message):
         reply_to=event.id,
         link_preview=False,
         silent=True,
-        file=pic_path if path.exists(pic_path) else None,
+        file=pic_path if pic_path.exists() else None,
     )
 
 
@@ -614,6 +613,6 @@ async def state_pic(event: Message):
     if not event.photo:
         return await event.reply(phrase.state.no_pic)
     await event.download_media(
-        file=path.join(pathes.states_pic, f"{state_name}.png"),
+        file=pathes.states_pic / f"{state_name}.png",
     )
     return await event.reply(phrase.state.pic_set)

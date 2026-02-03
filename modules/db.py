@@ -1,6 +1,6 @@
 from collections import defaultdict
 from datetime import datetime, timedelta
-from os import listdir, makedirs, path, remove, replace
+from pathlib import Path
 from random import choice, randint
 from time import time
 from typing import TypedDict
@@ -10,13 +10,12 @@ import asyncmy
 import orjson
 from loguru import logger
 
-from . import config, formatter, pathes
-from .get_theme import weighted_choice
+from . import config, formatter, get_theme, pathes
 
 logger.info(f"Загружен модуль {__name__}!")
 
 
-def _load_json_sync(filepath: str) -> dict:
+def _load_json_sync(filepath: Path) -> dict:
     """Загружает JSON файл синхронно. Возвращает {} при ошибке."""
     try:
         with open(filepath, "rb") as f:
@@ -28,10 +27,10 @@ def _load_json_sync(filepath: str) -> dict:
 
 
 def _save_json_sync(
-    filepath: str, data: dict, sort_keys: bool = False, indent: bool = False
+    filepath: Path, data: dict, sort_keys: bool = False, indent: bool = False
 ):
     """Сохраняет JSON файл синхронно."""
-    makedirs(path.dirname(filepath), exist_ok=True)
+    filepath.parent.mkdir(parents=True, exist_ok=True)
     options = 0
     if sort_keys:
         options |= orjson.OPT_SORT_KEYS
@@ -41,7 +40,7 @@ def _save_json_sync(
         f.write(orjson.dumps(data, option=options))
 
 
-async def _load_json_async(filepath: str) -> dict:
+async def _load_json_async(filepath: Path) -> dict:
     """Загружает JSON файл асинхронно. Возвращает {} при ошибке."""
     try:
         async with aiofiles.open(filepath, "rb") as f:
@@ -53,10 +52,10 @@ async def _load_json_async(filepath: str) -> dict:
 
 
 async def _save_json_async(
-    filepath: str, data: dict, sort_keys: bool = False, indent: bool = False
+    filepath: Path, data: dict, sort_keys: bool = False, indent: bool = False
 ):
     """Сохраняет JSON файл асинхронно."""
-    makedirs(path.dirname(filepath), exist_ok=True)
+    filepath.parent.mkdir(parents=True, exist_ok=True)
     options = 0
     if sort_keys:
         options |= orjson.OPT_SORT_KEYS
@@ -133,7 +132,7 @@ async def update_shop():
     new_theme = last_theme
     weights = await database("shop_weight")
     while new_theme == last_theme:
-        new_theme = weighted_choice(theme_names, weights)
+        new_theme = get_theme.weighted_choice(theme_names, weights)
 
     theme_items = all_themes[new_theme]
     item_names = list(theme_items.keys())
@@ -157,7 +156,9 @@ async def update_shop():
             min_p, max_p = price
             item_data["price"] = randint(min_p, max_p)
         elif not isinstance(price, (int, float)):
-            logger.exception(f"Некорректный формат цены для предмета '{item}': {price}")
+            logger.exception(
+                f"Некорректный формат цены для предмета '{item}': {price}"
+            )
         current_shop[item] = item_data
 
     _save_json_sync(pathes.shopc, current_shop, indent=True)
@@ -226,7 +227,9 @@ class crocodile_stat:
 
     def get_all(self=False):
         data = _load_json_sync(pathes.crocostat)
-        return dict(sorted(data.items(), key=lambda item: item[1], reverse=True))
+        return dict(
+            sorted(data.items(), key=lambda item: item[1], reverse=True)
+        )
 
 
 class nicks:
@@ -269,8 +272,8 @@ class statistic:
         self.days = days
 
     def get(self, nick, all_days=False, data=False):
-        filepath = path.join(pathes.stats, f"{nick}.json")
-        if not path.exists(filepath):
+        filepath = pathes.stats / f"{nick}.json"
+        if not filepath.exists():
             stats = {datetime.now().strftime("%Y.%m.%d"): 0}
             _save_json_sync(filepath, stats, sort_keys=True)
             return 0
@@ -289,10 +292,10 @@ class statistic:
 
     def get_all(self, all_days=False):
         data = {}
-        for file in listdir(pathes.stats):
-            if not file.endswith(".json"):
+        for file in pathes.stats.iterdir():
+            if not file.suffix == ".json":
                 continue
-            nick = file[:-5]
+            nick = file.stem
             nick_stat = self.get(nick, all_days=all_days)
             if nick_stat > 1:
                 data[nick] = nick_stat
@@ -300,23 +303,23 @@ class statistic:
 
     def add(self, date=None):
         now = date or datetime.now().strftime("%Y.%m.%d")
-        filepath = path.join(pathes.stats, f"{self}.json")
+        filepath = pathes.stats / f"{self}.json"
         stats = _load_json_sync(filepath)
         stats[now] = stats.get(now, 0) + 1
         _save_json_sync(filepath, stats, sort_keys=True)
 
     def get_raw(self) -> dict[str, int]:
         totals = defaultdict(int)
-        for json_file in listdir(pathes.stats):
-            if not json_file.endswith(".json"):
+        for json_file in pathes.stats.iterdir():
+            if not json_file.suffix == ".json":
                 continue
-            filepath = path.join(pathes.stats, json_file)
+            filepath = json_file
             try:
                 data = _load_json_sync(filepath)
                 for date, count in data.items():
                     totals[date] += count
             except Exception:
-                logger.error(f"Ошибка при чтении файла - {json_file}")
+                logger.error(f"Ошибка при чтении файла - {json_file.name}")
                 continue
 
         if self.days <= 0:
@@ -333,7 +336,7 @@ class statistic:
 class ticket:
     def get(self):
         self = str(self)
-        if not path.exists(pathes.tickets):
+        if not pathes.tickets.exists():
             _save_json_sync(pathes.tickets, {})
             return None
         data = _load_json_sync(pathes.tickets)
@@ -364,7 +367,7 @@ class state:
         self._info()
 
     def _info(self):
-        data = _load_json_sync(path.join(pathes.states, f"{self.name}.json"))
+        data = _load_json_sync(pathes.states / f"{self.name}.json")
         self.all = data
         self.price = data["price"]
         self.enter = data["enter"]
@@ -379,24 +382,22 @@ class state:
     def change(self, key, value):
         self.all[key] = value
         _save_json_sync(
-            path.join(pathes.states, f"{self.name}.json"), self.all, indent=True
+            pathes.states / f"{self.name}.json", self.all, indent=True
         )
 
     def rename(self, new_name: str):
-        if path.exists(path.join(pathes.states, f"{new_name}.json")):
+        new_path = pathes.states / f"{new_name}.json"
+        if new_path.exists():
             return False
-        replace(
-            path.join(pathes.states, f"{self.name}.json"),
-            path.join(pathes.states, f"{new_name}.json"),
-        )
+        (pathes.states / f"{self.name}.json").rename(new_path)
         self.name = new_name
         self._info()
 
 
 class states:
     def add(self, author):
-        filepath = path.join(pathes.states, f"{self}.json")
-        if path.exists(filepath):
+        filepath = pathes.states / f"{self}.json"
+        if filepath.exists():
             return None
         data = {
             "price": 0,
@@ -413,18 +414,18 @@ class states:
         return True
 
     def check(self):
-        return path.exists(path.join(pathes.states, f"{self}.json"))
+        return (pathes.states / f"{self}.json").exists()
 
     def get_all(self="players"):
         all_data = {}
-        for file in listdir(pathes.states):
-            if not file.endswith(".json"):
+        for file in pathes.states.iterdir():
+            if not file.suffix == ".json":
                 continue
-            name = file[:-5]
+            name = file.stem
             try:
-                all_data[name] = _load_json_sync(path.join(pathes.states, file))
+                all_data[name] = _load_json_sync(file)
             except Exception:
-                logger.error(f"Не удалось просмотреть гос-во {file}")
+                logger.error(f"Не удалось просмотреть гос-во {file.name}")
         if self == "money":
 
             def key_func(item):
@@ -437,34 +438,34 @@ class states:
         return dict(sorted(all_data.items(), key=key_func, reverse=True))
 
     def if_author(self: int):
-        for file in listdir(pathes.states):
-            if not file.endswith(".json"):
+        for file in pathes.states.iterdir():
+            if not file.suffix == ".json":
                 continue
-            data = _load_json_sync(path.join(pathes.states, file))
+            data = _load_json_sync(file)
             if data["author"] == self:
-                return file[:-5]
+                return file.stem
         return False
 
     def if_player(self: int):
-        for file in listdir(pathes.states):
-            if not file.endswith(".json"):
+        for file in pathes.states.iterdir():
+            if not file.suffix == ".json":
                 continue
-            data = _load_json_sync(path.join(pathes.states, file))
+            data = _load_json_sync(file)
             if self in data["players"]:
-                return file[:-5]
+                return file.stem
         return False
 
     def find(self: str) -> bool:
-        return path.exists(path.join(pathes.states, f"{self}.json"))
+        return (pathes.states / f"{self}.json").exists()
 
     def remove(self: str) -> bool:
-        state_path = path.join(pathes.states, f"{self}.json")
-        if not path.exists(state_path):
+        state_path = pathes.states / f"{self}.json"
+        if not state_path.exists():
             return False
-        pic_path = path.join(pathes.states_pic, f"{self}.png")
-        if path.exists(pic_path):
-            replace(pic_path, path.join(pathes.old_states, f"{self}.png"))
-        replace(state_path, path.join(pathes.old_states, f"{self}.json"))
+        pic_path = pathes.states_pic / f"{self}.png"
+        if pic_path.exists():
+            pic_path.rename(pathes.old_states / f"{self}.png")
+        state_path.rename(pathes.old_states / f"{self}.json")
         return True
 
 
@@ -556,22 +557,22 @@ Users = Mysql(
 
 class Notes:
     def __init__(self, storage_dir=pathes.notes):
-        self.storage_dir = storage_dir
-        makedirs(storage_dir, exist_ok=True)
+        self.storage_dir = Path(storage_dir)
+        self.storage_dir.mkdir(parents=True, exist_ok=True)
 
     def _get_file_path(self, name):
-        return path.join(self.storage_dir, f"{name}.txt")
+        return self.storage_dir / f"{name}.txt"
 
     def get(self, name: str):
         file_path = self._get_file_path(name.lower())
-        if not path.exists(file_path):
+        if not file_path.exists():
             return None
         with open(file_path, encoding="utf8") as f:
             return f.read()
 
     def create(self, name: str, text: str):
         file_path = self._get_file_path(name.lower())
-        if path.exists(file_path):
+        if file_path.exists():
             return False
         with open(file_path, "w", encoding="utf8") as f:
             f.write(text)
@@ -579,19 +580,15 @@ class Notes:
 
     def remove(self, name: str):
         file_path = self._get_file_path(name.lower())
-        if not path.exists(file_path):
+        if not file_path.exists():
             return False
-        remove(file_path)
+        file_path.unlink()
         return True
 
     def get_all(self) -> list[str]:
-        if not path.exists(self.storage_dir):
+        if not self.storage_dir.exists():
             return []
-        return [
-            path.splitext(f)[0]
-            for f in listdir(self.storage_dir)
-            if path.isfile(path.join(self.storage_dir, f))
-        ]
+        return [f.stem for f in self.storage_dir.iterdir() if f.is_file()]
 
 
 def check_withdraw_limit(id: int, amount: int) -> int | bool:
@@ -644,9 +641,9 @@ class RefCodes:
 
     async def add_uses(self, id: int, who_used: int):
         load = await self._read()
-        load[str(id)]["used"] = (
-            load.get(str(id), {}).get("used", []).append(str(who_used))
-        )
+        used_list = load.get(str(id), {}).get("used", [])
+        used_list.append(str(who_used))
+        load[str(id)]["used"] = used_list
         await self._write(load)
 
     async def check_ref(self, name) -> str:
@@ -684,7 +681,7 @@ class CitiesGame:
         self.data = self._load_data()
 
     def _load_data(self) -> dict:
-        if path.exists(self.data_file):
+        if self.data_file.exists():
             return _load_json_sync(self.data_file)
         return {
             "current_game": {
@@ -725,7 +722,9 @@ class CitiesGame:
 
     def who_answer(self) -> int | None:
         players = self.get_players()
-        return self.data["current_game"]["current_player_id"] if players else None
+        return (
+            self.data["current_game"]["current_player_id"] if players else None
+        )
 
     def next_answer(self):
         players = self.get_players()
@@ -769,14 +768,18 @@ class CitiesGame:
         self._save_data()
 
     def start_game(self):
-        city = choice(open(pathes.chk_city, encoding="utf8").read().splitlines())
+        city = choice((pathes.chk_city).read_text(encoding="utf8").splitlines())
         self.data["id"] = (self.data.get("id", 0) + 1) % 10 or 1
         self.data["status"] = True
         self.data["current_game"]["last_city"] = city
-        self.data["current_game"]["current_player_id"] = choice(self.get_players())
+        self.data["current_game"]["current_player_id"] = choice(
+            self.get_players()
+        )
         self.logger(f"Запущена игра Города. Начинается с города {city}")
         self.logger(f"Игроки: {self.get_players()}")
-        self.logger(f"Отвечает: {self.data['current_game']['current_player_id']}")
+        self.logger(
+            f"Отвечает: {self.data['current_game']['current_player_id']}"
+        )
         self._save_data()
         return self.data
 
@@ -789,7 +792,9 @@ class CitiesGame:
         if str(id) != str(self.data["current_game"]["current_player_id"]):
             self.logger(f"{id} сейчас не должен отвечать")
             return 2
-        valid_cities = set(open(pathes.chk_city, encoding="utf8").read().splitlines())
+        valid_cities = set(
+            (pathes.chk_city).read_text(encoding="utf8").splitlines()
+        )
         if city not in valid_cities:
             self.logger(f"{id} ответил неизвестным городом")
             return 1
@@ -803,7 +808,9 @@ class CitiesGame:
             self.logger(f"{id} ответил городом, который был")
             return 5
         self.data["current_game"]["last_city"] = city
-        self.data["statistics"][str(id)] = self.data["statistics"].get(str(id), 0) + 1
+        self.data["statistics"][str(id)] = (
+            self.data["statistics"].get(str(id), 0) + 1
+        )
         self.data["current_game"]["cities"].append(city)
         self.next_answer()
         self._save_data()
@@ -863,7 +870,9 @@ async def get_crocodile_word() -> str:
     return choice(list(words))
 
 
-async def add_pending_hint(user_id: int | str, hint_string: str, word: str) -> int:
+async def add_pending_hint(
+    user_id: int | str, hint_string: str, word: str
+) -> int:
     data = await _load_json_async(pathes.pending_hints)
     pending_id = max((int(k) for k in data), default=0) + 1
     data[str(pending_id)] = {
@@ -929,7 +938,9 @@ class Item(TypedDict):
     price: int
 
 
-async def add_item(id: str, author_id: int, item: str, count: int, price: int) -> None:
+async def add_item(
+    id: str, author_id: int, item: str, count: int, price: int
+) -> None:
     """Добавляет новый товар по ID. Перезаписывает, если уже существует."""
     data = await _load_json_async(pathes.items)
     data[str(id)] = {

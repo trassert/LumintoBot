@@ -1,53 +1,61 @@
-from os import path
+from pathlib import Path
 
 from loguru import logger
 
 logger.info(f"Загружен модуль {__name__}!")
 
-crocoall = path.join("db", "crocodile", "all.txt")
-crocobl = path.join("db", "crocodile", "blacklist.txt")
-crocomap = path.join("db", "crocodile", "mappings.json")
+# Конфиг
+config = Path("configs")
 
-pending_hints = path.join("db", "crocodile", "pending_hints.json")
+# Директории и файлы в db/crocodile/
+crocoall = Path("db") / "crocodile" / "all.txt"
+crocobl = Path("db") / "crocodile" / "blacklist.txt"
+crocomap = Path("db") / "crocodile" / "mappings.json"
+pending_hints = Path("db") / "crocodile" / "pending_hints.json"
 
-mine = path.join("db", "timings", "mine.json")
+# Директория timings
+mine = Path("db") / "timings" / "mine.json"
 
-roles = path.join("db", "users", "roles.json")
-money = path.join("db", "users", "money.json")
-nick = path.join("db", "users", "nicks.json")
-wdraw = path.join("db", "users", "withdraws.json")
-ref = path.join("db", "users", "ref.json")
-crocostat = path.join("db", "users", "crocodile_stat.json")
-hellomsg = path.join("db", "users", "hellomsg.json")
-votes = path.join("db", "users", "votes.json")
-mine_stat = path.join("db", "users", "mine.json")
+# Директория users
+roles = Path("db") / "users" / "roles.json"
+money = Path("db") / "users" / "money.json"
+nick = Path("db") / "users" / "nicks.json"
+wdraw = Path("db") / "users" / "withdraws.json"
+ref = Path("db") / "users" / "ref.json"
+crocostat = Path("db") / "users" / "crocodile_stat.json"
+hellomsg = Path("db") / "users" / "hellomsg.json"
+votes = Path("db") / "users" / "votes.json"
+mine_stat = Path("db") / "users" / "mine.json"
 
-items = path.join("db", "items.json")
-tickets = path.join("db", "tickets.json")
-mailing = path.join("db", "mailing.json")
-tasks = path.join("db", "tasks.json")
-embeddings = path.join("db", "embeddings.json")
-data = path.join("db", "data.json")
-shopc = path.join("db", "shop_current.json")
-shop = path.join("db", "shop_all.json")
+# Корневые файлы в db/
+items = Path("db") / "items.json"
+tickets = Path("db") / "tickets.json"
+mailing = Path("db") / "mailing.json"
+tasks = Path("db") / "tasks.json"
+embeddings = Path("db") / "embeddings.json"
+data = Path("db") / "data.json"
+shopc = Path("db") / "shop_current.json"
+shop = Path("db") / "shop_all.json"
 
-cities = path.join("db", "cities", "game.json")
-chk_city = path.join("db", "cities", "cities.txt")
-bl_city = path.join("db", "cities", "blacklist.txt")
+# Директория cities
+cities = Path("db") / "cities" / "game.json"
+chk_city = Path("db") / "cities" / "cities.txt"
+bl_city = Path("db") / "cities" / "blacklist.txt"
 
-bot = path.join("db", "bot")
-states = path.join("db", "states")
-times = path.join("db", "time")
-notes = path.join("db", "notes")
-stats = path.join("db", "chat_stats")
-shop_log = path.join("log", "shop")
+# Директории
+bot = Path("db") / "bot"
+states = Path("db") / "states"
+times = Path("db") / "time"
+notes = Path("db") / "notes"
+stats = Path("db") / "chat_stats"
+shop_log = Path("log") / "shop"
 
-old_states = path.join("backup", "states")
+old_states = Path("backup") / "states"
 
-font = path.join("fonts", "minecraft.ttf")
+font = Path("fonts") / "minecraft.ttf"
 
-chart = path.join("charts", "chart.png")
+chart = Path("charts") / "chart.png"
 
-states_pic = path.join("images", "states")
+states_pic = Path("images") / "states"
 
-pic = "images"
+pic = Path("images")

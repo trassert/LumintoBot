@@ -1,5 +1,4 @@
-import glob
-import os
+from pathlib import Path
 
 import orjson
 
@@ -13,14 +12,13 @@ def sizeof_fmt(num, suffix="B"):
 
 
 total_saved = 0
+stats_dir = Path("/media/server/LumintoBot/db/chat_stats")
 
-for path in glob.glob("/media/server/LumintoBot/db/chat_stats/*.json"):
-    orig_size = os.path.getsize(path)
-    with open(path, "rb") as f:
-        data = orjson.loads(f.read())
+for path in stats_dir.glob("*.json"):
+    orig_size = path.stat().st_size
+    data = orjson.loads(path.read_bytes())
     compact = orjson.dumps(data)
     new_size = len(compact)
     saved = orig_size - new_size
     total_saved += saved
-    with open(path, "wb") as f:
-        f.write(compact)
+    path.write_bytes(compact)
