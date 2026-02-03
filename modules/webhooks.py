@@ -108,7 +108,7 @@ async def server():
             return aiohttp.web.Response(text="Неверный пароль.", status=401)
         nick = request.query.get("nick")
         # message = request.query.get('message') Для будущих нужд
-        db.statistic.add(nick=nick)
+        db.statistic.add(nick)
         logger.debug(f"+ соо. от {nick}")
         return aiohttp.web.Response(text="ok")
 

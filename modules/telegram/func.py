@@ -118,19 +118,16 @@ async def get_author_by_msgid(chat_id: int, msg_id: int) -> int | None:
 async def swap_resolve_recipient(event: Message, args: list[str]) -> int | None:
     """Возвращает ID получателя или None."""
     if not len(args) > 1:
-        return None
-    try:
-        user = await client(GetFullUserRequest(args[1]))
-    except (TypeError, ValueError, tgerrors.UserError):
-        pass
+        msg_id = get_reply_message_id(event)
+        if msg_id:
+            return await get_author_by_msgid(event.chat_id, msg_id)
     else:
-        return user.full_user.id
-
-    msg_id = get_reply_message_id(event)
-    if msg_id:
-        return await get_author_by_msgid(event.chat_id, msg_id)
-    return None
-
+        try:
+            user = await client(GetFullUserRequest(args[1]))
+        except (TypeError, ValueError, tgerrors.UserError):
+            pass
+        else:
+            return user.full_user.id
 
 async def checks(event: Message | events.CallbackQuery.Event) -> bool:
     roles = db.roles()
