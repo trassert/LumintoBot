@@ -129,6 +129,7 @@ async def swap_resolve_recipient(event: Message, args: list[str]) -> int | None:
         else:
             return user.full_user.id
 
+
 async def checks(event: Message | events.CallbackQuery.Event) -> bool:
     roles = db.roles()
     if event.is_private and not isinstance(event, events.CallbackQuery.Event):

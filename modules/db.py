@@ -156,9 +156,7 @@ async def update_shop():
             min_p, max_p = price
             item_data["price"] = randint(min_p, max_p)
         elif not isinstance(price, (int, float)):
-            logger.exception(
-                f"Некорректный формат цены для предмета '{item}': {price}"
-            )
+            logger.exception(f"Некорректный формат цены для предмета '{item}': {price}")
         current_shop[item] = item_data
 
     _save_json_sync(pathes.shopc, current_shop, indent=True)
@@ -227,9 +225,7 @@ class crocodile_stat:
 
     def get_all(self=False):
         data = _load_json_sync(pathes.crocostat)
-        return dict(
-            sorted(data.items(), key=lambda item: item[1], reverse=True)
-        )
+        return dict(sorted(data.items(), key=lambda item: item[1], reverse=True))
 
 
 class nicks:
@@ -381,9 +377,7 @@ class state:
 
     def change(self, key, value):
         self.all[key] = value
-        _save_json_sync(
-            pathes.states / f"{self.name}.json", self.all, indent=True
-        )
+        _save_json_sync(pathes.states / f"{self.name}.json", self.all, indent=True)
 
     def rename(self, new_name: str):
         new_path = pathes.states / f"{new_name}.json"
@@ -722,9 +716,7 @@ class CitiesGame:
 
     def who_answer(self) -> int | None:
         players = self.get_players()
-        return (
-            self.data["current_game"]["current_player_id"] if players else None
-        )
+        return self.data["current_game"]["current_player_id"] if players else None
 
     def next_answer(self):
         players = self.get_players()
@@ -772,14 +764,10 @@ class CitiesGame:
         self.data["id"] = (self.data.get("id", 0) + 1) % 10 or 1
         self.data["status"] = True
         self.data["current_game"]["last_city"] = city
-        self.data["current_game"]["current_player_id"] = choice(
-            self.get_players()
-        )
+        self.data["current_game"]["current_player_id"] = choice(self.get_players())
         self.logger(f"Запущена игра Города. Начинается с города {city}")
         self.logger(f"Игроки: {self.get_players()}")
-        self.logger(
-            f"Отвечает: {self.data['current_game']['current_player_id']}"
-        )
+        self.logger(f"Отвечает: {self.data['current_game']['current_player_id']}")
         self._save_data()
         return self.data
 
@@ -792,9 +780,7 @@ class CitiesGame:
         if str(id) != str(self.data["current_game"]["current_player_id"]):
             self.logger(f"{id} сейчас не должен отвечать")
             return 2
-        valid_cities = set(
-            (pathes.chk_city).read_text(encoding="utf8").splitlines()
-        )
+        valid_cities = set((pathes.chk_city).read_text(encoding="utf8").splitlines())
         if city not in valid_cities:
             self.logger(f"{id} ответил неизвестным городом")
             return 1
@@ -808,9 +794,7 @@ class CitiesGame:
             self.logger(f"{id} ответил городом, который был")
             return 5
         self.data["current_game"]["last_city"] = city
-        self.data["statistics"][str(id)] = (
-            self.data["statistics"].get(str(id), 0) + 1
-        )
+        self.data["statistics"][str(id)] = self.data["statistics"].get(str(id), 0) + 1
         self.data["current_game"]["cities"].append(city)
         self.next_answer()
         self._save_data()
@@ -870,9 +854,7 @@ async def get_crocodile_word() -> str:
     return choice(list(words))
 
 
-async def add_pending_hint(
-    user_id: int | str, hint_string: str, word: str
-) -> int:
+async def add_pending_hint(user_id: int | str, hint_string: str, word: str) -> int:
     data = await _load_json_async(pathes.pending_hints)
     pending_id = max((int(k) for k in data), default=0) + 1
     data[str(pending_id)] = {
@@ -938,9 +920,7 @@ class Item(TypedDict):
     price: int
 
 
-async def add_item(
-    id: str, author_id: int, item: str, count: int, price: int
-) -> None:
+async def add_item(id: str, author_id: int, item: str, count: int, price: int) -> None:
     """Добавляет новый товар по ID. Перезаписывает, если уже существует."""
     data = await _load_json_async(pathes.items)
     data[str(id)] = {

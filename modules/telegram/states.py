@@ -430,9 +430,7 @@ async def state_add_money(event: Message):
     state.change("money", state.money + arg)
     logger.info(f"Казна {state_name} пополнена на {arg}")
     return await event.reply(
-        phrase.state.add_treasury.format(
-            formatter.value_to_str(arg, phrase.currency)
-        ),
+        phrase.state.add_treasury.format(formatter.value_to_str(arg, phrase.currency)),
     )
 
 
@@ -469,9 +467,7 @@ async def state_rem_money(event: Message):
     state.change("money", state.money - arg)
     db.add_money(event.sender_id, arg)
     return await event.reply(
-        phrase.state.rem_treasury.format(
-            formatter.value_to_str(arg, phrase.currency)
-        ),
+        phrase.state.rem_treasury.format(formatter.value_to_str(arg, phrase.currency)),
     )
 
 

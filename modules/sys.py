@@ -32,30 +32,37 @@ else:
             core_temps = []
 
             if "coretemp" in temps:
-                core_temps.extend([
-                    entry.current
-                    for entry in temps["coretemp"]
-                    if "core" in entry.label.lower() or "package" not in entry.label.lower()
-                ])
+                core_temps.extend(
+                    [
+                        entry.current
+                        for entry in temps["coretemp"]
+                        if "core" in entry.label.lower()
+                        or "package" not in entry.label.lower()
+                    ]
+                )
 
             if not core_temps:
                 for sensor_name in ["k10temp", "zenpower", "amdgpu", "nct"]:
                     if sensor_name in temps:
-                        core_temps.extend([
-                            entry.current
-                            for entry in temps[sensor_name]
-                            if hasattr(entry, "current")
-                        ])
+                        core_temps.extend(
+                            [
+                                entry.current
+                                for entry in temps[sensor_name]
+                                if hasattr(entry, "current")
+                            ]
+                        )
                         if core_temps:
                             break
 
             if not core_temps:
-                core_temps.extend([
-                    entry.current
-                    for sensor_entries in temps.values()
-                    for entry in sensor_entries
-                    if hasattr(entry, "current")
-                ])
+                core_temps.extend(
+                    [
+                        entry.current
+                        for sensor_entries in temps.values()
+                        for entry in sensor_entries
+                        if hasattr(entry, "current")
+                    ]
+                )
 
             if not core_temps:
                 return "N/A | N/A | N/A"

@@ -108,9 +108,7 @@ async def profile(event: Message):
         try:
             async with mcrcon.Vanilla as rcon:
                 time_played = (
-                    await rcon.send(
-                        f"papi parse --null %PTM_playtime_{nick}:luminto%"
-                    )
+                    await rcon.send(f"papi parse --null %PTM_playtime_{nick}:luminto%")
                 ).replace("\n", "")
         except Exception:
             time_played = "Неизвестно"
@@ -170,9 +168,7 @@ async def mine_start(event: Message):
         [Button.inline(phrase.mine.button_no, f"mine.no.{user_id}")],
     ]
     return await event.reply(
-        phrase.mine.done.format(
-            formatter.value_to_str(initial, phrase.currency)
-        )
+        phrase.mine.done.format(formatter.value_to_str(initial, phrase.currency))
         + phrase.mine.q,
         buttons=buttons,
     )
@@ -352,9 +348,7 @@ async def check_nick(event: Message):
         return await event.reply(phrase.nick.urnick.format(author_nick))
     nick = db.nicks(id=user).get()
     return await event.reply(
-        phrase.nick.no_nick
-        if nick is None
-        else phrase.nick.usernick.format(nick)
+        phrase.nick.no_nick if nick is None else phrase.nick.usernick.format(nick)
     )
 
 
@@ -366,9 +360,7 @@ async def check_nick(event: Message):
 async def swap_money(event: Message):
     args = event.pattern_match.group(1).strip().split()
     if not args:
-        return await event.reply(
-            phrase.money.no_count + phrase.money.swap_balance_use
-        )
+        return await event.reply(phrase.money.no_count + phrase.money.swap_balance_use)
 
     if args[0].lower() in {"все", "всё", "all", "весь"}:
         count = await db.get_money(event.sender_id)
@@ -394,9 +386,7 @@ async def swap_money(event: Message):
 
     user = await func.swap_resolve_recipient(event, args)
     if user is None:
-        return await event.reply(
-            phrase.money.no_people + phrase.money.swap_balance_use
-        )
+        return await event.reply(phrase.money.no_people + phrase.money.swap_balance_use)
 
     if event.sender_id == user:
         return await event.reply(phrase.money.selfbyself)
@@ -406,16 +396,12 @@ async def swap_money(event: Message):
         if entity.bot:
             return await event.reply(phrase.money.bot)
     except Exception:
-        return await event.reply(
-            phrase.money.no_people + phrase.money.swap_balance_use
-        )
+        return await event.reply(phrase.money.no_people + phrase.money.swap_balance_use)
 
     db.add_money(event.sender_id, -count)
     db.add_money(user, count)
     return await event.reply(
-        phrase.money.swap_money.format(
-            formatter.value_to_str(count, phrase.currency)
-        )
+        phrase.money.swap_money.format(formatter.value_to_str(count, phrase.currency))
     )
 
 
@@ -441,9 +427,7 @@ async def money_to_server(event: Message):
     if not db.check_withdraw_limit(event.sender_id, amount):
         limit = db.check_withdraw_limit(event.sender_id, 0)
         return await event.reply(
-            phrase.bank.limit.format(
-                formatter.value_to_str(limit, phrase.currency)
-            )
+            phrase.bank.limit.format(formatter.value_to_str(limit, phrase.currency))
         )
     balance = await db.get_money(event.sender_id)
     if balance < amount:
@@ -461,9 +445,7 @@ async def money_to_server(event: Message):
         db.check_withdraw_limit(event.sender_id, -amount)
         return await event.reply(phrase.bank.error)
     return await event.reply(
-        phrase.bank.withdraw.format(
-            formatter.value_to_str(amount, phrase.currency)
-        )
+        phrase.bank.withdraw.format(formatter.value_to_str(amount, phrase.currency))
     )
 
 
@@ -488,9 +470,7 @@ async def money_to_server_empty(event: Message):
 async def get_balance(event: Message):
     balance = await db.get_money(event.sender_id)
     return await event.reply(
-        phrase.money.wallet.format(
-            formatter.value_to_str(balance, phrase.currency)
-        )
+        phrase.money.wallet.format(formatter.value_to_str(balance, phrase.currency))
     )
 
 
@@ -527,9 +507,7 @@ async def link_nick(event: Message):
                 ),
             ]
         )
-        price = formatter.value_to_str(
-            config.cfg.PriceForChangeNick, phrase.currency
-        )
+        price = formatter.value_to_str(config.cfg.PriceForChangeNick, phrase.currency)
         return await event.reply(
             phrase.nick.already_have.format(price=price), buttons=keyboard
         )
@@ -739,9 +717,7 @@ async def cities_requests(event: Message):
         return
     entity = await func.get_name(event.sender_id)
     for word in pending:
-        logger.info(
-            f'Пользователь {event.sender_id} хочет добавить город "{word}"'
-        )
+        logger.info(f'Пользователь {event.sender_id} хочет добавить город "{word}"')
         keyboard = types.ReplyInlineMarkup(
             [
                 types.KeyboardButtonRow(
@@ -789,9 +765,7 @@ async def cities_remove_empty(event: Message):
     roles = db.roles()
     if roles.get(event.sender_id) < roles.ADMIN:
         return await event.reply(
-            phrase.roles.no_perms.format(
-                level=roles.ADMIN, name=phrase.roles.admin
-            )
+            phrase.roles.no_perms.format(level=roles.ADMIN, name=phrase.roles.admin)
         )
     return await event.reply(phrase.cities.rem_empty)
 
@@ -801,9 +775,7 @@ async def cities_remove(event: Message):
     roles = db.roles()
     if roles.get(event.sender_id) < roles.ADMIN:
         return await event.reply(
-            phrase.roles.no_perms.format(
-                level=roles.ADMIN, name=phrase.roles.admin
-            )
+            phrase.roles.no_perms.format(level=roles.ADMIN, name=phrase.roles.admin)
         )
     word = event.pattern_match.group(1).strip().lower()
     with open(pathes.chk_city, encoding="utf-8") as f:
@@ -840,9 +812,7 @@ async def online(event: Message):
     player_list = [p.strip() for p in players.split(",")] if players else []
     player_list = [p for p in player_list if p]
     return await event.reply(
-        phrase.online.format(
-            list=", ".join(player_list), count=len(player_list)
-        )
+        phrase.online.format(list=", ".join(player_list), count=len(player_list))
     )
 
 
@@ -885,9 +855,7 @@ async def add_new_hint(event: Message):
                     ]
                 ],
             )
-            return await conv.send_message(
-                phrase.newhints.sent.format(pending_id)
-            )
+            return await conv.send_message(phrase.newhints.sent.format(pending_id))
 
 
 @func.new_command(r"/gethint")
