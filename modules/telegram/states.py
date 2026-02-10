@@ -428,17 +428,20 @@ async def state_rem_money(event: Message) -> Message:
     )
 
 
-@func.new_command(r"/г кик\s(.+)")
-@func.new_command(r"/г кикнуть\s(.+)")
-@func.new_command(r"/г изгнать\s(.+)")
-@func.new_command(r"/г выгнать\s(.+)")
-@func.new_command(r"/выгнать\s(.+)")
+@func.new_command(r"/г кик(.*)")
+@func.new_command(r"/г кикнуть(.*)")
+@func.new_command(r"/г изгнать(.*)")
+@func.new_command(r"/г выгнать(.*)")
+@func.new_command(r"/выгнать(.*)")
 async def state_kick_user(event: Message) -> Message:
     state_name = db.states.if_author(event.sender_id)
     if not state_name:
         return await event.reply(phrase.state.not_a_author)
 
-    user_id = await func.get_id(event.pattern_match.group(1).strip())
+    try:
+        user_id = await func.get_id(event.pattern_match.group(1).strip())
+    except Exception:
+        user_id = None
     if user_id is None:
         msg_id = func.get_reply_message_id(event)
         if not msg_id:
