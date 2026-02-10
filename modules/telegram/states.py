@@ -440,7 +440,10 @@ async def state_kick_user(event: Message) -> Message:
 
     user_id = await func.get_id(event.pattern_match.group(1).strip())
     if user_id is None:
-        return await event.reply(phrase.player_not_in)
+        msg_id = func.get_reply_message_id(event)
+        if not msg_id:
+            return await event.reply(phrase.player_not_in)
+        user_id = await func.get_author_by_msgid(event.chat_id, msg_id)
 
     state = db.state(state_name)
     if user_id not in state.players:

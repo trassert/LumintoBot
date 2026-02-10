@@ -25,7 +25,7 @@ def _check_topic(event: Message) -> bool:
         getattr(event.reply_to, "reply_to_top_id", None) != config.chats.topics.games
     ):
         return False
-    return None
+    return True
 
 
 async def _safe_delete(message: Message | None):
