@@ -116,7 +116,7 @@ async def get_author_by_msgid(chat_id: int, msg_id: int) -> int | None:
 async def swap_resolve_recipient(event: Message, args: list[str]) -> int | None:
     """Возвращает ID получателя или None."""
     if len(args) > 1:
-        return (await get_id(args[1])).full_user.id
+        return await get_id(args[1])
     msg_id = get_reply_message_id(event)
     if msg_id:
         return await get_author_by_msgid(event.chat_id, msg_id)
