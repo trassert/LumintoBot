@@ -1,7 +1,6 @@
 import re
 
 from loguru import logger
-from telethon import errors as tgerrors
 from telethon import events
 from telethon.tl.custom import Message
 from telethon.tl.functions.users import GetFullUserRequest
@@ -57,7 +56,7 @@ async def get_id(str: str) -> int:
         if bool(re.fullmatch(r"^@\d+$", str)):
             str = str[1:]
         check = await get_name(int(str))
-        if check == "Неопознанный персонаж":
+        if check in ["Без имени", "Неопознанный персонаж"]:
             return None
         return int(str)
     user = await client(GetFullUserRequest(str))
@@ -123,8 +122,8 @@ async def swap_resolve_recipient(event: Message, args: list[str]) -> int | None:
             return await get_author_by_msgid(event.chat_id, msg_id)
     else:
         try:
-            user = await client(GetFullUserRequest(args[1]))
-        except (TypeError, ValueError, tgerrors.UserError):
+            user = await get_id(args[1])
+        except TypeError, ValueError:
             pass
         else:
             return user.full_user.id
