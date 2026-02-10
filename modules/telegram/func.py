@@ -52,10 +52,9 @@ async def get_name(id, push=False, minecraft=False, log=False) -> str | None:
 async def get_id(str: str) -> int:
     if str[-1] == ",":
         str = str[:-1]
-    if str.isdigit():
-        if bool(re.fullmatch(r"^@\d+$", str)):
-            str = str[1:]
-        check = await get_name(int(str))
+    if bool(re.fullmatch(r"@\d+", str)):
+        str = str[1:]
+        check = await get_name(str)
         if check in ["Без имени", "Неопознанный персонаж"]:
             return None
         return int(str)
@@ -116,17 +115,11 @@ async def get_author_by_msgid(chat_id: int, msg_id: int) -> int | None:
 
 async def swap_resolve_recipient(event: Message, args: list[str]) -> int | None:
     """Возвращает ID получателя или None."""
-    if not len(args) > 1:
-        msg_id = get_reply_message_id(event)
-        if msg_id:
-            return await get_author_by_msgid(event.chat_id, msg_id)
-    else:
-        try:
-            user = await get_id(args[1])
-        except TypeError, ValueError:
-            pass
-        else:
-            return user.full_user.id
+    if len(args) > 1:
+        return (await get_id(args[1])).full_user.id
+    msg_id = get_reply_message_id(event)
+    if msg_id:
+        return await get_author_by_msgid(event.chat_id, msg_id)
 
 
 async def checks(event: Message | events.CallbackQuery.Event) -> bool:
