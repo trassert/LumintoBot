@@ -21,8 +21,11 @@ CitiesTimerTask: asyncio.Task | None = None
 
 def _check_topic(event: Message) -> bool:
     """Проверяет, находится ли сообщение в игровом топике."""
-    topic_id = getattr(event.reply_to, "reply_to_top_id", event.reply_to_msg_id)
-    return topic_id == config.chats.topics.games
+    if (event.reply_to_msg_id != config.chats.topics.games) and (
+        getattr(event.reply_to, "reply_to_top_id", None) != config.chats.topics.games
+    ):
+        return False
+    return None
 
 
 async def _safe_delete(message: Message | None):
