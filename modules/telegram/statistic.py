@@ -50,8 +50,7 @@ async def active_check(event: Message):
     if send_chart:
         chart.create_plot(stat.get_raw())
         return await client.send_file(event.chat_id, pathes.chart, caption=caption)
-    else:
-        return await event.respond(caption)
+    return await event.respond(caption)
 
 
 @func.new_command(r"/топ крокодил$")

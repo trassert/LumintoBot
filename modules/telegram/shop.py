@@ -21,7 +21,7 @@ logger.info(f"Загружен модуль {__name__}!")
 @func.new_command(r"shop$")
 @func.new_command(r"шоп$")
 async def shop(event: Message):
-    shop_data = db.get_shop()
+    shop_data = await db.get_shop()
     version = await db.database("shop_version")
     theme = shop_data.pop("theme")
     theme_data = phrase.shop_quotes[theme]

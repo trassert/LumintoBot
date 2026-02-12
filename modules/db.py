@@ -83,13 +83,12 @@ async def database(key, value=None, delete=None, log=True):
         await _save_json_async(pathes.data, data, indent=True)
         return True
 
-    elif delete is not None:
+    if delete is not None:
         data.pop(key, None)
         await _save_json_async(pathes.data, data, indent=True)
         return True
 
-    else:
-        return data.get(key)
+    return data.get(key)
 
 
 async def get_money(id) -> int:
@@ -104,12 +103,12 @@ async def get_all_money():
     return sum(data.values())
 
 
-def add_money(id, count):
+async def add_money(id, count):
     id = str(id)
-    data = _load_json_sync(pathes.money)
+    data = await _load_json_async(pathes.money)
     old = data.get(id, 0)
     data[id] = max(old + count, 0)
-    _save_json_sync(pathes.money, data, indent=True)
+    await _save_json_async(pathes.money, data, indent=True)
     logger.info(f"Изменён баланс {id} ({old} -> {data[id]})")
     return data[id]
 
@@ -163,18 +162,18 @@ async def update_shop():
     return new_theme
 
 
-def get_shop() -> dict:
-    return _load_json_sync(pathes.shopc)
+async def get_shop() -> dict:
+    return await _load_json_async(pathes.shopc)
 
 
-def ready_to_mine(id: str) -> bool:
+async def ready_to_mine(id: str) -> bool:
     id = str(id)
-    data = _load_json_sync(pathes.mine)
+    data = await _load_json_async(pathes.mine)
     now = int(time())
     last = data.get(id, 0)
     if now - last > config.cfg.MineWait:
         data[id] = now
-        _save_json_sync(pathes.mine, data, indent=True)
+        await _save_json_async(pathes.mine, data, indent=True)
         return True
     return False
 
@@ -241,7 +240,7 @@ class nicks:
                 if key.lower() == nick_lower:
                     return value
             return if_nothing
-        elif self.id:
+        if self.id:
             data = _load_json_sync(pathes.nick)
             for key, value in data.items():
                 if value == self.id:
@@ -289,7 +288,7 @@ class statistic:
     def get_all(self, all_days=False):
         data = {}
         for file in pathes.stats.iterdir():
-            if not file.suffix == ".json":
+            if file.suffix != ".json":
                 continue
             nick = file.stem
             nick_stat = self.get(nick, all_days=all_days)
@@ -307,7 +306,7 @@ class statistic:
     def get_raw(self) -> dict[str, int]:
         totals = defaultdict(int)
         for json_file in pathes.stats.iterdir():
-            if not json_file.suffix == ".json":
+            if json_file.suffix != ".json":
                 continue
             filepath = json_file
             try:
@@ -386,6 +385,7 @@ class state:
         (pathes.states / f"{self.name}.json").rename(new_path)
         self.name = new_name
         self._info()
+        return None
 
 
 class states:
@@ -413,7 +413,7 @@ class states:
     def get_all(self="players"):
         all_data = {}
         for file in pathes.states.iterdir():
-            if not file.suffix == ".json":
+            if file.suffix != ".json":
                 continue
             name = file.stem
             try:
@@ -433,7 +433,7 @@ class states:
 
     def if_author(self: int):
         for file in pathes.states.iterdir():
-            if not file.suffix == ".json":
+            if file.suffix != ".json":
                 continue
             data = _load_json_sync(file)
             if data["author"] == self:
@@ -442,7 +442,7 @@ class states:
 
     def if_player(self: int):
         for file in pathes.states.iterdir():
-            if not file.suffix == ".json":
+            if file.suffix != ".json":
                 continue
             data = _load_json_sync(file)
             if self in data["players"]:
@@ -632,6 +632,7 @@ class RefCodes:
             load[str(id)] = {}
         load[str(id)]["own"] = name
         await self._write(load)
+        return None
 
     async def add_uses(self, id: int, who_used: int):
         load = await self._read()

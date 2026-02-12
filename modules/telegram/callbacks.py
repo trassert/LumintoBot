@@ -1,6 +1,7 @@
 import asyncio
 from random import choice, randint, random
 
+import aiofiles
 from loguru import logger
 from telethon import Button, events, types
 
@@ -31,7 +32,7 @@ async def _check_and_deduct_balance(
     balance = await db.get_money(user_id)
     if balance < price:
         return phrase.money.not_enough.format(formatter.value_to_str(balance, currency))
-    db.add_money(user_id, -price)
+    await db.add_money(user_id, -price)
     return True
 
 
@@ -58,16 +59,16 @@ async def _handle_suggestion(
 
     match data[1]:
         case "yes":
-            with open(accept_file, encoding="utf-8") as f:
-                if word in f.read().split("\n"):
+            async with aiofiles.open(accept_file) as aiof:
+                if word in (await aiof.read()).split("\n"):
                     return await client.edit_message(
                         sender_id, event.message_id, exists_phrase
                     )
 
-            with open(accept_file, "a", encoding="utf-8") as f:
-                f.write(f"\n{word}")
+            async with aiofiles.open(accept_file, "a") as aiof:
+                await aiof.write(f"\n{word}")
 
-            db.add_money(sender_id, config.cfg.WordRequest)
+            await db.add_money(sender_id, config.cfg.WordRequest)
             await client.send_message(
                 config.chats.chat,
                 success_phrase.format(
@@ -81,8 +82,8 @@ async def _handle_suggestion(
             return await client.edit_message(sender_id, event.message_id, add_phrase)
 
         case "no":
-            with open(reject_file, "a", encoding="utf-8") as f:
-                f.write(f"\n{word}")
+            async with aiofiles.open(reject_file, "a") as aiof:
+                await aiof.write(f"\n{word}")
             await client.send_message(
                 config.chats.chat,
                 reject_phrase.format(word=word, user=user_name),
@@ -114,7 +115,7 @@ async def state_callback(event: events.CallbackQuery.Event):
                 return await event.answer(balance_check, alert=True)
 
             state.change("money", state.money + state.price)
-            players = state.players + [sender_id]
+            players = [*state.players, sender_id]
             state.change("players", players)
 
             await client.send_message(
@@ -150,7 +151,7 @@ async def state_callback(event: events.CallbackQuery.Event):
             if not _ensure_owner(sender_id, state.author):
                 return await event.answer(phrase.not_for_you, alert=True)
 
-            db.add_money(state.author, state.money)
+            await db.add_money(state.author, state.money)
             if not db.states.remove(data[2]):
                 return await event.answer(phrase.error, alert=True)
 
@@ -234,7 +235,7 @@ async def casino_callback(event: events.CallbackQuery.Event):
     sender_id = event.sender_id
 
     if data[1] != "auto":
-        return
+        return None
 
     balance_check = await _check_and_deduct_balance(
         sender_id, config.cfg.PriceForCasino
@@ -254,7 +255,7 @@ async def casino_callback(event: events.CallbackQuery.Event):
         await db.Users.add_win(sender_id)
         logger.info(f"{sender_id} - победил в казино")
         win_amount = config.cfg.PriceForCasino * config.cfg.CasinoWinRatio
-        db.add_money(sender_id, win_amount)
+        await db.add_money(sender_id, win_amount)
         await asyncio.sleep(2)
         return await fm.edit(
             phrase.casino.win_auto.format(
@@ -263,7 +264,7 @@ async def casino_callback(event: events.CallbackQuery.Event):
         )
 
     if pos[0] == pos[1] or pos[1] == pos[2]:
-        db.add_money(sender_id, config.cfg.PriceForCasino)
+        await db.add_money(sender_id, config.cfg.PriceForCasino)
         await asyncio.sleep(2)
         return await fm.edit(
             phrase.casino.partially_auto.format(await func.get_name(sender_id))
@@ -366,7 +367,7 @@ async def shop_callback(event: events.CallbackQuery.Event):
     if nick is None:
         return await event.answer(phrase.nick.not_append, alert=True)
 
-    shop = db.get_shop()
+    shop = await db.get_shop()
     del shop["theme"]
     items = list(shop.keys())
     item = shop[items[int(data[1])]]
@@ -469,7 +470,7 @@ async def mine_callback(event: events.CallbackQuery.Event):
     match data[1]:
         case "no":
             total = session["gems"]
-            db.add_money(sender_id, total)
+            await db.add_money(sender_id, total)
             await db.add_mine_top(sender_id, total)
             del mining.sessions[sender_id]
             return await event.edit(
@@ -487,7 +488,7 @@ async def mine_callback(event: events.CallbackQuery.Event):
                 balance = await db.get_money(sender_id)
                 penalty = min(session["gems"], balance)
                 if penalty > 0:
-                    db.add_money(sender_id, -penalty)
+                    await db.add_money(sender_id, -penalty)
                 del mining.sessions[sender_id]
                 return await event.edit(
                     choice(phrase.mine.die).format(
@@ -530,6 +531,7 @@ async def mine_callback(event: events.CallbackQuery.Event):
                     [Button.inline(phrase.mine.button_no, f"mine.no.{sender_id}")],
                 ],
             )
+    return None
 
 
 @client.on(events.CallbackQuery(func=func.checks, pattern=r"^hint"))
@@ -538,7 +540,7 @@ async def hint_callback(event: events.CallbackQuery.Event):
     logger.info(f"КБ кнопка (Mine), дата: {data}")
     roles = db.roles()
     if roles.get(event.sender_id) < roles.ADMIN:
-        return
+        return None
     hint_data = await db.get_hint_byid(data[2])
     if hint_data is None:
         await event.answer(phrase.newhints.not_found)
@@ -550,7 +552,7 @@ async def hint_callback(event: events.CallbackQuery.Event):
                 await event.answer(phrase.newhints.not_found)
                 return await event.delete()
             await db.append_hint(word=hint_data["word"], hint=hint_data["hint"])
-            db.add_money(hint_data["user"], config.cfg.HintGift)
+            await db.add_money(hint_data["user"], config.cfg.HintGift)
             await client.send_message(
                 int(hint_data["user"]),
                 phrase.newhints.accept.format(

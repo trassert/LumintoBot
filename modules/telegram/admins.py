@@ -43,7 +43,7 @@ async def add_balance(event: Message):
             phrase.money.nan_count + phrase.money.change_balance_use,
         )
     old = await db.get_money(user.full_user.id)
-    db.add_money(user.full_user.id, new)
+    await db.add_money(user.full_user.id, new)
     await event.reply(
         phrase.money.add_money.format(name=tag, old=old, new=old + new),
     )
@@ -198,7 +198,7 @@ async def give_money(event: Message):
     except Exception:
         return await event.reply(phrase.money.no_people + phrase.money.swap_balance_use)
 
-    db.add_money(user, count)
+    await db.add_money(user, count)
     return await event.reply(
         phrase.money.give_money.format(formatter.value_to_str(count, phrase.currency))
     )

@@ -5,6 +5,7 @@ from random import choice, randint
 from time import time
 from typing import Any
 
+import aiofiles
 import aioping
 from loguru import logger
 from telethon import Button
@@ -167,7 +168,7 @@ async def mine_start(event: Message) -> Message:
 
     if not (db.states.if_player(user_id) or db.states.if_author(user_id)):
         return await event.reply(phrase.mine.not_in_state)
-    if not db.ready_to_mine(user_id):
+    if not await db.ready_to_mine(user_id):
         return await event.reply(choice(phrase.mine.not_ready))
     if user_id in mining.sessions:
         return await event.reply(phrase.mine.already)
@@ -270,8 +271,8 @@ async def swap_money(event: Message) -> Message:
     except Exception:
         return await event.reply(phrase.money.no_people + phrase.money.swap_balance_use)
 
-    db.add_money(sender_id, -amount)
-    db.add_money(recipient_id, amount)
+    await db.add_money(sender_id, -amount)
+    await db.add_money(recipient_id, amount)
 
     return await event.reply(
         phrase.money.swap_money.format(formatter.value_to_str(amount, phrase.currency))
@@ -319,14 +320,14 @@ async def money_to_server(event: Message) -> Message:
             )
         )
 
-    db.add_money(user_id, -amount)
+    await db.add_money(user_id, -amount)
 
     try:
         async with mcrcon.Vanilla as rcon:
             await rcon.send(f"invgive {nick} amethyst_shard {amount}")
     except Exception as e:
         logger.error(f"RCON Error during withdraw: {e}")
-        db.add_money(user_id, amount)
+        await db.add_money(user_id, amount)
         db.check_withdraw_limit(user_id, -amount)
         return await event.reply(phrase.bank.error)
 
@@ -411,8 +412,8 @@ async def link_nick(event: Message) -> Message:
         ref_author_id = await db.RefCodes().check_ref(ref_code)
         if ref_author_id:
             await db.RefCodes().add_uses(ref_author_id, sender_id)
-            db.add_money(ref_author_id, config.cfg.RefGift)
-            db.add_money(sender_id, config.cfg.RefGift)
+            await db.add_money(ref_author_id, config.cfg.RefGift)
+            await db.add_money(sender_id, config.cfg.RefGift)
             ref_msg = phrase.ref.gift.format(config.cfg.RefGift)
 
             try:
@@ -424,7 +425,7 @@ async def link_nick(event: Message) -> Message:
             except Exception:
                 pass
 
-    db.add_money(sender_id, config.cfg.LinkGift)
+    await db.add_money(sender_id, config.cfg.LinkGift)
     db.nicks(nick, sender_id).link()
 
     await event.reply(
@@ -434,6 +435,7 @@ async def link_nick(event: Message) -> Message:
     )
     if ref_msg:
         await event.reply(ref_msg)
+    return None
 
 
 @func.new_command(r"/linknick$")
@@ -539,11 +541,11 @@ async def cities_request(event: Message) -> Message:
     """Отправляет запрос администратору на добавление нового города."""
     word: str = event.pattern_match.group(1).strip().lower()
 
-    with open(pathes.chk_city, encoding="utf-8") as f:
-        if word in f.read().splitlines():
+    async with aiofiles.open(pathes.chk_city) as aiof:
+        if word in (await aiof.read()).splitlines():
             return await event.reply(phrase.cities.exists)
-    with open(pathes.bl_city, encoding="utf-8") as f:
-        if word in f.read().splitlines():
+    async with aiofiles.open(pathes.bl_city) as aiof:
+        if word in (await aiof.read()).splitlines():
             return await event.reply(phrase.cities.in_blacklist)
 
     user_name: str = await func.get_name(event.sender_id)
@@ -582,10 +584,10 @@ async def cities_requests(event: Message) -> Message:
 
     status_msg = await event.reply(phrase.cities.checker)
 
-    with open(pathes.chk_city, encoding="utf-8") as f:
-        existing = set(f.read().splitlines())
-    with open(pathes.bl_city, encoding="utf-8") as f:
-        blacklisted = set(f.read().splitlines())
+    async with aiofiles.open(pathes.chk_city) as aiof:
+        existing = set((await aiof.read()).splitlines())
+    async with aiofiles.open(pathes.bl_city) as aiof:
+        blacklisted = set((await aiof.read()).splitlines())
 
     output_lines: list[str] = []
     pending_to_admin: list[str] = []
@@ -628,6 +630,7 @@ async def cities_requests(event: Message) -> Message:
             await asyncio.sleep(0.3)
         except Exception:
             pass
+    return None
 
 
 @func.new_command(r"\-город (.+)")
@@ -640,15 +643,15 @@ async def cities_remove(event: Message) -> Message:
         )
 
     word: str = event.pattern_match.group(1).strip().lower()
-    with open(pathes.chk_city, encoding="utf-8") as f:
-        lines = f.read().splitlines()
+    async with aiofiles.open(pathes.chk_city) as aiof:
+        lines = (await aiof.read()).splitlines()
 
     if word not in lines:
         return await event.reply(phrase.cities.not_exists)
 
     lines.remove(word)
-    with open(pathes.chk_city, "w", encoding="utf-8") as f:
-        f.write("\n".join(lines))
+    async with aiofiles.open(pathes.chk_city, "w") as aiof:
+        await aiof.write("\n".join(lines))
     return await event.reply(phrase.cities.deleted.format(word))
 
 

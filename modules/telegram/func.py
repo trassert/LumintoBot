@@ -18,6 +18,7 @@ async def get_simple_push(id) -> str | None:
         return None
     if user.username:
         return user.username
+    return None
 
 
 async def get_name(id, push=False, minecraft=False, log=False) -> str | None:
@@ -120,6 +121,7 @@ async def swap_resolve_recipient(event: Message, args: list[str]) -> int | None:
     msg_id = get_reply_message_id(event)
     if msg_id:
         return await get_author_by_msgid(event.chat_id, msg_id)
+    return None
 
 
 async def checks(event: Message | events.CallbackQuery.Event) -> bool:

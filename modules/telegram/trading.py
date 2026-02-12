@@ -61,7 +61,7 @@ async def add_trade(event: Message):
             phrase.trade.more_than_0,
         )
         if count is None:
-            return
+            return None
 
         price = await ask_int(
             phrase.trade.price,
@@ -69,7 +69,7 @@ async def add_trade(event: Message):
             phrase.trade.more_than_0,
         )
         if price is None:
-            return
+            return None
 
     parsed_text = urllib.parse.quote(
         f"Хочу купить у тебя {arg}. Предложение актуально?"
@@ -104,6 +104,7 @@ async def add_trade(event: Message):
             id=message.id,
         )
     )
+    return None
 
 
 @func.new_command(r"\+заказ (.+)")
@@ -152,7 +153,7 @@ async def add_buy(event: Message):
             phrase.trade.more_than_0,
         )
         if count is None:
-            return
+            return None
 
         price = await ask_int(
             phrase.trade.price,
@@ -160,7 +161,7 @@ async def add_buy(event: Message):
             phrase.trade.more_than_0,
         )
         if price is None:
-            return
+            return None
 
     parsed_text = urllib.parse.quote(f"У меня есть {arg}. Могу продать тебе!")
     url = f"https://t.me/{username}?text={parsed_text}"
@@ -193,3 +194,4 @@ async def add_buy(event: Message):
             id=message.id,
         )
     )
+    return None

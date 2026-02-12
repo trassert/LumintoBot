@@ -31,7 +31,7 @@ async def rewards():
     for top in day_stat:
         tg_id = db.nicks(nick=top[0]).get()
         if tg_id is not None:
-            db.add_money(tg_id, config.cfg.ActiveGift)
+            await db.add_money(tg_id, config.cfg.ActiveGift)
             logger.info(f"Начислен подарок за активность {top[0]}")
             return await client.send_message(
                 config.chats.chat,
@@ -57,7 +57,7 @@ async def remove_states() -> None:
             today - datetime(state_date[0], state_date[1], state_date[2])
             > timedelta(days=config.cfg.DaysToStatesRemove)
         ):
-            db.add_money(state_info["author"], state_info["money"])
+            await db.add_money(state_info["author"], state_info["money"])
             db.states.remove(state)
             logger.warning(f"Государство {state} распалось")
             await client.send_message(

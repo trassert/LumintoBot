@@ -28,7 +28,7 @@ async def do_ticket(event: Message):
                 formatter.value_to_str(balance, phrase.currency),
             ),
         )
-    db.add_money(event.sender_id, -arg)
+    await db.add_money(event.sender_id, -arg)
     ticket_id = db.ticket.add(event.sender_id, arg)
     return await event.reply(
         phrase.ticket.added.format(
@@ -51,7 +51,7 @@ async def get_ticket(event: Message):
     ticket_info = db.ticket.get(arg)
     if ticket_info is None:
         return await event.reply(phrase.ticket.no_such)
-    db.add_money(event.sender_id, ticket_info["value"])
+    await db.add_money(event.sender_id, ticket_info["value"])
     db.ticket.delete(arg)
     return await event.reply(
         phrase.ticket.got.format(

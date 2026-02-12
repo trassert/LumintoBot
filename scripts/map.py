@@ -58,8 +58,7 @@ class MapSQL:
         query = f"SELECT * FROM {self.table}"
         async with self.pool.acquire() as conn, conn.cursor() as cursor:
             await cursor.execute(query)
-            result = await cursor.fetchall()
-            return result
+            return await cursor.fetchall()
 
 
 def randomize_coordinates(data, max_offset=0.02):
@@ -89,8 +88,7 @@ async def get_loc(ip_address: str):
                     logger.info(info)
                     if info["status"] == "success":
                         return [float(info["lat"]), float(info["lon"])]
-                    else:
-                        raise ValueError
+                    raise ValueError
             except Exception:
                 await asyncio.sleep(1)
                 async with session.get(ipinfo.format(ip)) as response:

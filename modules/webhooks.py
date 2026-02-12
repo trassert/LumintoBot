@@ -55,7 +55,7 @@ async def server():
             )
         tg_id = db.nicks(nick=nick).get()
         if tg_id is not None:
-            db.add_money(tg_id, 10)
+            await db.add_money(tg_id, 10)
             await db.add_votes(tg_id, 1)
             give = phrase.vote_money.format(
                 formatter.value_to_str(10, phrase.currency),
@@ -88,7 +88,7 @@ async def server():
             )
         tg_id = db.nicks(nick=username).get()
         if tg_id is not None:
-            db.add_money(tg_id, 10)
+            await db.add_money(tg_id, 10)
             await db.add_votes(tg_id, 1)
             give = phrase.vote_money.format(
                 formatter.value_to_str(10, phrase.currency),
@@ -131,7 +131,7 @@ async def server():
                 amount=formatter.value_to_str(amount, phrase.currency),
             ),
         )
-        db.add_money(playerid, amount)
+        await db.add_money(playerid, amount)
         logger.info(f"[Bank] Переведено {amount} на счет {playerid}")
         return aiohttp.web.Response(text="ok")
 

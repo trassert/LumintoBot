@@ -385,7 +385,7 @@ async def state_add_money(event: Message) -> Message:
             )
         )
 
-    db.add_money(event.sender_id, -amount)
+    await db.add_money(event.sender_id, -amount)
     state = db.state(state_name)
     state.change("money", state.money + amount)
     return await event.reply(
@@ -420,7 +420,7 @@ async def state_rem_money(event: Message) -> Message:
         return await event.reply(phrase.state.too_low)
 
     state.change("money", state.money - amount)
-    db.add_money(event.sender_id, amount)
+    await db.add_money(event.sender_id, amount)
     return await event.reply(
         phrase.state.rem_treasury.format(
             formatter.value_to_str(amount, phrase.currency)

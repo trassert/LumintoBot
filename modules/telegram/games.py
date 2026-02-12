@@ -1,6 +1,8 @@
 import asyncio
+import contextlib
 from random import choice, randint, random
 
+import aiofiles
 import orjson
 from loguru import logger
 from telethon import events
@@ -21,20 +23,18 @@ CitiesTimerTask: asyncio.Task | None = None
 
 def _check_topic(event: Message) -> bool:
     """Проверяет, находится ли сообщение в игровом топике."""
-    if (event.reply_to_msg_id != config.chats.topics.games) and (
-        getattr(event.reply_to, "reply_to_top_id", None) != config.chats.topics.games
-    ):
-        return False
-    return True
+    return not (
+        event.reply_to_msg_id != config.chats.topics.games
+        and getattr(event.reply_to, "reply_to_top_id", None)
+        != config.chats.topics.games
+    )
 
 
 async def _safe_delete(message: Message | None):
     """Безопасное удаление сообщения без вылета по ошибке."""
     if message:
-        try:
+        with contextlib.suppress(Exception):
             await message.delete()
-        except Exception:
-            pass
 
 
 @func.new_command("/казино$", chats=config.chats.chat)
@@ -123,7 +123,7 @@ async def crocodile_bet(event: Message):
     if str(event.sender_id) in all_bets:
         return await event.reply(phrase.crocodile.bet_already)
 
-    db.add_money(event.sender_id, -bet)
+    await db.add_money(event.sender_id, -bet)
     all_bets[str(event.sender_id)] = bet
     await db.database("crocodile_bets", all_bets)
 
@@ -168,12 +168,12 @@ async def super_game(event: Message):
 
 async def crocodile_handler(event: Message):
     if not _check_topic(event) or not event.text:
-        return
+        return None
 
     text = event.text.strip().lower()
     game_data = await db.database("current_game")
     if not game_data:
-        return
+        return None
 
     current_word = game_data["word"]
     current_mask = list(game_data["unsec"])
@@ -198,7 +198,7 @@ async def crocodile_handler(event: Message):
                 total_payout += bet_val
 
         if total_payout > 0:
-            db.add_money(event.sender_id, total_payout)
+            await db.add_money(event.sender_id, total_payout)
             win_msg = phrase.crocodile.bet_win.format(
                 formatter.value_to_str(total_payout, phrase.currency)
             )
@@ -238,6 +238,7 @@ async def crocodile_handler(event: Message):
             return await event.reply(
                 phrase.crocodile.new.format(new_mask_str.replace("_", ".."))
             )
+    return None
 
 
 async def crocodile_hint(event: Message):
@@ -246,7 +247,7 @@ async def crocodile_hint(event: Message):
 
     game = await db.database("current_game")
     if not game:
-        return
+        return None
 
     hints_list = game["hints"]
     if event.sender_id in hints_list:
@@ -264,8 +265,8 @@ async def crocodile_hint(event: Message):
                 return await event.reply(f"{i} буква в слове - **{word[i - 1]}**")
 
     try:
-        with open(pathes.crocomap, "rb") as f:
-            mapping = orjson.loads(f.read())
+        async with aiofiles.open(pathes.crocomap, "rb") as f:
+            mapping = orjson.loads(await f.read())
             if word in mapping:
                 return await event.reply(choice(mapping[word]))
     except Exception as e:
@@ -285,7 +286,7 @@ async def cities_timeout(current_player: int, last_city: str):
                 or Cities.get_last_city() != last_city
             ):
                 await _safe_delete(timer_msg)
-                return
+                return None
 
             if second <= 1:
                 await _safe_delete(timer_msg)
@@ -298,7 +299,7 @@ async def cities_timeout(current_player: int, last_city: str):
                 if next_player is False:
                     winner_id = players[0]
                     win_money = players_count * config.cfg.CitiesBet
-                    db.add_money(winner_id, win_money)
+                    await db.add_money(winner_id, win_money)
 
                     stats_lines = []
                     for n, (uid, count) in enumerate(Cities.get_all_stat().items(), 1):
@@ -415,7 +416,7 @@ async def cities_callback(event: events.CallbackQuery.Event):
                 )
             )
 
-        db.add_money(event.sender_id, -config.cfg.PriceForCities)
+        await db.add_money(event.sender_id, -config.cfg.PriceForCities)
         Cities.add_player(event.sender_id)
 
         names = [await func.get_name(pid) for pid in Cities.get_players()]
@@ -448,6 +449,7 @@ async def cities_callback(event: events.CallbackQuery.Event):
             return await event.answer(phrase.cities.not_in_players, alert=True)
         Cities.end_game()
         return await event.edit("❌ Игра отменена.")
+    return None
 
 
 @func.new_command(
@@ -486,6 +488,7 @@ async def cities_start(event: Message):
     if not Cities.get_game_status() and Cities.get_id() == current_id:
         await msg.edit(phrase.cities.wait_exceeded, buttons=None)
         Cities.end_game()
+    return None
 
 
 async def crocodile_onboot():

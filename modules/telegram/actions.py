@@ -39,3 +39,4 @@ async def chat_action(event: events.ChatAction.Event):
                 [Button.inline(phrase.chataction.test_btn, f"test.{event.user_id}")],
             ],
         )
+    return None
