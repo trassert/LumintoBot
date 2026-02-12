@@ -42,15 +42,14 @@ async def main():
 
     if sum((await db.database("shop_weight")).values()) != 100:
         logger.error("Сумма процентов в магазине не равна 100!")
-
     await db.Users.initialize()
-    await tg.start(bot_token=config.tokens.bot.token)
+    tg.start(bot_token=config.tokens.bot.token)
     await webhooks.server()
     await task_gen.UpdateShopTask.create(tasks.update_shop, 2)
     await task_gen.RewardsTask.create(tasks.rewards, "19:00")
     await task_gen.RemoveStatesTask.create(tasks.remove_states, "17:00")
     await games.crocodile_onboot()
-    await tg.run_until_disconnected()
+    tg.run_until_disconnected()
 
 
 if __name__ == "__main__":
@@ -64,5 +63,5 @@ if __name__ == "__main__":
                 "Uvloop не найден! Установите его для большей производительности",
             )
             asyncio.run(main())
-    except (KeyboardInterrupt, asyncio.CancelledError):
+    except KeyboardInterrupt, asyncio.CancelledError:
         logger.warning("Закрываю бота!")

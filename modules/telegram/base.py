@@ -61,9 +61,7 @@ async def ping(event: Message) -> Message:
     """Проверяет задержку бота и (опционально) сервера."""
     arg: str = event.pattern_match.group(1).strip().lower()
     latency: float = round(time() - event.date.timestamp(), 2)
-    latency_text: str = (
-        phrase.ping.min if latency <= 0 else f"за {latency} сек."
-    )
+    latency_text: str = phrase.ping.min if latency <= 0 else f"за {latency} сек."
 
     extra_pings: list[str] = []
     if arg in [
@@ -82,9 +80,7 @@ async def ping(event: Message) -> Message:
         except Exception:
             extra_pings.append("🌐 : Пинг сервера - ошибка")
 
-    text: str = (
-        f"{phrase.ping.set.format(latency_text)}\n{'\n'.join(extra_pings)}"
-    )
+    text: str = f"{phrase.ping.set.format(latency_text)}\n{'\n'.join(extra_pings)}"
     return await event.reply(text)
 
 
@@ -112,9 +108,7 @@ async def profile(event: Message) -> Message:
         state_info = f"**{state_author}, Глава**"
     else:
         state_player: str | bool = db.states.if_player(user_id)
-        state_info = (
-            state_player if state_player else "Не состоит в государстве"
-        )
+        state_info = state_player if state_player else "Не состоит в государстве"
 
     nick: str = db.nicks(id=user_id).get() or "Не привязан"
 
@@ -161,9 +155,7 @@ async def profile(event: Message) -> Message:
 @func.new_command(r"/msk$")
 async def msktime(event: Message) -> Message:
     """Показывает текущее московское время."""
-    return await event.reply(
-        phrase.time.format(datetime.now().strftime("%H:%M:%S"))
-    )
+    return await event.reply(phrase.time.format(datetime.now().strftime("%H:%M:%S")))
 
 
 @func.new_command(r"(/г )?(шахта|майнить|копать)$")
@@ -195,9 +187,7 @@ async def mine_start(event: Message) -> Message:
     ]
 
     msg_text: str = (
-        phrase.mine.done.format(
-            formatter.value_to_str(initial, phrase.currency)
-        )
+        phrase.mine.done.format(formatter.value_to_str(initial, phrase.currency))
         + phrase.mine.q
     )
     return await event.reply(msg_text, buttons=buttons)
@@ -230,9 +220,7 @@ async def check_nick(event: Message) -> Message:
 
     nick: str = db.nicks(id=user_id).get()
     return await event.reply(
-        phrase.nick.no_nick
-        if nick is None
-        else phrase.nick.usernick.format(nick)
+        phrase.nick.no_nick if nick is None else phrase.nick.usernick.format(nick)
     )
 
 
@@ -245,9 +233,7 @@ async def swap_money(event: Message) -> Message:
     """Переводит валюту другому игроку."""
     args: list[str] = event.pattern_match.group(1).strip().split()
     if not args:
-        return await event.reply(
-            phrase.money.no_count + phrase.money.swap_balance_use
-        )
+        return await event.reply(phrase.money.no_count + phrase.money.swap_balance_use)
 
     sender_id: int = event.sender_id
     sender_balance: int = await db.get_money(sender_id)
@@ -273,9 +259,7 @@ async def swap_money(event: Message) -> Message:
 
     recipient_id: int = await func.swap_resolve_recipient(event, args)
     if recipient_id is None:
-        return await event.reply(
-            phrase.money.no_people + phrase.money.swap_balance_use
-        )
+        return await event.reply(phrase.money.no_people + phrase.money.swap_balance_use)
     if sender_id == recipient_id:
         return await event.reply(phrase.money.selfbyself)
 
@@ -284,17 +268,13 @@ async def swap_money(event: Message) -> Message:
         if isinstance(entity, types.User) and entity.bot:
             return await event.reply(phrase.money.bot)
     except Exception:
-        return await event.reply(
-            phrase.money.no_people + phrase.money.swap_balance_use
-        )
+        return await event.reply(phrase.money.no_people + phrase.money.swap_balance_use)
 
     db.add_money(sender_id, -amount)
     db.add_money(recipient_id, amount)
 
     return await event.reply(
-        phrase.money.swap_money.format(
-            formatter.value_to_str(amount, phrase.currency)
-        )
+        phrase.money.swap_money.format(formatter.value_to_str(amount, phrase.currency))
     )
 
 
@@ -351,9 +331,7 @@ async def money_to_server(event: Message) -> Message:
         return await event.reply(phrase.bank.error)
 
     return await event.reply(
-        phrase.bank.withdraw.format(
-            formatter.value_to_str(amount, phrase.currency)
-        )
+        phrase.bank.withdraw.format(formatter.value_to_str(amount, phrase.currency))
     )
 
 
@@ -379,9 +357,7 @@ async def get_balance(event: Message) -> Message:
     """Показывает баланс аметистов игрока."""
     balance: int = await db.get_money(event.sender_id)
     return await event.reply(
-        phrase.money.wallet.format(
-            formatter.value_to_str(balance, phrase.currency)
-        )
+        phrase.money.wallet.format(formatter.value_to_str(balance, phrase.currency))
     )
 
 
@@ -414,9 +390,7 @@ async def link_nick(event: Message) -> Message:
 
     if current_linked_nick is not None:
         btn = [
-            KeyboardButtonCallback(
-                "✅ Сменить", f"nick.{nick}.{sender_id}".encode()
-            )
+            KeyboardButtonCallback("✅ Сменить", f"nick.{nick}.{sender_id}".encode())
         ]
         price_str = formatter.value_to_str(
             config.cfg.PriceForChangeNick, phrase.currency
@@ -445,9 +419,7 @@ async def link_nick(event: Message) -> Message:
                 sender_name = await func.get_name(sender_id, minecraft=True)
                 await client.send_message(
                     int(ref_author_id),
-                    phrase.ref.used.format(
-                        user=sender_name, amount=config.cfg.RefGift
-                    ),
+                    phrase.ref.used.format(user=sender_name, amount=config.cfg.RefGift),
                 )
             except Exception:
                 pass
@@ -539,9 +511,7 @@ async def check_info_by_nick(event: Message) -> Message:
     if user_id is None:
         return await event.reply(phrase.nick.not_find)
 
-    state: str | bool = db.states.if_player(user_id) or db.states.if_author(
-        user_id
-    )
+    state: str | bool = db.states.if_player(user_id) or db.states.if_author(user_id)
     state_info = state if state else "Нет"
 
     return await event.reply(
@@ -666,9 +636,7 @@ async def cities_remove(event: Message) -> Message:
     roles = db.roles()
     if roles.get(event.sender_id) < roles.ADMIN:
         return await event.reply(
-            phrase.roles.no_perms.format(
-                level=roles.ADMIN, name=phrase.roles.admin
-            )
+            phrase.roles.no_perms.format(level=roles.ADMIN, name=phrase.roles.admin)
         )
 
     word: str = event.pattern_match.group(1).strip().lower()
@@ -705,12 +673,8 @@ async def online(event: Message) -> Message:
         async with mcrcon.Vanilla as rcon:
             response: str = await rcon.send("list")
 
-        players_raw: str = (
-            response.split(":", 1)[1].strip() if ":" in response else ""
-        )
-        players: list[str] = [
-            p.strip() for p in players_raw.split(",") if p.strip()
-        ]
+        players_raw: str = response.split(":", 1)[1].strip() if ":" in response else ""
+        players: list[str] = [p.strip() for p in players_raw.split(",") if p.strip()]
 
         return await event.reply(
             phrase.online.format(list=", ".join(players), count=len(players))
@@ -744,9 +708,7 @@ async def add_new_hint(event: Message) -> Message:
                     continue
 
                 hint_cap = text.capitalize()
-                pending_id = await db.add_pending_hint(
-                    event.sender_id, hint_cap, word
-                )
+                pending_id = await db.add_pending_hint(event.sender_id, hint_cap, word)
 
                 admin_btns = [
                     [
@@ -763,9 +725,7 @@ async def add_new_hint(event: Message) -> Message:
                     ),
                     buttons=admin_btns,
                 )
-                return await conv.send_message(
-                    phrase.newhints.sent.format(pending_id)
-                )
+                return await conv.send_message(phrase.newhints.sent.format(pending_id))
         except TimeoutError:
             return await event.reply(phrase.newhints.timeout)
 
@@ -779,9 +739,7 @@ async def get_last_hint(event: Message) -> Message:
     roles = db.roles()
     if roles.get(event.sender_id) < roles.ADMIN:
         return await event.reply(
-            phrase.roles.no_perms.format(
-                level=roles.ADMIN, name=phrase.roles.admin
-            )
+            phrase.roles.no_perms.format(level=roles.ADMIN, name=phrase.roles.admin)
         )
 
     hint: dict[str, Any] = await db.get_latest_pending_hint()
@@ -791,7 +749,7 @@ async def get_last_hint(event: Message) -> Message:
     btns = [
         [
             Button.inline("✅", f"hint.accept.{hint['id']}"),
-            Button.inline("❌", f"hint.reject.{hint['id']}")
+            Button.inline("❌", f"hint.reject.{hint['id']}"),
         ]
     ]
 
