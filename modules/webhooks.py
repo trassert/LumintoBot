@@ -135,13 +135,6 @@ async def server():
         logger.info(f"[Bank] Переведено {amount} на счет {playerid}")
         return aiohttp.web.Response(text="ok")
 
-    # async def genai(request: aiohttp.web.Request):
-    #     player = request.query.get("player")
-    #     text = request.query.get("text")
-    #     logger.info(f"[AI] {player} > {text}")
-    #     chat = await ai.get_player_chat(player)
-    #     return aiohttp.web.Response(text=(await chat.send_message(text)).text)
-
     async def github(request: aiohttp.web.Request):
         load: dict = await request.json()
         commits = load.get("commits")
@@ -178,7 +171,6 @@ async def server():
             aiohttp.web.post("/github", github),
             aiohttp.web.get("/minecraft", minecraft),
             aiohttp.web.get("/bank", bank),
-            # aiohttp.web.get("/genai", genai),
             aiohttp.web.get("/", status),
         ],
     )
