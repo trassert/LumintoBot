@@ -75,3 +75,7 @@ def fmtime(s: float) -> str:
     units = [(h, "ч."), (m, "мин."), (s, "сек.")]
     parts = [f"{v} {u}" for v, u in units if v > 0]
     return ", ".join(parts) if parts else "0 сек."
+
+
+def is_valid_mc_nick(nick: str) -> bool:
+    return bool(re.fullmatch(r"[a-zA-Z0-9_]{3,16}", nick))

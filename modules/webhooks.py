@@ -107,6 +107,8 @@ async def server():
             logger.info("Неверный пароль (C2HTTP)")
             return aiohttp.web.Response(text="Неверный пароль.", status=401)
         nick = request.query.get("nick")
+        if formatter.is_valid_mc_nick(nick) is False:
+            return aiohttp.web.Response(text="Nick is not valid", status=406)
         # message = request.query.get('message') Для будущих нужд
         db.statistic.add(nick)
         logger.debug(f"+ соо. от {nick}")
