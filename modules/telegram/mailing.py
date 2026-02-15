@@ -35,8 +35,8 @@ async def send_to_subscribers(message_text):
 
 @func.new_command(r"\+обновление ([\s\S]+)")
 async def admin_broadcast(event: Message):
-    roles = db.roles()
-    if roles.get(event.sender_id) < roles.ADMIN:
+    roles = db.Roles()
+    if await roles.get(event.sender_id) < roles.ADMIN:
         return await event.reply(
             phrase.roles.no_perms.format(
                 level=roles.ADMIN,

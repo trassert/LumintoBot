@@ -178,7 +178,7 @@ async def ready_to_mine(id: str) -> bool:
     return False
 
 
-class roles:
+class Roles:
     BLACKLIST = -1
     USER = 0
     VIP = 1
@@ -187,24 +187,24 @@ class roles:
     ADMIN = 4
     OWNER = 5
 
-    def get(self, id: str) -> int:
+    async def get(self, id: str) -> int:
         """Получить роль пользователя (USER, если не найдено)"""
         id = str(id)
-        data = _load_json_sync(pathes.roles)
+        data = await _load_json_async(pathes.roles)
         return data.get(id, self.USER)
 
-    def set(self, id: str, role: int) -> bool:
+    async def set(self, id: str, role: int) -> bool:
         """Установить роль пользователя"""
         id = str(id)
         role = int(role)
-        data = _load_json_sync(pathes.roles)
+        data = await _load_json_async(pathes.roles)
         data[id] = role
         sorted_data = dict(sorted(data.items(), key=lambda x: (-x[1], x[0])))
-        _save_json_sync(pathes.roles, sorted_data, indent=True)
+        await _save_json_async(pathes.roles, sorted_data, indent=True)
         return True
 
 
-class crocodile_stat:
+class Crorostat:
     def __init__(self, id=False):
         if id:
             self.id = str(id)
@@ -217,13 +217,13 @@ class crocodile_stat:
         _save_json_sync(pathes.crocostat, data, sort_keys=True)
         return 0
 
-    def add(self):
-        data = _load_json_sync(pathes.crocostat)
+    async def add(self):
+        data = await _load_json_sync(pathes.crocostat)
         data[self.id] = data.get(self.id, 0) + 1
-        _save_json_sync(pathes.crocostat, data, sort_keys=True)
+        await _save_json_sync(pathes.crocostat, data, sort_keys=True)
 
-    def get_all(self=False):
-        data = _load_json_sync(pathes.crocostat)
+    async def get_all(self=False):
+        data = await _load_json_sync(pathes.crocostat)
         return dict(sorted(data.items(), key=lambda item: item[1], reverse=True))
 
 

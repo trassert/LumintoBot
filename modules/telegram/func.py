@@ -125,7 +125,7 @@ async def swap_resolve_recipient(event: Message, args: list[str]) -> int | None:
 
 
 async def checks(event: Message | events.CallbackQuery.Event) -> bool:
-    roles = db.roles()
+    roles = db.Roles()
     if event.is_private and not isinstance(event, events.CallbackQuery.Event):
         name = await get_name(event.sender_id, log=True)
         (
@@ -133,7 +133,7 @@ async def checks(event: Message | events.CallbackQuery.Event) -> bool:
             if len(event.text) < 100
             else logger.info(f"ЛС - {name} > {event.text[:100]}...")
         )
-    if roles.get(event.sender_id) != roles.BLACKLIST:
+    if await roles.get(event.sender_id) != roles.BLACKLIST:
         return True
     if isinstance(event, events.CallbackQuery.Event):
         await event.answer(phrase.blacklisted, alert=True)

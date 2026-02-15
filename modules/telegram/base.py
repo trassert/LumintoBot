@@ -1,5 +1,4 @@
 import asyncio
-import re
 from datetime import datetime
 from random import choice, randint
 from time import time
@@ -102,7 +101,7 @@ async def start(event: Message) -> Message:
 async def profile(event: Message) -> Message:
     """Выводит детальную информацию об игроке, его роли, государстве и статистике."""
     user_id: int = event.sender_id
-    role: int = db.roles().get(user_id)
+    role: int = await db.Roles().get(user_id)
 
     state_author: str | bool = db.states.if_author(user_id)
     if state_author:
@@ -376,11 +375,7 @@ async def link_nick(event: Message) -> Message:
     ref_code: str = event.pattern_match.group(2).strip()
     sender_id: int = event.sender_id
 
-    if len(nick) < 4:
-        return await event.reply(phrase.nick.too_short)
-    if len(nick) > 16:
-        return await event.reply(phrase.nick.too_big)
-    if not re.match(r"^[A-Za-z0-9_]*$", nick):
+    if formatter.is_valid_mc_nick(nick) is False:
         return await event.reply(phrase.nick.invalid)
 
     current_linked_nick = db.nicks(id=sender_id).get()
@@ -519,7 +514,7 @@ async def check_info_by_nick(event: Message) -> Message:
     return await event.reply(
         phrase.nick.info.format(
             tg=await func.get_name(user_id),
-            role=phrase.roles.types[db.roles().get(user_id)],
+            role=phrase.roles.types[await db.Roles().get(user_id)],
             state=state_info,
         )
     )
@@ -636,8 +631,8 @@ async def cities_requests(event: Message) -> Message:
 @func.new_command(r"\-город (.+)")
 async def cities_remove(event: Message) -> Message:
     """Удаляет город из базы (доступно администраторам)."""
-    roles = db.roles()
-    if roles.get(event.sender_id) < roles.ADMIN:
+    roles = db.Roles()
+    if await roles.get(event.sender_id) < roles.ADMIN:
         return await event.reply(
             phrase.roles.no_perms.format(level=roles.ADMIN, name=phrase.roles.admin)
         )
@@ -739,8 +734,8 @@ async def get_last_hint(event: Message) -> Message:
     if not event.is_private:
         return await event.reply(phrase.newhints.private)
 
-    roles = db.roles()
-    if roles.get(event.sender_id) < roles.ADMIN:
+    roles = db.Roles()
+    if await roles.get(event.sender_id) < roles.ADMIN:
         return await event.reply(
             phrase.roles.no_perms.format(level=roles.ADMIN, name=phrase.roles.admin)
         )

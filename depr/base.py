@@ -120,7 +120,7 @@
 
 # @func.new_command(r"\-слово$")
 # async def word_remove_empty(event: Message):
-#     roles = db.roles()
+#     roles = db.Roles()
 #     if roles.get(event.sender_id) < roles.ADMIN:
 #         return await event.reply(
 #             phrase.roles.no_perms.format(
@@ -132,7 +132,7 @@
 
 # @func.new_command(r"\-слово\s(.+)")
 # async def word_remove(event: Message):
-#     roles = db.roles()
+#     roles = db.Roles()
 #     if roles.get(event.sender_id) < roles.ADMIN:
 #         return await event.reply(
 #             phrase.roles.no_perms.format(

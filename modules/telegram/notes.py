@@ -11,8 +11,8 @@ logger.info(f"Загружен модуль {__name__}!")
 @func.new_command(r"\+нот (.+)\n([\s\S]+)")
 @func.new_command(r"\+note (.+)\n([\s\S]+)")
 async def add_note(event: Message):
-    roles = db.roles()
-    if roles.get(event.sender_id) < roles.VIP:
+    roles = db.Roles()
+    if await roles.get(event.sender_id) < roles.VIP:
         return await event.reply(
             phrase.roles.no_perms.format(level=roles.VIP, name=phrase.roles.vip),
         )
@@ -32,8 +32,8 @@ async def add_note(event: Message):
 @func.new_command(r"\+нот (.+)$")
 @func.new_command(r"\+note (.+)$")
 async def add_note_notext(event: Message):
-    roles = db.roles()
-    if roles.get(event.sender_id) < roles.VIP:
+    roles = db.Roles()
+    if await roles.get(event.sender_id) < roles.VIP:
         return await event.reply(
             phrase.roles.no_perms.format(level=roles.VIP, name=phrase.roles.vip),
         )
@@ -43,8 +43,8 @@ async def add_note_notext(event: Message):
 @func.new_command(r"\+нот\n([\s\S]+)")
 @func.new_command(r"\+note\n([\s\S]+)")
 async def add_note_noname(event: Message):
-    roles = db.roles()
-    if roles.get(event.sender_id) < roles.VIP:
+    roles = db.Roles()
+    if await roles.get(event.sender_id) < roles.VIP:
         return await event.reply(
             phrase.roles.no_perms.format(level=roles.VIP, name=phrase.roles.vip),
         )
@@ -87,8 +87,8 @@ async def get_all_notes(event: Message):
 @func.new_command(r"\-note (.+)$")
 @func.new_command(r"\-text (.+)$")
 async def del_note(event: Message):
-    roles = db.roles()
-    if roles.get(event.sender_id) < roles.VIP:
+    roles = db.Roles()
+    if await roles.get(event.sender_id) < roles.VIP:
         return await event.reply(
             phrase.roles.no_perms.format(level=roles.VIP, name=phrase.roles.vip),
         )

@@ -59,7 +59,7 @@ async def active_check(event: Message):
 @func.new_command(r"/стат слова$")
 @func.new_command(r"топ крокодила$")
 async def crocodile_wins(event: Message):
-    all = db.crocodile_stat.get_all()
+    all = await db.Crorostat.get_all()
     text = ""
     n = 1
     for id in all:

@@ -134,8 +134,8 @@ async def crocodile_bet(event: Message):
 
 @func.new_command(r"/суперигра(.*)")
 async def super_game(event: Message):
-    roles = db.roles()
-    if roles.get(event.sender_id) < roles.ADMIN:
+    roles = db.Roles()
+    if await roles.get(event.sender_id) < roles.ADMIN:
         return await event.reply(
             phrase.roles.no_perms.format(level=roles.ADMIN, name=phrase.roles.admin)
         )
@@ -182,7 +182,7 @@ async def crocodile_handler(event: Message):
         bets = await db.database("crocodile_bets")
         total_payout = 0
 
-        top_players = list(db.crocodile_stat.get_all().keys())[
+        top_players = list(await db.Crorostat.get_all().keys())[
             : config.cfg.TopLowerBets
         ]
 
@@ -216,7 +216,7 @@ async def crocodile_handler(event: Message):
 
         client.remove_event_handler(crocodile_hint)
         client.remove_event_handler(crocodile_handler)
-        db.crocodile_stat(event.sender_id).add()
+        await db.Crorostat(event.sender_id).add()
 
         return await event.reply(phrase.crocodile.win.format(current_word) + win_msg)
 

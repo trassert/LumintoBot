@@ -12,8 +12,8 @@ logger.info(f"Загружен модуль {__name__}!")
 @func.new_command(r"/изменить баланс(.*)")
 @func.new_command(r"/change balance(.*)")
 async def add_balance(event: Message):
-    roles = db.roles()
-    if roles.get(event.sender_id) < roles.ADMIN:
+    roles = db.Roles()
+    if await roles.get(event.sender_id) < roles.ADMIN:
         return await event.reply(
             phrase.roles.no_perms.format(
                 level=roles.ADMIN,
@@ -53,8 +53,8 @@ async def add_balance(event: Message):
 @func.new_command(r"\+стафф(.*)")
 @func.new_command(r"\+staff(.*)")
 async def add_staff(event: Message):
-    roles = db.roles()
-    if roles.get(event.sender_id) < roles.OWNER:
+    roles = db.Roles()
+    if await roles.get(event.sender_id) < roles.OWNER:
         return await event.reply(
             phrase.roles.no_perms.format(
                 level=roles.OWNER,
@@ -74,8 +74,8 @@ async def add_staff(event: Message):
             tag = await func.get_name(user)
         else:
             return await event.reply(phrase.money.no_people)
-    new_role = roles.get(user) + 1
-    roles.set(user, new_role)
+    new_role = await roles.get(user) + 1
+    await roles.set(user, new_role)
     return await event.reply(
         phrase.perms.upgrade.format(nick=tag, staff=new_role),
     )
@@ -84,8 +84,8 @@ async def add_staff(event: Message):
 @func.new_command(r"\-staff(.*)")
 @func.new_command(r"\-стафф(.*)")
 async def del_staff(event: Message):
-    roles = db.roles()
-    if roles.get(event.sender_id) < roles.OWNER:
+    roles = db.Roles()
+    if await roles.get(event.sender_id) < roles.OWNER:
         return await event.reply(
             phrase.roles.no_perms.format(
                 level=roles.OWNER,
@@ -105,8 +105,8 @@ async def del_staff(event: Message):
             tag = await func.get_name(user)
         else:
             return await event.reply(phrase.money.no_people)
-    new_role = roles.get(user) - 1
-    roles.set(user, new_role)
+    new_role = await roles.get(user) - 1
+    await roles.set(user, new_role)
     return await event.reply(
         phrase.perms.downgrade.format(nick=tag, staff=new_role),
     )
@@ -114,8 +114,8 @@ async def del_staff(event: Message):
 
 @func.new_command(r"//(.+)")
 async def vanilla_mcrcon(event: Message):
-    roles = db.roles()
-    if roles.get(event.sender_id) < roles.ADMIN:
+    roles = db.Roles()
+    if await roles.get(event.sender_id) < roles.ADMIN:
         return await event.reply(
             phrase.roles.no_perms.format(
                 level=roles.ADMIN,
@@ -144,8 +144,8 @@ async def vanilla_mcrcon(event: Message):
 @func.new_command(r"\+wl\s(.+)")
 @func.new_command(r"\-wl\s(.+)")
 async def whitelist(event: Message):
-    roles = db.roles()
-    if roles.get(event.sender_id) < roles.VIP:
+    roles = db.Roles()
+    if await roles.get(event.sender_id) < roles.VIP:
         return await event.reply(
             phrase.roles.no_perms.format(level=roles.VIP, name=phrase.roles.vip),
         )
@@ -167,8 +167,8 @@ async def whitelist(event: Message):
 
 @func.new_command(r"/выдать(.*)")
 async def give_money(event: Message):
-    roles = db.roles()
-    if roles.get(event.sender_id) < roles.ADMIN:
+    roles = db.Roles()
+    if await roles.get(event.sender_id) < roles.ADMIN:
         return await event.reply(
             phrase.roles.no_perms.format(
                 level=roles.ADMIN,
