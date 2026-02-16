@@ -1,7 +1,6 @@
 loguru
 matplotlib
 seaborn
-bestconfig
 pymorphy3
 psutil
 cryptography
