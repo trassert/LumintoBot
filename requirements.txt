@@ -7,7 +7,6 @@ cryptography
 orjson
 telethon
 cryptg
-pip-review
 
 aioping
 aiofiles
