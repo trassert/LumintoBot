@@ -42,7 +42,7 @@ PriceForChangeStateNick: 40
 WithdrawDailyLimit: 64
 
 # Рефералы
-RefGift: 25
+RefGift: 50
 
 # Автоудаление сообщений в мини-игре Города
 CitiesAutodelete: 10
