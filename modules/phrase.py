@@ -658,7 +658,7 @@ mcadd_money = "🤵🏻‍♂️ : **{player}**, ваш счёт пополне�
 vote = (
     "🗳 : Актуальные ссылки для голосов:\n"
     f"1. **[Буст чата](https://t.me/boost/{chat.name})**\n"
-    "2. **[Minecraft-servers](https://minecraft-servers.ru/server/trassert)**\n"
+    "2. **[Minecraft-servers](https://minecraft-servers.ru/server/lumintomc)**\n"
     "3. **[HotMC](https://hotmc.ru/vote-274472)**\n"
     f"4. **[Буст канала](https://t.me/boost/{chat.channel})**\n"
 )
