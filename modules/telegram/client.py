@@ -1,3 +1,4 @@
+import socks
 from loguru import logger
 from telethon import TelegramClient, types
 from telethon.extensions import markdown
@@ -85,6 +86,30 @@ class CustomMarkdown:
         return markdown.unparse(text, filtered)
 
 
+def get_proxy() -> tuple:
+    """
+    Выдаёт формат прокси.
+    1. Тип (SOCKS5 по умолчанию)
+    2. Айпишник прокси (str)
+    3. Порт прокси (int)
+    4. Авторизация (bool)
+    5. Логин (str)
+    6. Пароль (str)
+    В TelegramClient формат прокси неверный,
+        если ставить как там - будет ошибка.
+    """
+    if config.tokens.proxy.enabled is False:
+        return None
+    return (
+        socks.SOCKS5,
+        config.tokens.proxy.host,
+        config.tokens.proxy.port,
+        config.tokens.proxy.auth,
+        config.tokens.proxy.login,
+        config.tokens.proxy.password,
+    )
+
+
 client = TelegramClient(
     session=pathes.bot,
     api_id=config.tokens.bot.id,
@@ -96,6 +121,7 @@ client = TelegramClient(
     use_ipv6=config.cfg.UseIPv6,
     connection_retries=-1,
     retry_delay=2,
+    proxy=get_proxy(),
 )
 client.parse_mode = CustomMarkdown()
 
