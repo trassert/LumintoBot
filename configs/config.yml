@@ -54,7 +54,7 @@ CitiesBet: 5
 CitiesTimeout: 50
 
 Mining:
-  Timeout: 300
+  Timeout: 500
   InitialGems: 5
   DefaultGems: 3
   BaseDeathChance: 0.01
