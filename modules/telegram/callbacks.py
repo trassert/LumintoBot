@@ -455,10 +455,16 @@ async def mine_callback(event: events.CallbackQuery.Event):
 
     match data[1]:
         case "no":
+            try:
+                del mining.sessions[sender_id]
+            except Exception:
+                logger.info(
+                    "Триггернуто удаление сессии, но её и так нет. Пропускаю.."
+                )
+                return None
             total = session["gems"]
             await db.add_money(sender_id, total)
             await db.add_mine_top(sender_id, total)
-            del mining.sessions[sender_id]
             return await event.edit(
                 phrase.mine.quited.format(
                     formatter.value_to_str(total, phrase.currency)
