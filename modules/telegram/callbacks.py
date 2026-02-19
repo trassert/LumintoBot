@@ -448,7 +448,10 @@ async def mine_callback(event: events.CallbackQuery.Event):
 
     session = mining.sessions.get(sender_id)
     if not session:
-        return await event.edit(phrase.mine.closed)
+        try:
+            return await event.edit(phrase.mine.closed)
+        except Exception:
+            return None
 
     match data[1]:
         case "no":
