@@ -470,14 +470,19 @@ async def mine_callback(event: events.CallbackQuery.Event):
             if rand < death_chance:
                 balance = await db.get_money(sender_id)
                 penalty = min(session["gems"], balance)
+                post = ""
                 if penalty > 0:
                     await db.add_money(sender_id, -penalty)
+                    post = phrase.mine.post_die.format(
+                        formatter.value_to_str(penalty, phrase.currency)
+                    )
                 del mining.sessions[sender_id]
                 return await event.edit(
-                    choice(phrase.mine.die).format(
-                        killer=choice(phrase.mine.killers),
-                        value=formatter.value_to_str(penalty, phrase.currency),
-                    ),
+                    f"{
+                        choice(phrase.mine.die).format(
+                            killer=choice(phrase.mine.killers),
+                        )
+                    }{post}",
                     buttons=None,
                 )
 
