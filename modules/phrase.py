@@ -145,7 +145,7 @@ class money:
 
 
 class help:
-    comm = "🤖 : [Помощь по командам](https://t.me/trassert_help)"
+    comm = "🤖 : [Помощь по командам](https://github.com/trassert/LumintoBot/wiki)"
 
 
 class server:
@@ -154,6 +154,7 @@ class server:
     host = (
         f"🌐 **: IP сервера:** `{domain.v4}`\n"
         f"💨 **: IPv6:** `{domain.v6}`\n\n"
+        f""
         f"{hint} **[Что за IPv6?]({domain.v6_info})**"
     )
 
