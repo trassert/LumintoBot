@@ -51,7 +51,7 @@ async def host(event: Message) -> Message:
 @func.new_command(r"бот помощь$")
 async def help(event: Message) -> Message:
     """Выводит список доступных команд."""
-    return await event.reply(phrase.help.comm, link_preview=True)
+    return await event.reply(phrase.help.comm, link_preview=False)
 
 
 @func.new_command(r"/пинг(.*)")
