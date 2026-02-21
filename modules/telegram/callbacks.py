@@ -458,9 +458,7 @@ async def mine_callback(event: events.CallbackQuery.Event):
             try:
                 del mining.sessions[sender_id]
             except Exception:
-                logger.info(
-                    "Триггернуто удаление сессии, но её и так нет. Пропускаю.."
-                )
+                logger.info("Триггернуто удаление сессии, но её и так нет. Пропускаю..")
                 return None
             total = session["gems"]
             await db.add_money(sender_id, total)
