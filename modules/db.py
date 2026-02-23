@@ -218,12 +218,12 @@ class Crorostat:
         return 0
 
     async def add(self):
-        data = await _load_json_sync(pathes.crocostat)
+        data = await _load_json_async(pathes.crocostat)
         data[self.id] = data.get(self.id, 0) + 1
-        await _save_json_sync(pathes.crocostat, data, sort_keys=True)
+        await _save_json_async(pathes.crocostat, data, sort_keys=True)
 
     async def get_all(self=False):
-        data = await _load_json_sync(pathes.crocostat)
+        data = await _load_json_async(pathes.crocostat)
         return dict(sorted(data.items(), key=lambda item: item[1], reverse=True))
 
 

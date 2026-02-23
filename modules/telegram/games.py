@@ -182,7 +182,7 @@ async def crocodile_handler(event: Message):
         bets = await db.database("crocodile_bets")
         total_payout = 0
 
-        top_players = list(await db.Crorostat.get_all().keys())[
+        top_players = list((await db.Crorostat.get_all()).keys())[
             : config.cfg.TopLowerBets
         ]
 
