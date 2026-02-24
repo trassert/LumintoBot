@@ -19,7 +19,7 @@ from .. import (
 )
 from . import func
 from .client import client
-from .games import crocodile_handler, crocodile_hint
+from .games import CrocodileGame, crocodile_handler, crocodile_hint
 
 logger.info(f"Загружен модуль {__name__}!")
 
@@ -378,17 +378,11 @@ async def crocodile_callback(event: events.CallbackQuery.Event):
 
     match data[1]:
         case "start":
-            if await db.database("crocodile_super_game") == 1:
-                return await event.answer(phrase.crocodile.super_game_here, alert=True)
-            if await db.database("current_game") != 0:
+            if await CrocodileGame.is_running():
                 return await event.answer(phrase.crocodile.no, alert=True)
 
             word = await db.get_crocodile_word()
-
-            unsec = "".join("_" if x.isalpha() else x for x in word)
-            await db.database(
-                "current_game", {"hints": [], "word": word, "unsec": unsec}
-            )
+            await CrocodileGame.start_game(word)
 
             client.add_event_handler(
                 crocodile_hint, events.NewMessage(pattern=r"(?i)^/подсказка")
@@ -406,12 +400,10 @@ async def crocodile_callback(event: events.CallbackQuery.Event):
                 else f"{entity.first_name} {entity.last_name}".strip()
             )
 
-            if await db.database("current_game") == 0:
+            if not await CrocodileGame.is_running():
                 return await event.answer(phrase.crocodile.already_down, alert=True)
-            if await db.database("crocodile_super_game") == 1:
-                return await event.answer(phrase.crocodile.super_game_here, alert=True)
 
-            bets_json = await db.database("crocodile_bets")
+            bets_json = CrocodileGame.get_bets()
             bets = 0
             if bets_json:
                 bets = max(round(sum(bets_json.values()) / 2), 1)
@@ -419,9 +411,10 @@ async def crocodile_callback(event: events.CallbackQuery.Event):
                 if balance_check is not True:
                     return await event.answer(balance_check, alert=True)
 
-            word = (await db.database("current_game"))["word"]
-            await db.database("current_game", 0)
-            await db.database("crocodile_last_hint", 0)
+            game = CrocodileGame.get_current()
+            word = game.get("word") if isinstance(game, dict) else None
+            await CrocodileGame.stop_game()
+            await CrocodileGame.set_last_hint(0)
 
             client.remove_event_handler(crocodile_hint)
             client.remove_event_handler(crocodile_handler)

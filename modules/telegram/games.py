@@ -1,6 +1,6 @@
 import asyncio
 import contextlib
-from random import choice, randint, random
+from random import choice, random
 
 import aiofiles
 import orjson
@@ -19,6 +19,7 @@ logger.info(f"Загружен модуль {__name__}!")
 
 Cities = db.CitiesGame()
 CitiesTimerTask: asyncio.Task | None = None
+CrocodileGame = db.CrocodileGame()
 
 
 def _check_topic(event: Message) -> bool:
@@ -65,7 +66,7 @@ async def crocodile(event: Message):
     if not _check_topic(event):
         return await event.reply(phrase.game_topic_warning)
 
-    is_running = await db.database("current_game") != 0
+    is_running = await CrocodileGame.is_running()
     stop_btn = KeyboardButtonCallback(text="❌ Остановить игру", data=b"crocodile.stop")
 
     if not is_running:
@@ -87,8 +88,8 @@ async def crocodile_bet(event: Message):
         return await event.reply(phrase.game_topic_warning)
 
     raw_bet = event.pattern_match.group(1).strip()
-    min_bet = await db.database("min_bet")
-    max_bet = await db.database("max_bet")
+    min_bet = config.cfg.Crocodile.MinBet
+    max_bet = config.cfg.Crocodile.MaxBet
 
     try:
         bet = int(raw_bet) if raw_bet else min_bet
@@ -108,7 +109,7 @@ async def crocodile_bet(event: Message):
             )
         )
 
-    if await db.database("current_game") != 0:
+    if await CrocodileGame.is_running():
         return await event.reply(phrase.crocodile.no)
 
     sender_balance = await db.get_money(event.sender_id)
@@ -119,51 +120,17 @@ async def crocodile_bet(event: Message):
             )
         )
 
-    all_bets = await db.database("crocodile_bets")
+    all_bets = CrocodileGame.get_bets()
     if str(event.sender_id) in all_bets:
         return await event.reply(phrase.crocodile.bet_already)
 
     await db.add_money(event.sender_id, -bet)
     all_bets[str(event.sender_id)] = bet
-    await db.database("crocodile_bets", all_bets)
+    await CrocodileGame.set_bets(all_bets)
 
     return await event.reply(
         phrase.crocodile.bet.format(formatter.value_to_str(bet, phrase.currency))
     )
-
-
-@func.new_command(r"/суперигра(.*)")
-async def super_game(event: Message):
-    roles = db.Roles()
-    if await roles.get(event.sender_id) < roles.ADMIN:
-        return await event.reply(
-            phrase.roles.no_perms.format(level=roles.ADMIN, name=phrase.roles.admin)
-        )
-
-    arg = event.pattern_match.group(1).strip()
-    bets = await db.database("crocodile_bets")
-    bets[str(config.tokens.bot.creator)] = 50
-
-    await db.database("crocodile_bets", bets)
-    await db.database("crocodile_super_game", 1)
-    await db.database("max_bet", 100)
-    await db.database("min_bet", 50)
-
-    await client.send_message(config.chats.chat, phrase.crocodile.super_game_wait)
-    await asyncio.sleep(60)
-
-    await db.database(
-        "current_game", {"hints": [], "unsec": "_" * len(arg), "word": arg}
-    )
-
-    client.add_event_handler(
-        crocodile_hint, events.NewMessage(pattern=r"(?i)^/подсказка")
-    )
-    client.add_event_handler(
-        crocodile_handler, events.NewMessage(chats=config.chats.chat)
-    )
-
-    return await client.send_message(config.chats.chat, phrase.crocodile.super_game)
 
 
 async def crocodile_handler(event: Message):
@@ -171,15 +138,14 @@ async def crocodile_handler(event: Message):
         return None
 
     text = event.text.strip().lower()
-    game_data = await db.database("current_game")
+    game_data = CrocodileGame.get_current()
     if not game_data:
         return None
 
     current_word = game_data["word"]
-    current_mask = list(game_data["unsec"])
 
     if text == current_word:
-        bets = await db.database("crocodile_bets")
+        bets = CrocodileGame.get_bets()
         total_payout = 0
 
         top_players = list((await db.Crorostat.get_all()).keys())[
@@ -205,15 +171,8 @@ async def crocodile_handler(event: Message):
         else:
             win_msg = ""
 
-        await db.database("current_game", 0)
-        await db.database("crocodile_bets", {})
-        await db.database("crocodile_last_hint", 0)
-
-        if await db.database("crocodile_super_game") == 1:
-            await db.database("crocodile_super_game", 0)
-            await db.database("max_bet", config.cfg.CrocodileDefaultMaxBet)
-            await db.database("min_bet", config.cfg.CrocodileDefaultMinBet)
-
+        await CrocodileGame.stop_game()
+        await CrocodileGame.set_last_hint(0)
         client.remove_event_handler(crocodile_hint)
         client.remove_event_handler(crocodile_handler)
         await db.Crorostat(event.sender_id).add()
@@ -221,20 +180,8 @@ async def crocodile_handler(event: Message):
         return await event.reply(phrase.crocodile.win.format(current_word) + win_msg)
 
     if not text.startswith("/"):
-        changed = False
-        for i, char in enumerate(current_word):
-            if i < len(text) and text[i] == char and current_mask[i] == "_":
-                current_mask[i] = char
-                changed = True
-
+        changed, new_mask_str, finished = await CrocodileGame.reveal_on_guess(text)
         if changed:
-            new_mask_str = "".join(current_mask)
-            if new_mask_str == current_word:
-                current_mask[randint(0, len(current_mask) - 1)] = "_"
-                new_mask_str = "".join(current_mask)
-
-            game_data["unsec"] = new_mask_str
-            await db.database("current_game", game_data)
             return await event.reply(
                 phrase.crocodile.new.format(new_mask_str.replace("_", ".."))
             )
@@ -245,19 +192,17 @@ async def crocodile_hint(event: Message):
     if not _check_topic(event):
         return await event.reply(phrase.game_topic_warning)
 
-    game = await db.database("current_game")
+    game = CrocodileGame.get_current()
     if not game:
         return None
-
-    hints_list = game["hints"]
-    if event.sender_id in hints_list:
+    added = await CrocodileGame.add_hint(event.sender_id)
+    if not added:
         return await event.reply(phrase.crocodile.hints_all)
 
-    hints_list.append(event.sender_id)
-    game["hints"] = hints_list
-    await db.database("current_game", game)
+    game = CrocodileGame.get_current()
 
     word = game["word"]
+    hints_list = game.get("hints", [])
 
     if random() < config.cfg.PercentForRandomLetter and len(hints_list) > 1:
         for i, letter in enumerate(game["unsec"], 1):
@@ -492,7 +437,7 @@ async def cities_start(event: Message):
 
 
 async def crocodile_onboot():
-    if await db.database("current_game") != 0:
+    if await CrocodileGame.is_running():
         client.add_event_handler(
             crocodile_handler, events.NewMessage(chats=config.chats.chat)
         )

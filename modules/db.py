@@ -951,3 +951,143 @@ async def remove_item(id: str) -> bool:
     del data[id]
     await _save_json_async(pathes.items, data, indent=True)
     return True
+
+
+class CrocodileGame:
+    def __init__(self):
+        self.data_file = pathes.crocodile
+        self.data = self._load_data()
+
+    def _load_data(self):
+        try:
+            return _load_json_sync(self.data_file)
+        except FileNotFoundError:
+            return {"bets": {}, "current_game": {}}
+
+    async def _save_data(self, data):
+        await _save_json_async(self.data_file, data)
+
+    async def add_bet(self, user_id: int, bet: int):
+        """Добавляет (или уменьшает) ставку пользователя. Возвращает True/False."""
+        bets = self.data.setdefault("bets", {})
+        cur = bets.get(str(user_id), 0) + bet
+        if cur < 0:
+            return False
+        bets[str(user_id)] = cur
+        self.data["bets"] = bets
+        await self._save_data(self.data)
+        return True
+
+    def get_current(self):
+        """Возвращает текущее состояние игры или 0, если игры нет."""
+        return self.data.get("current_game", 0)
+
+    async def set_current(self, value):
+        """Устанавливает текущее состояние игры и сохраняет файл."""
+        self.data["current_game"] = value
+        await self._save_data(self.data)
+
+    async def is_running(self) -> bool:
+        return self.get_current() != 0
+
+    async def start_game(self, word: str):
+        """Запускает игру с указанным словом."""
+        payload = {
+            "hints": [],
+            "word": str(word),
+            "unsec": "".join("_" if x.isalpha() else x for x in str(word)),
+        }
+        await self.set_current(payload)
+        return payload
+
+    async def stop_game(self):
+        """Останавливает текущую игру, возвращая слово и очищая состояние."""
+        current = self.get_current()
+        word = None
+        if isinstance(current, dict):
+            word = current.get("word")
+        await self.set_current(0)
+
+        await self.clear_bets()
+        return word
+
+    def get_bets(self) -> dict:
+        return dict(self.data.get("bets", {}))
+
+    async def set_bets(self, bets: dict):
+        self.data["bets"] = dict(bets)
+        await self._save_data(self.data)
+
+    async def clear_bets(self):
+        self.data["bets"] = {}
+        await self._save_data(self.data)
+
+    async def add_hint(self, user_id: int) -> bool:
+        """Добавляет пользователя в список запросивших подсказку. Возвращает False если уже просил."""
+        current = self.get_current()
+        if not current or not isinstance(current, dict):
+            return False
+        hints = current.get("hints", [])
+        if user_id in hints:
+            return False
+        hints.append(user_id)
+        current["hints"] = hints
+        await self.set_current(current)
+        return True
+
+    async def reveal_on_guess(self, guess: str):
+        """Обновляет маску (`unsec`) по частичному отгадыванию.
+        Возвращает tuple (changed: bool, new_mask: str, finished_full_mask: bool).
+        finished_full_mask=True означает, что маска совпала с словом (до исправления).
+        """
+        current = self.get_current()
+        if not current or not isinstance(current, dict):
+            return False, None, False
+        word = current.get("word", "")
+        mask = list(current.get("unsec", ""))
+        changed = False
+        for i, ch in enumerate(word):
+            if i < len(guess) and guess[i] == ch and mask[i] == "_":
+                mask[i] = ch
+                changed = True
+
+        new_mask_str = "".join(mask)
+        finished = False
+        if new_mask_str == word:
+            if len(mask) > 0:
+                mask[randint(0, len(mask) - 1)] = "_"
+            new_mask_str = "".join(mask)
+            finished = True
+
+        current["unsec"] = new_mask_str
+        await self.set_current(current)
+        return changed, new_mask_str, finished
+
+    async def guess_word(self, user_id: int, guess: str):
+        """Пытается угадать слово полностью. Возвращает словарь с результатом.
+        {"win": bool, "word": str, "bets": dict}
+        """
+        current = self.get_current()
+        if not current or not isinstance(current, dict):
+            return {"win": False}
+        word = current.get("word")
+        if str(guess).strip().lower() == str(word).strip().lower():
+            bets = self.get_bets()
+
+            await self.set_current(0)
+            await self.clear_bets()
+            return {"win": True, "word": word, "bets": bets}
+        return {"win": False}
+
+    def get_last_hint(self):
+        """Возвращает значение последней подсказки (обычно int) или 0."""
+        return self.data.get("crocodile_last_hint", 0)
+
+    async def set_last_hint(self, value):
+        self.data["crocodile_last_hint"] = value
+        await self._save_data(self.data)
+
+    async def clear_last_hint(self):
+        if "crocodile_last_hint" in self.data:
+            del self.data["crocodile_last_hint"]
+            await self._save_data(self.data)
