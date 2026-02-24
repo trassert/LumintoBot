@@ -34,8 +34,9 @@ tickets = Path("db") / "tickets.json"
 mailing = Path("db") / "mailing.json"
 tasks = Path("db") / "tasks.json"
 data = Path("db") / "data.json"
-shopc = Path("db") / "shop_current.json"
-shop = Path("db") / "shop_all.json"
+shopc = Path("db") / "shop" / "current.json"
+shop = Path("db") / "shop" / "all.json"
+shopver = Path("db") / "shop" / "version.txt"
 
 # Директория cities
 cities = Path("db") / "cities" / "game.json"

@@ -343,7 +343,7 @@ async def shop_callback(event: events.CallbackQuery.Event):
     logger.info(f"КБ кнопка (Shop), дата: {data}")
     sender_id = event.sender_id
 
-    if int(data[-1]) != await db.database("shop_version"):
+    if int(data[-1]) != await db.shop_version():
         return await event.answer(phrase.shop.old, alert=True)
 
     nick = db.nicks(id=sender_id).get()

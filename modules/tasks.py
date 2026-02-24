@@ -11,6 +11,7 @@ logger.info(f"Загружен модуль {__name__}!")
 async def update_shop():
     logger.info("Обновление магазина..")
     try:
+        await db.shop_version(update=True)
         theme = await db.update_shop()
 
         await client.send_message(

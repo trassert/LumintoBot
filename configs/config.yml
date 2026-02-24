@@ -76,3 +76,23 @@ Flood:
 Crocodile:
   MaxBet: 5
   MinBet: 1
+
+ShopThemeWeights:
+  armorer: 9
+  blacksmith: 9
+  desert: 3
+  end: 7
+  flower: 1
+  heads: 7
+  mine: 9
+  music: 2
+  nether: 5
+  raiders: 10
+  redstone: 5
+  remains: 5
+  sculk: 2
+  water: 6
+  witch: 8
+  potions: 5
+  books: 5
+  decorations: 2

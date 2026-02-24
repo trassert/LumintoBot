@@ -22,8 +22,6 @@ async def main():
     from modules.telegram.client import client
 
     log.setup()
-    if sum((await db.database("shop_weight")).values()) != 100:
-        logger.error("Сумма процентов в магазине не равна 100!")
     await db.Users.initialize()
     await client.start(bot_token=config.tokens.bot.token)
     await webhooks.server()

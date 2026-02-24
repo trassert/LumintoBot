@@ -1,7 +1,7 @@
 from collections import defaultdict
 from datetime import datetime, timedelta
 from pathlib import Path
-from random import choice, randint
+from random import choice, randint, sample
 from time import time
 from typing import TypedDict
 
@@ -65,32 +65,6 @@ async def _save_json_async(
         await f.write(orjson.dumps(data, option=options))
 
 
-async def database(key, value=None, delete=None, log=True):
-    """Изменить/получить ключ из настроек"""
-    if log:
-        if value is not None:
-            logger.info(f"Значение {key} теперь {value}")
-        elif delete is not None:
-            logger.info(f"Удаляю ключ: {key}")
-        else:
-            logger.info(f"Получаю ключ: {key}")
-
-    data = await _load_json_async(pathes.data)
-
-    if value is not None:
-        data[key] = value
-        data = dict(sorted(data.items()))
-        await _save_json_async(pathes.data, data, indent=True)
-        return True
-
-    if delete is not None:
-        data.pop(key, None)
-        await _save_json_async(pathes.data, data, indent=True)
-        return True
-
-    return data.get(key)
-
-
 async def get_money(id) -> int:
     id = str(id)
     data = await _load_json_async(pathes.money)
@@ -115,25 +89,34 @@ async def add_money(id, count):
 
 async def update_shop():
     """Обновляет магазин, возвращая новую тему."""
-    last_theme_data = _load_json_sync(pathes.shopc)
-    last_theme = last_theme_data.get("theme")
-    all_themes = _load_json_sync(pathes.shop)
+    last_theme = (await _load_json_async(pathes.shopc)).get("theme")
+    all_themes = await _load_json_async(pathes.shop)
 
-    if not all_themes:
+    if not isinstance(all_themes, dict) or not all_themes:
         logger.exception("Файл shop_all.json пуст или не содержит тем.")
         return None
 
     theme_names = list(all_themes.keys())
-    if not theme_names:
-        logger.exception("Нет доступных тем в shop_all.json")
+    if last_theme in theme_names and len(theme_names) == 1:
+        logger.exception("Нет доступных альтернативных тем в shop_all.json")
         return None
 
-    new_theme = last_theme
-    weights = await database("shop_weight")
-    while new_theme == last_theme:
-        new_theme = get_theme.weighted_choice(theme_names, weights)
+    weights = config.cfg.ShopThemeWeights
 
-    theme_items = all_themes[new_theme]
+    new_theme = last_theme
+    attempts = 0
+    while new_theme == last_theme and attempts < 10:
+        new_theme = get_theme.weighted_choice(theme_names, weights)
+        attempts += 1
+    if new_theme == last_theme:
+        others = [t for t in theme_names if t != last_theme]
+        new_theme = choice(others) if others else last_theme
+
+    theme_items = all_themes.get(new_theme, {})
+    if not isinstance(theme_items, dict):
+        logger.exception(f"Тема '{new_theme}' не содержит предметов")
+        return None
+
     item_names = list(theme_items.keys())
     if len(item_names) < 5:
         logger.exception(
@@ -141,29 +124,38 @@ async def update_shop():
         )
         return None
 
-    selected_items = []
-    while len(selected_items) < 5:
-        item = choice(item_names)
-        if item not in selected_items:
-            selected_items.append(item)
+    selected_items = sample(item_names, 5) if len(item_names) > 5 else item_names[:5]
 
     current_shop = {"theme": new_theme}
     for item in selected_items:
         item_data = theme_items[item].copy()
         price = item_data.get("price")
-        if isinstance(price, list) and len(price) == 2:
-            min_p, max_p = price
-            item_data["price"] = randint(min_p, max_p)
+        if (
+            isinstance(price, list)
+            and len(price) == 2
+            and all(isinstance(p, int) for p in price)
+        ):
+            item_data["price"] = randint(price[0], price[1])
         elif not isinstance(price, (int, float)):
             logger.exception(f"Некорректный формат цены для предмета '{item}': {price}")
         current_shop[item] = item_data
 
-    _save_json_sync(pathes.shopc, current_shop, indent=True)
+    await _save_json_async(pathes.shopc, current_shop, indent=True)
     return new_theme
 
 
 async def get_shop() -> dict:
     return await _load_json_async(pathes.shopc)
+
+
+async def shop_version(update=False) -> str:
+    async with aiofiles.open(pathes.shopver) as f:
+        ver = int(await f.read())
+    if update:
+        ver += 1
+        async with aiofiles.open(pathes.shopver, "w") as f:
+            await f.write(str(ver))
+    return ver
 
 
 async def ready_to_mine(id: str) -> bool:
