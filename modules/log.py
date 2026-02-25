@@ -33,9 +33,7 @@ def setup():
     log_dir.mkdir(parents=True, exist_ok=True)
     logger.add(
         log_dir / "{time:YYYY-MM-DD}.log",
-        format="[{time:HH:mm:ss} {level}]:"
-        " {file}:{function}"
-        " > {message}",
+        format="[{time:HH:mm:ss} {level}]: {file}:{function} > {message}",
         rotation="00:00",
         retention="30 days",
         level="INFO",

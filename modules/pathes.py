@@ -2,6 +2,7 @@ from pathlib import Path
 
 # Конфиг
 config = Path("configs")
+db = Path("db")
 
 # Директории и файлы в db/crocodile/
 crocoall = Path("db") / "crocodile" / "all.txt"
@@ -50,6 +51,7 @@ log = Path("log")
 shop_log = log / "shop"
 
 old_states = Path("backup") / "states"
+backup_db = Path("backup") / "db"
 
 font = Path("fonts") / "minecraft.ttf"
 

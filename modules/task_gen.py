@@ -1,4 +1,5 @@
 import asyncio
+import inspect
 import time
 from collections.abc import Callable
 from datetime import datetime, timedelta
@@ -109,7 +110,7 @@ class Generator:
         """Безопасно выполняет функцию и сохраняет время запуска."""
         start_time = time.time()
         try:
-            if asyncio.iscoroutinefunction(func):
+            if inspect.iscoroutinefunction(func):
                 await func()
             else:
                 await asyncio.get_event_loop().run_in_executor(None, func)
@@ -202,3 +203,4 @@ class Generator:
 UpdateShopTask = Generator("UpdateShop")
 RewardsTask = Generator("Rewards")
 RemoveStatesTask = Generator("RemoveStates")
+BackupDBTask = Generator("BackupDB")
