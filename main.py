@@ -1,27 +1,17 @@
 import asyncio
-from sys import stderr
 
 from loguru import logger
 
-logger.remove()
-logger.add(
-    stderr,
-    format="[{time:HH:mm:ss} <level>{level}</level>]:"
-    " <green>{file}:{function}</green>"
-    " <cyan>></cyan> {message}",
-    level="INFO",
-    colorize=True,
-    backtrace=False,
-    diagnose=False,
-)
+from modules import log
+
+log.setup()
 
 
 async def main():
-    from modules import config, db, log, task_gen, tasks, webhooks
+    from modules import config, db, task_gen, tasks, webhooks
     from modules.telegram import games
     from modules.telegram.client import client
 
-    log.setup()
     await db.Users.initialize()
     await client.start(bot_token=config.tokens.bot.token)
     await webhooks.server()

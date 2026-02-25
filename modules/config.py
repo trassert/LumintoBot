@@ -29,7 +29,7 @@ class ConfigManager:
     "Root. Вызывается."
 
     def __init__(self, path: Path):
-        logger.info(f"Зарегестрирован конфиг {path}")
+        logger.info(f"Зарегистрирован конфиг {path}")
         raw_data = yaml.safe_load(path.read_text(encoding="utf-8"))
         self._data = ConfigSection(raw_data)
 

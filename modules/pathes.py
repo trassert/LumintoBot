@@ -49,7 +49,9 @@ states = Path("db") / "states"
 times = Path("db") / "time"
 notes = Path("db") / "notes"
 stats = Path("db") / "chat_stats"
-shop_log = Path("log") / "shop"
+
+log = Path("log")
+shop_log = log / "shop"
 
 old_states = Path("backup") / "states"
 

@@ -1,0 +1,7 @@
+{
+    "venv": ".venv",
+    "venvPath": ".",
+    "reportGeneralTypeIssues": "information", 
+    "reportOptionalCall": "information",
+    "typeCheckingMode": "off"
+}

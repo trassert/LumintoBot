@@ -259,7 +259,9 @@ async def swap_money(event: Message) -> Message:
     try:
         recipient_id: int = await func.swap_resolve_recipient(event, args)
     except ValueError:
-        return await event.reply(phrase.money.no_such_people + phrase.money.swap_balance_use)
+        return await event.reply(
+            phrase.money.no_such_people + phrase.money.swap_balance_use
+        )
     if recipient_id is None:
         return await event.reply(phrase.money.no_people + phrase.money.swap_balance_use)
     if sender_id == recipient_id:

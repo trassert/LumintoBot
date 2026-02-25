@@ -17,13 +17,9 @@ logger.info(f"Загружен модуль {__name__}!")
 
 def _load_json_sync(filepath: Path) -> dict:
     """Загружает JSON файл синхронно. Возвращает {} при ошибке."""
-    try:
-        with open(filepath, "rb") as f:
-            raw = f.read()
-        return orjson.loads(raw) if raw else {}
-    except (FileNotFoundError, orjson.JSONDecodeError, ValueError):
-        logger.error(f"Ошибка при чтении файла {filepath}")
-        return {}
+    with open(filepath, "rb") as f:
+        raw = f.read()
+    return orjson.loads(raw) if raw else {}
 
 
 def _save_json_sync(
@@ -42,13 +38,9 @@ def _save_json_sync(
 
 async def _load_json_async(filepath: Path) -> dict:
     """Загружает JSON файл асинхронно. Возвращает {} при ошибке."""
-    try:
-        async with aiofiles.open(filepath, "rb") as f:
-            raw = await f.read()
-        return orjson.loads(raw) if raw else {}
-    except (FileNotFoundError, orjson.JSONDecodeError, ValueError):
-        logger.error(f"Ошибка при чтении файла {filepath}")
-        return {}
+    async with aiofiles.open(filepath, "rb") as f:
+        raw = await f.read()
+    return orjson.loads(raw) if raw else {}
 
 
 async def _save_json_async(

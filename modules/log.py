@@ -1,5 +1,6 @@
 import datetime
 import logging
+from sys import stderr
 
 import aiofiles
 from loguru import logger
@@ -19,6 +20,32 @@ class InterceptHandler(logging.Handler):
 
 
 def setup():
+    logger.remove()
+    logger.add(
+        stderr,
+        format="[{time:HH:mm:ss} <level>{level}</level>]:"
+        " <green>{file}:{function}</green>"
+        " <cyan>></cyan> {message}",
+        level="INFO",
+        colorize=True,
+        backtrace=False,
+        diagnose=False,
+    )
+    log_dir = pathes.log
+    log_dir.mkdir(parents=True, exist_ok=True)
+    logger.add(
+        log_dir / "{time:YYYY-MM-DD}.log",
+        format="[{time:HH:mm:ss} <level>{level}</level>]:",
+        rotation="00:00",
+        retention="30 days",
+        level="INFO",
+        colorize=True,
+        enqueue=True,
+        backtrace=False,
+        diagnose=False,
+    )
+    logger.info("Настроено логирование!")
+
     return logging.basicConfig(handlers=[InterceptHandler()], level=0)
 
 
