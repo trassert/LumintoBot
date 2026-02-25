@@ -7,8 +7,6 @@ from loguru import logger
 
 from . import pathes
 
-logger.info(f"Загружен модуль {__name__}!")
-
 
 class InterceptHandler(logging.Handler):
     def emit(self, record):
@@ -35,7 +33,9 @@ def setup():
     log_dir.mkdir(parents=True, exist_ok=True)
     logger.add(
         log_dir / "{time:YYYY-MM-DD}.log",
-        format="[{time:HH:mm:ss} <level>{level}</level>]:",
+        format="[{time:HH:mm:ss} {level}]:"
+        " {file}:{function}"
+        " > {message}",
         rotation="00:00",
         retention="30 days",
         level="INFO",

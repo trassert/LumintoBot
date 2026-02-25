@@ -1,9 +1,5 @@
 from pathlib import Path
 
-from loguru import logger
-
-logger.info(f"Загружен модуль {__name__}!")
-
 # Конфиг
 config = Path("configs")
 
