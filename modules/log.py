@@ -37,7 +37,6 @@ def setup():
         rotation="00:00",
         retention="30 days",
         level="INFO",
-        colorize=True,
         enqueue=True,
         backtrace=False,
         diagnose=False,
