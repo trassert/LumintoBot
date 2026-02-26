@@ -69,7 +69,7 @@ async def states_all(event: Message) -> Message:
 @func.new_command(r"казна топ$")
 @func.new_command(r"казтоп$")
 async def states_all_top(event: Message) -> Message:
-    data = db.states.get_all(sortedby="money")
+    data = db.states.get_all("money")
     if not data:
         return await event.reply(phrase.state.empty_list)
 
