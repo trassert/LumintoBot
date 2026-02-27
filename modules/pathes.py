@@ -6,7 +6,6 @@ db = Path("db")
 
 # Директории и файлы в db/crocodile/
 crocoall = Path("db") / "crocodile" / "all.txt"
-crocobl = Path("db") / "crocodile" / "blacklist.txt"
 crocomap = Path("db") / "crocodile" / "mappings.json"
 crocodile = Path("db") / "crocodile" / "game.json"
 pending_hints = Path("db") / "crocodile" / "pending_hints.json"
