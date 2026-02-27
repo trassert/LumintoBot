@@ -1,7 +1,7 @@
 from random import choice
+from typing import TYPE_CHECKING
 
 from loguru import logger
-from telethon.tl.custom import Message
 from telethon.tl.types import (
     KeyboardButtonCallback,
     KeyboardButtonRow,
@@ -10,6 +10,9 @@ from telethon.tl.types import (
 
 from .. import db, formatter, phrase, task_gen
 from . import func
+
+if TYPE_CHECKING:
+    from telethon.tl.custom import Message
 
 logger.info(f"Загружен модуль {__name__}!")
 
@@ -40,7 +43,7 @@ async def shop(event: Message):
             KeyboardButtonCallback(
                 text=f"{idx + 1}\u20e3",
                 data=f"shop.{idx}.{version}".encode(),
-            )
+            ),
         )
 
     keyboard = ReplyInlineMarkup([KeyboardButtonRow(button_callbacks)])

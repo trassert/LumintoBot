@@ -13,14 +13,14 @@ async def main():
     from modules.telegram.client import client
 
     await db.Users.initialize()
-    await client.start(bot_token=config.tokens.bot.token) # type: ignore
+    await client.start(bot_token=config.tokens.bot.token)  # ty:ignore[invalid-await]
     await webhooks.server()
     await task_gen.UpdateShopTask.create(tasks.update_shop, 2)
     await task_gen.RewardsTask.create(tasks.rewards, "19:00")
     await task_gen.RemoveStatesTask.create(tasks.remove_states, "17:00")
     await task_gen.BackupDBTask.create(tasks.backup_db, "1:00")
     await games.crocodile_onboot()
-    await client.run_until_disconnected() # type: ignore
+    await client.run_until_disconnected()
 
 
 if __name__ == "__main__":

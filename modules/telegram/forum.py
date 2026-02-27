@@ -1,10 +1,14 @@
+from typing import TYPE_CHECKING
+
 from loguru import logger
 from telethon.tl import functions
-from telethon.tl.custom import Message
 
 from .. import config, phrase
 from . import func
 from .client import client
+
+if TYPE_CHECKING:
+    from telethon.tl.custom import Message
 
 logger.info(f"Загружен модуль {__name__}!")
 
@@ -21,7 +25,7 @@ async def create_topic(event: Message):
             functions.messages.CreateForumTopicRequest(
                 peer=config.chats.forum,
                 title=title,
-            )
+            ),
         )
         topic_id = result.updates[0].id
         link = f"https://t.me/c/{str(config.chats.forum)[4:]}/{topic_id}"

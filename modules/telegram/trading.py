@@ -1,7 +1,7 @@
 import urllib.parse
+from typing import TYPE_CHECKING
 
 from loguru import logger
-from telethon.tl.custom import Message
 from telethon.tl.types import (
     KeyboardButtonRow,
     KeyboardButtonUrl,
@@ -11,6 +11,9 @@ from telethon.tl.types import (
 from .. import config, db, formatter, phrase
 from . import func
 from .client import client
+
+if TYPE_CHECKING:
+    from telethon.tl.custom import Message
 
 logger.info(f"Загружен модуль {__name__}!")
 
@@ -29,7 +32,9 @@ async def add_trade(event: Message):
     async with client.conversation(event.sender_id, timeout=300) as conv:
 
         async def ask_int(
-            prompt: str, error_not_int: str, error_not_positive: str
+            prompt: str,
+            error_not_int: str,
+            error_not_positive: str,
         ) -> int | None:
             while True:
                 await conv.send_message(prompt)
@@ -72,7 +77,7 @@ async def add_trade(event: Message):
             return None
 
     parsed_text = urllib.parse.quote(
-        f"Хочу купить у тебя {arg}. Предложение актуально?"
+        f"Хочу купить у тебя {arg}. Предложение актуально?",
     )
     url = f"https://t.me/{username}?text={parsed_text}"
 
@@ -89,9 +94,9 @@ async def add_trade(event: Message):
                 KeyboardButtonRow(
                     [
                         KeyboardButtonUrl(text="🛒 Купить", url=url),
-                    ]
+                    ],
                 ),
-            ]
+            ],
         ),
     )
 
@@ -102,7 +107,7 @@ async def add_trade(event: Message):
             price=formatter.value_to_str(price, phrase.currency),
             count=count,
             id=message.id,
-        )
+        ),
     )
     return None
 
@@ -121,7 +126,9 @@ async def add_buy(event: Message):
     async with client.conversation(event.sender_id, timeout=300) as conv:
 
         async def ask_int(
-            prompt: str, error_not_int: str, error_not_positive: str
+            prompt: str,
+            error_not_int: str,
+            error_not_positive: str,
         ) -> int | None:
             while True:
                 await conv.send_message(prompt)
@@ -179,9 +186,9 @@ async def add_buy(event: Message):
                 KeyboardButtonRow(
                     [
                         KeyboardButtonUrl(text="🛒 Продать", url=url),
-                    ]
+                    ],
                 ),
-            ]
+            ],
         ),
     )
 
@@ -192,6 +199,6 @@ async def add_buy(event: Message):
             price=formatter.value_to_str(price, phrase.currency),
             count=count,
             id=message.id,
-        )
+        ),
     )
     return None

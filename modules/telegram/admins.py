@@ -1,10 +1,14 @@
+from typing import TYPE_CHECKING
+
 from loguru import logger
-from telethon.tl.custom import Message
 from telethon.tl.functions.users import GetFullUserRequest
 
 from .. import db, formatter, mcrcon, phrase
 from . import func
 from .client import client
+
+if TYPE_CHECKING:
+    from telethon.tl.custom import Message
 
 logger.info(f"Загружен модуль {__name__}!")
 
@@ -200,5 +204,5 @@ async def give_money(event: Message):
 
     await db.add_money(user, count)
     return await event.reply(
-        phrase.money.give_money.format(formatter.value_to_str(count, phrase.currency))
+        phrase.money.give_money.format(formatter.value_to_str(count, phrase.currency)),
     )

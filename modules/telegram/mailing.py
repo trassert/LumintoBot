@@ -1,11 +1,14 @@
 import asyncio
+from typing import TYPE_CHECKING
 
 from loguru import logger
-from telethon.tl.custom import Message
 
 from .. import db, phrase
 from . import func
 from .client import client
+
+if TYPE_CHECKING:
+    from telethon.tl.custom import Message
 
 logger.info(f"Загружен модуль {__name__}!")
 

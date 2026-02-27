@@ -1,16 +1,18 @@
 import asyncio
 import inspect
 import time
-from collections.abc import Callable
 from datetime import datetime, timedelta
 from datetime import time as dt_time
-from typing import Any, Literal
+from typing import TYPE_CHECKING, Any, Literal
 
 import aiofiles
 import orjson
 from loguru import logger
 
 from . import pathes
+
+if TYPE_CHECKING:
+    from collections.abc import Callable
 
 logger.info(f"Загружен модуль {__name__}!")
 
@@ -46,7 +48,7 @@ class Generator:
             self._task_type = None
             self._task_param = None
             msg = "Параметр времени должен быть int (часы) или str (HH:MM)"
-            raise ValueError(
+            raise TypeError(
                 msg,
             )
 

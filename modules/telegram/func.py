@@ -1,12 +1,15 @@
 import re
+from typing import TYPE_CHECKING
 
 from loguru import logger
 from telethon import events
-from telethon.tl.custom import Message
 from telethon.tl.functions.users import GetFullUserRequest
 
 from .. import db, phrase
 from .client import client
+
+if TYPE_CHECKING:
+    from telethon.tl.custom import Message
 
 logger.info(f"Загружен модуль {__name__}!")
 
@@ -147,7 +150,8 @@ def new_command(command: str, checks=checks, chats=None):
 
     def decorator(func):
         client.add_event_handler(
-            func, events.NewMessage(pattern=pattern, func=checks, chats=chats)
+            func,
+            events.NewMessage(pattern=pattern, func=checks, chats=chats),
         )
         return func
 

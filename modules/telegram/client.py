@@ -55,8 +55,10 @@ class CustomMarkdown:
             for off, length, collapsed in reversed(blockquotes):
                 entities.append(
                     types.MessageEntityBlockquote(
-                        offset=off, length=length, collapsed=collapsed or None
-                    )
+                        offset=off,
+                        length=length,
+                        collapsed=collapsed or None,
+                    ),
                 )
 
         for i, e in enumerate(entities):
@@ -65,7 +67,9 @@ class CustomMarkdown:
                     entities[i] = types.MessageEntitySpoiler(e.offset, e.length)
                 elif e.url.startswith("emoji/"):
                     entities[i] = types.MessageEntityCustomEmoji(
-                        e.offset, e.length, int(e.url.split("/", 1)[1])
+                        e.offset,
+                        e.length,
+                        int(e.url.split("/", 1)[1]),
                     )
         return text, entities
 
@@ -79,7 +83,9 @@ class CustomMarkdown:
         for i, e in enumerate(filtered):
             if isinstance(e, types.MessageEntityCustomEmoji):
                 filtered[i] = types.MessageEntityTextUrl(
-                    e.offset, e.length, f"emoji/{e.document_id}"
+                    e.offset,
+                    e.length,
+                    f"emoji/{e.document_id}",
                 )
             elif isinstance(e, types.MessageEntitySpoiler):
                 filtered[i] = types.MessageEntityTextUrl(e.offset, e.length, "spoiler")

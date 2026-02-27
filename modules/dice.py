@@ -7,7 +7,7 @@ logger.info(f"Загружен модуль {__name__}!")
 mapping = {"0": "Бар", "1": "Ягода", "2": "Лимон", "3": "7"}
 
 
-def get(value: int) -> int:
+def get(value: int) -> list[str]:
     return [
         str((value - 1) & 3),
         str(((value - 1) >> 2) & 3),

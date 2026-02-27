@@ -23,7 +23,10 @@ def _load_json_sync(filepath: Path) -> dict:
 
 
 def _save_json_sync(
-    filepath: Path, data: dict, sort_keys: bool = False, indent: bool = False
+    filepath: Path,
+    data: dict,
+    sort_keys: bool = False,
+    indent: bool = False,
 ):
     """Сохраняет JSON файл синхронно."""
     filepath.parent.mkdir(parents=True, exist_ok=True)
@@ -44,7 +47,10 @@ async def _load_json_async(filepath: Path) -> dict:
 
 
 async def _save_json_async(
-    filepath: Path, data: dict, sort_keys: bool = False, indent: bool = False
+    filepath: Path,
+    data: dict,
+    sort_keys: bool = False,
+    indent: bool = False,
 ):
     """Сохраняет JSON файл асинхронно."""
     filepath.parent.mkdir(parents=True, exist_ok=True)
@@ -112,7 +118,7 @@ async def update_shop():
     item_names = list(theme_items.keys())
     if len(item_names) < 5:
         logger.exception(
-            f"В теме '{new_theme}' недостаточно предметов (минимум 5, найдено {len(item_names)})"
+            f"В теме '{new_theme}' недостаточно предметов (минимум 5, найдено {len(item_names)})",
         )
         return None
 
@@ -140,7 +146,7 @@ async def get_shop() -> dict:
     return await _load_json_async(pathes.shopc)
 
 
-async def shop_version(update=False) -> str:
+async def shop_version(update=False) -> int:
     async with aiofiles.open(pathes.shopver) as f:
         ver = int(await f.read())
     if update:
@@ -216,7 +222,7 @@ class nicks:
         self.nick = nick
         self.id = id
 
-    def get(self, if_nothing=None) -> str:
+    def get(self, if_nothing=None) -> str | None:
         if self.nick:
             data = _load_json_sync(pathes.nick)
             nick_lower = self.nick.lower()
@@ -283,7 +289,10 @@ class statistic:
     def add(self, date=None):
         now = date or datetime.now().strftime("%Y.%m.%d")
         filepath = pathes.stats / f"{self}.json"
-        stats = _load_json_sync(filepath)
+        try:
+            stats = _load_json_sync(filepath)
+        except FileNotFoundError:
+            stats = {}
         stats[now] = stats.get(now, 0) + 1
         _save_json_sync(filepath, stats, sort_keys=True)
 
@@ -497,7 +506,7 @@ class Mysql:
     async def get_all(self) -> dict[int, dict[str, int]]:
         async with self.pool.acquire() as conn, conn.cursor() as cur:
             await cur.execute(
-                f"SELECT id, wins_casino, lose_moneys_in_casino FROM {self.table_name}"
+                f"SELECT id, wins_casino, lose_moneys_in_casino FROM {self.table_name}",
             )
             results = await cur.fetchall()
             return {
@@ -625,7 +634,7 @@ class RefCodes:
         load[str(id)]["used"] = used_list
         await self._write(load)
 
-    async def check_ref(self, name) -> str:
+    async def check_ref(self, name) -> str | None:
         load = await self._read()
         for user_id, data in load.items():
             try:
@@ -717,7 +726,7 @@ class CitiesGame:
             (idx + 1) % len(players)
         ]
         self.logger(
-            f"Очередь игрока {self.data['current_game']['current_player_id']} отвечать"
+            f"Очередь игрока {self.data['current_game']['current_player_id']} отвечать",
         )
         self._save_data()
 
@@ -727,7 +736,7 @@ class CitiesGame:
                 self.data["statistics"].items(),
                 key=lambda item: item[1],
                 reverse=True,
-            )
+            ),
         )
 
     def end_game(self):
@@ -772,7 +781,7 @@ class CitiesGame:
         last_city = self.data["current_game"]["last_city"]
         if city[0] != formatter.city_last_letter(last_city):
             self.logger(
-                f"{id} ответил городом с разными буквами ({city[0]} != {last_city[-1]})"
+                f"{id} ответил городом с разными буквами ({city[0]} != {last_city[-1]})",
             )
             return 4
         if city in self.data["current_game"]["cities"]:
@@ -894,7 +903,8 @@ async def add_mine_top(id: int | str, count: int):
 
 async def get_mine_top() -> list[list[str, int]]:
     return sorted(
-        (await _load_json_async(pathes.mine_stat)).items(), key=lambda x: -x[1]
+        (await _load_json_async(pathes.mine_stat)).items(),
+        key=lambda x: -x[1],
     )
 
 

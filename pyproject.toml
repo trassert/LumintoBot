@@ -24,6 +24,7 @@ dependencies = [
 ]
 
 [tool.ruff]
+exclude = ["depr", "scripts", ".venv"]
 unsafe-fixes = true
 line-length = 88
 indent-width = 4
@@ -45,6 +46,9 @@ select = [
     "ISC",
     "RET",
     "FURB",
+    "COM",
+    "FLY",
+    "TRY"
 ]
 ignore = []
 fixable = ["ALL"]
@@ -58,3 +62,12 @@ skip-magic-trailing-comma = false
 line-ending = "auto"
 docstring-code-format = false
 docstring-code-line-length = "dynamic"
+
+[tool.ty.rules]
+invalid-argument-type = "ignore"
+invalid-return-type = "ignore"
+invalid-type-arguments = "ignore"
+unresolved-attribute = "ignore"
+possibly-missing-attribute = "ignore"
+invalid-assignment = "ignore"
+no-matching-overload = "ignore"

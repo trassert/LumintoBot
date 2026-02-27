@@ -1,6 +1,7 @@
 import re
 import shutil
 from datetime import datetime, timedelta
+from pathlib import Path
 
 from loguru import logger
 
@@ -52,7 +53,7 @@ async def rewards():
 async def remove_states() -> None:
     logger.info("Проверяем пустые государства..")
     states = db.states.get_all()
-    today = datetime.now()
+    today: datetime = datetime.now()
     for state in states:
         state_info = states[state]
         state_date = list(map(int, state_info["date"].split(".")))
@@ -82,8 +83,8 @@ async def backup_db() -> None:
     backup_root = pathes.backup_db
     backup_root.mkdir(parents=True, exist_ok=True)
 
-    date_str = datetime.now().strftime("%Y-%m-%d")
-    dest = backup_root / date_str
+    date_str: str = datetime.now().strftime("%Y-%m-%d")
+    dest: Path = backup_root / date_str
     try:
         shutil.copytree(src, dest, dirs_exist_ok=True)
         logger.info(f"Создан бекап DB: {dest}")

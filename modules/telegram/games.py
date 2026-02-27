@@ -1,12 +1,12 @@
 import asyncio
 import contextlib
 from random import choice, random
+from typing import TYPE_CHECKING
 
 import aiofiles
 import orjson
 from loguru import logger
 from telethon import events
-from telethon.tl.custom import Message
 from telethon.tl.types import (
     KeyboardButtonCallback,
 )
@@ -14,6 +14,9 @@ from telethon.tl.types import (
 from .. import config, db, formatter, pathes, phrase
 from . import func
 from .client import client
+
+if TYPE_CHECKING:
+    from telethon.tl.custom import Message
 
 logger.info(f"Загружен модуль {__name__}!")
 
@@ -47,9 +50,10 @@ async def casino(event: Message):
     keyboard = [
         [
             KeyboardButtonCallback(
-                text="🎰 Автоматическая прокрутка", data=b"casino.auto"
-            )
-        ]
+                text="🎰 Автоматическая прокрутка",
+                data=b"casino.auto",
+            ),
+        ],
     ]
     return await event.reply(
         phrase.casino.start.format(config.cfg.PriceForCasino),
@@ -74,7 +78,7 @@ async def crocodile(event: Message):
             [
                 KeyboardButtonCallback(text="✅ Играть", data=b"crocodile.start"),
                 stop_btn,
-            ]
+            ],
         ]
         return await event.reply(phrase.crocodile.game, buttons=keyboard)
 
@@ -99,14 +103,14 @@ async def crocodile_bet(event: Message):
     if bet < min_bet:
         return await event.reply(
             phrase.money.min_count.format(
-                formatter.value_to_str(min_bet, phrase.currency)
-            )
+                formatter.value_to_str(min_bet, phrase.currency),
+            ),
         )
     if bet > max_bet:
         return await event.reply(
             phrase.money.max_count.format(
-                formatter.value_to_str(max_bet, phrase.currency)
-            )
+                formatter.value_to_str(max_bet, phrase.currency),
+            ),
         )
 
     if await CrocodileGame.is_running():
@@ -116,8 +120,8 @@ async def crocodile_bet(event: Message):
     if sender_balance < bet:
         return await event.reply(
             phrase.money.not_enough.format(
-                formatter.value_to_str(sender_balance, phrase.currency)
-            )
+                formatter.value_to_str(sender_balance, phrase.currency),
+            ),
         )
 
     all_bets = CrocodileGame.get_bets()
@@ -129,7 +133,7 @@ async def crocodile_bet(event: Message):
     await CrocodileGame.set_bets(all_bets)
 
     return await event.reply(
-        phrase.crocodile.bet.format(formatter.value_to_str(bet, phrase.currency))
+        phrase.crocodile.bet.format(formatter.value_to_str(bet, phrase.currency)),
     )
 
 
@@ -166,7 +170,7 @@ async def crocodile_handler(event: Message):
         if total_payout > 0:
             await db.add_money(event.sender_id, total_payout)
             win_msg = phrase.crocodile.bet_win.format(
-                formatter.value_to_str(total_payout, phrase.currency)
+                formatter.value_to_str(total_payout, phrase.currency),
             )
         else:
             win_msg = ""
@@ -183,7 +187,7 @@ async def crocodile_handler(event: Message):
         changed, new_mask_str, finished = await CrocodileGame.reveal_on_guess(text)
         if changed:
             return await event.reply(
-                phrase.crocodile.new.format(new_mask_str.replace("_", ".."))
+                phrase.crocodile.new.format(new_mask_str.replace("_", "..")),
             )
     return None
 
@@ -250,7 +254,7 @@ async def cities_timeout(current_player: int, last_city: str):
                     for n, (uid, count) in enumerate(Cities.get_all_stat().items(), 1):
                         prefix = "👑 1" if n == 1 else str(n)
                         stats_lines.append(
-                            f"{prefix}. **{await func.get_name(uid)}** назвал {count} городов"
+                            f"{prefix}. **{await func.get_name(uid)}** назвал {count} городов",
                         )
 
                     stat_text = "\n".join(stats_lines) or "Пусто!"
@@ -259,7 +263,8 @@ async def cities_timeout(current_player: int, last_city: str):
                         phrase.cities.winner.format(
                             await func.get_name(winner_id),
                             formatter.value_to_str(
-                                win_money - config.cfg.CitiesBet, phrase.currency
+                                win_money - config.cfg.CitiesBet,
+                                phrase.currency,
                             ),
                             stat_text,
                         ),
@@ -269,12 +274,14 @@ async def cities_timeout(current_player: int, last_city: str):
 
                 global CitiesTimerTask
                 CitiesTimerTask = asyncio.create_task(
-                    cities_timeout(next_player, last_city)
+                    cities_timeout(next_player, last_city),
                 )
                 return await client.send_message(
                     config.chats.chat,
                     phrase.cities.timeout_done.format(
-                        player_name, await func.get_name(next_player), last_city.title()
+                        player_name,
+                        await func.get_name(next_player),
+                        last_city.title(),
                     ),
                     reply_to=config.chats.topics.games,
                 )
@@ -286,11 +293,15 @@ async def cities_timeout(current_player: int, last_city: str):
                         await timer_msg.edit(text)
                     except Exception:
                         timer_msg = await client.send_message(
-                            config.chats.chat, text, reply_to=config.chats.topics.games
+                            config.chats.chat,
+                            text,
+                            reply_to=config.chats.topics.games,
                         )
                 else:
                     timer_msg = await client.send_message(
-                        config.chats.chat, text, reply_to=config.chats.topics.games
+                        config.chats.chat,
+                        text,
+                        reply_to=config.chats.topics.games,
                     )
 
             await asyncio.sleep(1)
@@ -328,8 +339,9 @@ async def cities_answer(event: Message):
         last_city = Cities.get_last_city()
         await event.reply(
             phrase.cities.city_accepted.format(
-                last_city.title(), await func.get_name(current_player)
-            )
+                last_city.title(),
+                await func.get_name(current_player),
+            ),
         )
         CitiesTimerTask = asyncio.create_task(cities_timeout(current_player, last_city))
 
@@ -357,8 +369,8 @@ async def cities_callback(event: events.CallbackQuery.Event):
         if balance < config.cfg.PriceForCities:
             return await event.answer(
                 phrase.money.not_enough.format(
-                    formatter.value_to_str(balance, phrase.currency)
-                )
+                    formatter.value_to_str(balance, phrase.currency),
+                ),
             )
 
         await db.add_money(event.sender_id, -config.cfg.PriceForCities)
@@ -381,12 +393,13 @@ async def cities_callback(event: events.CallbackQuery.Event):
         curr = Cities.who_answer()
         global CitiesTimerTask
         CitiesTimerTask = asyncio.create_task(
-            cities_timeout(curr, Cities.get_last_city())
+            cities_timeout(curr, Cities.get_last_city()),
         )
         return await event.edit(
             phrase.cities.game_started.format(
-                Cities.get_last_city().title(), await func.get_name(curr)
-            )
+                Cities.get_last_city().title(),
+                await func.get_name(curr),
+            ),
         )
 
     if action == "cancel":
@@ -398,7 +411,7 @@ async def cities_callback(event: events.CallbackQuery.Event):
 
 
 @func.new_command(
-    r"/(города|города старт|cities start|миниигра города|minigame cities|cities)$"
+    r"/(города|города старт|cities start|миниигра города|minigame cities|cities)$",
 )
 async def cities_start(event: Message):
     if event.chat_id != config.chats.chat:
@@ -410,7 +423,7 @@ async def cities_start(event: Message):
         return await event.reply(
             phrase.cities.already_started,
             buttons=[
-                [KeyboardButtonCallback(text="❌ Отменить", data="cities.cancel")]
+                [KeyboardButtonCallback(text="❌ Отменить", data="cities.cancel")],
             ],
         )
 
@@ -439,7 +452,8 @@ async def cities_start(event: Message):
 async def crocodile_onboot():
     if await CrocodileGame.is_running():
         client.add_event_handler(
-            crocodile_handler, events.NewMessage(chats=config.chats.chat)
+            crocodile_handler,
+            events.NewMessage(chats=config.chats.chat),
         )
         client.add_event_handler(
             crocodile_hint,

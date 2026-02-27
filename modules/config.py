@@ -1,9 +1,12 @@
-from pathlib import Path
+from typing import TYPE_CHECKING
 
 import yaml
 from loguru import logger
 
 from . import pathes
+
+if TYPE_CHECKING:
+    from pathlib import Path
 
 logger.info(f"Загружен модуль {__name__}!")
 

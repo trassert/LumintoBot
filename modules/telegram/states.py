@@ -1,10 +1,10 @@
 import asyncio
 import re
 from random import choice
+from typing import TYPE_CHECKING
 
 from loguru import logger
 from telethon import errors as tgerrors
-from telethon.tl.custom import Message
 from telethon.tl.types import (
     KeyboardButtonCallback,
     KeyboardButtonRow,
@@ -14,6 +14,9 @@ from telethon.tl.types import (
 from .. import config, db, formatter, pathes, phrase
 from . import func
 from .client import client
+
+if TYPE_CHECKING:
+    from telethon.tl.custom import Message
 
 logger.info(f"Загружен модуль {__name__}!")
 
@@ -91,7 +94,8 @@ async def state_make(event: Message) -> Message:
     if len(arg) > 28:
         return await event.reply(phrase.state.too_long)
     if not re.fullmatch(r"^[а-яА-ЯёЁa-zA-Z\- ]+$", arg) or re.fullmatch(
-        r"^[\- ]+$", arg
+        r"^[\- ]+$",
+        arg,
     ):
         return await event.reply(phrase.state.not_valid)
 
@@ -112,7 +116,7 @@ async def state_make(event: Message) -> Message:
             KeyboardButtonCallback(
                 text="🏰 Создать государство",
                 data=f"state.m.{event.sender_id}.{arg}".encode(),
-            )
+            ),
         ]
         return await event.reply(phrase.state.warn_make.format(arg), buttons=[button])
     except tgerrors.ButtonDataInvalidError:
@@ -154,7 +158,7 @@ async def state_enter(event: Message) -> Message:
             KeyboardButtonCallback(
                 text=f"✅ Оплатить вход ({state.price})",
                 data=f"state.pay.{state.name}".encode(),
-            )
+            ),
         ]
         return await event.reply(
             phrase.state.pay_to_enter,
@@ -179,12 +183,12 @@ async def state_enter(event: Message) -> Message:
 @func.new_command(r"/state@")
 @func.new_command(r"/госво(.*)")
 @func.new_command(r"/государство(.*)")
-async def state_get(event: Message) -> Message:
+async def state_get(event: Message):
     arg: str = event.pattern_match.group(1).strip().capitalize()
 
     if not arg:
         state_name = db.states.if_player(event.sender_id) or db.states.if_author(
-            event.sender_id
+            event.sender_id,
         )
         if not state_name:
             return await event.reply(phrase.state.no_name)
@@ -200,7 +204,7 @@ async def state_get(event: Message) -> Message:
         enter_val = formatter.value_to_str(state.price, phrase.currency)
 
     names = await asyncio.gather(
-        *[func.get_name(p, minecraft=True) for p in state.players]
+        *[func.get_name(p, minecraft=True) for p in state.players],
     )
     pic_path = pathes.states_pic / f"{state_name}.png"
 
@@ -244,7 +248,8 @@ async def state_leave(event: Message) -> Message:
     await client.send_message(
         entity=config.chats.chat,
         message=phrase.state.leave_player.format(
-            state=name_cap, player=db.nicks(id=event.sender_id).get()
+            state=name_cap,
+            player=db.nicks(id=event.sender_id).get(),
         ),
         reply_to=config.chats.topics.rp,
     )
@@ -269,7 +274,7 @@ async def state_rem(event: Message) -> Message:
         KeyboardButtonCallback(
             text=phrase.state.rem_button,
             data=f"state.remove.{state_name}".encode(),
-        )
+        ),
     ]
     return await event.reply(
         phrase.state.rem_message.format(name=state_name),
@@ -288,7 +293,7 @@ async def state_desc(event: Message) -> Message:
     new_desc: str = event.pattern_match.group(1).strip()
     if len(new_desc) > config.cfg.DescriptionsMaxLen:
         return await event.reply(
-            phrase.state.max_len.format(config.cfg.DescriptionsMaxLen)
+            phrase.state.max_len.format(config.cfg.DescriptionsMaxLen),
         )
 
     db.state(state_name).change("desc", new_desc)
@@ -303,13 +308,9 @@ async def state_coords(event: Message) -> Message:
         return await event.reply(phrase.state.not_a_author)
 
     arg: str = event.pattern_match.group(1).strip()
-    try:
-        coords = [str(int(x)) for x in arg.split()]
-        if len(coords) != 3:
-            raise ValueError
-    except ValueError:
+    coords = [str(int(x)) for x in arg.split()]
+    if len(coords) != 3:
         return await event.reply(phrase.state.howto_change_coords)
-
     db.state(state_name).change("coordinates", ", ".join(coords))
     return await event.reply(phrase.state.change_coords)
 
@@ -348,8 +349,8 @@ async def state_enter_arg(event: Message) -> Message:
         state.change("enter", True)
         return await event.reply(
             phrase.state.enter_price.format(
-                formatter.value_to_str(price, phrase.currency)
-            )
+                formatter.value_to_str(price, phrase.currency),
+            ),
         )
 
     return await event.reply(phrase.state.howto_enter)
@@ -361,7 +362,7 @@ async def state_enter_arg(event: Message) -> Message:
 @func.new_command(r"г пополнить (.+)")
 async def state_add_money(event: Message) -> Message:
     state_name = db.states.if_player(event.sender_id) or db.states.if_author(
-        event.sender_id
+        event.sender_id,
     )
     if not state_name:
         return await event.reply(phrase.state.not_a_member)
@@ -381,8 +382,8 @@ async def state_add_money(event: Message) -> Message:
     if amount > balance:
         return await event.reply(
             phrase.money.not_enough.format(
-                formatter.value_to_str(balance, phrase.currency)
-            )
+                formatter.value_to_str(balance, phrase.currency),
+            ),
         )
 
     await db.add_money(event.sender_id, -amount)
@@ -390,8 +391,8 @@ async def state_add_money(event: Message) -> Message:
     state.change("money", state.money + amount)
     return await event.reply(
         phrase.state.add_treasury.format(
-            formatter.value_to_str(amount, phrase.currency)
-        )
+            formatter.value_to_str(amount, phrase.currency),
+        ),
     )
 
 
@@ -423,8 +424,8 @@ async def state_rem_money(event: Message) -> Message:
     await db.add_money(event.sender_id, amount)
     return await event.reply(
         phrase.state.rem_treasury.format(
-            formatter.value_to_str(amount, phrase.currency)
-        )
+            formatter.value_to_str(amount, phrase.currency),
+        ),
     )
 
 
@@ -459,7 +460,8 @@ async def state_kick_user(event: Message) -> Message:
     await client.send_message(
         entity=config.chats.chat,
         message=choice(phrase.state.kicked_rp).format(
-            state=state_name, player=target_name
+            state=state_name,
+            player=target_name,
         ),
         reply_to=config.chats.topics.rp,
     )
@@ -486,7 +488,7 @@ async def state_rename(event: Message) -> Message:
         KeyboardButtonCallback(
             text=phrase.state.button_rename,
             data=f"state.rn.{new_name}.{event.sender_id}".encode(),
-        )
+        ),
     ]
     return await event.reply(
         phrase.state.rename.format(new_name.capitalize()),

@@ -1,9 +1,13 @@
+from typing import TYPE_CHECKING
+
 from loguru import logger
-from telethon.tl.custom import Message
 
 from .. import chart, config, db, formatter, mcrcon, pathes, phrase
 from . import func
 from .client import client
+
+if TYPE_CHECKING:
+    from telethon.tl.custom import Message
 
 logger.info(f"Загружен модуль {__name__}!")
 
@@ -100,7 +104,7 @@ async def server_top_list(event: Message):
                 ).strip()
                 playtime = (
                     await rcon.send(
-                        f"papi parse --null %PTM_playtime_top_{number}:luminto%"
+                        f"papi parse --null %PTM_playtime_top_{number}:luminto%",
                     )
                 ).strip()
                 text.append(f"{number}. {nickname} - {playtime}")
@@ -123,7 +127,7 @@ async def server_top_mine(event: Message):
         if n > config.cfg.MaxStatPlayers:
             break
         text.append(
-            f"{n}. {await func.get_name(player[0])} - {formatter.value_to_str(player[1], 'аметист')}"
+            f"{n}. {await func.get_name(player[0])} - {formatter.value_to_str(player[1], 'аметист')}",
         )
         n += 1
     return await event.reply(phrase.stat.mine.format("\n".join(text)), silent=True)

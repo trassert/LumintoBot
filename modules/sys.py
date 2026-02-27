@@ -38,7 +38,7 @@ else:
                         for entry in temps["coretemp"]
                         if "core" in entry.label.lower()
                         or "package" not in entry.label.lower()
-                    ]
+                    ],
                 )
 
             if not core_temps:
@@ -49,7 +49,7 @@ else:
                                 entry.current
                                 for entry in temps[sensor_name]
                                 if hasattr(entry, "current")
-                            ]
+                            ],
                         )
                         if core_temps:
                             break
@@ -61,7 +61,7 @@ else:
                         for sensor_entries in temps.values()
                         for entry in sensor_entries
                         if hasattr(entry, "current")
-                    ]
+                    ],
                 )
 
             if not core_temps:
@@ -70,10 +70,11 @@ else:
             mx = round(max(core_temps))
             avg = round(sum(core_temps) / len(core_temps))
             mn = round(min(core_temps))
-            return f"{mx} | {avg} | {mn}"
 
         except Exception as e:
             return f"Ошибка получения: {e}"
+        else:
+            return f"{mx} | {avg} | {mn}"
 
 
 async def get_current_speed():
