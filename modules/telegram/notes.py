@@ -61,16 +61,15 @@ async def get_note(event: Message):
     if note_text is None:
         return None
     if event.reply_to_msg_id:
-        try:
-            reply_message: Message = await event.get_reply_message()
-            return await client.send_message(
-                event.chat_id,
-                note_text,
-                reply_to=reply_message.id,
-                link_preview=False,
-            )
-        except AttributeError:
+        reply_message: Message = await event.get_reply_message()
+        if reply_message is None:
             return None
+        return await client.send_message(
+            event.chat_id,
+            note_text,
+            reply_to=reply_message.id,
+            link_preview=False,
+        )
     return await client.send_message(
         event.chat_id,
         note_text,
