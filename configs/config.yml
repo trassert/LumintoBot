@@ -19,8 +19,8 @@ MaxStatPlayers: 10
 
 # Типы государств
 Type0Players: 1
-Type1Players: 3
-Type2Players: 6
+Type1Players: 5
+Type2Players: 10
 
 # Время ожидания в секундах
 MineWait: 14400
