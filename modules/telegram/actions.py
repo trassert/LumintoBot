@@ -10,7 +10,10 @@ logger.info(f"Загружен модуль {__name__}!")
 
 @client.on(events.ChatAction(chats=config.chats.chat))
 async def chat_action(event: events.ChatAction.Event):
-    user_name = await func.get_name(event.user_id)
+    try:
+        user_name = await func.get_name(event.user_id)
+    except TypeError:
+        return None
 
     if event.user_left:
         return await client.send_message(

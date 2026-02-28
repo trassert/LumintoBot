@@ -349,7 +349,7 @@ class ticket:
         return True
 
 
-class state:
+class State:
     def __init__(self, name):
         self.name = name
         self._info()
@@ -381,7 +381,7 @@ class state:
         return None
 
 
-class states:
+class States:
     def add(self, author):
         filepath = pathes.states / f"{self}.json"
         if filepath.exists():

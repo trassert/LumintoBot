@@ -52,7 +52,7 @@ async def _check_and_update_tier(state, players_len: int, name_cap: str) -> None
 @func.new_command(r"государства$")
 @func.new_command(r"список госв$")
 async def states_all(event: Message) -> Message:
-    data = db.states.get_all()
+    data = db.States.get_all()
     if not data:
         return await event.reply(phrase.state.empty_list)
 
@@ -72,7 +72,7 @@ async def states_all(event: Message) -> Message:
 @func.new_command(r"казна топ$")
 @func.new_command(r"казтоп$")
 async def states_all_top(event: Message) -> Message:
-    data = db.states.get_all("money")
+    data = db.States.get_all("money")
     if not data:
         return await event.reply(phrase.state.empty_list)
 
@@ -101,11 +101,11 @@ async def state_make(event: Message) -> Message:
 
     if db.nicks(id=event.sender_id).get() is None:
         return await event.reply(phrase.state.not_connected)
-    if db.states.if_author(event.sender_id):
+    if db.States.if_author(event.sender_id):
         return await event.reply(phrase.state.already_author)
-    if db.states.if_player(event.sender_id):
+    if db.States.if_player(event.sender_id):
         return await event.reply(phrase.state.already_player)
-    if db.states.check(arg):
+    if db.States.check(arg):
         return await event.reply(phrase.state.already_here)
 
     if await db.get_money(event.sender_id) < config.cfg.PriceForNewState:
@@ -139,17 +139,17 @@ async def state_enter(event: Message) -> Message:
     if not arg:
         return await event.reply(phrase.state.no_name)
 
-    if not db.states.find(arg):
+    if not db.States.find(arg):
         return await event.reply(phrase.state.not_find)
 
     nick = db.nicks(id=event.sender_id).get()
     if not nick:
         return await event.reply(phrase.state.not_connected)
 
-    if db.states.if_player(event.sender_id) or db.states.if_author(event.sender_id):
+    if db.States.if_player(event.sender_id) or db.States.if_author(event.sender_id):
         return await event.reply(phrase.state.already_player)
 
-    state = db.state(arg)
+    state = db.State(arg)
     if not state.enter:
         return await event.reply(phrase.state.enter_exit)
 
@@ -187,7 +187,7 @@ async def state_get(event: Message):
     arg: str = event.pattern_match.group(1).strip().capitalize()
 
     if not arg:
-        state_name = db.states.if_player(event.sender_id) or db.states.if_author(
+        state_name = db.States.if_player(event.sender_id) or db.States.if_author(
             event.sender_id,
         )
         if not state_name:
@@ -195,10 +195,10 @@ async def state_get(event: Message):
     else:
         state_name = arg
 
-    if not db.states.find(state_name):
+    if not db.States.find(state_name):
         return await event.reply(phrase.state.not_find)
 
-    state = db.state(state_name)
+    state = db.State(state_name)
     enter_val = "Свободный" if state.enter else "Закрыт"
     if state.price > 0:
         enter_val = formatter.value_to_str(state.price, phrase.currency)
@@ -236,11 +236,11 @@ async def state_get(event: Message):
 @func.new_command(r"/г покинуть")
 @func.new_command(r"/г выйти")
 async def state_leave(event: Message) -> Message:
-    state_name = db.states.if_player(event.sender_id)
+    state_name = db.States.if_player(event.sender_id)
     if not state_name:
         return await event.reply(phrase.state.not_a_member)
 
-    state = db.state(state_name)
+    state = db.State(state_name)
     state.players.remove(event.sender_id)
     state.change("players", state.players)
 
@@ -266,7 +266,7 @@ async def state_leave(event: Message) -> Message:
 @func.new_command(r"/г уничтожить")
 @func.new_command(r"/г удалить")
 async def state_rem(event: Message) -> Message:
-    state_name = db.states.if_author(event.sender_id)
+    state_name = db.States.if_author(event.sender_id)
     if not state_name:
         return await event.reply(phrase.state.not_a_author)
 
@@ -286,7 +286,7 @@ async def state_rem(event: Message) -> Message:
 @func.new_command(r"/о госве\s([\s\S]+)")
 @func.new_command(r"/г о госве\s([\s\S]+)")
 async def state_desc(event: Message) -> Message:
-    state_name = db.states.if_author(event.sender_id)
+    state_name = db.States.if_author(event.sender_id)
     if not state_name:
         return await event.reply(phrase.state.not_a_author)
 
@@ -296,14 +296,14 @@ async def state_desc(event: Message) -> Message:
             phrase.state.max_len.format(config.cfg.DescriptionsMaxLen),
         )
 
-    db.state(state_name).change("desc", new_desc)
+    db.State(state_name).change("desc", new_desc)
     return await event.reply(phrase.state.change_desc)
 
 
 @func.new_command(r"/г корды\s(.+)")
 @func.new_command(r"/г координаты\s(.+)")
 async def state_coords(event: Message) -> Message:
-    state_name = db.states.if_author(event.sender_id)
+    state_name = db.States.if_author(event.sender_id)
     if not state_name:
         return await event.reply(phrase.state.not_a_author)
 
@@ -311,18 +311,18 @@ async def state_coords(event: Message) -> Message:
     coords = [str(int(x)) for x in arg.split()]
     if len(coords) != 3:
         return await event.reply(phrase.state.howto_change_coords)
-    db.state(state_name).change("coordinates", ", ".join(coords))
+    db.State(state_name).change("coordinates", ", ".join(coords))
     return await event.reply(phrase.state.change_coords)
 
 
 @func.new_command(r"/г входы\s(.+)")
 @func.new_command(r"/г вступления\s(.+)")
 async def state_enter_arg(event: Message) -> Message:
-    state_name = db.states.if_author(event.sender_id)
+    state_name = db.States.if_author(event.sender_id)
     if not state_name:
         return await event.reply(phrase.state.not_a_author)
 
-    state = db.state(state_name)
+    state = db.State(state_name)
     arg: str = event.pattern_match.group(1).strip().lower()
 
     if arg in ("да", "+", "разрешить", "открыть", "true", "ok", "ок", "можно"):
@@ -361,7 +361,7 @@ async def state_enter_arg(event: Message) -> Message:
 @func.new_command(r"\+казна (.+)")
 @func.new_command(r"г пополнить (.+)")
 async def state_add_money(event: Message) -> Message:
-    state_name = db.states.if_player(event.sender_id) or db.states.if_author(
+    state_name = db.States.if_player(event.sender_id) or db.States.if_author(
         event.sender_id,
     )
     if not state_name:
@@ -387,7 +387,7 @@ async def state_add_money(event: Message) -> Message:
         )
 
     await db.add_money(event.sender_id, -amount)
-    state = db.state(state_name)
+    state = db.State(state_name)
     state.change("money", state.money + amount)
     return await event.reply(
         phrase.state.add_treasury.format(
@@ -401,11 +401,11 @@ async def state_add_money(event: Message) -> Message:
 @func.new_command(r"\-казна (.+)")
 @func.new_command(r"г снять (.+)")
 async def state_rem_money(event: Message) -> Message:
-    state_name = db.states.if_author(event.sender_id)
+    state_name = db.States.if_author(event.sender_id)
     if not state_name:
         return await event.reply(phrase.state.not_a_author)
 
-    state = db.state(state_name)
+    state = db.State(state_name)
     arg: str = event.pattern_match.group(1).strip().lower()
 
     if arg in ("все", "всё", "все деньги", "на все"):
@@ -435,7 +435,7 @@ async def state_rem_money(event: Message) -> Message:
 @func.new_command(r"/г выгнать(.*)")
 @func.new_command(r"/выгнать(.*)")
 async def state_kick_user(event: Message) -> Message:
-    state_name = db.states.if_author(event.sender_id)
+    state_name = db.States.if_author(event.sender_id)
     if not state_name:
         return await event.reply(phrase.state.not_a_author)
 
@@ -449,7 +449,7 @@ async def state_kick_user(event: Message) -> Message:
             return await event.reply(phrase.player_not_in)
         user_id = await func.get_author_by_msgid(event.chat_id, msg_id)
 
-    state = db.state(state_name)
+    state = db.State(state_name)
     if user_id not in state.players:
         return await event.reply(phrase.state.player_not_in)
 
@@ -476,12 +476,12 @@ async def state_kick_user(event: Message) -> Message:
 @func.new_command(r"/г переназвать (.+)")
 @func.new_command(r"/название госва (.+)")
 async def state_rename(event: Message) -> Message:
-    state_name = db.states.if_author(event.sender_id)
+    state_name = db.States.if_author(event.sender_id)
     if not state_name:
         return await event.reply(phrase.state.not_a_author)
 
     new_name: str = event.pattern_match.group(1).strip()
-    if db.states.check(new_name.capitalize()):
+    if db.States.check(new_name.capitalize()):
         return await event.reply(phrase.state.already_here)
 
     btn = [
@@ -501,7 +501,7 @@ async def state_rename(event: Message) -> Message:
 @func.new_command(r"/г картинка$")
 @func.new_command(r"/г фото$")
 async def state_pic(event: Message) -> Message:
-    state_name = db.states.if_author(event.sender_id)
+    state_name = db.States.if_author(event.sender_id)
     if not state_name:
         return await event.reply(phrase.state.not_a_author)
     if not event.photo:

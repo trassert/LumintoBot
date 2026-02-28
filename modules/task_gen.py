@@ -136,7 +136,7 @@ class Generator:
             async with aiofiles.open(self.filename, "rb") as f:
                 content = await f.read()
                 return orjson.loads(content)
-        except (FileNotFoundError, orjson.JSONDecodeError):
+        except FileNotFoundError, orjson.JSONDecodeError:
             return {}
 
     async def _get_task_data(self) -> dict[str, Any]:

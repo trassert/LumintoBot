@@ -46,7 +46,6 @@ select = [
     "ISC",
     "RET",
     "FURB",
-    "COM",
     "FLY",
     "TRY"
 ]

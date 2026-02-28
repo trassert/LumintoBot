@@ -70,7 +70,7 @@ async def add_staff(event: Message):
         user = await client(GetFullUserRequest(arg))
         user = user.full_user.id
         tag = await func.get_name(user)
-    except (IndexError, ValueError):
+    except IndexError, ValueError:
         reply_to_msg = event.reply_to_msg_id
         if reply_to_msg:
             reply_message = await event.get_reply_message()
@@ -101,7 +101,7 @@ async def del_staff(event: Message):
         user = await client(GetFullUserRequest(arg))
         user = user.full_user.id
         tag = await func.get_name(user)
-    except (IndexError, ValueError):
+    except IndexError, ValueError:
         reply_to_msg = event.reply_to_msg_id
         if reply_to_msg:
             reply_message = await event.get_reply_message()

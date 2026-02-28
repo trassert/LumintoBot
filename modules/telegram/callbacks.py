@@ -111,12 +111,12 @@ async def state_callback(event: events.CallbackQuery.Event):
             nick = db.nicks(id=sender_id).get()
             if nick is None:
                 return await event.answer(phrase.state.not_connected, alert=True)
-            if db.states.if_player(sender_id) is not False:
+            if db.States.if_player(sender_id) is not False:
                 return await event.answer(phrase.state.already_player, alert=True)
-            if db.states.if_author(sender_id) is not False:
+            if db.States.if_author(sender_id) is not False:
                 return await event.answer(phrase.state.already_author, alert=True)
 
-            state = db.state(data[2])
+            state = db.State(data[2])
             balance_check = await _check_and_deduct_balance(sender_id, state.price)
             if balance_check is not True:
                 return await event.answer(balance_check, alert=True)
@@ -151,7 +151,7 @@ async def state_callback(event: events.CallbackQuery.Event):
 
         case "remove":
             try:
-                state = db.state(data[2])
+                state = db.State(data[2])
             except FileNotFoundError:
                 return await event.answer(phrase.state.already_deleted, alert=True)
 
@@ -159,7 +159,7 @@ async def state_callback(event: events.CallbackQuery.Event):
                 return await event.answer(phrase.not_for_you, alert=True)
 
             await db.add_money(state.author, state.money)
-            if not db.states.remove(data[2]):
+            if not db.States.remove(data[2]):
                 return await event.answer(phrase.error, alert=True)
 
             await client.send_message(
@@ -183,10 +183,10 @@ async def state_callback(event: events.CallbackQuery.Event):
             if balance_check is not True:
                 return await event.answer(balance_check, alert=True)
 
-            if db.states.check(state_name):
+            if db.States.check(state_name):
                 return await event.answer(phrase.state.already_here, alert=True)
 
-            db.states.add(state_name, sender_id)
+            db.States.add(state_name, sender_id)
             await event.reply(
                 phrase.state.make_by_callback.format(
                     author=await func.get_name(sender_id),
@@ -204,10 +204,10 @@ async def state_callback(event: events.CallbackQuery.Event):
                 return await event.answer(phrase.not_for_you)
 
             new_name = data[2].capitalize()
-            if db.states.check(new_name):
+            if db.States.check(new_name):
                 return await event.answer(phrase.state.already_here, alert=True)
 
-            state_name = db.states.if_author(sender_id)
+            state_name = db.States.if_author(sender_id)
             if state_name is False:
                 return await event.answer(phrase.state.not_a_author, alert=True)
 
@@ -218,7 +218,7 @@ async def state_callback(event: events.CallbackQuery.Event):
             if balance_check is not True:
                 return await event.answer(balance_check, alert=True)
 
-            if db.state(state_name).rename(new_name) is False:
+            if db.State(state_name).rename(new_name) is False:
                 return await event.answer(phrase.state.already_here, alert=True)
 
             await event.reply(

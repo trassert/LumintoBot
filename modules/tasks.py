@@ -52,7 +52,7 @@ async def rewards():
 
 async def remove_states() -> None:
     logger.info("Проверяем пустые государства..")
-    states = db.states.get_all()
+    states = db.States.get_all()
     today: datetime = datetime.now()
     for state in states:
         state_info = states[state]
@@ -62,7 +62,7 @@ async def remove_states() -> None:
             > timedelta(days=config.cfg.DaysToStatesRemove)
         ):
             await db.add_money(state_info["author"], state_info["money"])
-            db.states.remove(state)
+            db.States.remove(state)
             logger.warning(f"Государство {state} распалось")
             await client.send_message(
                 entity=config.chats.chat,
