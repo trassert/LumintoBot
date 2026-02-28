@@ -58,8 +58,10 @@ async def add_note_noname(event: Message):
 @func.new_command(r"\.(.+)")
 async def get_note(event: Message):
     note_text = db.Notes().get(event.pattern_match.group(1).strip().lower())
-    if note_text is not None:
-        if event.reply_to_msg_id:
+    if note_text is None:
+        return None
+    if event.reply_to_msg_id:
+        try:
             reply_message: Message = await event.get_reply_message()
             return await client.send_message(
                 event.chat_id,
@@ -67,13 +69,14 @@ async def get_note(event: Message):
                 reply_to=reply_message.id,
                 link_preview=False,
             )
-        return await client.send_message(
-            event.chat_id,
-            note_text,
-            reply_to=event.id,
-            link_preview=False,
-        )
-    return None
+        except AttributeError:
+            return None
+    return await client.send_message(
+        event.chat_id,
+        note_text,
+        reply_to=event.id,
+        link_preview=False,
+    )
 
 
 @func.new_command(r"/notes$")
