@@ -203,6 +203,13 @@ async def state_get(event: Message):
     if state.price > 0:
         enter_val = formatter.value_to_str(state.price, phrase.currency)
 
+    if state.is_recognized:
+        recognition_val = phrase.state.status_recognized
+    elif state.recognition_pending:
+        recognition_val = phrase.state.status_pending
+    else:
+        recognition_val = phrase.state.status_not_recognized
+
     names = await asyncio.gather(
         *[func.get_name(p, minecraft=True) for p in state.players],
     )
@@ -216,6 +223,7 @@ async def state_get(event: Message):
             money=formatter.value_to_str(int(state.money), phrase.currency),
             author=db.nicks(id=state.author).get(),
             enter=enter_val,
+            recognition=recognition_val,
             desc=state.desc,
             date=state.date,
             players=len(state.players),
@@ -509,3 +517,90 @@ async def state_pic(event: Message) -> Message:
 
     await event.download_media(file=pathes.states_pic / f"{state_name}.png")
     return await event.reply(phrase.state.pic_set)
+
+
+@func.new_command(r"/г конгресс$")
+@func.new_command(r"/г заявка$")
+async def state_congress(event: Message) -> Message:
+    state_name = db.States.if_author(event.sender_id)
+    if not state_name:
+        return await event.reply(phrase.state.congress_no_state)
+
+    state = db.State(state_name)
+    if state.is_recognized:
+        return await event.reply(phrase.state.congress_already_recognized)
+    if state.recognition_pending:
+        return await event.reply(phrase.state.congress_already)
+
+    state.change("recognition_pending", True)
+    return await event.reply(phrase.state.congress_sent.format(name=state_name))
+
+
+@func.new_command(r"/г признать\s(.+)")
+async def state_recognize(event: Message) -> Message:
+    voter_state = db.States.if_author(event.sender_id)
+    if not voter_state:
+        return await event.reply(phrase.state.not_a_author)
+
+    arg: str = event.pattern_match.group(1).strip().capitalize()
+    if not db.States.find(arg):
+        return await event.reply(phrase.state.not_find)
+
+    if arg == voter_state:
+        return await event.reply(phrase.state.recognize_self)
+
+    target = db.State(arg)
+    if not target.recognition_pending:
+        return await event.reply(phrase.state.recognize_no_pending)
+    if voter_state in target.recognition_votes:
+        return await event.reply(phrase.state.recognize_already)
+
+    votes = target.recognition_votes
+    votes.append(voter_state)
+    target.change("recognition_votes", votes)
+
+    return await event.reply(
+        phrase.state.recognize_ok.format(voter=voter_state, target=arg),
+    )
+
+
+@func.new_command(r"/г признать$")
+async def state_recognize_empty(event: Message) -> Message:
+    return await event.reply(phrase.state.recognize_no_name)
+
+
+@func.new_command(r"/г статус\s(.+)")
+async def state_status(event: Message) -> Message:
+    arg: str = event.pattern_match.group(1).strip().capitalize()
+    if not db.States.find(arg):
+        return await event.reply(phrase.state.not_find)
+
+    state = db.State(arg)
+    total = db.States.count()
+    other_count = max(total - 1, 1)
+
+    if state.is_recognized:
+        status = phrase.state.status_recognized
+    elif state.recognition_pending:
+        status = phrase.state.status_pending
+    else:
+        status = phrase.state.status_not_recognized
+
+    voters = ", ".join(state.recognition_votes) if state.recognition_votes else "Нет"
+
+    return await event.reply(
+        phrase.state.status_info.format(
+            name=arg,
+            status=status,
+            votes=len(state.recognition_votes),
+            total=other_count,
+            money=state.money,
+            type=phrase.state_types[state.type],
+            voters=voters,
+        ),
+    )
+
+
+@func.new_command(r"/г статус$")
+async def state_status_empty(event: Message) -> Message:
+    return await event.reply(phrase.state.status_no_name)

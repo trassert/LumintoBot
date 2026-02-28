@@ -366,6 +366,20 @@ class State:
         self.author = data["author"]
         self.coordinates = data["coordinates"]
         self.money = data["money"]
+        self.recognition_votes = data.get("recognition_votes", [])
+        self.recognition_pending = data.get("recognition_pending", False)
+
+    @property
+    def is_recognized(self) -> bool:
+        """Государство признано, если выполнено любое из условий."""
+        if self.type >= 1:
+            return True
+        if self.money >= 500:
+            return True
+        total = States.count()
+        if total > 1 and len(self.recognition_votes) / (total - 1) > 0.5:
+            return True
+        return False
 
     def change(self, key, value):
         self.all[key] = value
@@ -441,6 +455,10 @@ class States:
             if self in data["players"]:
                 return file.stem
         return False
+
+    def count() -> int:
+        """Количество существующих государств."""
+        return sum(1 for f in pathes.states.iterdir() if f.suffix == ".json")
 
     def find(self: str) -> bool:
         return (pathes.states / f"{self}.json").exists()
