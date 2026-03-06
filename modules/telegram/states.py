@@ -184,7 +184,10 @@ async def state_enter(event: Message) -> Message:
 @func.new_command(r"/госво(.*)")
 @func.new_command(r"/государство(.*)")
 async def state_get(event: Message):
-    arg: str = event.pattern_match.group(1).strip().capitalize()
+    try:
+        arg: str = event.pattern_match.group(1).strip().capitalize()
+    except IndexError:
+        arg = ""
 
     if not arg:
         state_name = db.States.if_player(event.sender_id) or db.States.if_author(
