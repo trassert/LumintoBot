@@ -17,7 +17,7 @@ logger.info(f"Загружен модуль {__name__}!")
 
 def _load_json_sync(filepath: Path) -> dict:
     """Загружает JSON файл синхронно. Возвращает {} при ошибке."""
-    with open(filepath, "rb") as f:
+    with filepath.open("rb") as f:
         raw = f.read()
     return orjson.loads(raw) if raw else {}
 
@@ -35,7 +35,7 @@ def _save_json_sync(
         options |= orjson.OPT_SORT_KEYS
     if indent:
         options |= orjson.OPT_INDENT_2
-    with open(filepath, "wb") as f:
+    with filepath.open("wb") as f:
         f.write(orjson.dumps(data, option=options))
 
 

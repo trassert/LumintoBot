@@ -47,7 +47,8 @@ select = [
     "RET",
     "FURB",
     "FLY",
-    "TRY"
+    "TRY",
+    "PTH",
 ]
 ignore = []
 fixable = ["ALL"]
