@@ -85,7 +85,7 @@ async def ping(event: Message) -> Message:
             else:
                 pings = formatter.parse_pings_strict(resp)
                 extra_pings.append(
-                    f"🌐 : Пинг сервера ↑|≈|↓ - {max(pings)}|{sum(pings) // len(pings)}|{min(pings)} мс"
+                    f"🌐 : Пинг сервера ↑|≈|↓ - {max(pings)} | {sum(pings) // len(pings)} | {min(pings)} мс"
                 )
         except Exception:
             extra_pings.append("🌐 : Пинг сервера - ошибка")
