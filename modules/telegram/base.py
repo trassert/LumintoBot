@@ -77,8 +77,16 @@ async def ping(event: Message) -> Message:
         "full",
     ]:
         try:
-            ms: int = round((await aioping.ping("yandex.ru")) * 1000)
-            extra_pings.append(f"🌐 : Пинг сервера - {ms} мс")
+            async with mcrcon.Vanilla as rcon:
+                resp = formatter.rm_colors(await rcon.send("ping @a"))
+            if "ms" not in resp:
+                ms: int = round((await aioping.ping("yandex.ru")) * 1000)
+                extra_pings.append(f"🌐 : Пинг сервера - {ms} мс")
+            else:
+                pings = formatter.parse_pings_strict(resp)
+                extra_pings.append(
+                    f"🌐 : Пинг сервера ↑|≈|↓ - {max(pings)}|{sum(pings) // len(pings)}|{min(pings)} мс"
+                )
         except Exception:
             extra_pings.append("🌐 : Пинг сервера - ошибка")
 
