@@ -457,7 +457,7 @@ async def state_kick_user(event: Message) -> Message:
     if user_id is None:
         msg_id = func.get_reply_message_id(event)
         if not msg_id:
-            return await event.reply(phrase.player_not_in)
+            return await event.reply(phrase.state.player_not_in)
         user_id = await func.get_author_by_msgid(event.chat_id, msg_id)
 
     state = db.State(state_name)
@@ -607,3 +607,34 @@ async def state_status(event: Message) -> Message:
 @func.new_command(r"/г статус$")
 async def state_status_empty(event: Message) -> Message:
     return await event.reply(phrase.state.status_no_name)
+
+
+@func.new_command(r"/г передать(.*)")
+async def state_transfer(event: Message) -> Message:
+    state_name = db.States.if_author(event.sender_id)
+    if not state_name:
+        return await event.reply(phrase.state.not_a_author)
+    try:
+        user_id = await func.get_id(event.pattern_match.group(1).strip())
+    except Exception:
+        msg_id = func.get_reply_message_id(event)
+        if not msg_id:
+            return await event.reply(phrase.state.invalid_new)
+        user_id = await func.get_author_by_msgid(event.chat_id, msg_id)
+    nick = await func.get_name(user_id, minecraft=True)
+    if nick is None:
+        return await event.reply(phrase.state.new_not_connected)
+    if db.States.if_player(user_id) or db.States.if_author(user_id):
+        return await event.reply(phrase.state.new_already_player)
+    return await event.reply(
+        phrase.state.transfer.format(
+            new_leader=nick,
+            state=state_name,
+        ),
+        buttons=[
+            KeyboardButtonCallback(
+                text=phrase.state.button_transfer,
+                data=f"state.mv.{state_name}.{user_id}".encode(),
+            ),
+        ],
+    )

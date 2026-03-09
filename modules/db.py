@@ -438,7 +438,7 @@ class States:
 
         return dict(sorted(all_data.items(), key=key_func, reverse=True))
 
-    def if_author(self: int):
+    def if_author(self: int) -> str | bool:
         for file in pathes.states.iterdir():
             if file.suffix != ".json":
                 continue

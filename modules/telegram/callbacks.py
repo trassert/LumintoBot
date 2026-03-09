@@ -233,6 +233,26 @@ async def state_callback(event: events.CallbackQuery.Event):
                 reply_to=config.chats.topics.rp,
             )
 
+        case "mv":
+            state_name = db.States.if_author(sender_id)
+            if state_name != data[2]:
+                return await event.answer(phrase.state.not_a_author, alert=True)
+            db.State(state_name).change("author", int(data[3]))
+            await event.answer(
+                phrase.state.transfer_ok.format(
+                    new_leader=db.nicks(id=int(data[3])).get(),
+                    state=state_name,
+                ),
+                alert=True
+            )
+            return await client.send_message(
+                entity=config.chats.chat,
+                message=phrase.state.transfer_rp.format(
+                    state=state_name,
+                    new_leader=await func.get_name(int(data[3]), minecraft=True),
+                ),
+                reply_to=config.chats.topics.rp,
+            )
 
 @client.on(events.CallbackQuery(func=func.checks, pattern=r"^casino"))
 async def casino_callback(event: events.CallbackQuery.Event):
