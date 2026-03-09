@@ -30,7 +30,7 @@ async def get_name(id, push=False, minecraft=False, log=False) -> str | None:
     id = int(id)
 
     if minecraft:
-        nick = db.nicks(id=id).get()
+        nick = await db.Nicks(id=id).get()
         return f"[{nick}](tg://user?id={id})" if nick else None
 
     try:

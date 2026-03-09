@@ -33,7 +33,7 @@ async def do_ticket(event: Message):
             ),
         )
     await db.add_money(event.sender_id, -arg)
-    ticket_id = db.ticket.add(event.sender_id, arg)
+    ticket_id = await db.Ticket.add(event.sender_id, arg)
     return await event.reply(
         phrase.ticket.added.format(
             value=arg,
@@ -52,11 +52,11 @@ async def get_ticket(event: Message):
     arg = event.pattern_match.group(1).strip()
     if arg == "":
         return await event.reply(phrase.ticket.no_value)
-    ticket_info = db.ticket.get(arg)
+    ticket_info = await db.Ticket.get(arg)
     if ticket_info is None:
         return await event.reply(phrase.ticket.no_such)
     await db.add_money(event.sender_id, ticket_info["value"])
-    db.ticket.delete(arg)
+    await db.Ticket.delete(arg)
     return await event.reply(
         phrase.ticket.got.format(
             author=await func.get_name(ticket_info["author"]),

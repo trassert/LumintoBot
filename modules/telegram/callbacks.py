@@ -108,7 +108,7 @@ async def state_callback(event: events.CallbackQuery.Event):
 
     match data[1]:
         case "pay":
-            nick = db.nicks(id=sender_id).get()
+            nick = await db.Nicks(id=sender_id).get()
             if nick is None:
                 return await event.answer(phrase.state.not_connected, alert=True)
             if db.States.if_player(sender_id) is not False:
@@ -240,10 +240,10 @@ async def state_callback(event: events.CallbackQuery.Event):
             db.State(state_name).change("author", int(data[3]))
             await event.answer(
                 phrase.state.transfer_ok.format(
-                    new_leader=db.nicks(id=int(data[3])).get(),
+                    new_leader=await db.Nicks(id=int(data[3])).get(),
                     state=state_name,
                 ),
-                alert=True
+                alert=True,
             )
             return await client.send_message(
                 entity=config.chats.chat,
@@ -253,6 +253,7 @@ async def state_callback(event: events.CallbackQuery.Event):
                 ),
                 reply_to=config.chats.topics.rp,
             )
+
 
 @client.on(events.CallbackQuery(func=func.checks, pattern=r"^casino"))
 async def casino_callback(event: events.CallbackQuery.Event):
@@ -323,7 +324,7 @@ async def nick_callback(event: events.CallbackQuery.Event):
     if not _ensure_owner(sender_id, data[2]):
         return await event.answer(phrase.not_for_you)
 
-    old_nick = db.nicks(id=sender_id).get()
+    old_nick = await db.Nicks(id=sender_id).get()
     if old_nick == data[1]:
         return await event.answer(phrase.nick.already_you, alert=True)
 
@@ -342,7 +343,7 @@ async def nick_callback(event: events.CallbackQuery.Event):
         logger.error("Внутренняя ошибка при управлении белым списком")
         return await event.answer(phrase.nick.error, alert=True)
 
-    db.nicks(data[1], sender_id).link()
+    await db.Nicks(data[1], sender_id).link()
     user_name = await func.get_name(sender_id)
     return await event.reply(
         phrase.nick.buy_nick.format(
@@ -381,7 +382,7 @@ async def shop_callback(event: events.CallbackQuery.Event):
     if int(data[-1]) != await db.shop_version():
         return await event.answer(phrase.shop.old, alert=True)
 
-    nick = db.nicks(id=sender_id).get()
+    nick = await db.Nicks(id=sender_id).get()
     if nick is None:
         return await event.answer(phrase.nick.not_append, alert=True)
 

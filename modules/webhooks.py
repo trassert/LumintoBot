@@ -53,7 +53,7 @@ async def server():
                 text="Переданные данные не прошли проверку.",
                 status=401,
             )
-        tg_id = db.nicks(nick=nick).get()
+        tg_id = await db.Nicks(nick=nick).get()
         if tg_id is not None:
             await db.add_money(tg_id, 10)
             await db.add_votes(tg_id, 1)
@@ -86,7 +86,7 @@ async def server():
                 text="Переданные данные не прошли проверку.",
                 status=401,
             )
-        tg_id = db.nicks(nick=username).get()
+        tg_id = await db.Nicks(nick=username).get()
         if tg_id is not None:
             await db.add_money(tg_id, 10)
             await db.add_votes(tg_id, 1)
@@ -110,7 +110,7 @@ async def server():
         if formatter.is_valid_mc_nick(nick) is False:
             return aiohttp.web.Response(text="Nick is not valid", status=406)
         # message = request.query.get('message') Для будущих нужд
-        db.statistic.add(nick)
+        await db.Statistic.add(nick)
         logger.debug(f"+ соо. от {nick}")
         return aiohttp.web.Response(text="ok")
 
@@ -118,7 +118,7 @@ async def server():
         if request.query.get("key") != config.tokens.bankplugin:
             logger.warning("Неверный пароль (BankPlugin)")
             return aiohttp.web.Response(text="Неверный пароль.", status=401)
-        playerid = db.nicks(nick=request.query.get("player")).get()
+        playerid = await db.Nicks(nick=request.query.get("player")).get()
         if playerid is None:
             logger.warning("Неверный игрок (BankPlugin)")
             return aiohttp.web.Response(text="Неверный игрок.", status=401)

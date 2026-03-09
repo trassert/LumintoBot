@@ -31,9 +31,9 @@ async def update_shop():
 
 async def rewards():
     logger.info("Начисление подарков за активность..")
-    day_stat = db.statistic().get_all()
+    day_stat = await db.Statistic().get_all()
     for top in day_stat:
-        tg_id = db.nicks(nick=top[0]).get()
+        tg_id = await db.Nicks(nick=top[0]).get()
         if tg_id is not None:
             await db.add_money(tg_id, config.cfg.ActiveGift)
             logger.info(f"Начислен подарок за активность {top[0]}")

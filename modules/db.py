@@ -199,12 +199,12 @@ class Crorostat:
         if id:
             self.id = str(id)
 
-    def get(self):
-        data = _load_json_sync(pathes.crocostat)
+    async def get(self):
+        data = await _load_json_async(pathes.crocostat)
         if self.id in data:
             return data[self.id]
         data[self.id] = 0
-        _save_json_sync(pathes.crocostat, data, sort_keys=True)
+        await _save_json_async(pathes.crocostat, data, sort_keys=True)
         return 0
 
     async def add(self):
@@ -217,53 +217,53 @@ class Crorostat:
         return dict(sorted(data.items(), key=lambda item: item[1], reverse=True))
 
 
-class nicks:
+class Nicks:
     def __init__(self, nick=None, id=None):
         self.nick = nick
         self.id = id
 
-    def get(self, if_nothing=None) -> str | None:
+    async def get(self, if_nothing=None) -> str | None:
         if self.nick:
-            data = _load_json_sync(pathes.nick)
+            data = await _load_json_async(pathes.nick)
             nick_lower = self.nick.lower()
             for key, value in data.items():
                 if key.lower() == nick_lower:
                     return value
             return if_nothing
         if self.id:
-            data = _load_json_sync(pathes.nick)
+            data = await _load_json_async(pathes.nick)
             for key, value in data.items():
                 if value == self.id:
                     return key
             return if_nothing
         return if_nothing
 
-    def get_all(self):
-        data = _load_json_sync(pathes.nick)
+    async def get_all(self):
+        data = await _load_json_async(pathes.nick)
         return dict(sorted(data.items()))
 
-    def link(self):
-        data = _load_json_sync(pathes.nick)
+    async def link(self):
+        data = await _load_json_async(pathes.nick)
         keys_to_remove = [k for k, v in data.items() if v == self.id]
         for k in keys_to_remove:
             del data[k]
         data[self.nick] = int(self.id)
-        _save_json_sync(pathes.nick, data, indent=True)
+        await _save_json_async(pathes.nick, data, indent=True)
         return True
 
 
-class statistic:
+class Statistic:
     def __init__(self, days=1):
         self.days = days
 
-    def get(self, nick, all_days=False, data=False):
+    async def get(self, nick, all_days=False, data=False):
         filepath = pathes.stats / f"{nick}.json"
         if not filepath.exists():
             stats = {datetime.now().strftime("%Y.%m.%d"): 0}
-            _save_json_sync(filepath, stats, sort_keys=True)
+            await _save_json_async(filepath, stats, sort_keys=True)
             return 0
 
-        stats = _load_json_sync(filepath)
+        stats = await _load_json_async(filepath)
         if all_days:
             return sum(stats.values()) or 0
 
@@ -275,35 +275,35 @@ class statistic:
         }
         return filtered if data else sum(filtered.values()) or 0
 
-    def get_all(self, all_days=False):
+    async def get_all(self, all_days=False):
         data = {}
         for file in pathes.stats.iterdir():
             if file.suffix != ".json":
                 continue
             nick = file.stem
-            nick_stat = self.get(nick, all_days=all_days)
+            nick_stat = await self.get(nick, all_days=all_days)
             if nick_stat > 1:
                 data[nick] = nick_stat
         return sorted(data.items(), key=lambda item: item[1], reverse=True)
 
-    def add(self, date=None):
+    async def add(self, date=None):
         now = date or datetime.now().strftime("%Y.%m.%d")
         filepath = pathes.stats / f"{self}.json"
         try:
-            stats = _load_json_sync(filepath)
+            stats = await _load_json_async(filepath)
         except FileNotFoundError:
             stats = {}
         stats[now] = stats.get(now, 0) + 1
-        _save_json_sync(filepath, stats, sort_keys=True)
+        await _save_json_async(filepath, stats, sort_keys=True)
 
-    def get_raw(self) -> dict[str, int]:
+    async def get_raw(self) -> dict[str, int]:
         totals = defaultdict(int)
         for json_file in pathes.stats.iterdir():
             if json_file.suffix != ".json":
                 continue
             filepath = json_file
             try:
-                data = _load_json_sync(filepath)
+                data = await _load_json_async(filepath)
                 for date, count in data.items():
                     totals[date] += count
             except Exception:
@@ -321,31 +321,31 @@ class statistic:
         }
 
 
-class ticket:
-    def get(self):
+class Ticket:
+    async def get(self):
         self = str(self)
         if not pathes.tickets.exists():
-            _save_json_sync(pathes.tickets, {})
+            await _save_json_async(pathes.tickets, {})
             return None
-        data = _load_json_sync(pathes.tickets)
+        data = await _load_json_async(pathes.tickets)
         return data.get(self)
 
-    def add(self, value):
-        data = _load_json_sync(pathes.tickets)
+    async def add(self, value):
+        data = await _load_json_async(pathes.tickets)
         while True:
             random_id = str(randint(1000, 9999))
             if random_id not in data:
                 break
         data[random_id] = {"author": int(self), "value": int(value)}
-        _save_json_sync(pathes.tickets, data, indent=True)
+        await _save_json_async(pathes.tickets, data, indent=True)
         return random_id
 
-    def delete(self):
-        data = _load_json_sync(pathes.tickets)
+    async def delete(self):
+        data = await _load_json_async(pathes.tickets)
         if self not in data:
             return None
         del data[self]
-        _save_json_sync(pathes.tickets, data, indent=True)
+        await _save_json_async(pathes.tickets, data, indent=True)
         return True
 
 

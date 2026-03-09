@@ -120,13 +120,13 @@ async def profile(event: Message) -> Message:
         state_player: str | bool = db.States.if_player(user_id)
         state_info = state_player or "Не состоит в государстве"
 
-    nick: str = db.nicks(id=user_id).get() or "Не привязан"
+    nick: str = await db.Nicks(id=user_id).get() or "Не привязан"
 
     if nick != "Не привязан":
-        m_day: int = db.statistic(1).get(nick)
-        m_week: int = db.statistic(7).get(nick)
-        m_month: int = db.statistic(30).get(nick)
-        m_all: int = db.statistic().get(nick, all_days=True)
+        m_day: int = await db.Statistic(1).get(nick)
+        m_week: int = await db.Statistic(7).get(nick)
+        m_month: int = await db.Statistic(30).get(nick)
+        m_all: int = await db.Statistic().get(nick, all_days=True)
 
         try:
             async with mcrcon.Vanilla as rcon:
@@ -225,12 +225,12 @@ async def check_nick(event: Message) -> Message:
         )
 
     if user_id is None:
-        author_nick: str = db.nicks(id=event.sender_id).get()
+        author_nick: str = await db.Nicks(id=event.sender_id).get()
         if author_nick is None:
             return await event.reply(phrase.nick.who)
         return await event.reply(phrase.nick.urnick.format(author_nick))
 
-    nick: str = db.nicks(id=user_id).get()
+    nick: str = await db.Nicks(id=user_id).get()
     return await event.reply(
         phrase.nick.no_nick if nick is None else phrase.nick.usernick.format(nick),
     )
@@ -307,7 +307,7 @@ async def swap_money(event: Message) -> Message:
 async def money_to_server(event: Message) -> Message:
     """Выводит валюту из бота на игровой сервер (выдача предметами)."""
     user_id: int = event.sender_id
-    nick: str = db.nicks(id=user_id).get()
+    nick: str = await db.Nicks(id=user_id).get()
 
     if nick is None:
         return await event.reply(phrase.nick.not_append)
@@ -397,10 +397,10 @@ async def link_nick(event: Message) -> Message:
     if formatter.is_valid_mc_nick(nick) is False:
         return await event.reply(phrase.nick.invalid)
 
-    current_linked_nick = db.nicks(id=sender_id).get()
+    current_linked_nick = await db.Nicks(id=sender_id).get()
     if current_linked_nick == nick:
         return await event.reply(phrase.nick.already_you)
-    if db.nicks(nick=nick).get() is not None:
+    if await db.Nicks(nick=nick).get() is not None:
         return await event.reply(phrase.nick.taken)
 
     if current_linked_nick is not None:
@@ -442,7 +442,7 @@ async def link_nick(event: Message) -> Message:
                 pass
 
     await db.add_money(sender_id, config.cfg.LinkGift)
-    db.nicks(nick, sender_id).link()
+    await db.Nicks(nick, sender_id).link()
 
     await event.reply(
         phrase.nick.success.format(
@@ -524,7 +524,7 @@ async def vote(event: Message) -> Message:
 async def check_info_by_nick(event: Message) -> Message:
     """Ищет Telegram-профиль и статус игрока по его Minecraft нику."""
     nick: str = event.pattern_match.group(1).strip()
-    user_id: int = db.nicks(nick=nick).get()
+    user_id: int = await db.Nicks(nick=nick).get()
 
     if user_id is None:
         return await event.reply(phrase.nick.not_find)

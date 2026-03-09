@@ -29,8 +29,8 @@ async def active_check(event: Message):
         except ValueError:
             days = 1
 
-    stat = db.statistic(days=days)
-    all_data = stat.get_all(all_days=(days == 0))
+    stat = db.Statistic(days=days)
+    all_data = await stat.get_all(all_days=(days == 0))
 
     if not all_data:
         return await event.reply(phrase.stat.empty)
@@ -52,7 +52,7 @@ async def active_check(event: Message):
 
     send_chart = (days == 0) or (days >= 7)
     if send_chart:
-        chart.create_plot(stat.get_raw())
+        chart.create_plot(await stat.get_raw())
         return await client.send_file(event.chat_id, pathes.chart, caption=caption)
     return await event.respond(caption)
 

@@ -99,7 +99,7 @@ async def state_make(event: Message) -> Message:
     ):
         return await event.reply(phrase.state.not_valid)
 
-    if db.nicks(id=event.sender_id).get() is None:
+    if await db.Nicks(id=event.sender_id).get() is None:
         return await event.reply(phrase.state.not_connected)
     if db.States.if_author(event.sender_id):
         return await event.reply(phrase.state.already_author)
@@ -142,7 +142,7 @@ async def state_enter(event: Message) -> Message:
     if not db.States.find(arg):
         return await event.reply(phrase.state.not_find)
 
-    nick = db.nicks(id=event.sender_id).get()
+    nick = await db.Nicks(id=event.sender_id).get()
     if not nick:
         return await event.reply(phrase.state.not_connected)
 
@@ -224,7 +224,7 @@ async def state_get(event: Message):
             type=phrase.state_types[state.type],
             name=state.name,
             money=formatter.value_to_str(int(state.money), phrase.currency),
-            author=db.nicks(id=state.author).get(),
+            author=await db.Nicks(id=state.author).get(),
             enter=enter_val,
             recognition=recognition_val,
             desc=state.desc,
@@ -260,7 +260,7 @@ async def state_leave(event: Message) -> Message:
         entity=config.chats.chat,
         message=phrase.state.leave_player.format(
             state=name_cap,
-            player=db.nicks(id=event.sender_id).get(),
+            player=await db.Nicks(id=event.sender_id).get(),
         ),
         reply_to=config.chats.topics.rp,
     )

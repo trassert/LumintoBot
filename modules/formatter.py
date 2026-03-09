@@ -81,6 +81,5 @@ def is_valid_mc_nick(nick: str) -> bool:
     return bool(re.fullmatch(r"[a-zA-Z0-9_]{3,16}", nick))
 
 
-
 def parse_pings_strict(text: str) -> list[int]:
     return [int(x) for x in re.findall(r"- (\d+)ms", text)]
