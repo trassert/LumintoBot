@@ -6,11 +6,11 @@
 ![Visual Studio Code](https://img.shields.io/badge/Visual%20Studio%20Code-0078d7.svg?style=for-the-badge&logo=visual-studio-code&logoColor=white)
 ![MariaDB](https://img.shields.io/badge/MariaDB-003545?style=for-the-badge&logo=mariadb&logoColor=white)
 
-![Issues](https://img.shields.io/github/issues-raw/trassert/LumintoBot?color=c78aff&label=issues&style=for-the-badge)
-![Contributors](https://img.shields.io/github/contributors/trassert/LumintoBot?color=c78aff&label=contributors&style=for-the-badge)
-![Lines](https://img.shields.io/endpoint?url=https://ghloc.vercel.app/api/trassert/LumintoBot/badge?style=flat&logoColor=white&color=c78aff&style=for-the-badge)
-![Commit Activity](https://img.shields.io/github/commit-activity/m/trassert/LumintoBot?color=c78aff&label=commits&style=for-the-badge)
-![Last Commit](https://img.shields.io/github/last-commit/trassert/LumintoBot?color=c78aff&label=last%20commit&style=for-the-badge)
+![Issues](https://img.shields.io/github/issues-raw/trassert/Luminto?color=c78aff&label=issues&style=for-the-badge)
+![Contributors](https://img.shields.io/github/contributors/trassert/Luminto?color=c78aff&label=contributors&style=for-the-badge)
+![Lines](https://img.shields.io/endpoint?url=https://ghloc.vercel.app/api/trassert/Luminto/badge?style=flat&logoColor=white&color=c78aff&style=for-the-badge)
+![Commit Activity](https://img.shields.io/github/commit-activity/m/trassert/Luminto?color=c78aff&label=commits&style=for-the-badge)
+![Last Commit](https://img.shields.io/github/last-commit/trassert/Luminto?color=c78aff&label=last%20commit&style=for-the-badge)
 
 # Luminto - бот сервера
 
@@ -18,7 +18,7 @@
 
 ## Функционал бота
 
-[**Команды описаны тут**](https://github.com/trassert/LumintoGold/wiki)
+[**Команды описаны тут**](https://github.com/trassert/Luminto/wiki)
 
 
 При копировании модулей бота или бота целиком, указывайте авторство, см. лицензию.  
