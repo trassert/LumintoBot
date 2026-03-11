@@ -3,8 +3,8 @@ import logging
 from sys import stderr
 
 import aiofiles
-from loguru import logger
 from aiohttp.abc import AbstractAccessLogger
+from loguru import logger
 
 from . import pathes
 
@@ -60,7 +60,7 @@ class AccessLogger(AbstractAccessLogger):
         self.logger.info(
             f"{request.remote} - "
             f'{request.method} "{request.path}": '
-            f"{response.status} | {round(time, 2)}s",
+            f"{response.status} | {round(time, 1)}s",
         )
 
     @property

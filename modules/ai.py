@@ -11,6 +11,7 @@ from . import config, pathes, phrase
 
 logger.info(f"Загружен модуль {__name__}!")
 
+
 class AI:
     def __init__(
         self,

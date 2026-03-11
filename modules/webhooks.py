@@ -1,5 +1,4 @@
 import asyncio
-import logging
 from hashlib import md5, sha1
 from typing import cast
 
@@ -7,7 +6,7 @@ import aiohttp
 import aiohttp.web
 from loguru import logger
 
-from . import config, db, formatter, phrase, log
+from . import config, db, formatter, log, phrase
 from .telegram import func
 from .telegram.client import client
 
@@ -165,11 +164,12 @@ async def server():
                     ),
                     phrase.github.new.format(
                         repo=repo.get("name"),
-                        type="Приватный" if repo.get("private") is True else "Публичный",
+                        type="Приватный"
+                        if repo.get("private") is True
+                        else "Публичный",
                         url=repo.get("html_url"),
                         author=sender.get("login"),
-                        author_url=sender.get("html_url")
-
+                        author_url=sender.get("html_url"),
                     ),
                     link_preview=False,
                     reply_to=repos.get(load["repository"]["name"], {}).get(
