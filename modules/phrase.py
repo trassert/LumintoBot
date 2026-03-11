@@ -666,7 +666,7 @@ class cities:
 
 class github:
     update = (
-        "**🎉 : {repo} получил обновление!**\n"
+        "**🎉 : {repo}{branch} получил обновление!**\n"
         "\n"
         "👨🏻‍💻 : Автор: **{author}**\n"
         "💬 : {message}\n"

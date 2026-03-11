@@ -126,17 +126,18 @@ async def server():
 
     async def github(request: aiohttp.web.Request):
         load: dict[str] = cast(dict[str], await request.json())
-        logger.info(load)
         commits = load.get("commits", None)
         if commits is not None:
             for head in commits:
                 logger.info(f"Обновление! Репо {load['repository']['name']}")
+                branch = load.get("ref").split("/")[-1]
                 await client.send_message(
                     repos.get(load["repository"]["name"], {}).get(
                         "chat",
                         config.chats.chat,
                     ),
                     phrase.github.update.format(
+                        branch=f" ({branch})" if branch != "master" else "",
                         author=f"[{head['author']['name']}](https://github.com/{head['author']['name']})",
                         message=head["message"],
                         changes=f"**[Что изменилось?]({head['url']})**"
