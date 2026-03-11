@@ -4,6 +4,7 @@ from sys import stderr
 
 import aiofiles
 from loguru import logger
+from aiohttp.abc import AbstractAccessLogger
 
 from . import pathes
 
@@ -52,3 +53,16 @@ async def buy(nick: str, item: str, value: str):
         "a",
     ) as f:
         await f.write(f"{nick}|{item}-{value}\n")
+
+
+class AccessLogger(AbstractAccessLogger):
+    def log(self, request, response, time):
+        self.logger.info(
+            f"{request.remote} - "
+            f'{request.method} "{request.path}": '
+            f"{response.status} | {round(time, 2)}s",
+        )
+
+    @property
+    def enabled(self):
+        return self.logger.isEnabledFor(logging.INFO)

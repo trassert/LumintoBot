@@ -5,27 +5,13 @@ from typing import cast
 
 import aiohttp
 import aiohttp.web
-from aiohttp.abc import AbstractAccessLogger
 from loguru import logger
 
-from . import config, db, formatter, phrase
+from . import config, db, formatter, phrase, log
 from .telegram import func
 from .telegram.client import client
 
 logger.info(f"Загружен модуль {__name__}!")
-
-
-class AccessLogger(AbstractAccessLogger):
-    def log(self, request, response, time):
-        self.logger.info(
-            f"{request.remote} - "
-            f'{request.method} "{request.path}": '
-            f"{response.status} | {round(time, 2)}s",
-        )
-
-    @property
-    def enabled(self):
-        return self.logger.isEnabledFor(logging.INFO)
 
 
 repos = {
@@ -204,7 +190,7 @@ async def server():
             aiohttp.web.get("/", status),
         ],
     )
-    runner = aiohttp.web.AppRunner(app, access_log_class=AccessLogger)
+    runner = aiohttp.web.AppRunner(app, access_log_class=log.AccessLogger)
     try:
         await runner.setup()
         ipv4 = aiohttp.web.TCPSite(runner, "127.0.0.1", 5000)
