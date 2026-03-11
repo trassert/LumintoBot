@@ -673,8 +673,12 @@ class github:
         "\n"
         "{changes}"
     )
-    bot = "**🎉 : Обновление бота**\n\n👨🏻‍💻 : Автор: **{author}**\n💬 : {message}\n"
-    mod = "**🎉 : Обновление мод-пака**\n\n👨🏻‍💻 : Автор: **{author}**\n💬 : {message}\n\n**[Что изменилось?]({link})**"
+    new = (
+        "**🆕 : Новый проект - [{repo}]({url})**\n"
+        "\n"
+        "👨🏻‍💻 : Автор: **[{author}]({author_url})**\n"
+        "🗂 : Тип: **{type}**"
+    )
 
 
 class port:

@@ -1,6 +1,7 @@
 import asyncio
 import logging
 from hashlib import md5, sha1
+from typing import cast
 
 import aiohttp
 import aiohttp.web
@@ -138,32 +139,59 @@ async def server():
         return aiohttp.web.Response(text="ok")
 
     async def github(request: aiohttp.web.Request):
-        load: dict = await request.json()
-        commits = load.get("commits")
-        if commits is None:
-            return aiohttp.web.Response(text="Неверный запрос", status=400)
-        for head in commits:
-            logger.info(f"Обновление! Репо {load['repository']['name']}")
-            await client.send_message(
-                repos.get(load["repository"]["name"], {}).get(
-                    "chat",
-                    config.chats.chat,
-                ),
-                phrase.github.update.format(
-                    author=f"[{head['author']['name']}](https://github.com/{head['author']['name']})",
-                    message=head["message"],
-                    changes=f"**[Что изменилось?]({head['url']})**"
-                    if load["repository"]["private"] is False
-                    else "",
-                    repo=f"[{load['repository']['name']}](https://github.com/{load['repository']['full_name']})",
-                ),
-                link_preview=False,
-                reply_to=repos.get(load["repository"]["name"], {}).get(
-                    "topic",
-                    config.chats.topics.updates,
-                ),
-            )
-        return aiohttp.web.Response(text="ok")
+        load: dict[str] = cast(dict[str], await request.json())
+        logger.info(load)
+        commits = load.get("commits", None)
+        if commits is not None:
+            for head in commits:
+                logger.info(f"Обновление! Репо {load['repository']['name']}")
+                await client.send_message(
+                    repos.get(load["repository"]["name"], {}).get(
+                        "chat",
+                        config.chats.chat,
+                    ),
+                    phrase.github.update.format(
+                        author=f"[{head['author']['name']}](https://github.com/{head['author']['name']})",
+                        message=head["message"],
+                        changes=f"**[Что изменилось?]({head['url']})**"
+                        if load["repository"]["private"] is False
+                        else "",
+                        repo=f"[{load['repository']['name']}](https://github.com/{load['repository']['full_name']})",
+                    ),
+                    link_preview=False,
+                    reply_to=repos.get(load["repository"]["name"], {}).get(
+                        "topic",
+                        config.chats.topics.updates,
+                    ),
+                )
+            return aiohttp.web.Response(text="ok")
+        hook = load.get("hook", None)
+        if hook is not None:
+            if hook.get("type", None) == "Repository":
+                repo = load.get("repository")
+                sender = load.get("sender")
+                logger.info(f"Новое репо - {load['repository']['name']}")
+                await client.send_message(
+                    repos.get(load["repository"]["name"], {}).get(
+                        "chat",
+                        config.chats.chat,
+                    ),
+                    phrase.github.new.format(
+                        repo=repo.get("name"),
+                        type="Приватный" if repo.get("private") is True else "Публичный",
+                        url=repo.get("html_url"),
+                        author=sender.get("login"),
+                        author_url=sender.get("html_url")
+
+                    ),
+                    link_preview=False,
+                    reply_to=repos.get(load["repository"]["name"], {}).get(
+                        "topic",
+                        config.chats.topics.updates,
+                    ),
+                )
+            return aiohttp.web.Response(text="ok")
+        return aiohttp.web.Response(text="Неверный запрос", status=400)
 
     app = aiohttp.web.Application()
     app.add_routes(
