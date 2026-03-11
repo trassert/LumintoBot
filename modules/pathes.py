@@ -1,5 +1,7 @@
 from pathlib import Path
 
+ai = Path("db") / "ai" / "history.json"
+
 # Конфиг
 config = Path("configs")
 db = Path("db")

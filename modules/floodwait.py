@@ -20,7 +20,7 @@ class FloodWaitBase:
         self.timer = timer
         self.exit_multiplier = exit_multiplier
 
-    def request(self):
+    def request(self) -> int | bool:
         now = time()
         elapsed = now - self.time
         if elapsed >= self.timer:  # Разрешать сразу, если прошло достаточно
@@ -35,3 +35,4 @@ class FloodWaitBase:
 
 WaitCasino = FloodWaitBase("WaitCasino", config.cfg.Flood.Casino)
 WaitPic = FloodWaitBase("WaitPic", config.cfg.Flood.Pic, exit_multiplier=1)
+WaitAI = FloodWaitBase("WaitAI", config.cfg.Flood.AI, exit_multiplier=1)

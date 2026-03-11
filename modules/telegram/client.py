@@ -134,6 +134,7 @@ client.parse_mode = CustomMarkdown()
 from . import (  # noqa: E402, F401
     actions,
     admins,
+    ai,
     base,
     callbacks,
     forum,
