@@ -1,0 +1,19 @@
+input: .
+output: build
+
+url: https://lumintomc.ru/wiki # Use your website address here
+
+start:
+  # Uncomment the next line to try Retype Pro features
+  # pro: true
+
+branding:
+  title: Luminto
+  label: Wiki
+
+links:
+  - text: Телеграм-чат
+    link: https://t.me/lumintomc
+
+footer:
+  copyright: "&copy; Copyright by trassert ({{ year }}). All rights reserved."
