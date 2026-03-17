@@ -29,7 +29,9 @@ class ConfigSection(dict):
 
 
 class ConfigManager:
-    "Root. Вызывается."
+    """Root. Вызывается.
+    Пример: config.cfg.bot.token
+    """
 
     def __init__(self, path: Path):
         logger.info(f"Зарегистрирован конфиг {path}")

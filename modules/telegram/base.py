@@ -28,7 +28,7 @@ from .. import (
     sys,
 )
 from . import func
-from .client import client
+from .client import aio, client
 
 if TYPE_CHECKING:
     from telethon.tl.custom import Message
@@ -387,8 +387,8 @@ async def get_balance(event: Message) -> Message:
 @func.new_command(r"/линкник (\S+)\s*(\S*)$")
 async def link_nick(event: Message) -> Message:
     """Привязывает Minecraft ник к Telegram аккаунту и добавляет в WhiteList."""
-    if event.chat_id != config.chats.chat:
-        return await event.reply(phrase.nick.chat)
+    # if event.chat_id != config.chats.chat:
+    #    return await event.reply(phrase.nick.chat)
 
     nick: str = event.pattern_match.group(1).strip()
     ref_code: str = event.pattern_match.group(2).strip()
@@ -451,7 +451,13 @@ async def link_nick(event: Message) -> Message:
     )
     if ref_msg:
         await event.reply(ref_msg)
-    return None
+    logger.success(f"Юзер {sender_id} привязал свой ник!")
+    try:
+        return await aio.approve_chat_join_request(
+            chat_id=config.chats.chat, user_id=sender_id
+        )
+    except Exception:
+        logger.info("Игрок {sender_id} привязал ник, но заявки нет. Пропускаю...")
 
 
 @func.new_command(r"/linknick$")

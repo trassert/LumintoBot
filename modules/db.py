@@ -1,3 +1,4 @@
+import asyncio
 from collections import defaultdict
 from datetime import datetime, timedelta
 from pathlib import Path
@@ -46,6 +47,18 @@ async def _load_json_async(filepath: Path) -> dict:
     return orjson.loads(raw) if raw else {}
 
 
+_file_locks: dict[str, asyncio.Lock] = {}
+_locks_lock = asyncio.Lock()
+
+
+async def get_lock(filepath: Path) -> asyncio.Lock:
+    path_str = str(filepath.resolve())
+    async with _locks_lock:
+        if path_str not in _file_locks:
+            _file_locks[path_str] = asyncio.Lock()
+        return _file_locks[path_str]
+
+
 async def _save_json_async(
     filepath: Path,
     data: dict,
@@ -53,14 +66,16 @@ async def _save_json_async(
     indent: bool = False,
 ):
     """Сохраняет JSON файл асинхронно."""
-    filepath.parent.mkdir(parents=True, exist_ok=True)
-    options = 0
-    if sort_keys:
-        options |= orjson.OPT_SORT_KEYS
-    if indent:
-        options |= orjson.OPT_INDENT_2
-    async with aiofiles.open(filepath, "wb") as f:
-        await f.write(orjson.dumps(data, option=options))
+    lock = await get_lock(filepath)
+    async with lock:
+        filepath.parent.mkdir(parents=True, exist_ok=True)
+        options = 0
+        if sort_keys:
+            options |= orjson.OPT_SORT_KEYS
+        if indent:
+            options |= orjson.OPT_INDENT_2
+        async with aiofiles.open(filepath, "wb") as f:
+            return await f.write(orjson.dumps(data, option=options))
 
 
 async def get_money(id) -> int:

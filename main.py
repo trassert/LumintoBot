@@ -10,7 +10,7 @@ log.setup()
 async def main():
     from modules import config, db, task_gen, tasks, webhooks
     from modules.telegram import games
-    from modules.telegram.client import client
+    from modules.telegram.client import aio, client, dp
 
     await db.Users.initialize()
     await client.start(bot_token=config.tokens.bot.token)  # ty:ignore[invalid-await]
@@ -20,7 +20,7 @@ async def main():
     await task_gen.RemoveStatesTask.create(tasks.remove_states, "17:00")
     await task_gen.BackupDBTask.create(tasks.backup_db, "1:00")
     await games.crocodile_onboot()
-    await client.run_until_disconnected()
+    await dp.start_polling(aio)
 
 
 if __name__ == "__main__":

@@ -1,4 +1,6 @@
 import socks
+from aiogram import Bot, Dispatcher
+from aiogram.client.session.aiohttp import AiohttpSession
 from loguru import logger
 from telethon import TelegramClient, types
 from telethon.extensions import markdown
@@ -92,7 +94,7 @@ class CustomMarkdown:
         return markdown.unparse(text, filtered)
 
 
-def get_proxy() -> tuple:
+def get_proxy(aiogram=False) -> tuple:
     """
     Выдаёт формат прокси.
     1. Тип (SOCKS5 по умолчанию)
@@ -106,6 +108,8 @@ def get_proxy() -> tuple:
     """
     if config.tokens.proxy.enabled is False:
         return None
+    if aiogram:
+        return f"socks5://{config.tokens.proxy.login}:{config.tokens.proxy.password}@{config.tokens.proxy.host}:{config.tokens.proxy.port}"
     return (
         socks.SOCKS5,
         config.tokens.proxy.host,
@@ -130,6 +134,11 @@ client = TelegramClient(
     proxy=get_proxy(),
 )
 client.parse_mode = CustomMarkdown()
+
+aio = Bot(
+    token=config.tokens.bot.token, session=AiohttpSession(proxy=get_proxy(aiogram=True))
+)
+dp = Dispatcher()
 
 from . import (  # noqa: E402, F401
     actions,
