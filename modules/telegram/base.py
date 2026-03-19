@@ -457,7 +457,7 @@ async def link_nick(event: Message) -> Message:
             chat_id=config.chats.chat, user_id=sender_id
         )
     except Exception:
-        logger.info("Игрок {sender_id} привязал ник, но заявки нет. Пропускаю...")
+        logger.info(f"Игрок {sender_id} привязал ник, но заявки нет. Пропускаю...")
 
 
 @func.new_command(r"/linknick$")
